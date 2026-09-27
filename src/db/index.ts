@@ -10,6 +10,7 @@ export const DEFAULT_SETTINGS: AppSettings = {
   googleClientId: '',
   autoSyncDrive: false,
   ttsEnabled: true,
+  ttsVoice: 'giuseppe',
   ttsAutoExplainOnMistake: true,
   ttsAutoPlayQuestion: false,
   ttsPlaybackRate: 1.0,

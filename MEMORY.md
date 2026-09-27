@@ -58,3 +58,17 @@ Questo file costituisce la **memoria tecnica permanente** del progetto. Raccogli
 - **Quaderno Errori**: Ingresso con 1 errore (`timesWrong > 0`), promozione e uscita solo con `consecutiveCorrect >= 2`.
 - **Isolamento In-Memory**: Test di persistenza Dexie eseguiti con `fake-indexeddb/auto` senza dipendere dal DOM o dal browser reale.
 - **Comandi**: `npm run test:unit` per la suite rapida, `npm run test:coverage` per il report di copertura v8.
+
+---
+
+## 6. Motore Vocale Neurale (TTS Offline & Multi-Voce)
+- **Voci Disponibili**:
+  - `giuseppe`: Maschile, tono calmo cockpit (`it-IT-GiuseppeMultilingualNeural`, rate -5%, pitch -5Hz).
+  - `elsa`: Femminile, dizione cristallina e brillante (`it-IT-ElsaNeural`, rate +0%, pitch +0Hz).
+- **Archiviazione Segmenti Audio**:
+  - `public/audio/{voice}/{qid}_{part}.mp3` dove `part` è `q` (domanda), `1`, `2`, `3` (opzioni) ed `e` (spiegazione didattica su errore).
+  - 2.520 segmenti per ciascuna voce (504 quiz x 5 file), totale 5.040 segmenti audio.
+- **Normalizzazione Fonetica Aeronautica (`src/utils/aviationPhonetics.ts`)**:
+  - Tutti i testi passano dal normalizzatore per espansione acronimi (`D.P.R. 133/2010`, `VDS/VL`, `AeCI`, `hPa`, `FL`, `km/h`, `kt`, `m/s`).
+  - Pronuncia opzioni in stile cockpit standard: *"Uno. [testo]"*, *"Due. [testo]"*, *"Tre. [testo]"*.
+- **Persistenza & Switch**: Selezione della voce salvata in Dexie (`settings.ttsVoice: 'giuseppe' | 'elsa'`) e commutabile istantaneamente dalle impostazioni.

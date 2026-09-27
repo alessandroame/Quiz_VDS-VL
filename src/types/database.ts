@@ -43,6 +43,7 @@ export interface AppSettings {
   autoSyncDrive: boolean;
   lastDriveSyncAt?: number;
   ttsEnabled: boolean;
+  ttsVoice: 'giuseppe' | 'elsa';
   ttsAutoExplainOnMistake: boolean;
   ttsAutoPlayQuestion: boolean;
   ttsPlaybackRate: number;

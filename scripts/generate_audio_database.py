@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 """
 Pipeline di generazione batch dell'audio vocale neurale per i quiz VDS-VL
-Utilizza edge-tts con voce Giuseppe Neurale Calmo (it-IT-GiuseppeMultilingualNeural)
-Genera i 5 segmenti discreti per ciascun quiz in public/audio/
-Supporta ripresa automatica (salta file già generati), filtri per materia e range di ID.
+Supporta selezione multipla di voci (Giuseppe ed Elsa) con configurazioni timbriche personalizzate:
+- Giuseppe (it-IT-GiuseppeMultilingualNeural, rate=-5%, pitch=-5Hz) in public/audio/giuseppe/
+- Elsa (it-IT-ElsaNeural, rate=-2%, pitch=+0Hz) in public/audio/elsa/
 """
 
 import os
@@ -14,10 +14,20 @@ import re
 import argparse
 import edge_tts
 
-VOICE = "it-IT-GiuseppeMultilingualNeural"
-RATE = "-5%"
-PITCH = "-5Hz"
-AUDIO_DIR = os.path.join("public", "audio")
+VOICE_CONFIGS = {
+    "giuseppe": {
+        "voice": "it-IT-GiuseppeMultilingualNeural",
+        "rate": "-5%",
+        "pitch": "-5Hz",
+        "dir": os.path.join("public", "audio", "giuseppe")
+    },
+    "elsa": {
+        "voice": "it-IT-ElsaNeural",
+        "rate": "-2%",
+        "pitch": "+0Hz",
+        "dir": os.path.join("public", "audio", "elsa")
+    }
+}
 
 def normalize_phonetics(text: str) -> str:
     if not text:
@@ -90,32 +100,58 @@ def build_segments(q: dict):
         (f"{qid}_e.mp3", f"Risposta errata. La risposta esatta è {ordinals[correct_idx]}: {correct_text}. Regola: {rule}. Tranello: {trap}.")
     ]
 
-async def generate_single(filename: str, text: str, semaphore: asyncio.Semaphore, max_retries: int = 3):
-    dest = os.path.join(AUDIO_DIR, filename)
+async def generate_single(out_dir: str, filename: str, text: str, voice_cfg: dict, semaphore: asyncio.Semaphore, max_retries: int = 3):
+    dest = os.path.join(out_dir, filename)
     if os.path.exists(dest) and os.path.getsize(dest) > 1000:
         return True # Già presente
 
     async with semaphore:
         for attempt in range(max_retries):
             try:
-                comm = edge_tts.Communicate(text, VOICE, rate=RATE, pitch=PITCH)
+                comm = edge_tts.Communicate(text, voice_cfg["voice"], rate=voice_cfg["rate"], pitch=voice_cfg["pitch"])
                 await comm.save(dest)
                 return True
             except Exception as e:
                 if attempt == max_retries - 1:
-                    print(f"\n[ERRORE] Impossibile generare {filename}: {e}", file=sys.stderr)
+                    print(f"\n[ERRORE] Impossibile generare {dest}: {e}", file=sys.stderr)
                     return False
                 await asyncio.sleep(1.5 * (attempt + 1))
 
+async def process_voice(voice_key: str, questions: list, concurrency: int):
+    cfg = VOICE_CONFIGS[voice_key]
+    out_dir = cfg["dir"]
+    os.makedirs(out_dir, exist_ok=True)
+    print(f"\n=== Generazione Voce: {voice_key.upper()} ({cfg['voice']}) in {out_dir} ===")
+
+    semaphore = asyncio.Semaphore(concurrency)
+    tasks = []
+    total_segments = 0
+    for q in questions:
+        segments = build_segments(q)
+        total_segments += len(segments)
+        for fn, txt in segments:
+            tasks.append(generate_single(out_dir, fn, txt, cfg, semaphore))
+
+    print(f"Segmenti totali: {total_segments} (Concorrenza: {concurrency})")
+    
+    completed = 0
+    for fut in asyncio.as_completed(tasks):
+        await fut
+        completed += 1
+        if completed % 20 == 0 or completed == total_segments:
+            pct = (completed / total_segments) * 100
+            print(f"\rAvanzamento [{voice_key}]: {completed}/{total_segments} segmenti ({pct:.1f}%)", end="", flush=True)
+
+    print(f"\nCompletata voce {voice_key.upper()}!")
+
 async def main():
-    parser = argparse.ArgumentParser(description="Generatore Audio Neurale VDS-VL")
+    parser = argparse.ArgumentParser(description="Generatore Audio Neurale VDS-VL Multi-Voce")
+    parser.add_argument("--voice", choices=["giuseppe", "elsa", "all"], default="all", help="Voce da generare")
     parser.add_argument("--start", type=int, default=None, help="ID domanda di inizio (es. 1001)")
     parser.add_argument("--end", type=int, default=None, help="ID domanda di fine (es. 1040)")
     parser.add_argument("--limit", type=int, default=None, help="Limite massimo di quiz da processare")
-    parser.add_argument("--concurrency", type=int, default=5, help="Chiamate concorrenti a edge-tts")
+    parser.add_argument("--concurrency", type=int, default=10, help="Chiamate concorrenti a edge-tts")
     args = parser.parse_args()
-
-    os.makedirs(AUDIO_DIR, exist_ok=True)
 
     with open("src/data/questions.json", "r", encoding="utf-8") as f:
         all_questions = json.load(f)
@@ -128,28 +164,13 @@ async def main():
     if args.limit is not None:
         target_questions = target_questions[:args.limit]
 
-    print(f"Quiz da processare: {len(target_questions)} su {len(all_questions)}")
-    semaphore = asyncio.Semaphore(args.concurrency)
+    print(f"Quiz selezionati: {len(target_questions)} su {len(all_questions)}")
 
-    tasks = []
-    total_segments = 0
-    for q in target_questions:
-        segments = build_segments(q)
-        total_segments += len(segments)
-        for fn, txt in segments:
-            tasks.append(generate_single(fn, txt, semaphore))
+    voices_to_run = ["giuseppe", "elsa"] if args.voice == "all" else [args.voice]
+    for v in voices_to_run:
+        await process_voice(v, target_questions, args.concurrency)
 
-    print(f"Segmenti audio totali: {total_segments} (Concorrenza: {args.concurrency})")
-    
-    completed = 0
-    for fut in asyncio.as_completed(tasks):
-        res = await fut
-        completed += 1
-        if completed % 10 == 0 or completed == total_segments:
-            pct = (completed / total_segments) * 100
-            print(f"\rAvanzamento: {completed}/{total_segments} segmenti ({pct:.1f}%)", end="", flush=True)
-
-    print("\nGenerazione completata con successo!")
+    print("\nTutte le generazioni richieste sono terminate con successo!")
 
 if __name__ == "__main__":
     asyncio.run(main())

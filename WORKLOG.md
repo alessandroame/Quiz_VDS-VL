@@ -18,6 +18,38 @@ Questo documento registra in ordine cronologico tutte le lavorazioni svolte nel 
 
 ## Registro Cronologico
 
+### [2026-09-27] - Integrazione Voce Neurale Femminile Elsa & Selettore Multi-Voce Istruttore
+- **Cosa abbiamo fatto**:
+  - Esteso lo script di generazione `scripts/generate_audio_database.py` con supporto al flag `--voice` (`giuseppe` ed `elsa`).
+  - Generato l'intero catalogo dei 2.520 segmenti audio in italiano naturale con la voce femminile ad alta chiarezza **Elsa** (`it-IT-ElsaNeural`) archiviati in `public/audio/elsa/`.
+  - Esteso il tipo `AppSettings` con `ttsVoice: 'giuseppe' | 'elsa'` e valorizzato il default in `src/db/index.ts`.
+  - Aggiornato `src/services/voiceService.ts` per supportare il cambio dinamico della voce (`setVoice`, `getVoice`) e la risoluzione dei percorsi `public/audio/{voice}/`.
+  - Sincronizzata la voce nel `QuizContext.tsx` con effetto immediato su ogni componente dell'applicazione.
+  - Implementato in `src/components/SettingsModal.tsx` il selettore visivo card-based per la scelta tra la voce maschile (*👨‍✈️ Giuseppe - Tono calmo cockpit*) e femminile (*👩‍✈️ Elsa - Dizione cristallina*).
+  - Verificato il superamento di tutti i 63 test Vitest (`npm test`) e la compilazione del bundle PWA di produzione (`npm run build`).
+- **Scelte architetturali & Rationale**:
+  - *Separazione Directory Audio per Voce*: Archiviando `public/audio/giuseppe/` e `public/audio/elsa/` separatamente, la selezione della voce a runtime è un'operazione O(1) priva di fetch a server esterni e compatibile al 100% con la natura offline PWA.
+  - *Coerenza Fonetica*: Entrambe le voci condividono la stessa pipeline di normalizzazione fonetica aeronautica (`aviationPhonetics.ts`) e la cadenza cockpit (*"Uno."*, *"Due."*, *"Tre."*).
+- **Impatto sul Desiderata**:
+  - Completa libertà di scelta per il candidato pilota tra voce maschile e femminile ad altissima qualità, con persistenza locale e zero latenza.
+
+### [2026-09-27] - Implementazione Modalità Alla Guida ("Truck & Drive Cockpit Mode")
+- **Cosa abbiamo fatto**:
+  - Redatto lo studio di fattibilità ed ergonomia tattile in [truck_cockpit_mode_plan.md](file:///C:/Users/aless/.gemini/antigravity/brain/4f1a0bad-73d5-4ee0-9d28-f4a2d17159c5/truck_cockpit_mode_plan.md).
+  - Implementato `src/utils/voiceCommandParser.ts` per il parsing selettivo e deterministico dei comandi vocali italiani ("Uno", "Due", "Tre", "Avanti", "Indietro", "Ripeti", "Bandiera", "Pausa", "Riprendi") con suite di unit test (`src/utils/voiceCommandParser.test.ts`).
+  - Implementato `src/hooks/useWakeLock.ts` per il mantenimento attivo del display su supporto cruscotto (Screen Wake Lock API) con gestione del ciclo di vita e riaggancio su `visibilitychange`.
+  - Implementato `src/hooks/useDriveVoiceCommands.ts` per il controllo vocale hands-free continuo via Web Speech Recognition.
+  - Realizzato il componente `src/components/DriveModeScreen.tsx`: layout a tutto schermo con viewport bloccato (`100dvh`) e zero-scroll, 3 macro-fasce tattili ingrandite (Fitts's Law estrema), pilota automatico sequenziale ("Radio Quiz") e supporto gesture swipe.
+  - Integrato lo switch alla Modalità Alla Guida in `Navbar.tsx`, `ExamScreen.tsx`, `TopicsScreen.tsx`, `MistakesScreen.tsx` e `QuizContext.tsx` per supportare sia l'avvio autonomo che la prosecuzione istantanea di una sessione d'esame in corso.
+  - Aggiunte impostazioni dedicate (Pilota Automatico, Comandi Vocali, Tempo di attesa) in `SettingsModal.tsx` e nel DB Dexie.
+  - Collaudato con successo con Chrome CDP headless (`scripts/test_drive_mode.js`) su viewport mobile (390x844), validando l'interazione, la navigazione e registrando zero errori in console.
+- **Scelte architetturali & Rationale**:
+  - *Modalità Dedicata vs Compromesso Universale*: Forzare bottoni da 80-100px nella vista standard avrebbe compromesso la densità informativa dello studio a casa, costringendo a continuo scrolling verticale. La modalità dedicata a schermo intero (`100dvh`) consente zero scrolling e massima reattività tattile a distanza braccio.
+  - *Pilota Automatico Passivo / Radio Quiz*: Essenziale in viaggio: permette l'ascolto continuo di domande e opzioni con auto-rivelazione della risposta e della regola dopo un tempo limite (3-8s), studiando senza dover toccare il dispositivo.
+  - *Screen Wake Lock*: Impedisce lo spegnimento dello schermo ogni 30 secondi quando il telefono è agganciato al cruscotto.
+- **Impatto sul Desiderata**:
+  - Requisito 7 del [DESIDERATA.md](file:///c:/github/Quiz_VDS-VL/DESIDERATA.md) pienamente soddisfatto. La suite Vitest sale a 63 test unitari tutti verdi.
+
 ### [2026-09-27] - Integrazione Motore Vocale Neurale Integrale (TTS Giuseppe Calmo) & Generazione Catalogo 504 Quiz
 - **Cosa abbiamo fatto**:
   1. **Valutazione Critica & Blind Test preliminare**:

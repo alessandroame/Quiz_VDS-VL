@@ -62,9 +62,16 @@ Questo documento rappresenta la **bussola strategica e funzionale** del progetto
    - Storico temporale delle sessioni d'esame e grafico di tendenza.
    - Elenco dei quiz più sbagliati (Top 10 ostacoli).
 
-6. **Audio & Feedback Sonoro Avionico** *(In arricchimento)*:
+6. **Audio & Feedback Sonoro Avionico**:
    - Suoni cockpit di conferma/allerta opzionali.
    - Sintesi vocale italiana per lettura domande e annunci telegrafici secondo fonetica aeronautica ICAO.
+
+7. **Modalità Alla Guida (Truck & Cockpit Drive Mode)**:
+   - Vista a tutto schermo con viewport bloccato (`100dvh`) e zero-scroll.
+   - Tre macro-fasce tattili ad altissima leggibilità e contrasto elevato (Fitts's Law estrema).
+   - Screen Wake Lock API integrato per prevenire lo spegnimento dello schermo su supporto/cruscotto.
+   - Pilota Automatico ("Radio Quiz") continuo per studio e ripasso a mani libere senza tocco fisico.
+   - Comandi vocali in lingua italiana tramite Web Speech Recognition ("Uno", "Due", "Tre", "Avanti", "Ripeti", "Pausa").
 
 ---
 
@@ -94,9 +101,10 @@ Questo documento rappresenta la **bussola strategica e funzionale** del progetto
 | Archivio & Ricerca Full-Text | 🟢 Completato | Ricerca istantanea, preferiti e note personali salvate in Dexie. |
 | Dashboard Statistiche | 🟢 Completato | Radar materie, prontezza esame e storico sessioni. |
 | Temi Cockpit Dark & Hangar Light | 🟢 Completato | Gestione contrasto, icone responsive e switch istantaneo. |
-| Suite Vitest (Unit & BVA) | 🟢 Completato | 57 test attivi, soglie limite verificate, simulazione Monte Carlo. |
+| Suite Vitest (Unit & BVA) | 🟢 Completato | 63 test attivi, soglie limite verificate, simulazione Monte Carlo. |
 | Supporto Audio Avionico | 🟢 Completato | Sintesi vocale, feedback sonoro cockpit Web Audio API e fonetica ICAO integrata. |
 | Google Drive Cloud Sync | 🟢 Completato | Integrazione GIS con `appDataFolder` privata e fallback JSON export/import. |
+| Modalità Alla Guida | 🟢 Completato | Layout zero-scroll, Screen Wake Lock, Pilota Auto Radio Quiz e Speech Recognition. |
 
 
 ---

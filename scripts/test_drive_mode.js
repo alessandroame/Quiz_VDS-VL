@@ -92,7 +92,7 @@ async function run() {
         consoleLogs.push({ type: msg.params.type, text });
       }
       if (msg.id && callbacks.has(msg.id)) {
-        callbacks.get(msg.id)(msg);
+        callbacks.get(msg.id)(msg.result || msg);
         callbacks.delete(msg.id);
       }
     };
@@ -129,83 +129,91 @@ async function run() {
         if (!btn) return 'Pulsante non trovato';
         btn.click();
         return 'OK';
-      })()`
+      })()`,
+      returnByValue: true
     });
     console.log('Esito click:', clickRes.result?.value);
     await sleep(800);
 
-    // Verifica presenza della Modalità Alla Guida nel DOM
-    const verifyLauncher = await sendCDP('Runtime.evaluate', {
-      expression: `(() => {
-        const title = document.querySelector('h1')?.innerText;
-        const wakeLockBadge = document.body.innerText.includes('Wake Lock');
-        const autopilotBadge = document.body.innerText.includes('Pilota Automatico');
-        return { title, wakeLockBadge, autopilotBadge };
-      })()`,
-      returnByValue: true
-    });
-    console.log('Verifica Launcher Guida:', verifyLauncher.result?.value);
-
     // Cattura screenshot launcher guida
     const screenshotLauncher = await sendCDP('Page.captureScreenshot', { format: 'png' });
     const outLauncher = path.join(process.cwd(), 'drive_mode_launcher.png');
-    fs.writeFileSync(outLauncher, Buffer.from(screenshotLauncher.result.data, 'base64'));
+    fs.writeFileSync(outLauncher, Buffer.from(screenshotLauncher.data, 'base64'));
     console.log(`Screenshot Launcher salvato in: ${outLauncher}`);
 
     // Clicca su "Esame Ufficiale AeCI" dentro il Launcher
     console.log('Avvio esame dentro la Modalità Guida...');
-    await sendCDP('Runtime.evaluate', {
+    const startRes = await sendCDP('Runtime.evaluate', {
       expression: `(() => {
-        const buttons = Array.from(document.querySelectorAll('button'));
-        const examBtn = buttons.find(b => b.innerText.includes('Esame Ufficiale'));
-        if (examBtn) examBtn.click();
-      })()`
-    });
-    await sleep(1000);
-
-    // Verifica interfaccia zero-scroll e 3 macro-pulsanti
-    const verifyExam = await sendCDP('Runtime.evaluate', {
-      expression: `(() => {
-        const isRunning = document.body.innerText.includes('Esci') && document.body.innerText.includes('Succ');
-        const optionButtons = document.querySelectorAll('button[class*="rounded-2xl"]').length;
-        const hasTime = document.body.innerText.includes('⏱');
-        return { isRunning, optionCount: optionButtons, hasTime };
+        const examBtn = document.getElementById('btn-drive-start-exam');
+        if (examBtn) {
+          examBtn.click();
+          return 'CLICKED_EXAM_BTN';
+        }
+        return 'BTN_NOT_FOUND';
       })()`,
       returnByValue: true
     });
-    console.log('Verifica HUD Esame Guida:', verifyExam.result?.value);
+    console.log('Esito avvio esame:', startRes.result?.value);
+    await sleep(1500);
+
+    // Verifica stato interno
+    const statusCheck = await sendCDP('Runtime.evaluate', {
+      expression: `(() => {
+        const bodyText = document.body.innerText;
+        const hasEsci = bodyText.includes('Esci');
+        const hasSucc = bodyText.includes('Succ');
+        const hasOptions = document.querySelectorAll('button[class*="rounded-2xl"]').length;
+        const firstHeader = document.querySelector('h2')?.innerText;
+        return { hasEsci, hasSucc, hasOptions, firstHeader };
+      })()`,
+      returnByValue: true
+    });
+    console.log('Diagnostica stato HUD:', statusCheck.result?.value);
 
     // Cattura screenshot dell'esame in Modalità Guida
     const screenshotExam = await sendCDP('Page.captureScreenshot', { format: 'png' });
     const outExam = path.join(process.cwd(), 'drive_mode_active_exam.png');
-    fs.writeFileSync(outExam, Buffer.from(screenshotExam.result.data, 'base64'));
+    fs.writeFileSync(outExam, Buffer.from(screenshotExam.data, 'base64'));
     console.log(`Screenshot Quiz attivo salvato in: ${outExam}`);
 
     // Clicca sull'opzione 1 per testare la selezione tattile gigante
     console.log('Selezione Opzione 1...');
-    await sendCDP('Runtime.evaluate', {
+    const clickOptRes = await sendCDP('Runtime.evaluate', {
       expression: `(() => {
         const buttons = Array.from(document.querySelectorAll('button'));
         const opt1 = buttons.find(b => b.innerText.includes('1') && b.className.includes('rounded-2xl'));
-        if (opt1) opt1.click();
-      })()`
+        if (opt1) {
+          opt1.click();
+          return 'CLICKED_OPT1';
+        }
+        return 'OPT1_NOT_FOUND';
+      })()`,
+      returnByValue: true
     });
-    await sleep(500);
+    console.log('Esito click opzione:', clickOptRes.result?.value);
+    await sleep(800);
 
     const screenshotAnswered = await sendCDP('Page.captureScreenshot', { format: 'png' });
     const outAnswered = path.join(process.cwd(), 'drive_mode_selected_option.png');
-    fs.writeFileSync(outAnswered, Buffer.from(screenshotAnswered.result.data, 'base64'));
+    fs.writeFileSync(outAnswered, Buffer.from(screenshotAnswered.data, 'base64'));
     console.log(`Screenshot Opzione selezionata salvato in: ${outAnswered}`);
 
-    // Chiudi modale guida
+    // Clicca su Successiva
+    console.log('Click su Domanda Successiva...');
     await sendCDP('Runtime.evaluate', {
       expression: `(() => {
         const buttons = Array.from(document.querySelectorAll('button'));
-        const closeBtn = buttons.find(b => b.innerText.includes('Esci'));
-        if (closeBtn) closeBtn.click();
+        const nextBtn = buttons.find(b => b.innerText.includes('Succ'));
+        if (nextBtn) nextBtn.click();
       })()`
     });
-    await sleep(500);
+    await sleep(800);
+
+    const screenshotNext = await sendCDP('Page.captureScreenshot', { format: 'png' });
+    const outNext = path.join(process.cwd(), 'drive_mode_next_question.png');
+    fs.writeFileSync(outNext, Buffer.from(screenshotNext.data, 'base64'));
+    console.log(`Screenshot Domanda Successiva salvato in: ${outNext}`);
 
     ws.close();
     console.log('Verifica console errori JS...');

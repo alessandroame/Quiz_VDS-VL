@@ -78,7 +78,8 @@ export const QuizProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   useEffect(() => {
     voiceService.setPlaybackRate(settings.ttsPlaybackRate || 1.0);
-  }, [settings.ttsPlaybackRate]);
+    voiceService.setVoice(settings.ttsVoice || 'giuseppe');
+  }, [settings.ttsPlaybackRate, settings.ttsVoice]);
 
   const statsMap = useMemo(() => {
     const map = new Map<number, QuestionStat>();

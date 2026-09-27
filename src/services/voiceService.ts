@@ -12,6 +12,7 @@ class VoiceService {
   private isSequencePlaying: boolean = false;
   private listeners: Set<StateListener> = new Set();
   private playbackRate: number = 1.0;
+  private voiceName: 'giuseppe' | 'elsa' = 'giuseppe';
   private sequenceTimeout: any = null;
 
   constructor() {
@@ -63,6 +64,20 @@ class VoiceService {
     }
   }
 
+  public setVoice(voice: 'giuseppe' | 'elsa') {
+    if (this.voiceName !== voice) {
+      this.voiceName = voice;
+      // Se c'era audio in corso, fermiamo per evitare mismatch
+      if (this.getState().isPlaying) {
+        this.stop();
+      }
+    }
+  }
+
+  public getVoice(): 'giuseppe' | 'elsa' {
+    return this.voiceName;
+  }
+
   private getAudioUrl(questionId: number, part: AudioPart): string {
     const suffixMap: Record<AudioPart, string> = {
       question: 'q',
@@ -72,7 +87,7 @@ class VoiceService {
       explanation: 'e'
     };
     const baseUrl = (import.meta.env.BASE_URL || '/').replace(/\/+$/, '');
-    return `${baseUrl}/audio/${questionId}_${suffixMap[part]}.mp3`;
+    return `${baseUrl}/audio/${this.voiceName}/${questionId}_${suffixMap[part]}.mp3`;
   }
 
   private updateMediaSession(questionId: number, titlePart: string) {

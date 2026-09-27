@@ -14,7 +14,8 @@
     "test:visual": "node .agents/skills/headless-pwa-tester/scripts/visual_check.js desktop",
     "test:visual:portrait": "node .agents/skills/headless-pwa-tester/scripts/visual_check.js mobile-portrait",
     "test:visual:landscape": "node .agents/skills/headless-pwa-tester/scripts/visual_check.js mobile-landscape",
-    "test:visual:all": "node .agents/skills/headless-pwa-tester/scripts/visual_check.js all"
+    "test:visual:all": "node .agents/skills/headless-pwa-tester/scripts/visual_check.js all",
+    "test:visual:drive": "node scripts/test_drive_mode.js"
   },
   "dependencies": {
     "canvas-confetti": "^1.9.4",

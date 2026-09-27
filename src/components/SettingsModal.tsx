@@ -230,10 +230,10 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose })
             <div className="flex items-center justify-between p-2.5 rounded-xl border border-slate-800 bg-slate-950/60 light:bg-slate-50 light:border-slate-200">
               <div>
                 <span className="text-slate-300 light:text-slate-700 font-medium block">
-                  Voce Istruttore (Giuseppe Calmo)
+                  Abilita Assistente Vocale
                 </span>
                 <span className="text-[11px] text-slate-500">
-                  Lettura audio ad alta fedeltà delle domande e delle opzioni
+                  Lettura audio neurale ad alta fedeltà di domande e opzioni
                 </span>
               </div>
               <input
@@ -246,6 +246,54 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose })
 
             {settings.ttsEnabled && (
               <>
+                {/* Selettore Voce Istruttore */}
+                <div className="p-2.5 rounded-xl border border-slate-800 bg-slate-950/60 light:bg-slate-50 light:border-slate-200 space-y-2">
+                  <span className="text-slate-300 light:text-slate-700 font-medium block">
+                    Voce Istruttore di Volo
+                  </span>
+                  <div className="grid grid-cols-2 gap-2">
+                    <button
+                      type="button"
+                      onClick={() => updateSetting('ttsVoice', 'giuseppe')}
+                      className={`p-2.5 rounded-xl border text-left flex flex-col gap-1 transition-all ${
+                        (settings.ttsVoice || 'giuseppe') === 'giuseppe'
+                          ? 'border-sky-500 bg-sky-500/20 text-sky-300 light:border-sky-600 light:bg-sky-50 light:text-sky-800'
+                          : 'border-slate-800 bg-slate-900/60 text-slate-400 light:border-slate-200 light:bg-slate-100 hover:border-slate-700'
+                      }`}
+                    >
+                      <div className="flex items-center justify-between">
+                        <span className="font-semibold text-xs text-slate-200 light:text-slate-800">👨‍✈️ Giuseppe</span>
+                        {(settings.ttsVoice || 'giuseppe') === 'giuseppe' && (
+                          <span className="w-2 h-2 rounded-full bg-sky-400 ring-2 ring-sky-400/30"></span>
+                        )}
+                      </div>
+                      <span className="text-[10px] text-slate-400 light:text-slate-500 leading-tight">
+                        Maschile, tono calmo cockpit
+                      </span>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => updateSetting('ttsVoice', 'elsa')}
+                      className={`p-2.5 rounded-xl border text-left flex flex-col gap-1 transition-all ${
+                        settings.ttsVoice === 'elsa'
+                          ? 'border-sky-500 bg-sky-500/20 text-sky-300 light:border-sky-600 light:bg-sky-50 light:text-sky-800'
+                          : 'border-slate-800 bg-slate-900/60 text-slate-400 light:border-slate-200 light:bg-slate-100 hover:border-slate-700'
+                      }`}
+                    >
+                      <div className="flex items-center justify-between">
+                        <span className="font-semibold text-xs text-slate-200 light:text-slate-800">👩‍✈️ Elsa</span>
+                        {settings.ttsVoice === 'elsa' && (
+                          <span className="w-2 h-2 rounded-full bg-sky-400 ring-2 ring-sky-400/30"></span>
+                        )}
+                      </div>
+                      <span className="text-[10px] text-slate-400 light:text-slate-500 leading-tight">
+                        Femminile, dizione cristallina
+                      </span>
+                    </button>
+                  </div>
+                </div>
+
                 <div className="flex items-center justify-between p-2.5 rounded-xl border border-slate-800 bg-slate-950/60 light:bg-slate-50 light:border-slate-200">
                   <div>
                     <span className="text-slate-300 light:text-slate-700 font-medium block">
