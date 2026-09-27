@@ -8,11 +8,18 @@ import { MistakesScreen } from './components/MistakesScreen';
 import { ArchiveScreen } from './components/ArchiveScreen';
 import { StatsScreen } from './components/StatsScreen';
 import { SettingsModal } from './components/SettingsModal';
+import { DriveModeScreen } from './components/DriveModeScreen';
 import { Download, AlertTriangle } from 'lucide-react';
 import { voiceService } from './services/voiceService';
 
 function AppContent() {
-  const { isExamRunning, setIsExamRunning } = useQuiz();
+  const {
+    isExamRunning,
+    setIsExamRunning,
+    isDriveModeOpen,
+    closeDriveMode,
+    driveSessionContext
+  } = useQuiz();
   const [activeTab, setActiveTab] = useState<NavTab>('exam');
   const [pendingTab, setPendingTab] = useState<NavTab | null>(null);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
@@ -122,6 +129,13 @@ function AppContent() {
       <SettingsModal
         isOpen={isSettingsOpen}
         onClose={() => setIsSettingsOpen(false)}
+      />
+
+      {/* Modalità Alla Guida Fullscreen */}
+      <DriveModeScreen
+        isOpen={isDriveModeOpen}
+        onClose={closeDriveMode}
+        sessionContext={driveSessionContext || undefined}
       />
 
       {/* Modal di Avviso Cambio Pagina durante Esame Attivo */}

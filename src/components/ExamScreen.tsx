@@ -10,7 +10,8 @@ import {
   RotateCcw,
   Zap,
   ListFilter,
-  LogOut
+  LogOut,
+  Car
 } from 'lucide-react';
 import type { Question } from '../types/quiz';
 import type { ExamSession } from '../types/database';
@@ -21,7 +22,15 @@ import { formatTime } from '../utils/timer';
 import { QuestionCard } from './QuestionCard';
 
 export const ExamScreen: React.FC = () => {
-  const { questions, statsMap, saveExam, recordAnswer, settings, setIsExamRunning } = useQuiz();
+  const {
+    questions,
+    statsMap,
+    saveExam,
+    recordAnswer,
+    settings,
+    setIsExamRunning,
+    openDriveMode
+  } = useQuiz();
 
   // Stato esame
   const [examState, setExamState] = useState<'idle' | 'running' | 'review'>('idle');
@@ -354,6 +363,30 @@ export const ExamScreen: React.FC = () => {
         </div>
 
         <div className="flex items-center gap-2">
+          <button
+            id="btn-exam-drive-mode"
+            onClick={() => {
+              openDriveMode({
+                questions: examQuestions,
+                currentIndex,
+                answers,
+                flags,
+                onAnswer: (_qid, ans) => handleSelectAnswer(ans),
+                onToggleFlag: handleToggleFlag,
+                onNavigateIndex: (idx) => setCurrentIndex(idx),
+                isExam: true,
+                secondsRemaining,
+                onSubmitExam: handleSubmitExam,
+                title: 'Esame Ufficiale'
+              });
+            }}
+            className="px-2.5 py-1.5 rounded-lg border border-amber-500/40 bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 light:bg-amber-100 light:text-amber-800 text-xs font-bold transition-colors flex items-center gap-1.5"
+            title="Passa alla Modalità Alla Guida per questo esame"
+          >
+            <Car className="w-3.5 h-3.5" />
+            <span className="hidden sm:inline">Alla Guida</span>
+          </button>
+
           <button
             id="btn-abandon-exam"
             onClick={() => setShowAbandonModal(true)}

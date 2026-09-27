@@ -2,14 +2,15 @@ import React, { useState } from 'react';
 import {
   ArrowRight,
   ArrowLeft,
-  CheckCircle2
+  CheckCircle2,
+  Car
 } from 'lucide-react';
 import type { Question } from '../types/quiz';
 import { useQuiz } from '../context/QuizContext';
 import { QuestionCard } from './QuestionCard';
 
 export const TopicsScreen: React.FC = () => {
-  const { questions, statsMap, recordAnswer, subjectsAnalytics, settings } = useQuiz();
+  const { questions, statsMap, recordAnswer, subjectsAnalytics, settings, openDriveMode } = useQuiz();
 
   const [activeSubjectId, setActiveSubjectId] = useState<number | null>(null);
   const [sessionQuestions, setSessionQuestions] = useState<Question[]>([]);
@@ -74,8 +75,31 @@ export const TopicsScreen: React.FC = () => {
             {currentSubjectMeta?.name}
           </div>
 
-          <div className="text-xs font-mono text-sky-400 light:text-sky-600 font-semibold">
-            {currentIndex + 1}/{sessionQuestions.length}
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => {
+                openDriveMode({
+                  questions: sessionQuestions,
+                  currentIndex,
+                  answers: sessionAnswers,
+                  flags: {},
+                  onAnswer: (_qid: number, ans: 1 | 2 | 3) => handleAnswer(ans),
+                  onToggleFlag: () => {},
+                  onNavigateIndex: (idx: number) => setCurrentIndex(idx),
+                  isExam: false,
+                  title: currentSubjectMeta?.name || 'Materia'
+                });
+              }}
+              className="px-2 py-1 rounded-lg border border-amber-500/40 bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 light:bg-amber-100 light:text-amber-800 text-[11px] font-bold transition-colors flex items-center gap-1"
+              title="Passa alla Modalità Alla Guida"
+            >
+              <Car className="w-3.5 h-3.5" />
+              <span>Alla Guida</span>
+            </button>
+
+            <div className="text-xs font-mono text-sky-400 light:text-sky-600 font-semibold">
+              {currentIndex + 1}/{sessionQuestions.length}
+            </div>
           </div>
         </div>
 

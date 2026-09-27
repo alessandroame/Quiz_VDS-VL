@@ -46,4 +46,7 @@ export interface AppSettings {
   ttsAutoExplainOnMistake: boolean;
   ttsAutoPlayQuestion: boolean;
   ttsPlaybackRate: number;
+  driveModeAutopilot: boolean;
+  driveModeAutoAdvanceSeconds: number;
+  driveModeVoiceCommands: boolean;
 }

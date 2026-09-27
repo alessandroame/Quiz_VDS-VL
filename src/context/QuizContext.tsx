@@ -12,6 +12,7 @@ import {
   saveQuestionNote,
   setSetting
 } from '../db';
+import type { DriveModeSessionContext } from '../components/DriveModeScreen';
 import {
   type SubjectAnalytics,
   calculateMistakesCount,
@@ -28,6 +29,10 @@ interface QuizContextType {
   settings: AppSettings;
   isExamRunning: boolean;
   setIsExamRunning: (running: boolean) => void;
+  isDriveModeOpen: boolean;
+  driveSessionContext: DriveModeSessionContext | null;
+  openDriveMode: (context?: DriveModeSessionContext) => void;
+  closeDriveMode: () => void;
   updateSetting: <K extends keyof AppSettings>(key: K, value: AppSettings[K]) => Promise<void>;
   recordAnswer: (questionId: number, isCorrect: boolean) => Promise<void>;
   toggleBookmark: (questionId: number) => Promise<boolean>;
@@ -45,6 +50,18 @@ const QuizContext = createContext<QuizContextType | null>(null);
 export const QuizProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const questions: Question[] = questionsData as Question[];
   const [isExamRunning, setIsExamRunning] = useState<boolean>(false);
+  const [isDriveModeOpen, setIsDriveModeOpen] = useState<boolean>(false);
+  const [driveSessionContext, setDriveSessionContext] = useState<DriveModeSessionContext | null>(null);
+
+  const openDriveMode = (context?: DriveModeSessionContext) => {
+    setDriveSessionContext(context || null);
+    setIsDriveModeOpen(true);
+  };
+
+  const closeDriveMode = () => {
+    setIsDriveModeOpen(false);
+    setDriveSessionContext(null);
+  };
 
   // Reattività istantanea con Dexie live queries
   const statsList = useLiveQuery(() => db.stats.toArray(), []) || [];
@@ -123,6 +140,10 @@ export const QuizProvider: React.FC<{ children: React.ReactNode }> = ({ children
         settings,
         isExamRunning,
         setIsExamRunning,
+        isDriveModeOpen,
+        driveSessionContext,
+        openDriveMode,
+        closeDriveMode,
         updateSetting,
         recordAnswer,
         toggleBookmark,

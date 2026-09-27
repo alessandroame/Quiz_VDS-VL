@@ -8,7 +8,8 @@ import {
   Settings as SettingsIcon,
   Sun,
   Moon,
-  Monitor
+  Monitor,
+  Car
 } from 'lucide-react';
 import { useTheme } from '../context/ThemeContext';
 import { useQuiz } from '../context/QuizContext';
@@ -23,7 +24,7 @@ interface NavbarProps {
 
 export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab, openSettings }) => {
   const { theme, cycleTheme } = useTheme();
-  const { mistakesCount, readinessScore, isExamRunning } = useQuiz();
+  const { mistakesCount, readinessScore, isExamRunning, openDriveMode } = useQuiz();
 
   const navItems = [
     { id: 'exam' as NavTab, label: 'Esame', icon: Compass },
@@ -65,6 +66,17 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab, openSet
           </div>
 
           <div className="flex items-center gap-1.5">
+            {/* Modalità Alla Guida */}
+            <button
+              id="btn-drive-mode"
+              onClick={() => openDriveMode()}
+              title="Modalità Alla Guida (Pulsanti giganti & Hands-free)"
+              className="px-2.5 py-1.5 rounded-lg bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 light:bg-amber-100 light:text-amber-800 border border-amber-500/30 flex items-center gap-1.5 text-xs font-bold transition-all active:scale-95 shadow-sm"
+            >
+              <Car className="w-4 h-4 text-amber-400 light:text-amber-700" />
+              <span className="hidden sm:inline">Alla Guida</span>
+            </button>
+
             {/* Theme quick toggle */}
             <button
               id="btn-theme-toggle"

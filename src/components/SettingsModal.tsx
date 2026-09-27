@@ -11,7 +11,8 @@ import {
   Download,
   Upload,
   Trash2,
-  KeyRound
+  KeyRound,
+  Car
 } from 'lucide-react';
 import { useTheme } from '../context/ThemeContext';
 import { useQuiz } from '../context/QuizContext';
@@ -306,6 +307,80 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose })
                 </div>
               </>
             )}
+          </div>
+        </div>
+
+        {/* 2.6 Modalità Alla Guida */}
+        <div className="space-y-2 pt-2 border-t border-slate-800/80 light:border-slate-100">
+          <label className="text-xs font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
+            <Car className="w-3.5 h-3.5 text-amber-400" />
+            <span>Modalità Alla Guida</span>
+          </label>
+
+          <p className="text-[11px] text-slate-400 light:text-slate-500">
+            Pulsanti giganti per cruscotto, zero-scroll, Screen Wake Lock e comandi hands-free.
+          </p>
+
+          <div className="space-y-2 text-xs">
+            <div className="flex items-center justify-between p-2.5 rounded-xl border border-slate-800 bg-slate-950/60 light:bg-slate-50 light:border-slate-200">
+              <div>
+                <span className="text-slate-300 light:text-slate-700 font-medium block">
+                  Pilota Automatico (Radio Quiz)
+                </span>
+                <span className="text-[11px] text-slate-500">
+                  Legge continuamente le domande per lo studio passivo
+                </span>
+              </div>
+              <input
+                type="checkbox"
+                checked={settings.driveModeAutopilot ?? true}
+                onChange={e => updateSetting('driveModeAutopilot', e.target.checked)}
+                className="w-4 h-4 accent-amber-500 rounded"
+              />
+            </div>
+
+            <div className="flex items-center justify-between p-2.5 rounded-xl border border-slate-800 bg-slate-950/60 light:bg-slate-50 light:border-slate-200">
+              <div>
+                <span className="text-slate-300 light:text-slate-700 font-medium block">
+                  Comandi Vocali Hands-Free
+                </span>
+                <span className="text-[11px] text-slate-500">
+                  Rispondi pronunciando "Uno", "Due", "Tre" o "Avanti"
+                </span>
+              </div>
+              <input
+                type="checkbox"
+                checked={settings.driveModeVoiceCommands ?? false}
+                onChange={e => updateSetting('driveModeVoiceCommands', e.target.checked)}
+                className="w-4 h-4 accent-amber-500 rounded"
+              />
+            </div>
+
+            <div className="p-2.5 rounded-xl border border-slate-800 bg-slate-950/60 light:bg-slate-50 light:border-slate-200 space-y-1.5">
+              <div className="flex justify-between items-center">
+                <span className="text-slate-300 light:text-slate-700 font-medium">
+                  Tempo Attesa Risposta
+                </span>
+                <span className="font-mono font-bold text-amber-400">
+                  {settings.driveModeAutoAdvanceSeconds || 5} secondi
+                </span>
+              </div>
+              <div className="grid grid-cols-3 gap-1.5 pt-1">
+                {[3, 5, 8].map(sec => (
+                  <button
+                    key={sec}
+                    onClick={() => updateSetting('driveModeAutoAdvanceSeconds', sec)}
+                    className={`py-1 rounded-lg text-[11px] font-semibold transition-colors ${
+                      (settings.driveModeAutoAdvanceSeconds || 5) === sec
+                        ? 'bg-amber-600 text-white'
+                        : 'bg-slate-800 hover:bg-slate-700 text-slate-300'
+                    }`}
+                  >
+                    {sec}s
+                  </button>
+                ))}
+              </div>
+            </div>
           </div>
         </div>
 
