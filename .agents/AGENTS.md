@@ -50,5 +50,14 @@ L'alberatura delle configurazioni dell'agente è standardizzata, modulare e ordi
 4. **Proattività Critica e Prompt Refactoring**:
    - Applicare [proactive_mentorship.md](file:///c:/github/Quiz_VDS-VL/.agents/rules/proactive_mentorship.md) per individuare rischi tecnici, trade-off negativi o ottimizzazioni del prompt prima di avviare interventi massicci.
 
-5. **Memoria di Progetto Permanente**:
-   - Registrare decisioni stabili o correzioni dell'utente in `MEMORY.md` via `self-correction-loop`.
+5. **Desiderata di Progetto, Memoria Tecnica e Registro Lavorazioni (WORKLOG)**:
+   - **Pre-Flight Obbligatorio**: Prima di modificare codice, consultare tassativamente:
+     * [DESIDERATA.md](file:///c:/github/Quiz_VDS-VL/DESIDERATA.md) per comprendere la visione del prodotto, i requisiti core e la matrice di stato.
+     * [MEMORY.md](file:///c:/github/Quiz_VDS-VL/MEMORY.md) per i vincoli tecnici stabili, le regole AeCI e i criteri di testing.
+     * [WORKLOG.md](file:///c:/github/Quiz_VDS-VL/WORKLOG.md) per conoscere le ultime decisioni architetturali (ADR) e lo storico recente.
+   - **Post-Task Obbligatorio**: A fronte di **OGNI lavorazione**, aggiornare obbligatoriamente [WORKLOG.md](file:///c:/github/Quiz_VDS-VL/WORKLOG.md) riportando:
+     * **Cosa abbiamo fatto**: sintesi puntuale e verificabile degli interventi effettuati e dei file toccati.
+     * **Scelte architetturali & Rationale**: decisioni tecniche adottate, motivazioni e alternative scartate.
+     * **Impatto sul Desiderata**: allineamento con [DESIDERATA.md](file:///c:/github/Quiz_VDS-VL/DESIDERATA.md) e istruzioni per il prossimo agente.
+   - Nessun task può considerarsi concluso senza questo aggiornamento di bordo.
+

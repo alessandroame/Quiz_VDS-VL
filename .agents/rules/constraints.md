@@ -17,3 +17,9 @@
 ## 3. Politica Anti-Accrocchio (Zero Quick-Fix)
 - Vietato l'uso di `setTimeout` per attendere scritture sul database o per forzare l'allineamento della UI.
 - Vietato duplicare lo stato dell'esame o delle risposte in variabili globali o attributi DOM `data-*`.
+
+## 4. Continuità Cognitiva e Passaggio di Consegne Inter-Agente
+- **Aggiornamento Obbligatorio di WORKLOG.md**: Al termine di ogni sessione o lavorazione, l'agente deve registrare in [WORKLOG.md](file:///c:/github/Quiz_VDS-VL/WORKLOG.md) cosa è stato fatto e le scelte tecniche/architetturali prese con le relative motivazioni, allineando lo stato in [DESIDERATA.md](file:///c:/github/Quiz_VDS-VL/DESIDERATA.md).
+- **Divieto di Amnesia e Inizio al Buio**: Nessun agente può avviare modifiche senza consultare prima la triade di conoscenza ([DESIDERATA.md](file:///c:/github/Quiz_VDS-VL/DESIDERATA.md), [MEMORY.md](file:///c:/github/Quiz_VDS-VL/MEMORY.md), [WORKLOG.md](file:///c:/github/Quiz_VDS-VL/WORKLOG.md)), né può chiudere un task senza aver documentato il lavoro svolto per chi subentrerà.
+
+

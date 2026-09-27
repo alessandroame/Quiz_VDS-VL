@@ -1,14 +1,26 @@
 # Project Memory: VDS-VL Quiz Master 🛩️
 
-Questo file costituisce la memoria permanente del progetto. Raccoglie decisioni architetturali consolidate, correzioni dell'utente e regole di dominio per evitare il ripetersi di errori o allucinazioni nelle sessioni di sviluppo.
+Questo file costituisce la **memoria tecnica permanente** del progetto. Raccoglie i vincoli architetturali consolidati, le regole normative AeCI, gli standard di testing e le convenzioni operative per prevenire allucinazioni, regressioni o spreco di token nelle sessioni di sviluppo.
+
+> Per la visione complessiva, i requisiti utente e la matrice di stato, consultare **[DESIDERATA.md](file:///c:/github/Quiz_VDS-VL/DESIDERATA.md)**.  
+> Per il diario cronologico delle lavorazioni e le decisioni architetturali (ADR), consultare **[WORKLOG.md](file:///c:/github/Quiz_VDS-VL/WORKLOG.md)**.
 
 ---
 
 ## 1. Regolamento & Quiz VDS-VL (AeCI)
 - **Catalogo Completo**: 504 quiz totali (database ufficiale AeCI 2017).
 - **Esame Ufficiale**: 30 quesiti a scelta multipla, 45 minuti max, idoneità con max 3 errori (minimo 27/30). 4 o più errori = NON IDONEO.
-- **Ripartizione Materie (30 quiz)**: Normativa (2), Aerodinamica (9), Primo Soccorso (1), Fisiopatologia (1), Meteo (8), Strumenti (1), Tecnica Pilotaggio (5), Materiali (1), Sicurezza (2).
-- **Spiegazioni Didattiche**: Devono limitarsi a `Regola` (principio fisico o norma) e `Tranello` (motivo tipico di errore), senza menzionare fonti terze.
+- **Ripartizione Materie (30 quiz)**:
+  - Normativa (2)
+  - Aerodinamica (9)
+  - Primo Soccorso (1)
+  - Fisiopatologia (1)
+  - Meteo (8)
+  - Strumenti (1)
+  - Tecnica Pilotaggio (5)
+  - Materiali (1)
+  - Sicurezza (2)
+- **Spiegazioni Didattiche**: Devono limitarsi a `Regola` (principio fisico o norma) e `Tranello` (motivo tipico di errore), senza menzionare fonti terze o manuali non ufficiali.
 
 ---
 
@@ -20,15 +32,23 @@ Questo file costituisce la memoria permanente del progetto. Raccoglie decisioni 
 ---
 
 ## 3. UI/UX Avionico & Microcopy
-- **Cockpit Style**: Zero preamboli, etichette essenziali (Esame, Materie, Errori, Archivio, Stats).
-- **Feedback**: Secco e chiaro (Esatta, Errata, ⚑ Rivedi, IDONEO, NON IDONEO).
+- **Cockpit Style**: Zero preamboli, etichette essenziali (**Esame**, **Materie**, **Errori**, **Archivio**, **Stats**).
+- **Feedback**: Secco e chiaro (`Esatta`, `Errata`, `⚑ Rivedi`, `IDONEO`, `NON IDONEO`).
 - **Desktop Keyboard**: Tasti `1`, `2`, `3` per risposta, `F` per flag, frecce o `Spazio` per navigazione.
+- **Sistema Temi (Cockpit Dark / Hangar Light)**:
+  * In `tailwind.config.js` è registrata la variante `light:` (`addVariant('light', ':is(.light &)')`) per supportare le classi `light:*`.
+  * In `index.html`, `<body>` include sia le classi scure che quelle chiare (`light:bg-slate-50 light:text-slate-900`).
+  * Il ciclo tema (`cycleTheme`) passa sempre subito da tema scuro a tema chiaro al primo click, assicurando un feedback visivo immediato all'utente.
+  * In `ThemeContext.tsx`, l'idratazione iniziale verifica l'esistenza reale di una chiave salvata in Dexie prima di sovrascrivere `localStorage`.
 
 ---
 
 ## 4. Tooling & Governance
-- **Zero Dangling Background Tasks**: Comandi di build/test eseguiti con `WaitMsBeforeAsync: 10000` per evitare processi zombie.
-- **Circuit Breaker**: Stop immediato se lo stesso errore di compilazione o test si ripete senza progressi.
+- **Zero Dangling Background Tasks**: Comandi di build/test eseguiti con `WaitMsBeforeAsync: 10000` per favorire l'esecuzione sincrona. Terminare subito processi orfani.
+- **Circuit Breaker**: Stop immediato se lo stesso errore di compilazione o test si ripete per 2 iterazioni consecutive senza progressi.
+- **Continuità Cognitiva Inter-Agente**:
+  * Consultare [DESIDERATA.md](file:///c:/github/Quiz_VDS-VL/DESIDERATA.md) e [WORKLOG.md](file:///c:/github/Quiz_VDS-VL/WORKLOG.md) nel Pre-Flight.
+  * Al termine di ogni lavorazione, registrare cosa è stato fatto e le scelte prese in [WORKLOG.md](file:///c:/github/Quiz_VDS-VL/WORKLOG.md).
 
 ---
 

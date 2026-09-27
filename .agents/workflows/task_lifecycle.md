@@ -13,8 +13,10 @@ Questo workflow garantisce che ogni task si svolga in modo ordinato, verificabil
    ```bash
    git status --porcelain
    ```
-2. **Consultazione Vincoli**:
-   - Leggere `MEMORY.md` per verificare eventuali regole preesistenti sull'argomento.
+2. **Consultazione Triade di Conoscenza (Desiderata, Memory, Worklog)**:
+   - Consultare [DESIDERATA.md](file:///c:/github/Quiz_VDS-VL/DESIDERATA.md) per comprendere la visione funzionale e la matrice di stato attuale.
+   - Consultare [MEMORY.md](file:///c:/github/Quiz_VDS-VL/MEMORY.md) per verificare i vincoli tecnici stabili, le regole AeCI e gli standard operativi.
+   - Consultare [WORKLOG.md](file:///c:/github/Quiz_VDS-VL/WORKLOG.md) per verificare le decisioni architetturali recenti prima di toccare codice o proporre modifiche.
 
 ---
 
@@ -41,6 +43,19 @@ Questo workflow garantisce che ogni task si svolga in modo ordinato, verificabil
 
 ---
 
-## 4. Consolidamento e Commit
+## 4. Aggiornamento Registro di Bordo (WORKLOG & Desiderata) - Obbligatorio
+A fronte di **OGNI lavorazione completata**, prima del commit:
+1. **Aggiornare [WORKLOG.md](file:///c:/github/Quiz_VDS-VL/WORKLOG.md)**:
+   - Aggiungere una voce in cima al registro cronologico:
+     - **Cosa abbiamo fatto**: elenco puntuale delle modifiche e file impattati.
+     - **Scelte architetturali & Rationale**: motivazioni della soluzione tecnica adottata e trade-off considerati.
+     - **Impatto sul Desiderata**: come la lavorazione fa avanzare il desiderata di progetto.
+2. **Allineare la Matrice di Stato in [DESIDERATA.md](file:///c:/github/Quiz_VDS-VL/DESIDERATA.md)** se sono state completate feature o definiti nuovi requisiti.
+
+
+---
+
+## 5. Consolidamento e Commit
 - Rispettare rigorosamente la specifica Conventional Commits come definita nella skill `git-pro`.
 - Se si apportano rifiniture prima del push, procedere con `git commit --amend --no-edit`.
+
