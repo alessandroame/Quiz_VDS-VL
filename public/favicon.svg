@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" fill="none">
+  <rect width="100" height="100" rx="22" fill="#090d16"/>
+  <circle cx="50" cy="50" r="38" stroke="#1e293b" stroke-width="4"/>
+  <!-- Horizon artificial line -->
+  <line x1="20" y1="50" x2="80" y2="50" stroke="#0284c7" stroke-width="3" stroke-linecap="round"/>
+  <!-- Glider wing profile arc -->
+  <path d="M22 46 Q 50 18 78 46 Q 50 38 22 46 Z" fill="#0284c7" fill-opacity="0.9"/>
+  <!-- Center dot -->
+  <circle cx="50" cy="50" r="3.5" fill="#f59e0b"/>
+</svg>

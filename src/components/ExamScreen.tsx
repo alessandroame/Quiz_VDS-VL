@@ -1,0 +1,500 @@
+import React, { useState, useEffect, useCallback } from 'react';
+import confetti from 'canvas-confetti';
+import {
+  Timer,
+  AlertCircle,
+  CheckCircle2,
+  XCircle,
+  ArrowRight,
+  ArrowLeft,
+  RotateCcw,
+  Zap,
+  ListFilter
+} from 'lucide-react';
+import type { Question } from '../types/quiz';
+import type { ExamSession, ExamQuestionSnapshot } from '../types/database';
+import { useQuiz } from '../context/QuizContext';
+import { generateExamQuestions } from '../utils/fairRandomizer';
+import { QuestionCard } from './QuestionCard';
+
+export const ExamScreen: React.FC = () => {
+  const { questions, statsMap, saveExam, recordAnswer, settings } = useQuiz();
+
+  // Stato esame
+  const [examState, setExamState] = useState<'idle' | 'running' | 'review'>('idle');
+  const [examQuestions, setExamQuestions] = useState<Question[]>([]);
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [answers, setAnswers] = useState<Record<number, 1 | 2 | 3>>({});
+  const [flags, setFlags] = useState<Record<number, boolean>>({});
+  const [secondsRemaining, setSecondsRemaining] = useState(45 * 60);
+  const [startTime, setStartTime] = useState(0);
+  const [isMarathon, setIsMarathon] = useState(false);
+  const [showSubmitModal, setShowSubmitModal] = useState(false);
+  const [completedSession, setCompletedSession] = useState<ExamSession | null>(null);
+
+  const startExam = (marathon = false) => {
+    setIsMarathon(marathon);
+    const generated = generateExamQuestions(questions, statsMap, marathon);
+    setExamQuestions(generated);
+    setCurrentIndex(0);
+    setAnswers({});
+    setFlags({});
+    const totalMinutes = marathon ? 60 : settings.examTimerMinutes || 45;
+    setSecondsRemaining(totalMinutes * 60);
+    setStartTime(Date.now());
+    setCompletedSession(null);
+    setExamState('running');
+  };
+
+  // Timer countdown
+  useEffect(() => {
+    if (examState !== 'running') return;
+
+    const interval = setInterval(() => {
+      setSecondsRemaining(prev => {
+        if (prev <= 1) {
+          clearInterval(interval);
+          handleSubmitExam();
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, [examState]);
+
+  const currentQuestion = examQuestions[currentIndex];
+  const totalCount = examQuestions.length;
+  const answeredCount = Object.keys(answers).length;
+  const flaggedCount = Object.values(flags).filter(Boolean).length;
+
+  const handleSelectAnswer = (ans: 1 | 2 | 3) => {
+    if (!currentQuestion) return;
+    setAnswers(prev => ({ ...prev, [currentQuestion.id]: ans }));
+  };
+
+  const handleToggleFlag = () => {
+    if (!currentQuestion) return;
+    setFlags(prev => ({ ...prev, [currentQuestion.id]: !prev[currentQuestion.id] }));
+  };
+
+  // Keyboard navigation
+  useEffect(() => {
+    if (examState !== 'running' || !currentQuestion) return;
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) return;
+
+      if (e.key === '1') handleSelectAnswer(1);
+      else if (e.key === '2') handleSelectAnswer(2);
+      else if (e.key === '3') handleSelectAnswer(3);
+      else if (e.key.toLowerCase() === 'f') handleToggleFlag();
+      else if (e.key === 'ArrowLeft' && currentIndex > 0) setCurrentIndex(prev => prev - 1);
+      else if (e.key === 'ArrowRight' && currentIndex < totalCount - 1) setCurrentIndex(prev => prev + 1);
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [examState, currentIndex, currentQuestion, totalCount]);
+
+  const handleSubmitExam = useCallback(async () => {
+    setShowSubmitModal(false);
+    const durationSeconds = Math.round((Date.now() - startTime) / 1000);
+
+    let correctCount = 0;
+    let wrongCount = 0;
+    const subjectMap: Record<number, { total: number; correct: number; wrong: number }> = {};
+    const snapshots: ExamQuestionSnapshot[] = [];
+
+    for (const q of examQuestions) {
+      const userAns = answers[q.id];
+      const isCorrect = userAns === q.correctAnswer;
+
+      if (isCorrect) correctCount++;
+      else wrongCount++;
+
+      // Registra telemetria permanente su Dexie
+      if (userAns !== undefined) {
+        await recordAnswer(q.id, isCorrect);
+      }
+
+      if (!subjectMap[q.subjectId]) {
+        subjectMap[q.subjectId] = { total: 0, correct: 0, wrong: 0 };
+      }
+      subjectMap[q.subjectId].total++;
+      if (isCorrect) subjectMap[q.subjectId].correct++;
+      else subjectMap[q.subjectId].wrong++;
+
+      snapshots.push({
+        questionId: q.id,
+        userAnswer: userAns,
+        correctAnswer: q.correctAnswer,
+        isCorrect,
+        wasFlagged: !!flags[q.id]
+      });
+    }
+
+    // Regola Ufficiale AeCI: Max 3 errori su 30 (o max 6 su 60 per maratona)
+    const maxAllowedErrors = isMarathon ? 6 : 3;
+    const isPassed = wrongCount <= maxAllowedErrors;
+
+    const session: ExamSession = {
+      date: Date.now(),
+      durationSeconds,
+      totalQuestions: totalCount,
+      correctAnswers: correctCount,
+      wrongAnswers: wrongCount,
+      isPassed,
+      isMarathon,
+      subjectBreakdown: subjectMap,
+      snapshots
+    };
+
+    await saveExam(session);
+    setCompletedSession(session);
+    setExamState('review');
+
+    if (isPassed) {
+      try {
+        confetti({
+          particleCount: 80,
+          spread: 70,
+          origin: { y: 0.6 }
+        });
+      } catch {
+        // Ignora
+      }
+    }
+  }, [answers, examQuestions, flags, isMarathon, recordAnswer, saveExam, startTime, totalCount]);
+
+  const formatTimer = (secs: number) => {
+    const m = Math.floor(secs / 60);
+    const s = secs % 60;
+    return `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+  };
+
+  // --- Schermata IDLE: Avvio Esame ---
+  if (examState === 'idle') {
+    return (
+      <div className="max-w-2xl mx-auto px-4 py-8 space-y-6">
+        <div className="text-center space-y-2">
+          <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-sky-500/10 text-sky-400 mb-2">
+            <Zap className="w-8 h-8" />
+          </div>
+          <h1 className="text-2xl font-bold tracking-tight">Simulazione Esame</h1>
+          <p className="text-xs text-slate-400 light:text-slate-600 max-w-sm mx-auto">
+            Regolamento Ufficiale AeCI (D.P.R. 133/2010): 30 quesiti proporzionali, max 3 errori, 45 minuti.
+          </p>
+        </div>
+
+        {/* Card Regole Ufficiali */}
+        <div className="bg-slate-900 border border-slate-800 rounded-xl p-5 light:bg-white light:border-slate-200 shadow-sm space-y-3">
+          <div className="grid grid-cols-3 gap-3 text-center">
+            <div className="p-3 bg-slate-950/60 light:bg-slate-50 rounded-lg border border-slate-800/80 light:border-slate-200">
+              <div className="text-2xl font-black text-sky-400 light:text-sky-600">30</div>
+              <div className="text-[11px] text-slate-400 light:text-slate-500 font-medium">Quesiti</div>
+            </div>
+            <div className="p-3 bg-slate-950/60 light:bg-slate-50 rounded-lg border border-slate-800/80 light:border-slate-200">
+              <div className="text-2xl font-black text-emerald-400 light:text-emerald-600">max 3</div>
+              <div className="text-[11px] text-slate-400 light:text-slate-500 font-medium">Errori Ammessi</div>
+            </div>
+            <div className="p-3 bg-slate-950/60 light:bg-slate-50 rounded-lg border border-slate-800/80 light:border-slate-200">
+              <div className="text-2xl font-black text-amber-400 light:text-amber-600">45'</div>
+              <div className="text-[11px] text-slate-400 light:text-slate-500 font-medium">Tempo Limite</div>
+            </div>
+          </div>
+
+          <div className="text-xs text-slate-400 light:text-slate-500 pt-2 flex items-center justify-between border-t border-slate-800 light:border-slate-100">
+            <span>Algoritmo Copertura Garantita:</span>
+            <span className="text-sky-400 light:text-sky-600 font-medium">Priorità mai viste</span>
+          </div>
+        </div>
+
+        {/* Pulsanti Avvio */}
+        <div className="space-y-3 pt-2">
+          <button
+            onClick={() => startExam(false)}
+            className="w-full py-4 rounded-xl bg-sky-600 hover:bg-sky-500 text-white font-bold text-base shadow-lg shadow-sky-950/40 flex items-center justify-center gap-2 transition-all active:scale-[0.99]"
+          >
+            <span>Avvia Esame Ufficiale (30 Quiz)</span>
+            <ArrowRight className="w-5 h-5" />
+          </button>
+
+          <button
+            onClick={() => startExam(true)}
+            className="w-full py-3 rounded-xl bg-slate-900 border border-slate-800 hover:border-slate-700 text-slate-300 light:bg-slate-100 light:text-slate-700 light:border-slate-300 text-xs font-semibold flex items-center justify-center gap-1.5 transition-colors"
+          >
+            <ListFilter className="w-4 h-4" />
+            <span>Maratona Intensiva (60 Quiz - 60 min)</span>
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  // --- Schermata REVIEW / DEBRIEFING ESITO ---
+  if (examState === 'review' && completedSession) {
+    const isPassed = completedSession.isPassed;
+    const errors = completedSession.wrongAnswers;
+    const correct = completedSession.correctAnswers;
+    const total = completedSession.totalQuestions;
+
+    return (
+      <div className="max-w-2xl mx-auto px-4 py-8 space-y-6">
+        {/* Banner Esito */}
+        <div
+          className={`p-6 rounded-2xl border text-center space-y-2 ${
+            isPassed
+              ? 'bg-emerald-950/30 border-emerald-500/60 light:bg-emerald-50 light:border-emerald-300'
+              : 'bg-rose-950/30 border-rose-500/60 light:bg-rose-50 light:border-rose-300'
+          }`}
+        >
+          <div className="inline-flex items-center justify-center w-14 h-14 rounded-full mb-1">
+            {isPassed ? (
+              <CheckCircle2 className="w-14 h-14 text-emerald-400 light:text-emerald-600" />
+            ) : (
+              <XCircle className="w-14 h-14 text-rose-400 light:text-rose-600" />
+            )}
+          </div>
+          <h2
+            className={`text-2xl font-black tracking-tight ${
+              isPassed ? 'text-emerald-300 light:text-emerald-800' : 'text-rose-300 light:text-rose-800'
+            }`}
+          >
+            {isPassed ? 'IDONEO' : 'NON IDONEO'}
+          </h2>
+          <div className="text-sm font-semibold text-slate-300 light:text-slate-700">
+            {correct}/{total} esatte ({errors} {errors === 1 ? 'errore' : 'errori'})
+          </div>
+          <p className="text-xs text-slate-400 light:text-slate-600">
+            {isPassed
+              ? 'Complimenti! Hai superato la soglia ufficiale del 90% (max 3 errori).'
+              : 'Soglia massima di 3 errori superata. Rivedi subito gli errori qui sotto.'}
+          </p>
+        </div>
+
+        {/* Dettaglio Materie con Errori */}
+        <div className="bg-slate-900 border border-slate-800 rounded-xl p-4 light:bg-white light:border-slate-200">
+          <h3 className="text-xs font-bold text-slate-400 light:text-slate-600 uppercase tracking-wider mb-3">
+            Ripartizione Materie
+          </h3>
+          <div className="space-y-2 text-xs">
+            {Object.entries(completedSession.subjectBreakdown).map(([subIdStr, data]) => {
+              const subId = Number(subIdStr);
+              const qSample = examQuestions.find(q => q.subjectId === subId);
+              const subName = qSample?.subjectName || `Materia ${subId}`;
+              const hasErrors = data.wrong > 0;
+
+              return (
+                <div key={subId} className="flex items-center justify-between py-1 border-b border-slate-800/60 light:border-slate-100 last:border-none">
+                  <span className="text-slate-300 light:text-slate-700 font-medium truncate max-w-[200px]">
+                    {subName}
+                  </span>
+                  <div className="flex items-center gap-2">
+                    <span className="text-slate-400">
+                      {data.correct}/{data.total}
+                    </span>
+                    {hasErrors ? (
+                      <span className="px-1.5 py-0.5 rounded bg-rose-500/20 text-rose-400 font-bold text-[10px]">
+                        -{data.wrong} err
+                      </span>
+                    ) : (
+                      <span className="px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-400 font-bold text-[10px]">
+                        100%
+                      </span>
+                    )}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Pulsanti Azione */}
+        <div className="flex gap-3">
+          <button
+            onClick={() => startExam(false)}
+            className="flex-1 py-3 rounded-xl bg-sky-600 hover:bg-sky-500 text-white font-bold text-sm flex items-center justify-center gap-2"
+          >
+            <RotateCcw className="w-4 h-4" />
+            <span>Nuovo Esame</span>
+          </button>
+        </div>
+
+        {/* Revisione Domande Sessione */}
+        <div className="space-y-4 pt-4">
+          <h3 className="text-sm font-bold text-slate-200 light:text-slate-800">
+            Revisione Quesiti Sessione
+          </h3>
+          <div className="space-y-4">
+            {examQuestions.map((q, idx) => {
+              const snap = completedSession.snapshots[idx];
+              return (
+                <QuestionCard
+                  key={q.id}
+                  question={q}
+                  selectedAnswer={snap.userAnswer}
+                  onSelectAnswer={() => {}}
+                  showFeedback={true}
+                  indexNumber={idx + 1}
+                  totalNumber={totalCount}
+                />
+              );
+            })}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // --- Schermata RUNNING: Esame in Corso ---
+  return (
+    <div className="max-w-2xl mx-auto px-4 py-4 space-y-4">
+      {/* Top Bar: Timer, Progresso, Consegna */}
+      <div className="flex items-center justify-between gap-2 p-3 bg-slate-900 border border-slate-800 rounded-xl dark:bg-slate-900 light:bg-white light:border-slate-200 shadow-sm sticky top-14 z-30">
+        <div className="flex items-center gap-2">
+          <div
+            className={`flex items-center gap-1.5 font-mono font-bold text-sm px-2.5 py-1 rounded-lg ${
+              secondsRemaining < 300
+                ? 'bg-rose-500/20 text-rose-400 animate-pulse'
+                : 'bg-slate-950 text-slate-100 light:bg-slate-100 light:text-slate-800'
+            }`}
+          >
+            <Timer className="w-4 h-4 text-sky-400" />
+            <span>{formatTimer(secondsRemaining)}</span>
+          </div>
+
+          <div className="text-xs text-slate-400 light:text-slate-600 font-medium">
+            <span>{answeredCount}</span>/{totalCount}
+            {flaggedCount > 0 && (
+              <span className="ml-1 text-amber-400 font-medium">
+                ({flaggedCount} ⚑)
+              </span>
+            )}
+          </div>
+        </div>
+
+        <button
+          onClick={() => setShowSubmitModal(true)}
+          className="px-3.5 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs shadow-sm transition-all"
+        >
+          Consegna ({answeredCount}/{totalCount})
+        </button>
+      </div>
+
+      {/* Griglia Navigatore Domande (30 bolle) */}
+      <div className="p-3 bg-slate-900/60 border border-slate-800 rounded-xl light:bg-white light:border-slate-200">
+        <div className="flex flex-wrap gap-1.5 justify-center">
+          {examQuestions.map((q, idx) => {
+            const isAnswered = answers[q.id] !== undefined;
+            const isFlagged = flags[q.id] === true;
+            const isCurrent = currentIndex === idx;
+
+            let bubbleStyle = 'border-slate-800 bg-slate-950 text-slate-400 light:border-slate-200 light:bg-slate-50 light:text-slate-600';
+            if (isAnswered) {
+              bubbleStyle = 'border-sky-500 bg-sky-500 text-white font-bold';
+            }
+            if (isFlagged) {
+              bubbleStyle = 'border-amber-500 bg-amber-500/20 text-amber-300 font-bold';
+            }
+            if (isCurrent) {
+              bubbleStyle += ' ring-2 ring-sky-400 ring-offset-2 ring-offset-slate-950 light:ring-offset-white';
+            }
+
+            return (
+              <button
+                key={q.id}
+                onClick={() => setCurrentIndex(idx)}
+                className={`w-7 h-7 rounded-lg border text-xs flex items-center justify-center transition-all ${bubbleStyle}`}
+                title={`Quesito #${q.id}`}
+              >
+                {idx + 1}
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* Card Domanda Corrente */}
+      {currentQuestion && (
+        <QuestionCard
+          question={currentQuestion}
+          selectedAnswer={answers[currentQuestion.id]}
+          onSelectAnswer={handleSelectAnswer}
+          showFeedback={false}
+          isFlagged={flags[currentQuestion.id]}
+          onToggleFlag={handleToggleFlag}
+          indexNumber={currentIndex + 1}
+          totalNumber={totalCount}
+        />
+      )}
+
+      {/* Controlli Precedente / Successiva */}
+      <div className="flex items-center justify-between gap-3 pt-2">
+        <button
+          onClick={() => setCurrentIndex(prev => Math.max(0, prev - 1))}
+          disabled={currentIndex === 0}
+          className="px-4 py-2.5 rounded-xl border border-slate-800 bg-slate-900 text-slate-300 light:bg-white light:border-slate-200 light:text-slate-700 text-xs font-semibold flex items-center gap-1.5 disabled:opacity-30"
+        >
+          <ArrowLeft className="w-4 h-4" />
+          <span>Precedente</span>
+        </button>
+
+        <button
+          onClick={() => setCurrentIndex(prev => Math.min(totalCount - 1, prev + 1))}
+          disabled={currentIndex === totalCount - 1}
+          className="px-4 py-2.5 rounded-xl border border-slate-800 bg-slate-900 text-slate-300 light:bg-white light:border-slate-200 light:text-slate-700 text-xs font-semibold flex items-center gap-1.5 disabled:opacity-30"
+        >
+          <span>Successiva</span>
+          <ArrowRight className="w-4 h-4" />
+        </button>
+      </div>
+
+      {/* Modal di Conferma Consegna */}
+      {showSubmitModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4 animate-in fade-in">
+          <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 max-w-sm w-full space-y-4 shadow-2xl light:bg-white light:border-slate-200">
+            <div className="flex items-center gap-2 text-amber-400">
+              <AlertCircle className="w-6 h-6" />
+              <h3 className="font-bold text-base text-slate-100 light:text-slate-900">
+                Consegna Esame
+              </h3>
+            </div>
+
+            <div className="text-xs text-slate-300 light:text-slate-600 space-y-2">
+              <p>
+                Hai risposto a <strong>{answeredCount}</strong> su <strong>{totalCount}</strong> quesiti.
+              </p>
+              {totalCount - answeredCount > 0 && (
+                <p className="text-rose-400 font-medium">
+                  Attenzione: {totalCount - answeredCount} domande non risposte verranno considerate errate.
+                </p>
+              )}
+              {flaggedCount > 0 && (
+                <p className="text-amber-400">
+                  Hai ancora {flaggedCount} domande contrassegnate da rivedere.
+                </p>
+              )}
+            </div>
+
+            <div className="flex gap-2 pt-2">
+              <button
+                onClick={() => setShowSubmitModal(false)}
+                className="flex-1 py-2.5 rounded-xl border border-slate-800 text-slate-400 hover:text-slate-200 light:border-slate-300 light:text-slate-700 text-xs font-medium"
+              >
+                Continua
+              </button>
+              <button
+                onClick={handleSubmitExam}
+                className="flex-1 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold shadow-md"
+              >
+                Conferma
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
