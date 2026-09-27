@@ -135,4 +135,60 @@ describe('Suite 7: Google Drive Sync Service (src/services/googleDrive.ts)', () 
     expect(res.success).toBe(false);
     expect(res.message).toContain('Nessun backup trovato');
   });
+
+  it('DRV-07: uploadBackup rileva errore 403 API disabilitata e restituisce messaggio diagnostico', async () => {
+    // Arrange
+    (service as any).accessToken = 'mock_valid_token';
+    (service as any).tokenExpiry = Date.now() + 3600000;
+
+    const mockFetch = vi.fn();
+    globalThis.fetch = mockFetch;
+
+    // Ricerca file fallisce con 403 SERVICE_DISABLED
+    mockFetch.mockResolvedValueOnce({
+      ok: false,
+      status: 403,
+      json: async () => ({
+        error: {
+          code: 403,
+          message: 'Google Drive API has not been used in project 182413802928 before or it is disabled.'
+        }
+      })
+    });
+
+    // Act
+    const res = await service.uploadBackup('{"test": true}');
+
+    // Assert
+    expect(res.success).toBe(false);
+    expect(res.message).toContain('Google Drive API non abilitata nel progetto Google Cloud');
+  });
+
+  it('DRV-08: downloadBackup rileva errore 403 API disabilitata e restituisce messaggio diagnostico', async () => {
+    // Arrange
+    (service as any).accessToken = 'mock_valid_token';
+    (service as any).tokenExpiry = Date.now() + 3600000;
+
+    const mockFetch = vi.fn();
+    globalThis.fetch = mockFetch;
+
+    // Ricerca file fallisce con 403 SERVICE_DISABLED
+    mockFetch.mockResolvedValueOnce({
+      ok: false,
+      status: 403,
+      json: async () => ({
+        error: {
+          code: 403,
+          message: 'Google Drive API has not been used in project 182413802928 before or it is disabled.'
+        }
+      })
+    });
+
+    // Act
+    const res = await service.downloadBackup();
+
+    // Assert
+    expect(res.success).toBe(false);
+    expect(res.message).toContain('Google Drive API non abilitata nel progetto Google Cloud');
+  });
 });

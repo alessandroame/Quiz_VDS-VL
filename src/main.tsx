@@ -3,14 +3,7 @@ import ReactDOM from 'react-dom/client';
 import App from './App';
 import './index.css';
 
-// Registrazione del Service Worker PWA per funzionamento offline
-if ('serviceWorker' in navigator && import.meta.env.PROD) {
-  window.addEventListener('load', () => {
-    navigator.serviceWorker.register('/sw.js').catch(err => {
-      console.warn('Errore registrazione service worker:', err);
-    });
-  });
-}
+// vite-plugin-pwa gestisce automaticamente la registrazione del Service Worker con scope e base path corretti tramite registerSW.js
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>

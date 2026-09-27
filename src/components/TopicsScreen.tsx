@@ -212,6 +212,7 @@ export const TopicsScreen: React.FC = () => {
               {/* Pulsanti Avvio per Filtro */}
               <div className="flex items-center gap-2 pt-1 text-xs">
                 <button
+                  id={`btn-topic-all-${sub.id}`}
                   onClick={() => startTopicSession(sub.id, 'all')}
                   className="flex-1 py-2 rounded-lg bg-sky-600 hover:bg-sky-500 text-white font-semibold flex items-center justify-center gap-1 transition-colors"
                 >

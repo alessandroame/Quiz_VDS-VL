@@ -61,6 +61,34 @@ export class GoogleDriveService {
     });
   }
 
+  private async handleApiError(res: Response, action: string): Promise<never> {
+    let detail = '';
+    try {
+      const json = await res.json();
+      detail = json?.error?.message || JSON.stringify(json);
+    } catch {
+      detail = await res.text().catch(() => '');
+    }
+
+    if (res.status === 403) {
+      if (
+        detail.includes('Google Drive API') ||
+        detail.includes('disabled') ||
+        detail.includes('SERVICE_DISABLED') ||
+        detail.includes('has not been used')
+      ) {
+        throw new Error(
+          'Google Drive API non abilitata nel progetto Google Cloud. Abilitala su Google Cloud Console (APIs & Services > Library > Google Drive API).'
+        );
+      }
+      throw new Error(
+        `Permesso negato (403): ${detail || 'Verifica che il tuo account Google sia autorizzato o che l\'app sia verificata/pubblicata.'}`
+      );
+    }
+
+    throw new Error(`${action} fallito (${res.status}): ${detail}`);
+  }
+
   public async uploadBackup(backupJson: string): Promise<{ success: boolean; message: string }> {
     try {
       const token = await this.getAccessToken();
@@ -72,6 +100,9 @@ export class GoogleDriveService {
           headers: { Authorization: `Bearer ${token}` }
         }
       );
+      if (!searchRes.ok) {
+        await this.handleApiError(searchRes, 'Ricerca file esistente');
+      }
       const searchData = await searchRes.json();
       const existingFile = searchData.files && searchData.files.length > 0 ? searchData.files[0] : null;
 
@@ -112,8 +143,7 @@ export class GoogleDriveService {
       });
 
       if (!uploadRes.ok) {
-        const errText = await uploadRes.text();
-        throw new Error(`Upload fallito: ${errText}`);
+        await this.handleApiError(uploadRes, 'Caricamento backup');
       }
 
       return { success: true, message: 'Backup salvato su Google Drive' };
@@ -132,6 +162,9 @@ export class GoogleDriveService {
           headers: { Authorization: `Bearer ${token}` }
         }
       );
+      if (!searchRes.ok) {
+        await this.handleApiError(searchRes, 'Ricerca file di backup');
+      }
       const searchData = await searchRes.json();
       if (!searchData.files || searchData.files.length === 0) {
         return { success: false, message: 'Nessun backup trovato su Google Drive' };
@@ -143,7 +176,7 @@ export class GoogleDriveService {
       });
 
       if (!downloadRes.ok) {
-        throw new Error('Impossibile scaricare il file da Drive');
+        await this.handleApiError(downloadRes, 'Download backup');
       }
 
       const text = await downloadRes.text();

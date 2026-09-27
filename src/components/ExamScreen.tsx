@@ -511,6 +511,7 @@ export const ExamScreen: React.FC = () => {
                 Continua
               </button>
               <button
+                id="btn-confirm-submit-exam"
                 onClick={handleSubmitExam}
                 className="flex-1 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold shadow-md"
               >

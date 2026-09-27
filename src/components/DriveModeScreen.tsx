@@ -659,6 +659,7 @@ export const DriveModeScreen: React.FC<DriveModeScreenProps> = ({
           {/* Top Bar HUD */}
           <div className="flex items-center justify-between gap-2 pb-2 border-b border-slate-800/90 text-xs">
             <button
+              id="btn-drive-exit"
               onClick={handleClose}
               className="px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-800 text-slate-300 font-bold flex items-center gap-1 hover:text-white"
             >
@@ -786,6 +787,7 @@ export const DriveModeScreen: React.FC<DriveModeScreenProps> = ({
               return (
                 <button
                   key={optNum}
+                  id={`btn-drive-opt-${optNum}`}
                   onClick={() => handleSelectAnswer(optNum)}
                   className={`flex-1 w-full rounded-2xl border-2 p-3 sm:p-4 flex items-center gap-3 sm:gap-4 text-left transition-all ${style}`}
                 >
