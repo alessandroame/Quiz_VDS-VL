@@ -1,7 +1,11 @@
 ---
 name: self-correction-loop
-description: Sistema di cattura e memorizzazione permanente delle correzioni in MEMORY.md. Evita il ripetersi di errori tra sessioni diverse, riducendo l'attrito e il consumo di token.
-version: 1.0.0
+description: >
+  Sistema di cattura e memorizzazione permanente delle correzioni in MEMORY.md. Evita il ripetersi di errori tra sessioni diverse,
+  riducendo l'attrito e il consumo di token.
+  Attiva questa skill quando: l'utente corregge un comportamento o un dato, dice 'ricordati questo', 'non farlo più',
+  'memorizza', 'aggiorna memoria', 'regola di progetto', o all'inizio di una sessione per consultare le regole esistenti.
+version: 1.1.0
 language: it-IT
 ---
 

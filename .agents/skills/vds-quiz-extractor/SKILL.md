@@ -1,7 +1,10 @@
 ---
 name: vds-quiz-extractor
-description: Estrazione, normalizzazione e validazione di integrità dei 504 quiz VDS-VL AeCI da file PDF a schema JSON tipizzato.
-version: 1.0.0
+description: >
+  Estrazione, normalizzazione e validazione di integrità dei 504 quiz VDS-VL AeCI da file PDF a schema JSON tipizzato.
+  Attiva questa skill quando: estrai quiz dal PDF ufficiale quiz_VDS-VL_2017.pdf, verifichi la coerenza delle domande o soluzioni,
+  o rigeneri il dataset JSON dei quiz con le relative spiegazioni didattiche.
+version: 1.1.0
 language: it-IT
 ---
 

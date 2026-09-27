@@ -1,7 +1,11 @@
 ---
 name: autonomous-loops
-description: Cicli di iterazione autonomi con Circuit Breaker per sviluppo Vite, TypeScript e Vitest. Blocca loop infiniti, previene lo spreco di token e interrompe l'esecuzione in caso di stallo o regressione.
-version: 1.0.0
+description: >
+  Cicli di iterazione autonomi con Circuit Breaker salva-token per sviluppo Vite, TypeScript e Vitest.
+  Previene loop infiniti, blocca iterazioni a vuoto e interrompe l'esecuzione in caso di stallo (STUCK) o regressione.
+  Attiva questa skill quando: risolvi errori di build o typecheck con tsc, fixi test falliti in Vitest, esegui refactoring,
+  o quando l'utente dice 'risolvi la build', 'correggi i test', 'fai funzionare', 'autonomous loop' o 'circuit breaker'.
+version: 1.1.0
 language: it-IT
 ---
 

@@ -1,7 +1,10 @@
 ---
 name: aviation-ui-ux
-description: Design system avionico, linee guida microcopy minimale (cockpit style), temi chiaro/scuro/auto e usabilità mobile/desktop per la PWA VDS-VL.
-version: 1.0.0
+description: >
+  Design system avionico, linee guida microcopy minimale (cockpit style), temi chiaro/scuro/auto e usabilità mobile/desktop per la PWA VDS-VL.
+  Attiva questa skill quando: crei o modifichi componenti UI, pulsanti, palette colori (Cockpit Dark / Hangar Light), layout responsive,
+  microcopy essenziale, o scorciatoie da tastiera (1, 2, 3, F, Spazio).
+version: 1.1.0
 language: it-IT
 ---
 

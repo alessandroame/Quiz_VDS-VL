@@ -1,7 +1,9 @@
 ---
 name: git-pro
-description: Standard e procedure professionali per il versionamento Git, commit atomici convenzionali, gestione amend pre-push e igiene del repository.
-version: 1.0.0
+description: >
+  Standard e procedure professionali per il versionamento Git, commit atomici convenzionali, gestione amend pre-push e igiene del repository.
+  Attiva questa skill quando: crei commit, gestisci amend pre-push, controlli lo stato di git o mantieni pulito il working tree.
+version: 1.1.0
 language: it-IT
 ---
 

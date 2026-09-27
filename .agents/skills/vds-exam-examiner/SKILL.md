@@ -1,7 +1,11 @@
 ---
 name: vds-exam-examiner
-description: Skill specialistica per l'interrogazione, la simulazione e la validazione secondo il Regolamento Ufficiale d'Esame VDS/VL (Volo Libero - Parapendio e Deltaplano) AeCI e D.P.R. 133/2010.
-version: 1.1.0
+description: >
+  Skill specialistica per l'interrogazione, la simulazione e la validazione secondo il Regolamento Ufficiale d'Esame VDS/VL
+  (Volo Libero - Parapendio e Deltaplano) AeCI e D.P.R. 133/2010.
+  Attiva questa skill quando: simuli una sessione d'esame ufficiale (30 quiz, 45 min, max 3 errori), verifichi la conformità alle 9 materie,
+  valuti l'idoneità del candidato o fornisci spiegazioni didattiche (regola + tranello) sulle domande ufficiali.
+version: 1.2.0
 language: it-IT
 strict_compliance: true
 ---

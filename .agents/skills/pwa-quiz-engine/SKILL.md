@@ -1,7 +1,11 @@
 ---
 name: pwa-quiz-engine
-description: Architettura dell'engine per la PWA VDS-VL, inclusi Fair Coverage Randomizer, persistenza Dexie (IndexedDB), sync Google Drive e gestione offline.
-version: 1.0.0
+description: >
+  Architettura dell'engine per la PWA VDS-VL, inclusi Fair Coverage Randomizer anti-coupon collector, persistenza Dexie (IndexedDB),
+  sync Google Drive e gestione offline via Service Worker.
+  Attiva questa skill quando: sviluppi o modifichi la logica di estrazione dei 30 quiz per esame, lo store IndexedDB/Dexie,
+  il calcolo delle statistiche di studio, il backup Drive o la configurazione offline PWA.
+version: 1.1.0
 language: it-IT
 ---
 
