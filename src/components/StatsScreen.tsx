@@ -39,9 +39,9 @@ export const StatsScreen: React.FC = () => {
   return (
     <div className="max-w-2xl mx-auto px-4 py-6 space-y-6">
       <div>
-        <h1 className="text-xl font-bold tracking-tight">Statistiche & Telemetria</h1>
+        <h1 className="text-xl font-bold tracking-tight">I tuoi Progressi</h1>
         <p className="text-xs text-slate-400 light:text-slate-600">
-          Monitoraggio preparazione esame VDS-VL
+          Come sta procedendo la tua preparazione per l'esame VDS-VL
         </p>
       </div>
 
@@ -50,7 +50,7 @@ export const StatsScreen: React.FC = () => {
         <div className="flex items-center justify-between">
           <div className="space-y-1">
             <span className="text-xs font-bold text-slate-400 light:text-slate-500 uppercase tracking-wider">
-              Indice di Prontezza
+              Prontezza Esame
             </span>
             <div className="text-3xl sm:text-4xl font-black text-sky-400 light:text-sky-600">
               {readinessScore}%
@@ -79,7 +79,7 @@ export const StatsScreen: React.FC = () => {
         {/* 3 Metric Box */}
         <div className="grid grid-cols-3 gap-2 pt-2 text-center text-xs">
           <div className="p-2.5 rounded-xl bg-slate-950/60 light:bg-slate-50 border border-slate-800/80 light:border-slate-200">
-            <div className="text-slate-400 light:text-slate-500 text-[10px]">Copertura</div>
+            <div className="text-slate-400 light:text-slate-500 text-[10px]">Quiz Visti</div>
             <div className="font-bold text-slate-200 light:text-slate-800 mt-0.5">
               {totalSeen}/{totalQuestionsCount}
             </div>
@@ -91,7 +91,7 @@ export const StatsScreen: React.FC = () => {
             <div className="font-bold text-rose-400 mt-0.5">
               {mistakesCount}
             </div>
-            <div className="text-[10px] text-slate-500">errori attivi</div>
+            <div className="text-[10px] text-slate-500">errori da rivedere</div>
           </div>
 
           <div className="p-2.5 rounded-xl bg-slate-950/60 light:bg-slate-50 border border-slate-800/80 light:border-slate-200">
@@ -100,7 +100,7 @@ export const StatsScreen: React.FC = () => {
               {sessions.length}
             </div>
             <div className="text-[10px] text-emerald-400">
-              {sessions.filter(s => s.isPassed).length} idonee
+              {sessions.filter(s => s.isPassed).length} superate
             </div>
           </div>
         </div>
@@ -110,7 +110,7 @@ export const StatsScreen: React.FC = () => {
       <div className="p-5 rounded-2xl border border-slate-800 bg-slate-900 light:bg-white light:border-slate-200 space-y-3">
         <h3 className="text-xs font-bold text-slate-400 light:text-slate-600 uppercase tracking-wider flex items-center gap-1.5">
           <TrendingUp className="w-3.5 h-3.5 text-sky-400" />
-          <span>Accuratezza per Materia</span>
+          <span>Risposte Esatte per Materia</span>
         </h3>
 
         <div className="space-y-3 pt-1">

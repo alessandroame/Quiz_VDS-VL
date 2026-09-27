@@ -44,7 +44,7 @@ export class GoogleDriveService {
     }
 
     if (!this.tokenClient) {
-      throw new Error('Client Google non inizializzato. Inserisci il Google Client ID nelle impostazioni.');
+      throw new Error('Client Google non inizializzato. Riprova tra pochi istanti.');
     }
 
     return new Promise((resolve, reject) => {

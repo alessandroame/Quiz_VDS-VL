@@ -223,8 +223,10 @@ export const DriveModeScreen: React.FC<DriveModeScreenProps> = ({
     // Lettura spiegazione
     playExplanation();
 
-    // Registra come vista/non risposta
-    await recordAnswer(currentQ.id, false);
+    // Registra come vista/non risposta (solo se fuori esame e senza context padre)
+    if (!isExamSession && !sessionContext) {
+      await recordAnswer(currentQ.id, false);
+    }
 
     // Passa alla prossima domanda dopo 3.5 secondi
     setTimeout(() => {
@@ -261,7 +263,9 @@ export const DriveModeScreen: React.FC<DriveModeScreenProps> = ({
 
     if (!isExamSession) {
       setRevealedQuestionId(currentQ.id);
-      await recordAnswer(currentQ.id, isCorrect);
+      if (!sessionContext) {
+        await recordAnswer(currentQ.id, isCorrect);
+      }
 
       if (!isCorrect) {
         playExplanation();
@@ -369,6 +373,14 @@ export const DriveModeScreen: React.FC<DriveModeScreenProps> = ({
   // Consegna Esame
   const handleSubmitExam = async () => {
     stopVoice();
+
+    // Se l'esame proviene da una sessione genitore (es. ExamScreen), deleghiamo il salvataggio
+    if (sessionContext?.onSubmitExam) {
+      sessionContext.onSubmitExam();
+      onClose();
+      return;
+    }
+
     const durationSeconds = Math.round((Date.now() - startTime) / 1000);
 
     const session = evaluateExam({
@@ -388,10 +400,6 @@ export const DriveModeScreen: React.FC<DriveModeScreenProps> = ({
     await saveExam(session);
     setCompletedSession(session);
     setInternalMode('debriefing');
-
-    if (sessionContext?.onSubmitExam) {
-      sessionContext.onSubmitExam();
-    }
   };
 
   // Keyboard Navigation per telecomandi Bluetooth da volante o tastierini
@@ -523,7 +531,7 @@ export const DriveModeScreen: React.FC<DriveModeScreenProps> = ({
                   <span>Modalità Alla Guida</span>
                 </h1>
                 <p className="text-xs text-slate-400 font-medium">
-                  Controlli ingranditi • Hands-free • Zero scroll
+                  Pulsanti giganti • Rispondi a voce • Nessun bisogno di scorrere
                 </p>
               </div>
             </div>
@@ -638,7 +646,7 @@ export const DriveModeScreen: React.FC<DriveModeScreenProps> = ({
           <div className="pt-3 border-t border-slate-900 flex items-center justify-between text-xs text-slate-500">
             <div className="flex items-center gap-1.5">
               <Lightbulb className={`w-3.5 h-3.5 ${isWakeLockActive ? 'text-emerald-400' : 'text-slate-600'}`} />
-              <span>{isWakeLockActive ? 'Schermo sempre acceso (Wake Lock)' : 'Wake Lock inattivo'}</span>
+              <span>{isWakeLockActive ? 'Schermo sempre acceso durante la guida' : 'Standby schermo attivo'}</span>
             </div>
             <span>VDS-VL 2017</span>
           </div>

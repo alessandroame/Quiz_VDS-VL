@@ -103,7 +103,7 @@ const ArchiveItem: React.FC<ArchiveItemProps> = ({ question: q, isExpanded, onTo
           {settings.ttsEnabled && (
             <div className="flex items-center justify-between pb-2 border-b border-slate-800/60 light:border-slate-200 text-xs">
               <span className="text-[11px] text-slate-400 font-medium">
-                Ascolto Vocale Neurale
+                Ascolto Vocale
               </span>
               <div className="flex items-center gap-1.5">
                 <button
@@ -301,7 +301,7 @@ const ArchiveItem: React.FC<ArchiveItemProps> = ({ question: q, isExpanded, onTo
               className="w-full py-2 px-3 rounded-lg border border-dashed border-slate-800 dark:border-slate-800 hover:border-sky-500/60 light:border-slate-300 light:hover:border-sky-600 text-slate-400 hover:text-sky-400 light:text-slate-500 light:hover:text-sky-700 text-xs font-medium flex items-center justify-center gap-1.5 transition-colors"
             >
               <Plus className="w-3.5 h-3.5" />
-              <span>Aggiungi appunto personale sul quesito #{q.id}</span>
+              <span>Aggiungi una nota personale sulla domanda #{q.id}</span>
             </button>
           )}
         </div>
@@ -352,7 +352,7 @@ export const ArchiveScreen: React.FC = () => {
       <div>
         <h1 className="text-xl font-bold tracking-tight">Archivio Completo</h1>
         <p className="text-xs text-slate-400 light:text-slate-600">
-          504 quesiti ufficiali AeCI consultabili e ascoltabili liberamente
+          Tutti i 504 quiz ufficiali AeCI: cerca, leggi e ascolta qualsiasi domanda
         </p>
       </div>
 

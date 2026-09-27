@@ -46,12 +46,15 @@ export const TopicsScreen: React.FC = () => {
 
   const currentQ = sessionQuestions[currentIndex];
 
-  const handleAnswer = async (ans: 1 | 2 | 3) => {
-    if (!currentQ || sessionAnswers[currentQ.id]) return;
+  const handleAnswer = async (ans: 1 | 2 | 3, qid?: number) => {
+    const targetQid = qid ?? currentQ?.id;
+    if (!targetQid || sessionAnswers[targetQid]) return;
+    const targetQ = sessionQuestions.find(q => q.id === targetQid) || currentQ;
+    if (!targetQ) return;
 
-    setSessionAnswers(prev => ({ ...prev, [currentQ.id]: ans }));
-    const isCorrect = ans === currentQ.correctAnswer;
-    await recordAnswer(currentQ.id, isCorrect);
+    setSessionAnswers(prev => ({ ...prev, [targetQid]: ans }));
+    const isCorrect = ans === targetQ.correctAnswer;
+    await recordAnswer(targetQid, isCorrect);
   };
 
   // --- Vista Sessione Quiz per Materia ---
@@ -83,7 +86,7 @@ export const TopicsScreen: React.FC = () => {
                   currentIndex,
                   answers: sessionAnswers,
                   flags: {},
-                  onAnswer: (_qid: number, ans: 1 | 2 | 3) => handleAnswer(ans),
+                  onAnswer: (qid: number, ans: 1 | 2 | 3) => handleAnswer(ans, qid),
                   onToggleFlag: () => {},
                   onNavigateIndex: (idx: number) => setCurrentIndex(idx),
                   isExam: false,

@@ -36,12 +36,15 @@ export const MistakesScreen: React.FC = () => {
 
   const currentQ = reviewQuestions[currentIndex];
 
-  const handleAnswer = async (ans: 1 | 2 | 3) => {
-    if (!currentQ || reviewAnswers[currentQ.id]) return;
+  const handleAnswer = async (ans: 1 | 2 | 3, qid?: number) => {
+    const targetQid = qid ?? currentQ?.id;
+    if (!targetQid || reviewAnswers[targetQid]) return;
+    const targetQ = reviewQuestions.find(q => q.id === targetQid) || currentQ;
+    if (!targetQ) return;
 
-    setReviewAnswers(prev => ({ ...prev, [currentQ.id]: ans }));
-    const isCorrect = ans === currentQ.correctAnswer;
-    await recordAnswer(currentQ.id, isCorrect);
+    setReviewAnswers(prev => ({ ...prev, [targetQid]: ans }));
+    const isCorrect = ans === targetQ.correctAnswer;
+    await recordAnswer(targetQid, isCorrect);
   };
 
   // --- Modalità Ripasso in Corso ---
@@ -74,7 +77,7 @@ export const MistakesScreen: React.FC = () => {
                   currentIndex,
                   answers: reviewAnswers,
                   flags: {},
-                  onAnswer: (_qid, ans) => handleAnswer(ans),
+                  onAnswer: (qid, ans) => handleAnswer(ans, qid),
                   onToggleFlag: () => {},
                   onNavigateIndex: (idx) => setCurrentIndex(idx),
                   isExam: false,
@@ -94,11 +97,11 @@ export const MistakesScreen: React.FC = () => {
           </div>
         </div>
 
-        {/* Badge Maestria Spaziata */}
+        {/* Badge Obiettivo 2 risposte corrette */}
         <div className="px-3 py-1.5 bg-slate-900/60 border border-slate-800 rounded-lg text-xs text-slate-400 flex items-center justify-between">
-          <span>Stato padronanza quesito:</span>
+          <span>Obiettivo: 2 risposte esatte di fila per toglierla</span>
           <span className="font-semibold text-slate-200 light:text-slate-700">
-            {consecutive}/2 successi consecutivi per uscire
+            {consecutive}/2 completate
           </span>
         </div>
 
@@ -152,12 +155,12 @@ export const MistakesScreen: React.FC = () => {
         <div>
           <h1 className="text-xl font-bold tracking-tight">Quaderno Errori</h1>
           <p className="text-xs text-slate-400 light:text-slate-600">
-            Ripetizione spaziata (richiesti 2 successi consecutivi)
+            Rispondi esattamente per 2 volte di fila per togliere una domanda dagli errori
           </p>
         </div>
 
         <div className="px-3 py-1 bg-rose-500/10 border border-rose-500/20 rounded-full text-rose-400 font-bold text-xs">
-          {mistakesCount} nel quaderno
+          {mistakesCount} da ripassare
         </div>
       </div>
 
@@ -167,10 +170,10 @@ export const MistakesScreen: React.FC = () => {
             <CheckCircle2 className="w-6 h-6" />
           </div>
           <h3 className="text-base font-bold text-slate-200 light:text-slate-800">
-            Nessun errore pendente
+            Nessun errore da ripassare
           </h3>
           <p className="text-xs text-slate-400 light:text-slate-600 max-w-sm mx-auto">
-            Tutte le domande affrontate sono state superate per almeno 2 volte consecutive. Esegui una simulazione esame per mettere alla prova la tua preparazione!
+            Hai risposto correttamente a tutte le domande affrontate per almeno 2 volte consecutive. Ottimo lavoro! Avvia una simulazione d'esame per metterti alla prova.
           </p>
         </div>
       ) : (
@@ -180,13 +183,13 @@ export const MistakesScreen: React.FC = () => {
             className="w-full py-4 rounded-xl bg-rose-600 hover:bg-rose-500 text-white font-bold text-sm shadow-lg shadow-rose-950/40 flex items-center justify-center gap-2 transition-all"
           >
             <RotateCcw className="w-4 h-4" />
-            <span>Ripassa {mistakesCount} Quesiti Sbagliati</span>
+            <span>Ripassa le {mistakesCount} Domande Sbagliate</span>
           </button>
 
           {/* Elenco dettagliato errori */}
           <div className="space-y-3">
             <h3 className="text-xs font-bold text-slate-400 light:text-slate-600 uppercase tracking-wider">
-              Elenco Quesiti da Perfezionare
+              Domande da Ripassare
             </h3>
             <div className="space-y-2">
               {mistakeQuestions.map(q => {

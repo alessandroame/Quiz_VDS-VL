@@ -157,6 +157,14 @@ async function runSingleViewportCheck(viewportName, options = {}) {
           (async () => {
             const selectors = ${JSON.stringify(options.clickSelector)}.split(',').map(s => s.trim()).filter(Boolean);
             for (const sel of selectors) {
+              if (sel.startsWith('scroll:')) {
+                const target = document.querySelector(sel.slice(7));
+                if (target) {
+                  target.scrollIntoView({ behavior: 'instant', block: 'center' });
+                  await new Promise(r => setTimeout(r, 200));
+                }
+                continue;
+              }
               const el = document.querySelector(sel);
               if (!el) return { success: false, reason: 'Elemento non trovato: ' + sel };
               el.scrollIntoView({ behavior: 'instant', block: 'center' });

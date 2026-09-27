@@ -94,14 +94,16 @@ export const ExamScreen: React.FC = () => {
   const answeredCount = Object.keys(answers).length;
   const flaggedCount = Object.values(flags).filter(Boolean).length;
 
-  const handleSelectAnswer = (ans: 1 | 2 | 3) => {
-    if (!currentQuestion) return;
-    setAnswers(prev => ({ ...prev, [currentQuestion.id]: ans }));
+  const handleSelectAnswer = (ans: 1 | 2 | 3, qid?: number) => {
+    const targetId = qid ?? currentQuestion?.id;
+    if (!targetId) return;
+    setAnswers(prev => ({ ...prev, [targetId]: ans }));
   };
 
-  const handleToggleFlag = () => {
-    if (!currentQuestion) return;
-    setFlags(prev => ({ ...prev, [currentQuestion.id]: !prev[currentQuestion.id] }));
+  const handleToggleFlag = (qid?: number) => {
+    const targetId = qid ?? currentQuestion?.id;
+    if (!targetId) return;
+    setFlags(prev => ({ ...prev, [targetId]: !prev[targetId] }));
   };
 
   // Keyboard navigation
@@ -191,8 +193,8 @@ export const ExamScreen: React.FC = () => {
           </div>
 
           <div className="text-xs text-slate-400 light:text-slate-500 pt-2 flex items-center justify-between border-t border-slate-800 light:border-slate-100">
-            <span>Algoritmo Copertura Garantita:</span>
-            <span className="text-sky-400 light:text-sky-600 font-medium">Priorità mai viste</span>
+            <span>Selezione domande:</span>
+            <span className="text-sky-400 light:text-sky-600 font-medium">Priorità a quelle non ancora viste</span>
           </div>
         </div>
 
@@ -371,8 +373,8 @@ export const ExamScreen: React.FC = () => {
                 currentIndex,
                 answers,
                 flags,
-                onAnswer: (_qid, ans) => handleSelectAnswer(ans),
-                onToggleFlag: handleToggleFlag,
+                onAnswer: (qid, ans) => handleSelectAnswer(ans, qid),
+                onToggleFlag: (qid) => handleToggleFlag(qid),
                 onNavigateIndex: (idx) => setCurrentIndex(idx),
                 isExam: true,
                 secondsRemaining,

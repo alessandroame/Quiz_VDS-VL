@@ -120,8 +120,8 @@
 - **100% Client-Side & Zero Profilazione**: nessun database proprietario centrale, nessun cookie pubblicitario o tracciamento.
 - **Persistenza Locale Dexie.js (IndexedDB)**: storage asincrono, strutturato e robusto sul browser dell'utente (Single Source of Truth).
 - **Service Worker PWA**: installazione come applicazione standalone su iOS, Android, macOS e Windows con funzionamento completo anche in assenza di segnale.
-- **Backup File JSON (Zero-Config)**: esportazione e ripristino immediato di tutto il database (statistiche, preferiti, note, esami) con un click.
-- **Backup Cloud Google Drive (Opzionale)**: sincronizzazione on-demand verso la cartella privata e isolata `appDataFolder` del proprio account Google.
+- **Salva o Carica da File**: esportazione e ripristino immediato di una copia dei dati su file con un click (100% offline, per chi preferisce non usare Google).
+- **Salvataggio Cloud Google (1-Click)**: sincronizzazione trasparente e immediata ("Salva su Google" / "Ripristina da Google") sul proprio account Google personale, senza configurazioni complesse.
 
 ---
 

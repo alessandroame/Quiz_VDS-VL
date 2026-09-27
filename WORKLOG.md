@@ -18,6 +18,24 @@ Questo documento registra in ordine cronologico tutte le lavorazioni svolte nel 
 
 ## Registro Cronologico
 
+### [2026-09-27] - Umanizzazione UI/UX & Rimozione Configurazione Tecnica Client ID
+- **Cosa abbiamo fatto**:
+  - Rimossa dall'interfaccia utente qualsiasi menzione visibile del "Google Client ID", il campo di testo per l'inserimento manuale, il pulsante toggle per opzioni sviluppatore e la dicitura tecnica `(appDataFolder)`.
+  - Il Client ID Google OAuth opera ora completamente sotto il cofano, garantendo l'accesso e la sincronizzazione cloud tramite due soli pulsanti immediati: **"Salva su Google"** e **"Ripristina da Google"**.
+  - Revisionato e semplificato l'intero microcopy dell'applicazione per renderlo chiaro, naturale e accessibile a qualsiasi aspirante pilota (da chi non ha competenze informatiche agli esperti):
+    - `SettingsModal.tsx`: testi semplici per sincronizzazione cloud, salvataggio su file ("Scarica copia" / "Carica copia") e azzeramento ("Cancella tutti i dati e ricomincia da zero"). Semplificate le descrizioni di voci, velocità e modalità alla guida.
+    - `ExamScreen.tsx`: sostituito "Algoritmo Copertura Garantita: Priorità mai viste" con "Selezione domande: Priorità a quelle non ancora viste".
+    - `StatsScreen.tsx`: sostituito "Statistiche & Telemetria" con "I tuoi Progressi", "Indice di Prontezza" con "Prontezza Esame", "Copertura" con "Quiz Visti" e "errori attivi" con "errori da rivedere".
+    - `MistakesScreen.tsx`: sostituito il gergo didattico astratto con "Rispondi esattamente per 2 volte di fila per togliere una domanda dagli errori" e "Domande da Ripassare".
+    - `ArchiveScreen.tsx`: sostituito "Ascolto Vocale Neurale" con "Ascolto Vocale" e testo del pulsante note.
+    - `DriveModeScreen.tsx`: chiarito lo stato dello schermo sempre acceso e dei pulsanti giganti.
+  - Esteso lo script headless CDP `visual_check.js` con il supporto per selettori di scorrimento `scroll:<selector>`.
+  - Convalidato l'aggiornamento visivo tramite screenshot headless pixel-perfect in tema scuro e chiaro (0 errori in console) e superamento di tutti i 63 test unitari Vitest (`npm test`).
+- **Scelte architetturali & Rationale**:
+  - *Zero Gergo Tecnico (No Jargon Principle)*: In un'applicazione rivolta a studenti e allievi di volo libero di qualunque estrazione (dal camionista alla bidella all'ingegnere), la complessità tecnica (OAuth, Client ID, JSON, appDataFolder) deve essere interamente assorbita dall'architettura del software. L'interfaccia deve parlare la lingua dell'utente: "Salva su Google", "Salva su file", "Ricomincia da capo".
+- **Impatto sul Desiderata**:
+  - Esperienza utente estremamente fluida, rassicurante e accessibile. Tutti i requisiti del [DESIDERATA.md](file:///c:/github/Quiz_VDS-VL/DESIDERATA.md) restano pienamente operativi con 63/63 test verdi.
+
 ### [2026-09-27] - Integrazione Client ID Google OAuth & Configurazione .env
 - **Cosa abbiamo fatto**:
   - Creato il file di configurazione locale `.env` contenente il Client ID Google OAuth fornito dall'utente (`182413802928-q7sphls58ob60s2mu3fspbbkk9kq2am9.apps.googleusercontent.com`).
