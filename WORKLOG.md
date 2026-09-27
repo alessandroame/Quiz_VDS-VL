@@ -18,6 +18,40 @@ Questo documento registra in ordine cronologico tutte le lavorazioni svolte nel 
 
 ## Registro Cronologico
 
+### [2026-09-27] - Analisi Funzionale Approfondita & Collaudo Multi-Contesto d'Uso
+- **Cosa abbiamo fatto**:
+  - Modellati ed esaminati 5 contesti d'uso reali per la PWA:
+    1. *Studio Desktop a Casa*: Schermo 1440x900, scorciatoie tastiera (`1`, `2`, `3`, `F`, frecce), navigatore a 30 slot, Navigation Guard su cambio tab durante simulazione e schermata finale di debriefing con esito AeCI.
+    2. *Ripasso alla Guida / in Viaggio (Truck & Cockpit Drive Mode)*: Schermo mobile 390x844, layout zero-scroll `100dvh`, macro-pulsanti tattili Fitts's law, Pilota Automatico sequenziale (Radio Quiz) e comandi vocali.
+    3. *Campo di Volo / Sole Diretto (Hangar Light)*: Contrasto elevato bivalente chiaro/scuro, studio per singola materia con spiegazioni didattiche istantanee Regola + Tranello.
+    4. *Archivio & Privacy Dati*: Ricerca full-text istantanea per testo e keyword, gestione note personali persistenti, toggle preferiti ed export locale JSON offline-first.
+    5. *Ripasso Intensivo Pre-Esame (Quaderno Errori)*: Verifica algoritmo Spaced Repetition Leitner (rimozione vincolata a 2 risposte corrette consecutive) e radar 9 materie.
+  - Diagnosticato e risolto un difetto critico di sincronizzazione stato tra `DriveModeScreen` e le schermate chiamanti (`ExamScreen`, `TopicsScreen`, `MistakesScreen`):
+    - Introdotto passaggio esplicito dell'identificativo quesito `qid` nei gestori `handleSelectAnswer(ans, qid)` e `handleToggleFlag(qid)` per prevenire race conditions e stale closure.
+    - Prevenuta la doppia registrazione delle risposte (`recordAnswer`) e il doppio salvataggio delle sessioni d'esame (`saveExam`) delegando interamente la finalizzazione al context genitore quando presente.
+    - Evitata la marcatura erronea di risposte non date durante simulazioni d'esame attive in Drive Mode.
+  - Implementato lo script di collaudo headless automatico `scripts/test_all_use_cases.js` via Chrome DevTools Protocol (CDP), verificando con successo al 100% tutti i 5 contesti con zero errori in console browser.
+  - Validata l'intera suite Vitest: 65 test unitari e di integrazione superati in 491ms, con compilazione bundle Vite (`npm run build`) senza avvisi o errori.
+- **Scelte architetturali & Rationale**:
+  - *Disaccoppiamento Closure vs Parametro Esplicito*: Affidare la risoluzione della domanda corrente allo stato locale del componente genitore durante l'apertura di un modal a schermo intero è soggetto a disallineamenti asincroni React. Il passaggio esplicito del `qid` come parametro primario rende la sincronizzazione deterministica, pura e a prova di race condition.
+  - *Delega del Ciclo di Vita (Single Responsibility)*: Quando `DriveModeScreen` opera come interfaccia alternativa di un esame già avviato in `ExamScreen`, non deve duplicare la logica di valutazione o persistenza DB, ma delegare il completamento alla sessione chiamante.
+- **Impatto sul Desiderata**:
+  - Piena conformità funzionale a tutti i 7 requisiti core del [DESIDERATA.md](file:///c:/github/Quiz_VDS-VL/DESIDERATA.md). Nessuna regressione rilevata nei test.
+
+### [2026-09-27] - Adozione Standard Operativo "Cockpit Executive Mode"
+- **Cosa abbiamo fatto**:
+  - Formalizzato in [MEMORY.md](file:///c:/github/Quiz_VDS-VL/MEMORY.md) (Sezione 7) lo standard operativo "Cockpit Executive Mode" per l'interazione agente-utente:
+    - Risposte strutturate su sintesi estrema (max 3 bullet: cosa fatto, dove intervenire, cosa decidere).
+    - Progressive disclosure: dettagli tecnici, codice esteso e diff confinati nei file di progetto o negli Artifacts.
+    - Decisioni e bivi gestiti via modali rapidi `ask_question` con opzione raccomandata in cima per decisioni a 1 click.
+    - Riserva esclusiva del tag `> [!WARNING]` per reali rischi di rottura, breaking change o perdita dati.
+    - Dimostrazione tangibile tramite esiti test/typecheck prima delle spiegazioni discorsive.
+    - Suddivisione del lavoro in task atomici (1 problema alla volta) con diff leggibili in 15 secondi.
+- **Scelte architetturali & Rationale**:
+  - *Mitigazione della Fatica Cognitiva*: Lo sviluppo guidato da LLM soffre frequentemente di "muri di testo" prolissi che portano l'utente a saltare la lettura critica e accettare modifiche alla cieca. L'adozione del paradigma Cockpit Executive protegge la concentrazione dell'utente, riduce i tempi decisionali e azzera il rischio di allucinazioni inosservate.
+- **Impatto sul Desiderata**:
+  - Incremento immediato della qualità delle revisioni umane e dell'efficienza nel ciclo di sviluppo di [Quiz_VDS-VL](file:///c:/github/Quiz_VDS-VL/). Nessun impatto runtime sull'applicazione.
+
 ### [2026-09-27] - Istituzione Vincolo Lingua Inglese per Sorgenti, Commenti e Commit Git
 - **Cosa abbiamo fatto**:
   - Formalizzato il vincolo cogente di utilizzo esclusivo della lingua inglese per tutti gli artefatti di sviluppo:
@@ -176,6 +210,20 @@ Questo documento registra in ordine cronologico tutte le lavorazioni svolte nel 
   - *Accessibilità e Contrasto Bimodale*: Le note personali devono risaltare visivamente all'aperto sia in tema scuro che in tema chiaro, offrendo al contempo strumenti completi di CRUD (Create, Read, Update, Delete) direttamente nei punti focali di studio (Archivio, Scheda Quesito, Quaderno Errori).
 - **Impatto sul Desiderata**:
   - Eliminati entrambi i punti di attrito UX segnalati dall'utente. La PWA offre ora un flusso didattico ergonomico, affidabile e protetto da errori accidentali.
+
+### [2026-09-27] - Fix Service Worker GitHub Pages & Diagnostica Google Drive API 403
+- **Cosa abbiamo fatto**:
+  - Risolto errore 404 del Service Worker (`Failed to register a ServiceWorker for scope ('https://alessandroame.github.io/') with script ('https://alessandroame.github.io/sw.js')`): rimosso il blocco manuale ridondante in `src/main.tsx` che forzava `/sw.js` alla root del dominio anziché rispettare il base path `/Quiz_VDS-VL/`. La registrazione è ora interamente delegata al file `registerSW.js` generato e iniettato automaticamente da `vite-plugin-pwa`.
+  - Risolto l'avviso correlato del browser `cross-world service worker resource mismatch` e `link preload not used`.
+  - Diagnosticato e gestito l'errore `403 (Forbidden)` sulle chiamate `https://www.googleapis.com/drive/v3/files`: la Google Drive API deve essere abilitata nel progetto Google Cloud associato al Client ID.
+  - Aggiornato `src/services/googleDrive.ts` con un metodo dedicato `handleApiError` che intercetta i codici 403 e fornisce messaggi diagnostici chiari in italiano anziché fallire silenziosamente o mostrare messaggi generici.
+  - Aggiunti unit test dedicati `DRV-07` e `DRV-08` in `src/services/googleDrive.test.ts` (suite portata a 65 test, 100% passati).
+- **Scelte architetturali & Rationale**:
+  - *Single Registration Authority*: Evitare doppie registrazioni conflittuali del Service Worker; `vite-plugin-pwa` calcola a compile-time il base path corretto sia per sviluppo locale (`/`) che per produzione GitHub Pages (`/Quiz_VDS-VL/`).
+  - *Fail-Fast & Feedback Diagnostico*: Quando un servizio esterno (come Google Drive API) restituisce 403 per API disabilitata nel progetto Cloud, l'applicazione deve guidare lo sviluppatore/utente verso l'esatta schermata di abilitazione nella Cloud Console.
+- **Impatto sul Desiderata**:
+  - Deploy GitHub Pages perfettamente conforme come PWA offline senza errori in console.
+  - Robustezza e resilienza del connettore Google Drive Cloud Sync.
 
 ### [2026-09-27] - Semplificazione UX Backup Google Drive & Supporto .env
 - **Cosa abbiamo fatto**:

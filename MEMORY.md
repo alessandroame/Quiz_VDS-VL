@@ -74,3 +74,14 @@ Questo file costituisce la **memoria tecnica permanente** del progetto. Raccogli
   - Tutti i testi passano dal normalizzatore per espansione acronimi (`D.P.R. 133/2010`, `VDS/VL`, `AeCI`, `hPa`, `FL`, `km/h`, `kt`, `m/s`).
   - Pronuncia opzioni in stile cockpit standard: *"Uno. [testo]"*, *"Due. [testo]"*, *"Tre. [testo]"*.
 - **Persistenza & Switch**: Selezione della voce salvata in Dexie (`settings.ttsVoice: 'giuseppe' | 'elsa'`) e commutabile istantaneamente dalle impostazioni.
+
+---
+
+## 7. Modalità di Interazione (Cockpit Executive Mode)
+- **Executive Summary First (Max 3 bullet)**: Risposte chiare e ad alto livello: *Cosa ho fatto*, *Dove intervenire*, *Cosa decidere*. Nessun muro di testo.
+- **Progressive Disclosure**: Dettagli implementativi e codice esteso confinati in file sorgente o Artifacts, non nella chat.
+- **Decisioni Rapide (`ask_question`)**: Bivi architetturali e scelte operative presentati tramite modali a selezione rapida con opzione consigliata in cima.
+- **Evidenziazione Chirurgica Allarmi**: Usare `> [!WARNING]` solo per rischi concreti (breaking change, perdita dati, regressioni).
+- **Prove Tangibili**: Mostrare esiti di test (`npm run test:unit`, `tsc`) prima di rassicurazioni discorsive.
+- **Interventi Atomici**: Micro-step focalizzati (1 problema alla volta) per diff leggibili in 15 secondi.
+
