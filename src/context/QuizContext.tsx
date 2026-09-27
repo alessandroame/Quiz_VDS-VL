@@ -11,15 +11,14 @@ import {
   saveQuestionNote,
   setSetting
 } from '../db';
+import {
+  type SubjectAnalytics,
+  calculateMistakesCount,
+  calculateSubjectAnalytics,
+  calculateReadinessScore
+} from '../utils/analytics';
 
-export interface SubjectAnalytics {
-  id: number;
-  name: string;
-  total: number;
-  seen: number;
-  correct: number;
-  accuracy: number;
-}
+export type { SubjectAnalytics };
 
 interface QuizContextType {
   questions: Question[];
@@ -70,8 +69,7 @@ export const QuizProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, [statsList]);
 
   const mistakesCount = useMemo(() => {
-    // Entra nel quaderno errori se l'ultima risposta è errata o se ha errori e non ha ancora 2 successi consecutivi
-    return statsList.filter(s => s.timesWrong > 0 && s.consecutiveCorrect < 2).length;
+    return calculateMistakesCount(statsList);
   }, [statsList]);
 
   const bookmarksCount = useMemo(() => {
@@ -80,58 +78,12 @@ export const QuizProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   // Statistiche per materia
   const subjectsAnalytics = useMemo<SubjectAnalytics[]>(() => {
-    const subjectMap: Record<number, { name: string; total: number; seen: number; correct: number }> = {};
-
-    for (const q of questions) {
-      if (!subjectMap[q.subjectId]) {
-        subjectMap[q.subjectId] = { name: q.subjectName, total: 0, seen: 0, correct: 0 };
-      }
-      subjectMap[q.subjectId].total++;
-
-      const stat = statsMap.get(q.id);
-      if (stat && stat.timesSeen > 0) {
-        subjectMap[q.subjectId].seen++;
-        if (stat.lastResult === 'correct') {
-          subjectMap[q.subjectId].correct++;
-        }
-      }
-    }
-
-    return Object.entries(subjectMap).map(([idStr, val]) => {
-      const id = Number(idStr);
-      const accuracy = val.seen > 0 ? Math.round((val.correct / val.seen) * 100) : 0;
-      return {
-        id,
-        name: val.name,
-        total: val.total,
-        seen: val.seen,
-        correct: val.correct,
-        accuracy
-      };
-    });
+    return calculateSubjectAnalytics(questions, statsMap);
   }, [questions, statsMap]);
 
   // Indice di prontezza all'esame (0 - 100%)
   const readinessScore = useMemo(() => {
-    if (questions.length === 0) return 0;
-
-    // Componente 1: Copertura catalogo (peso 35%)
-    const coverage = totalSeen / questions.length;
-
-    // Componente 2: Accuratezza generale sulle viste (peso 35%)
-    const correctCount = statsList.filter(s => s.lastResult === 'correct').length;
-    const accuracy = totalSeen > 0 ? correctCount / totalSeen : 0;
-
-    // Componente 3: Media ultime 3 simulazioni (peso 30%)
-    let examScoreFactor = 0;
-    if (sessions.length > 0) {
-      const recent = sessions.slice(0, 3);
-      const passedCount = recent.filter(s => s.isPassed).length;
-      examScoreFactor = passedCount / recent.length;
-    }
-
-    const calculated = Math.round((coverage * 0.35 + accuracy * 0.35 + examScoreFactor * 0.3) * 100);
-    return Math.min(100, Math.max(0, calculated));
+    return calculateReadinessScore(questions.length, totalSeen, statsList, sessions);
   }, [questions.length, totalSeen, statsList, sessions]);
 
   const updateSetting = async <K extends keyof AppSettings>(key: K, value: AppSettings[K]) => {

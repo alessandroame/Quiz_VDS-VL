@@ -12,9 +12,11 @@ import {
   ListFilter
 } from 'lucide-react';
 import type { Question } from '../types/quiz';
-import type { ExamSession, ExamQuestionSnapshot } from '../types/database';
+import type { ExamSession } from '../types/database';
 import { useQuiz } from '../context/QuizContext';
 import { generateExamQuestions } from '../utils/fairRandomizer';
+import { evaluateExam } from '../services/examEvaluator';
+import { formatTime } from '../utils/timer';
 import { QuestionCard } from './QuestionCard';
 
 export const ExamScreen: React.FC = () => {
@@ -102,60 +104,26 @@ export const ExamScreen: React.FC = () => {
     setShowSubmitModal(false);
     const durationSeconds = Math.round((Date.now() - startTime) / 1000);
 
-    let correctCount = 0;
-    let wrongCount = 0;
-    const subjectMap: Record<number, { total: number; correct: number; wrong: number }> = {};
-    const snapshots: ExamQuestionSnapshot[] = [];
-
-    for (const q of examQuestions) {
-      const userAns = answers[q.id];
-      const isCorrect = userAns === q.correctAnswer;
-
-      if (isCorrect) correctCount++;
-      else wrongCount++;
-
-      // Registra telemetria permanente su Dexie
-      if (userAns !== undefined) {
-        await recordAnswer(q.id, isCorrect);
-      }
-
-      if (!subjectMap[q.subjectId]) {
-        subjectMap[q.subjectId] = { total: 0, correct: 0, wrong: 0 };
-      }
-      subjectMap[q.subjectId].total++;
-      if (isCorrect) subjectMap[q.subjectId].correct++;
-      else subjectMap[q.subjectId].wrong++;
-
-      snapshots.push({
-        questionId: q.id,
-        userAnswer: userAns,
-        correctAnswer: q.correctAnswer,
-        isCorrect,
-        wasFlagged: !!flags[q.id]
-      });
-    }
-
-    // Regola Ufficiale AeCI: Max 3 errori su 30 (o max 6 su 60 per maratona)
-    const maxAllowedErrors = isMarathon ? 6 : 3;
-    const isPassed = wrongCount <= maxAllowedErrors;
-
-    const session: ExamSession = {
-      date: Date.now(),
+    const session = evaluateExam({
+      questions: examQuestions,
+      answers,
+      flags,
       durationSeconds,
-      totalQuestions: totalCount,
-      correctAnswers: correctCount,
-      wrongAnswers: wrongCount,
-      isPassed,
-      isMarathon,
-      subjectBreakdown: subjectMap,
-      snapshots
-    };
+      isMarathon
+    });
+
+    // Registra telemetria permanente su Dexie per i quiz risposti
+    for (const snap of session.snapshots) {
+      if (snap.userAnswer !== undefined) {
+        await recordAnswer(snap.questionId, snap.isCorrect);
+      }
+    }
 
     await saveExam(session);
     setCompletedSession(session);
     setExamState('review');
 
-    if (isPassed) {
+    if (session.isPassed) {
       try {
         confetti({
           particleCount: 80,
@@ -166,13 +134,7 @@ export const ExamScreen: React.FC = () => {
         // Ignora
       }
     }
-  }, [answers, examQuestions, flags, isMarathon, recordAnswer, saveExam, startTime, totalCount]);
-
-  const formatTimer = (secs: number) => {
-    const m = Math.floor(secs / 60);
-    const s = secs % 60;
-    return `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
-  };
+  }, [answers, examQuestions, flags, isMarathon, recordAnswer, saveExam, startTime]);
 
   // --- Schermata IDLE: Avvio Esame ---
   if (examState === 'idle') {
@@ -362,7 +324,7 @@ export const ExamScreen: React.FC = () => {
             }`}
           >
             <Timer className="w-4 h-4 text-sky-400" />
-            <span>{formatTimer(secondsRemaining)}</span>
+            <span>{formatTime(secondsRemaining)}</span>
           </div>
 
           <div className="text-xs text-slate-400 light:text-slate-600 font-medium">
