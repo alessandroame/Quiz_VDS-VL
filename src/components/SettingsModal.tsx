@@ -29,7 +29,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose })
   const { theme, setTheme } = useTheme();
   const { settings, updateSetting } = useQuiz();
 
-  const envClientId = (import.meta.env?.VITE_GOOGLE_CLIENT_ID as string) || '';
+  const envClientId = (import.meta.env?.VITE_GOOGLE_CLIENT_ID as string) || '182413802928-q7sphls58ob60s2mu3fspbbkk9kq2am9.apps.googleusercontent.com';
   const effectiveClientId = (settings.googleClientId || envClientId).trim();
 
   const [googleClientId, setGoogleClientId] = useState(settings.googleClientId || '');

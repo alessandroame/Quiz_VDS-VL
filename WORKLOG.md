@@ -18,6 +18,27 @@ Questo documento registra in ordine cronologico tutte le lavorazioni svolte nel 
 
 ## Registro Cronologico
 
+### [2026-09-27] - Integrazione Client ID Google OAuth & Configurazione .env
+- **Cosa abbiamo fatto**:
+  - Creato il file di configurazione locale `.env` contenente il Client ID Google OAuth fornito dall'utente (`182413802928-q7sphls58ob60s2mu3fspbbkk9kq2am9.apps.googleusercontent.com`).
+  - Configurato il Client ID come fallback predefinito in `src/services/googleDrive.ts` e `src/components/SettingsModal.tsx` per garantire il funzionamento automatico a 1-click anche nelle build statiche distribuite su GitHub Pages.
+  - Verificato con test headless CDP il rendering del badge verde **"Pronto"** nella sezione Backup Cloud di `SettingsModal.tsx`.
+- **Scelte architetturali & Rationale**:
+  - *Fallback duale .env + build*: Poiché `.env` è escluso dal controllo di versione per prassi, impostare il Client ID come fallback garantisce che il deploy su `https://alessandroame.github.io/Quiz_VDS-VL/` funzioni istantaneamente senza dipendere da configurazioni manuali di GitHub Actions secrets.
+- **Impatto sul Desiderata**:
+  - Sincronizzazione cloud 1-click pronta all'uso sia in locale sia online.
+
+### [2026-09-27] - Redazione README Funzionale & Istituzione Vincolo di Allineamento Continuo
+- **Cosa abbiamo fatto**:
+  - Redatto e integrato nella root del progetto il file [README.md](file:///c:/github/Quiz_VDS-VL/README.md) completo ed esaustivo, documentando nel dettaglio tutte le 11 macro-funzionalità dell'app (Database 504 quiz AeCI con Regola e Tranello, Simulatore d'Esame con quote e timer 45 min, Studio per Materie, Quaderno Errori Leitner, Archivio full-text con Note Personali e Preferiti, Statistiche con radar 9 materie, Modalità Alla Guida con zero-scroll e Web Speech Recognition, Motore Vocale Neurale offline bivalente Giuseppe/Elsa e fonetica ICAO, Ergonomia cockpit con temi Dark/Light e scorciatoie tastiera, Fair Coverage Randomizer, PWA Offline-First e sincronizzazione dati locale/Drive).
+  - Documentato lo stack tecnologico (React 19, Vite, TypeScript strict, Tailwind CSS, Dexie.js, Vitest, Web Audio/Speech API).
+  - Aggiunte istruzioni dettagliate di avvio rapido, comandi di test unitari, coverage e collaudi visivi CDP headless.
+  - Istituito il vincolo normativo permanente di allineamento continuo del [README.md](file:///c:/github/Quiz_VDS-VL/README.md) in [.agents/AGENTS.md](file:///c:/github/Quiz_VDS-VL/.agents/AGENTS.md), in [MEMORY.md](file:///c:/github/Quiz_VDS-VL/MEMORY.md), in [.agents/rules/constraints.md](file:///c:/github/Quiz_VDS-VL/.agents/rules/constraints.md) e nel workflow di fine lavorazione di [.agents/skills/self-correction-loop/SKILL.md](file:///c:/github/Quiz_VDS-VL/.agents/skills/self-correction-loop/SKILL.md).
+- **Scelte architetturali & Rationale**:
+  - *Allineamento a Catena della Governance*: La richiesta utente di "tienile aggiornate anche in futuro quando faremo modifiche" è stata formalizzata sia a livello di direttive agent (`AGENTS.md`), sia nella memoria stabile di progetto (`MEMORY.md`), sia nei vincoli architetturali (`constraints.md`), sia nello schema procedurale della skill `self-correction-loop`. In questo modo qualsiasi sessione futura o subagente avrà il vincolo esplicito di aggiornare il `README.md` all'aggiunta o modifica di funzionalità.
+- **Impatto sul Desiderata**:
+  - Massima trasparenza per utenti, sviluppatori e allievi piloti che approcciano il repository GitHub. Documentazione completa, navigabile e integrata con la triade di conoscenza.
+
 ### [2026-09-27] - Integrazione Voce Neurale Femminile Elsa & Selettore Multi-Voce Istruttore
 - **Cosa abbiamo fatto**:
   - Esteso lo script di generazione `scripts/generate_audio_database.py` con supporto al flag `--voice` (`giuseppe` ed `elsa`).

@@ -61,3 +61,7 @@ L'alberatura delle configurazioni dell'agente è standardizzata, modulare e ordi
      * **Impatto sul Desiderata**: allineamento con [DESIDERATA.md](file:///c:/github/Quiz_VDS-VL/DESIDERATA.md) e istruzioni per il prossimo agente.
    - Nessun task può considerarsi concluso senza questo aggiornamento di bordo.
 
+6. **Mantenimento Continuo della Documentazione Funzionale (README.md)**:
+   - A fronte di qualsiasi nuova funzionalità introdotta, estensione di moduli o modifica al comportamento dell'applicazione, aggiornare tempestivamente il [README.md](file:///c:/github/Quiz_VDS-VL/README.md) mantenendolo allineato alle capacità correnti del software.
+
+

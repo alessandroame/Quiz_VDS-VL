@@ -20,6 +20,8 @@
 
 ## 4. Continuità Cognitiva e Passaggio di Consegne Inter-Agente
 - **Aggiornamento Obbligatorio di WORKLOG.md**: Al termine di ogni sessione o lavorazione, l'agente deve registrare in [WORKLOG.md](file:///c:/github/Quiz_VDS-VL/WORKLOG.md) cosa è stato fatto e le scelte tecniche/architetturali prese con le relative motivazioni, allineando lo stato in [DESIDERATA.md](file:///c:/github/Quiz_VDS-VL/DESIDERATA.md).
+- **Allineamento Continuo del README.md**: Ogni volta che vengono introdotte nuove funzionalità o modificate quelle esistenti, aggiornare tempestivamente il [README.md](file:///c:/github/Quiz_VDS-VL/README.md) per mantenere la documentazione utente allineata allo stato del software.
 - **Divieto di Amnesia e Inizio al Buio**: Nessun agente può avviare modifiche senza consultare prima la triade di conoscenza ([DESIDERATA.md](file:///c:/github/Quiz_VDS-VL/DESIDERATA.md), [MEMORY.md](file:///c:/github/Quiz_VDS-VL/MEMORY.md), [WORKLOG.md](file:///c:/github/Quiz_VDS-VL/WORKLOG.md)), né può chiudere un task senza aver documentato il lavoro svolto per chi subentrerà.
+
 
 

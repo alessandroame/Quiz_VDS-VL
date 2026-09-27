@@ -18,7 +18,7 @@ export class GoogleDriveService {
   }
 
   public initTokenClient(clientId?: string, onTokenReceived?: (token: string) => void): void {
-    const effectiveId = clientId || (import.meta.env?.VITE_GOOGLE_CLIENT_ID as string) || '';
+    const effectiveId = clientId || (import.meta.env?.VITE_GOOGLE_CLIENT_ID as string) || '182413802928-q7sphls58ob60s2mu3fspbbkk9kq2am9.apps.googleusercontent.com';
     if (!this.isGisLoaded() || !effectiveId) return;
 
     try {

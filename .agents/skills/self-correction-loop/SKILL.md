@@ -40,7 +40,8 @@ Al completamento di ciascun blocco di lavoro o feature:
 1. RECAP       -> Sintetizzare cosa è stato fatto (file creati/modificati, feature implementate o refactoring).
 2. RATIONALE   -> Esplicitare le scelte architetturali/tecniche prese (perché questa soluzione e quali alternative sono state scartate).
 3. DESIDERATA  -> Verificare se la matrice di stato in DESIDERATA.md va aggiornata (da 🟡 in lavorazione a 🟢 completato).
-4. APPEND      -> Aggiungere la voce in cima al registro cronologico in WORKLOG.md.
+4. README       -> Verificare se sono state aggiunte/modificate funzionalità e aggiornare README.md.
+5. APPEND      -> Aggiungere la voce in cima al registro cronologico in WORKLOG.md.
 ```
 
 ### Formato Standard della Voce nel Registro (`WORKLOG.md`):

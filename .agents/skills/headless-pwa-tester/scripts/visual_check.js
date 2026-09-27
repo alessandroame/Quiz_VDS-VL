@@ -159,8 +159,9 @@ async function runSingleViewportCheck(viewportName, options = {}) {
             for (const sel of selectors) {
               const el = document.querySelector(sel);
               if (!el) return { success: false, reason: 'Elemento non trovato: ' + sel };
+              el.scrollIntoView({ behavior: 'instant', block: 'center' });
               el.click();
-              await new Promise(r => setTimeout(r, 200));
+              await new Promise(r => setTimeout(r, 300));
             }
             return { success: true };
           })()

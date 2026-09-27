@@ -49,6 +49,7 @@ Questo file costituisce la **memoria tecnica permanente** del progetto. Raccogli
 - **Continuità Cognitiva Inter-Agente**:
   * Consultare [DESIDERATA.md](file:///c:/github/Quiz_VDS-VL/DESIDERATA.md) e [WORKLOG.md](file:///c:/github/Quiz_VDS-VL/WORKLOG.md) nel Pre-Flight.
   * Al termine di ogni lavorazione, registrare cosa è stato fatto e le scelte prese in [WORKLOG.md](file:///c:/github/Quiz_VDS-VL/WORKLOG.md).
+- **Sincronizzazione README.md**: A fronte di ogni nuova funzionalità introdotta o variazione comportamentale dell'app, aggiornare tempestivamente [README.md](file:///c:/github/Quiz_VDS-VL/README.md) per mantenere allineata la documentazione utente.
 
 ---
 
