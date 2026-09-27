@@ -56,6 +56,6 @@ A fronte di **OGNI lavorazione completata**, prima del commit:
 ---
 
 ## 5. Consolidamento e Commit
-- Rispettare rigorosamente la specifica Conventional Commits come definita nella skill `git-pro`.
+- Rispettare rigorosamente la specifica Conventional Commits redatta **esclusivamente in lingua inglese** come definita nella skill `git-pro` (es. `feat(quiz): implement fair coverage randomizer`).
 - Se si apportano rifiniture prima del push, procedere con `git commit --amend --no-edit`.
 

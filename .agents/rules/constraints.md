@@ -6,8 +6,14 @@
 - **PWA & Offline First**: Funzionamento garantito al 100% offline via Service Worker; la sincronizzazione Google Drive è rigorosamente on-demand e opzionale.
 - **Microcopy**: Rispettare categoricamente il Cockpit Style definito in `aviation-ui-ux` (nessun testo superfluo o verboso).
 
-## 2. Standard di Codice e Naming
-- **Linguaggio di Programmazione**: Tutti i nomi di variabili, funzioni, interfacce, tipi, file e classi devono essere in lingua inglese (es. `FairCoverageRandomizer`, `QuestionStat`, `evaluateExamSession`).
+## 2. Standard di Codice, Commenti e Lingua Inglese (Strict English in Source Code & Git)
+- **Lingua Esclusiva nei Sorgenti (Code & Comments)**:
+  - Tutti i nomi di variabili, funzioni, interfacce, tipi, file e classi devono essere in lingua inglese (es. `FairCoverageRandomizer`, `QuestionStat`, `evaluateExamSession`).
+  - **TUTTI i commenti di codice** (inline `//`, a blocchi `/* */`, Python `#`, TODO, FIXME) e le annotazioni JSDoc/TSDoc DEVONO essere scritti **esclusivamente in lingua inglese**.
+  - **Suite di Test**: I titoli dei blocchi `describe`, `it`, `test` e le relative asserzioni devono essere espressi in lingua inglese (es. `it('should promote question after two consecutive correct answers')`).
+  - **Log e Messaggi Interni**: `console.log`, `console.warn`, messaggi di eccezione interna (`throw new Error(...)`) devono essere in inglese.
+  - *Eccezione*: Solo le stringhe dell'interfaccia utente (microcopy visibile all'allievo pilota) e i contenuti del database dei quiz ufficiali AeCI (`questions.json`: quesiti, opzioni, regola/tranello) rimangono in italiano in conformità all'esame ufficiale.
+- **Messaggi di Commit Git**: Tutti i messaggi di commit Git devono essere redatti rigorosamente in lingua inglese seguendo la convenzione Conventional Commits (cfr. `git-pro`).
 - **Single Responsibility Principle (SRP)**:
   - Separare rigorosamente la logica di calcolo puro (algoritmo randomizer, calcolo punteggio, elaborazione quote) dalla manipolazione del DOM o dalla persistenza IndexedDB.
   - Evitare funzioni monolitiche; comporre moduli testabili singolarmente con Vitest.

@@ -64,4 +64,10 @@ L'alberatura delle configurazioni dell'agente è standardizzata, modulare e ordi
 6. **Mantenimento Continuo della Documentazione Funzionale (README.md)**:
    - A fronte di qualsiasi nuova funzionalità introdotta, estensione di moduli o modifica al comportamento dell'applicazione, aggiornare tempestivamente il [README.md](file:///c:/github/Quiz_VDS-VL/README.md) mantenendolo allineato alle capacità correnti del software.
 
+7. **Lingua Inglese Esclusiva nei Sorgenti e nei Commit (English Only for Code & Git)**:
+   - **File Sorgente & Script**: Tutto il codice (`.ts`, `.tsx`, `.js`, `.py`, `.css`), inclusi nomi di variabili/funzioni/tipi, commenti (inline `//`, blocchi `/* */`, `#`), docstring (JSDoc, TSDoc, Python docstrings), suite di test (`describe`, `it`, `test`) e log interni (`console.log`, errori) DEVONO essere scritti esclusivamente in lingua inglese.
+   - **Messaggi di Commit**: Tutti i messaggi di commit Git DEVONO seguire la specifica Conventional Commits rigorosamente in lingua inglese (es. `feat(exam): add countdown timer warning`, `fix(randomizer): handle empty pool edge case`).
+   - **Eccezione Circoscritta**: L'italiano è riservato tassativamente solo ai testi mostrati all'utente finale (microcopy UI dell'app per gli allievi piloti italiani), ai dati ufficiali dei 504 quiz AeCI (`questions.json`: domande, opzioni, spiegazioni didattiche Regola/Tranello) e alla documentazione di progetto / conversazione con l'utente.
+
+
 

@@ -50,6 +50,7 @@ Questo file costituisce la **memoria tecnica permanente** del progetto. Raccogli
   * Consultare [DESIDERATA.md](file:///c:/github/Quiz_VDS-VL/DESIDERATA.md) e [WORKLOG.md](file:///c:/github/Quiz_VDS-VL/WORKLOG.md) nel Pre-Flight.
   * Al termine di ogni lavorazione, registrare cosa è stato fatto e le scelte prese in [WORKLOG.md](file:///c:/github/Quiz_VDS-VL/WORKLOG.md).
 - **Sincronizzazione README.md**: A fronte di ogni nuova funzionalità introdotta o variazione comportamentale dell'app, aggiornare tempestivamente [README.md](file:///c:/github/Quiz_VDS-VL/README.md) per mantenere allineata la documentazione utente.
+- **Standard Linguistico Codice & Git (English Only)**: Tutti i sorgenti (`.ts`, `.tsx`, `.js`, `.py`, `.css`, test unitari, script di utility), inclusi commenti inline, blocchi di commento, TODO, annotazioni JSDoc/TSDoc, test assertions e messaggi di log/errore interni DEVONO essere scritti esclusivamente in lingua inglese. Tutti i messaggi di commit Git DEVONO essere redatti rigorosamente in inglese secondo la specifica Conventional Commits (es. `feat(quiz): implement fair coverage randomizer`). L'italiano è riservato unicamente al microcopy dell'interfaccia utente (destinata agli allievi piloti italiani) e al catalogo dei 504 quiz AeCI.
 
 ---
 

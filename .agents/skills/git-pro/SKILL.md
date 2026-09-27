@@ -25,18 +25,20 @@ Questa skill definisce le regole operative per una gestione di Git rigorosa, pul
     ```
   - **Regola di sicurezza**: mai effettuare amend o riscrivere la storia su commit già pubblicati (`pushed`) su branch condivisi.
 
-## 2. Standard dei Messaggi: Conventional Commits
-I messaggi di commit devono seguire la specifica Conventional Commits:
-`<tipo>(<ambito opzionale>): <descrizione sintetica e chiara>`
+## 2. Standard dei Messaggi: Conventional Commits (English Only)
+I messaggi di commit DEVONO essere redatti **esclusivamente in lingua inglese** in modalità imperativa e seguire la specifica Conventional Commits:
+`<type>(<optional scope>): <imperative summary in English>`
 
-### Tipi Ammessi:
-- `feat`: Nuova funzionalità (es. `feat(quiz): implementa fair coverage randomizer`)
-- `fix`: Risoluzione di un bug o correzione dati (es. `fix(extractor): gestisci eccezione domanda 7037`)
-- `docs`: Documentazione o aggiornamento roadmap (es. `docs(plan): aggiorna TODO e piano di progetto`)
-- `style`: Formattazione, spazi, linting senza alterazione logica
-- `refactor`: Riorganizzazione codice senza aggiungere feature o fix
-- `chore`: Modifiche alla build, dipendenze, configurazioni (.gitignore, skills)
-- `test`: Aggiunta o modifica di test di validazione
+**Regola Vincolante**: È fatto espresso divieto di scrivere commit message in lingua italiana. Tutto il testo del commit (tipo, scope, subject ed eventuale body/footer) deve essere redatto in inglese.
+
+### Tipi Ammessi ed Esempi:
+- `feat`: Nuova funzionalità (es. `feat(quiz): implement fair coverage randomizer algorithm`)
+- `fix`: Risoluzione di un bug o correzione dati (es. `fix(extractor): handle question 7037 parsing edge case`)
+- `docs`: Documentazione o aggiornamento roadmap (es. `docs(readme): update feature list and test commands`)
+- `style`: Formattazione, spazi, linting senza alterazione logica (es. `style(theme): adjust cockpit dark contrast utility classes`)
+- `refactor`: Riorganizzazione codice senza alterare il comportamento esterno (es. `refactor(audio): decouple TTS speech synthesis player`)
+- `chore`: Modifiche a build, tooling, dipendenze o configurazioni (es. `chore(deps): update vite and dexie dependencies`)
+- `test`: Aggiunta o modifica di test di validazione (es. `test(evaluator): add boundary value analysis tests for exam thresholds`)
 
 ## 3. Igiene Pre-Commit e Repository
 1. **Verifica dello Stato**:

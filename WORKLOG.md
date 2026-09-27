@@ -18,6 +18,20 @@ Questo documento registra in ordine cronologico tutte le lavorazioni svolte nel 
 
 ## Registro Cronologico
 
+### [2026-09-27] - Istituzione Vincolo Lingua Inglese per Sorgenti, Commenti e Commit Git
+- **Cosa abbiamo fatto**:
+  - Formalizzato il vincolo cogente di utilizzo esclusivo della lingua inglese per tutti gli artefatti di sviluppo:
+    - `.agents/AGENTS.md`: introdotta la direttiva comportamentale cardine n. 7 che impone l'inglese per file sorgente, script, commenti inline, docstring, asserzioni di test e messaggi di commit Git.
+    - `.agents/rules/constraints.md`: aggiornata la sezione 2 vietando esplicitamente commenti in italiano nel codice e prescrivendo Conventional Commits in inglese.
+    - `.agents/skills/git-pro/SKILL.md`: revisionata la specifica dei commit message sostituendo gli esempi italiani con template rigorosamente in inglese (`feat(...)`, `fix(...)`, `refactor(...)`, etc.) e vietando testi di commit in italiano.
+    - `.agents/workflows/task_lifecycle.md`: ribadito l'obbligo di Conventional Commits in inglese nel ciclo di vita dei task.
+    - `MEMORY.md`: consolidata la convenzione nella memoria tecnica permanente del repository.
+  - Circoscritta puntualmente l'unica eccezione ammessa per l'italiano: il microcopy visibile all'utente finale (l'allievo pilota che sostiene l'esame AeCI), il catalogo ufficiale dei 504 quiz (`questions.json`: quesiti, opzioni, spiegazioni didattiche) e la documentazione di alto livello / dialogo chat con l'utente.
+- **Scelte architetturali & Rationale**:
+  - *Separazione tra Livello Tecnico e Livello Utente*: Negli standard ingegneristici professionali moderni, il codice, i commenti tecnici, le suite di test e la cronologia Git devono essere scritti in inglese per garantire interoperabilità con strumenti di analisi statica, linter, modelli AI e sviluppatori internazionali. L'interfaccia utente finale rimane invece rigorosamente in italiano coerente con le normative dell'Aero Club d'Italia (AeCI).
+- **Impatto sul Desiderata**:
+  - Governance del codice ineccepibile e allineamento perfetto con le migliori pratiche di sviluppo open source professionale. Nessun impatto sulla funzionalità runtime dell'applicazione.
+
 ### [2026-09-27] - Umanizzazione UI/UX & Rimozione Configurazione Tecnica Client ID
 - **Cosa abbiamo fatto**:
   - Rimossa dall'interfaccia utente qualsiasi menzione visibile del "Google Client ID", il campo di testo per l'inserimento manuale, il pulsante toggle per opzioni sviluppatore e la dicitura tecnica `(appDataFolder)`.
