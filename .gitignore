@@ -3,9 +3,10 @@ node_modules/
 .pnp
 .pnp.js
 
-# Production build
+# Production build & test coverage
 dist/
 build/
+coverage/
 
 # Environment variables
 .env
