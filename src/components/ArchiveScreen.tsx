@@ -263,6 +263,7 @@ const ArchiveItem: React.FC<ArchiveItemProps> = ({ question: q, isExpanded, onTo
                 )}
               </div>
               <textarea
+                id={`textarea-note-${q.id}`}
                 value={noteText}
                 onChange={e => setNoteText(e.target.value)}
                 placeholder="Scrivi qui la tua nota personale per questo quesito..."
@@ -277,6 +278,7 @@ const ArchiveItem: React.FC<ArchiveItemProps> = ({ question: q, isExpanded, onTo
                   Annulla
                 </button>
                 <button
+                  id={`btn-save-note-${q.id}`}
                   onClick={async () => {
                     await saveNote(q.id, noteText);
                     setIsEditingNote(false);
@@ -291,6 +293,7 @@ const ArchiveItem: React.FC<ArchiveItemProps> = ({ question: q, isExpanded, onTo
 
           {!stat?.userNote && !isEditingNote && (
             <button
+              id={`btn-add-note-${q.id}`}
               onClick={() => {
                 setNoteText('');
                 setIsEditingNote(true);
@@ -405,6 +408,7 @@ export const ArchiveScreen: React.FC = () => {
         </button>
 
         <button
+          id="btn-filter-notes"
           onClick={() => setOnlyWithNotes(!onlyWithNotes)}
           className={`px-2.5 py-1.5 rounded-lg border text-xs font-semibold flex items-center gap-1.5 transition-colors ${
             onlyWithNotes
