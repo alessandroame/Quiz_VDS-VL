@@ -1,7 +1,7 @@
 # 📋 VDS-VL Quiz Master - Avanzamento Lavori (TODO)
 
 **Data Inizio**: 27/09/2026  
-**Stato Generale**: 🟡 In Corso (Fase 1 & Fase 2)
+**Stato Generale**: 🟢 Fase 1 e Fase 2 Completate | In Avvio: Fase 3 (Scaffolding PWA)
 
 ---
 
@@ -16,20 +16,21 @@
 
 ---
 
-### [ ] Fase 1: Creazione Custom Skills (.agents/skills)
+### [x] Fase 1: Creazione Custom Skills (.agents/skills)
 - [x] `.agents/skills/vds-exam-examiner` (Regolamento ufficiale AeCI & D.P.R. 133/2010)
-- [ ] `.agents/skills/vds-quiz-extractor` (Pipeline estrazione PDF, normalizzazione, validazione)
-- [ ] `.agents/skills/pwa-quiz-engine` (Fair Coverage Randomizer, Dexie DB, Drive Backup, PWA)
-- [ ] `.agents/skills/aviation-ui-ux` (Design cockpit avionico, microcopy minimale, temi chiaro/scuro/auto)
+- [x] `.agents/skills/vds-quiz-extractor` (Pipeline estrazione PDF, normalizzazione, validazione)
+- [x] `.agents/skills/pwa-quiz-engine` (Fair Coverage Randomizer, Dexie DB, Drive Backup, PWA)
+- [x] `.agents/skills/aviation-ui-ux` (Design cockpit avionico, microcopy minimale, temi chiaro/scuro/auto)
+- [x] `.agents/skills/git-pro` (Procedure professionali Git, commit atomici, gestione amend)
 
 ---
 
-### [ ] Fase 2: Estrazione Dati & Dataset 504 Quiz
-- [ ] Script Python `extract_quizzes.py` per parsing su 2 colonne e join con soluzioni
-- [ ] Correzione cesure a capo, trattini e caratteri speciali UTF-8
-- [ ] Sintesi spiegazioni didattiche essenziali (Regola fisica/normativa + Tranello)
-- [ ] Validazione di integrità: 504 quiz estratti, 3 opzioni per quiz, risposte 1-3 valide
-- [ ] Generazione `src/data/questions.json` e tipi TypeScript `src/types/quiz.ts`
+### [x] Fase 2: Estrazione Dati & Dataset 504 Quiz
+- [x] Script Python `extract_quizzes.py` per parsing su 2 colonne e join con soluzioni
+- [x] Correzione cesure a capo, trattini e caratteri speciali UTF-8
+- [x] Sintesi spiegazioni didattiche essenziali (Regola fisica/normativa + Tranello)
+- [x] Validazione di integrità: 504 quiz estratti, 3 opzioni per quiz, risposte 1-3 valide
+- [x] Generazione `src/data/questions.json`, `public/data/questions.json` e `src/types/quiz.ts`
 
 ---
 
