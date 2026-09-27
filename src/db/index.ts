@@ -9,6 +9,10 @@ export const DEFAULT_SETTINGS: AppSettings = {
   hapticEnabled: true,
   googleClientId: '',
   autoSyncDrive: false,
+  ttsEnabled: true,
+  ttsAutoExplainOnMistake: true,
+  ttsAutoPlayQuestion: false,
+  ttsPlaybackRate: 1.0,
 };
 
 export class VdsQuizDatabase extends Dexie {
@@ -113,7 +117,11 @@ export async function toggleQuestionBookmark(questionId: number): Promise<boolea
 
 export async function saveQuestionNote(questionId: number, note: string): Promise<void> {
   const existing = await db.stats.get(questionId);
+  const trimmed = note.trim();
+  const valueToSave = trimmed.length > 0 ? trimmed : undefined;
+
   if (!existing) {
+    if (!valueToSave) return;
     await db.stats.put({
       questionId,
       timesSeen: 0,
@@ -121,10 +129,10 @@ export async function saveQuestionNote(questionId: number, note: string): Promis
       timesWrong: 0,
       consecutiveCorrect: 0,
       isBookmarked: false,
-      userNote: note
+      userNote: valueToSave
     });
   } else {
-    await db.stats.update(questionId, { userNote: note });
+    await db.stats.update(questionId, { userNote: valueToSave });
   }
 }
 

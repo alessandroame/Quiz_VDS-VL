@@ -17,12 +17,13 @@ export class GoogleDriveService {
     return typeof window !== 'undefined' && !!window.google?.accounts?.oauth2;
   }
 
-  public initTokenClient(clientId: string, onTokenReceived?: (token: string) => void): void {
-    if (!this.isGisLoaded() || !clientId) return;
+  public initTokenClient(clientId?: string, onTokenReceived?: (token: string) => void): void {
+    const effectiveId = clientId || (import.meta.env?.VITE_GOOGLE_CLIENT_ID as string) || '';
+    if (!this.isGisLoaded() || !effectiveId) return;
 
     try {
       this.tokenClient = window.google.accounts.oauth2.initTokenClient({
-        client_id: clientId,
+        client_id: effectiveId,
         scope: 'https://www.googleapis.com/auth/drive.appdata https://www.googleapis.com/auth/drive.file',
         callback: (resp: any) => {
           if (resp.access_token) {

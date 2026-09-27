@@ -108,6 +108,21 @@ describe('Suite 4: Persistenza Dexie IndexedDB (src/db/index.ts)', () => {
     await saveQuestionNote(2002, 'Aggiornamento: vale anche in termica');
     stat = await db.stats.get(2002);
     expect(stat!.userNote).toBe('Aggiornamento: vale anche in termica');
+
+    // Act 3: cancellazione nota con stringa vuota o spazi
+    await saveQuestionNote(2002, '   ');
+    stat = await db.stats.get(2002);
+    expect(stat!.userNote).toBeUndefined();
+
+    // Act 4: verifica che la rimozione della nota preservi i dati di telemetria e bookmark
+    await recordQuestionAnswer(2002, true);
+    await toggleQuestionBookmark(2002);
+    await saveQuestionNote(2002, 'Nuova nota temporanea');
+    await saveQuestionNote(2002, '');
+    stat = await db.stats.get(2002);
+    expect(stat!.userNote).toBeUndefined();
+    expect(stat!.timesSeen).toBeGreaterThan(0);
+    expect(stat!.isBookmarked).toBe(true);
   });
 
   it('DB-07: gestione impostazioni e fallback trasparente ai default', async () => {

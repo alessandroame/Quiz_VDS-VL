@@ -42,4 +42,8 @@ export interface AppSettings {
   googleClientId?: string;
   autoSyncDrive: boolean;
   lastDriveSyncAt?: number;
+  ttsEnabled: boolean;
+  ttsAutoExplainOnMistake: boolean;
+  ttsAutoPlayQuestion: boolean;
+  ttsPlaybackRate: number;
 }

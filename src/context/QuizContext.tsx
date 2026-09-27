@@ -1,8 +1,9 @@
-import React, { createContext, useContext, useMemo } from 'react';
+import React, { createContext, useContext, useMemo, useEffect, useState } from 'react';
 import { useLiveQuery } from 'dexie-react-hooks';
 import questionsData from '../data/questions.json';
 import type { Question } from '../types/quiz';
 import type { QuestionStat, ExamSession, AppSettings } from '../types/database';
+import { voiceService } from '../services/voiceService';
 import {
   db,
   DEFAULT_SETTINGS,
@@ -25,6 +26,8 @@ interface QuizContextType {
   statsMap: Map<number, QuestionStat>;
   sessions: ExamSession[];
   settings: AppSettings;
+  isExamRunning: boolean;
+  setIsExamRunning: (running: boolean) => void;
   updateSetting: <K extends keyof AppSettings>(key: K, value: AppSettings[K]) => Promise<void>;
   recordAnswer: (questionId: number, isCorrect: boolean) => Promise<void>;
   toggleBookmark: (questionId: number) => Promise<boolean>;
@@ -41,6 +44,7 @@ const QuizContext = createContext<QuizContextType | null>(null);
 
 export const QuizProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const questions: Question[] = questionsData as Question[];
+  const [isExamRunning, setIsExamRunning] = useState<boolean>(false);
 
   // Reattività istantanea con Dexie live queries
   const statsList = useLiveQuery(() => db.stats.toArray(), []) || [];
@@ -54,6 +58,10 @@ export const QuizProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }, {} as Partial<AppSettings>);
     return { ...DEFAULT_SETTINGS, ...map };
   }, [settingsList]);
+
+  useEffect(() => {
+    voiceService.setPlaybackRate(settings.ttsPlaybackRate || 1.0);
+  }, [settings.ttsPlaybackRate]);
 
   const statsMap = useMemo(() => {
     const map = new Map<number, QuestionStat>();
@@ -113,6 +121,8 @@ export const QuizProvider: React.FC<{ children: React.ReactNode }> = ({ children
         statsMap,
         sessions,
         settings,
+        isExamRunning,
+        setIsExamRunning,
         updateSetting,
         recordAnswer,
         toggleBookmark,

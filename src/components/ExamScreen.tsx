@@ -9,7 +9,8 @@ import {
   ArrowLeft,
   RotateCcw,
   Zap,
-  ListFilter
+  ListFilter,
+  LogOut
 } from 'lucide-react';
 import type { Question } from '../types/quiz';
 import type { ExamSession } from '../types/database';
@@ -20,7 +21,7 @@ import { formatTime } from '../utils/timer';
 import { QuestionCard } from './QuestionCard';
 
 export const ExamScreen: React.FC = () => {
-  const { questions, statsMap, saveExam, recordAnswer, settings } = useQuiz();
+  const { questions, statsMap, saveExam, recordAnswer, settings, setIsExamRunning } = useQuiz();
 
   // Stato esame
   const [examState, setExamState] = useState<'idle' | 'running' | 'review'>('idle');
@@ -32,7 +33,20 @@ export const ExamScreen: React.FC = () => {
   const [startTime, setStartTime] = useState(0);
   const [isMarathon, setIsMarathon] = useState(false);
   const [showSubmitModal, setShowSubmitModal] = useState(false);
+  const [showAbandonModal, setShowAbandonModal] = useState(false);
   const [completedSession, setCompletedSession] = useState<ExamSession | null>(null);
+
+  // Sincronizza lo stato globale dell'esame attivo (per bloccare navigazione accidentale)
+  useEffect(() => {
+    setIsExamRunning(examState === 'running');
+  }, [examState, setIsExamRunning]);
+
+  // Cleanup all'unmount
+  useEffect(() => {
+    return () => {
+      setIsExamRunning(false);
+    };
+  }, [setIsExamRunning]);
 
   const startExam = (marathon = false) => {
     setIsMarathon(marathon);
@@ -176,6 +190,7 @@ export const ExamScreen: React.FC = () => {
         {/* Pulsanti Avvio */}
         <div className="space-y-3 pt-2">
           <button
+            id="btn-start-exam"
             onClick={() => startExam(false)}
             className="w-full py-4 rounded-xl bg-sky-600 hover:bg-sky-500 text-white font-bold text-base shadow-lg shadow-sky-950/40 flex items-center justify-center gap-2 transition-all active:scale-[0.99]"
           >
@@ -184,6 +199,7 @@ export const ExamScreen: React.FC = () => {
           </button>
 
           <button
+            id="btn-start-marathon"
             onClick={() => startExam(true)}
             className="w-full py-3 rounded-xl bg-slate-900 border border-slate-800 hover:border-slate-700 text-slate-300 light:bg-slate-100 light:text-slate-700 light:border-slate-300 text-xs font-semibold flex items-center justify-center gap-1.5 transition-colors"
           >
@@ -337,12 +353,24 @@ export const ExamScreen: React.FC = () => {
           </div>
         </div>
 
-        <button
-          onClick={() => setShowSubmitModal(true)}
-          className="px-3.5 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs shadow-sm transition-all"
-        >
-          Consegna ({answeredCount}/{totalCount})
-        </button>
+        <div className="flex items-center gap-2">
+          <button
+            id="btn-abandon-exam"
+            onClick={() => setShowAbandonModal(true)}
+            className="px-2.5 py-1.5 rounded-lg border border-slate-700/80 hover:border-rose-500/80 text-slate-400 hover:text-rose-400 light:border-slate-300 light:text-slate-600 light:hover:text-rose-600 text-xs font-medium transition-colors flex items-center gap-1"
+            title="Abbandona la sessione di esame"
+          >
+            <LogOut className="w-3.5 h-3.5" />
+            <span className="hidden sm:inline">Abbandona</span>
+          </button>
+
+          <button
+            onClick={() => setShowSubmitModal(true)}
+            className="px-3.5 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs shadow-sm transition-all"
+          >
+            Consegna ({answeredCount}/{totalCount})
+          </button>
+        </div>
       </div>
 
       {/* Griglia Navigatore Domande (30 bolle) */}
@@ -452,6 +480,48 @@ export const ExamScreen: React.FC = () => {
                 className="flex-1 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold shadow-md"
               >
                 Conferma
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Modal di Conferma Abbandono Esame */}
+      {showAbandonModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/75 p-4 animate-in fade-in">
+          <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 max-w-sm w-full space-y-4 shadow-2xl light:bg-white light:border-slate-200">
+            <div className="flex items-center gap-2 text-rose-400 light:text-rose-600">
+              <AlertCircle className="w-6 h-6" />
+              <h3 className="font-bold text-base text-slate-100 light:text-slate-900">
+                Abbandonare l'Esame?
+              </h3>
+            </div>
+
+            <div className="text-xs text-slate-300 light:text-slate-600 space-y-2">
+              <p>
+                Sei sicuro di voler interrompere la simulazione in corso?
+              </p>
+              <p className="text-amber-400 light:text-amber-700 font-medium">
+                Tutte le {answeredCount} risposte fornite finora andranno perse e la scheda non verrà conteggiata.
+              </p>
+            </div>
+
+            <div className="flex gap-2 pt-2">
+              <button
+                onClick={() => setShowAbandonModal(false)}
+                className="flex-1 py-2.5 rounded-xl bg-sky-600 hover:bg-sky-500 text-white text-xs font-bold shadow-md"
+              >
+                Continua Esame
+              </button>
+              <button
+                onClick={() => {
+                  setShowAbandonModal(false);
+                  setExamState('idle');
+                  setIsExamRunning(false);
+                }}
+                className="flex-1 py-2.5 rounded-xl border border-rose-500/60 text-rose-400 hover:bg-rose-500/10 light:text-rose-600 light:border-rose-300 text-xs font-medium"
+              >
+                Abbandona
               </button>
             </div>
           </div>

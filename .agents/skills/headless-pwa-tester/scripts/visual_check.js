@@ -1,9 +1,10 @@
 // scripts/visual_check.js - Zero-dependency Headless Visual & Interactive Testing Tool using native Chrome/Edge CDP
-const { spawn } = require('child_process');
-const http = require('http');
-const fs = require('fs');
-const path = require('path');
-const os = require('os');
+import { spawn } from 'node:child_process';
+import http from 'node:http';
+import fs from 'node:fs';
+import path from 'node:path';
+import os from 'node:os';
+import { fileURLToPath } from 'node:url';
 
 const POSSIBLE_PATHS = [
   process.env.CHROME_PATH,
@@ -148,18 +149,23 @@ async function runSingleViewportCheck(viewportName, options = {}) {
     await send('Page.navigate', { url: targetUrl });
     await sleep(options.waitMs || 1500);
 
-    // Esegui click interattivo opzionale su selettore CSS
+    // Esegui click interattivo opzionale su selettore CSS (o sequenza separata da virgola)
     if (options.clickSelector) {
       console.log(`[HEADLESS-CHECK] Interazione click su selettore: '${options.clickSelector}'...`);
       const clickRes = await send('Runtime.evaluate', {
         expression: `
-          (() => {
-            const el = document.querySelector(${JSON.stringify(options.clickSelector)});
-            if (!el) return { success: false, reason: 'Elemento non trovato' };
-            el.click();
+          (async () => {
+            const selectors = ${JSON.stringify(options.clickSelector)}.split(',').map(s => s.trim()).filter(Boolean);
+            for (const sel of selectors) {
+              const el = document.querySelector(sel);
+              if (!el) return { success: false, reason: 'Elemento non trovato: ' + sel };
+              el.click();
+              await new Promise(r => setTimeout(r, 200));
+            }
             return { success: true };
           })()
         `,
+        awaitPromise: true,
         returnByValue: true
       });
       if (!clickRes.result.value.success) {
@@ -206,23 +212,25 @@ async function main() {
   const targetViewport = args[0] || 'mobile-portrait';
   const targetUrl = args[1] || 'http://localhost:5173';
   const clickSelector = args[2] || null;
+  const customOutput = args[3] || null;
 
   if (targetViewport === 'all') {
     const viewports = ['mobile-portrait', 'mobile-landscape', 'desktop'];
     let allPassed = true;
     for (const vp of viewports) {
-      const res = await runSingleViewportCheck(vp, { url: targetUrl, clickSelector });
+      const res = await runSingleViewportCheck(vp, { url: targetUrl, clickSelector, output: customOutput });
       if (!res.success) allPassed = false;
     }
     process.exit(allPassed ? 0 : 1);
   } else {
-    const res = await runSingleViewportCheck(targetViewport, { url: targetUrl, clickSelector });
+    const res = await runSingleViewportCheck(targetViewport, { url: targetUrl, clickSelector, output: customOutput });
     process.exit(res.success ? 0 : 1);
   }
 }
 
-if (require.main === module) {
+const isMain = process.argv[1] && fileURLToPath(import.meta.url) === path.resolve(process.argv[1]);
+if (isMain) {
   main();
 }
 
-module.exports = { runSingleViewportCheck, VIEWPORTS };
+export { runSingleViewportCheck, VIEWPORTS };

@@ -4,7 +4,8 @@ import {
   CheckCircle2,
   ArrowRight,
   ArrowLeft,
-  Flame
+  Flame,
+  FileText
 } from 'lucide-react';
 import type { Question } from '../types/quiz';
 import { useQuiz } from '../context/QuizContext';
@@ -179,6 +180,12 @@ export const MistakesScreen: React.FC = () => {
                       <p className="text-slate-200 light:text-slate-800 line-clamp-2">
                         {q.question}
                       </p>
+                      {s?.userNote && (
+                        <div className="flex items-center gap-1.5 mt-1 text-[11px] text-sky-400 light:text-sky-700 bg-sky-950/40 light:bg-sky-50 px-2 py-0.5 rounded border border-sky-800/40 light:border-sky-200 w-fit max-w-full">
+                          <FileText className="w-3 h-3 flex-shrink-0" />
+                          <span className="truncate italic">Nota: "{s.userNote}"</span>
+                        </div>
+                      )}
                     </div>
 
                     <div className="flex flex-col items-end flex-shrink-0 space-y-1">

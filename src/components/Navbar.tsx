@@ -22,14 +22,8 @@ interface NavbarProps {
 }
 
 export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab, openSettings }) => {
-  const { theme, setTheme } = useTheme();
-  const { mistakesCount, readinessScore } = useQuiz();
-
-  const cycleTheme = () => {
-    if (theme === 'dark') setTheme('light');
-    else if (theme === 'light') setTheme('system');
-    else setTheme('dark');
-  };
+  const { theme, cycleTheme } = useTheme();
+  const { mistakesCount, readinessScore, isExamRunning } = useQuiz();
 
   const navItems = [
     { id: 'exam' as NavTab, label: 'Esame', icon: Compass },
@@ -57,6 +51,12 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab, openSet
               <div className="font-bold text-sm tracking-wide flex items-center gap-1.5">
                 <span>VDS-VL</span>
                 <span className="text-[10px] px-1.5 py-0.5 rounded bg-sky-500/20 text-sky-400 font-mono">2017</span>
+                {isExamRunning && (
+                  <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-rose-500/20 text-rose-400 border border-rose-500/40 font-bold flex items-center gap-1 animate-pulse">
+                    <span className="w-1.5 h-1.5 rounded-full bg-rose-500" />
+                    <span>IN CORSO</span>
+                  </span>
+                )}
               </div>
               <div className="text-[11px] text-slate-400 light:text-slate-500">
                 Prontezza: <strong className="text-sky-400 light:text-sky-600">{readinessScore}%</strong>
@@ -67,6 +67,7 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab, openSet
           <div className="flex items-center gap-1.5">
             {/* Theme quick toggle */}
             <button
+              id="btn-theme-toggle"
               onClick={cycleTheme}
               title={`Tema: ${theme}`}
               className="p-2 rounded-lg text-slate-400 hover:text-slate-200 light:text-slate-600 light:hover:text-slate-900 hover:bg-slate-800/60 light:hover:bg-slate-100 transition-colors"
@@ -78,6 +79,7 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab, openSet
 
             {/* Settings button */}
             <button
+              id="btn-settings"
               onClick={openSettings}
               title="Impostazioni"
               className="p-2 rounded-lg text-slate-400 hover:text-slate-200 light:text-slate-600 light:hover:text-slate-900 hover:bg-slate-800/60 light:hover:bg-slate-100 transition-colors"
@@ -97,6 +99,7 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab, openSet
             return (
               <button
                 key={item.id}
+                id={`nav-${item.id}`}
                 onClick={() => setActiveTab(item.id)}
                 className={`relative flex flex-col items-center justify-center gap-1 py-1 transition-colors ${
                   isActive
@@ -109,6 +112,12 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab, openSet
                   {item.badge !== undefined && (
                     <span className="absolute -top-1.5 -right-2.5 px-1 py-0.2 min-w-4 text-[10px] font-bold rounded-full bg-rose-500 text-white text-center">
                       {item.badge}
+                    </span>
+                  )}
+                  {item.id === 'exam' && isExamRunning && (
+                    <span className="absolute -top-1 -right-1 flex h-2.5 w-2.5">
+                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-rose-400 opacity-75" />
+                      <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-rose-500" />
                     </span>
                   )}
                 </div>
