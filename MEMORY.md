@@ -29,3 +29,12 @@ Questo file costituisce la memoria permanente del progetto. Raccoglie decisioni 
 ## 4. Tooling & Governance
 - **Zero Dangling Background Tasks**: Comandi di build/test eseguiti con `WaitMsBeforeAsync: 10000` per evitare processi zombie.
 - **Circuit Breaker**: Stop immediato se lo stesso errore di compilazione o test si ripete senza progressi.
+
+---
+
+## 5. Testing & Architettura Suite (Vitest)
+- **Moduli Puri Estratti (SRP)**: La logica di valutazione esame risiede in `src/services/examEvaluator.ts`, il timer in `src/utils/timer.ts`, e le metriche in `src/utils/analytics.ts`.
+- **Zero Faux-Testing & BVA**: Soglie esame verificate su 2, 3 (Idoneo limite), 4 (Respinto), 6 (Idoneo maratona), 7 (Respinto maratona).
+- **Quaderno Errori**: Ingresso con 1 errore (`timesWrong > 0`), promozione e uscita solo con `consecutiveCorrect >= 2`.
+- **Isolamento In-Memory**: Test di persistenza Dexie eseguiti con `fake-indexeddb/auto` senza dipendere dal DOM o dal browser reale.
+- **Comandi**: `npm run test:unit` per la suite rapida, `npm run test:coverage` per il report di copertura v8.
