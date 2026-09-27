@@ -577,6 +577,7 @@ export const DriveModeScreen: React.FC<DriveModeScreenProps> = ({
           {/* Opzioni di Avvio Rapido */}
           <div className="flex-1 flex flex-col justify-center gap-3.5">
             <button
+              id="btn-drive-start-exam"
               onClick={() => startDriveExam(false)}
               className="w-full py-5 px-6 rounded-2xl bg-sky-600 hover:bg-sky-500 active:scale-[0.98] text-white font-black text-lg flex items-center justify-between shadow-xl transition-all"
             >
@@ -591,6 +592,7 @@ export const DriveModeScreen: React.FC<DriveModeScreenProps> = ({
             </button>
 
             <button
+              id="btn-drive-start-radio"
               onClick={startDriveRadioQuiz}
               className="w-full py-5 px-6 rounded-2xl bg-amber-600 hover:bg-amber-500 active:scale-[0.98] text-white font-black text-lg flex items-center justify-between shadow-xl transition-all"
             >
@@ -605,6 +607,7 @@ export const DriveModeScreen: React.FC<DriveModeScreenProps> = ({
             </button>
 
             <button
+              id="btn-drive-start-mistakes"
               onClick={startDriveMistakes}
               className="w-full py-4 px-6 rounded-2xl bg-slate-900 border border-slate-800 hover:border-slate-700 active:scale-[0.98] text-rose-300 font-bold text-base flex items-center justify-between transition-all"
             >
@@ -619,6 +622,7 @@ export const DriveModeScreen: React.FC<DriveModeScreenProps> = ({
             </button>
 
             <button
+              id="btn-drive-start-marathon"
               onClick={() => startDriveExam(true)}
               className="w-full py-3.5 px-6 rounded-2xl bg-slate-900/60 border border-slate-800 text-slate-400 font-semibold text-sm flex items-center justify-between transition-all"
             >
