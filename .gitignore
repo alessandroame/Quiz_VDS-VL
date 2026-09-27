@@ -20,6 +20,10 @@ coverage/
 .DS_Store
 Thumbs.db
 *.swp
+# Test screenshots and visual artifacts
+*.png
+!public/**/*.png
+
 
 # Python cache
 __pycache__/

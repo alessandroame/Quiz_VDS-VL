@@ -71,7 +71,8 @@ class VoiceService {
       opt3: '3',
       explanation: 'e'
     };
-    return `/audio/${questionId}_${suffixMap[part]}.mp3`;
+    const baseUrl = (import.meta.env.BASE_URL || '/').replace(/\/+$/, '');
+    return `${baseUrl}/audio/${questionId}_${suffixMap[part]}.mp3`;
   }
 
   private updateMediaSession(questionId: number, titlePart: string) {

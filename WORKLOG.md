@@ -18,6 +18,53 @@ Questo documento registra in ordine cronologico tutte le lavorazioni svolte nel 
 
 ## Registro Cronologico
 
+### [2026-09-27] - Integrazione Motore Vocale Neurale Integrale (TTS Giuseppe Calmo) & Generazione Catalogo 504 Quiz
+- **Cosa abbiamo fatto**:
+  1. **Valutazione Critica & Blind Test preliminare**:
+     - Dimostrata l'inadeguatezza del `window.speechSynthesis` nativo del browser desktop Windows (voce robotica metallica `Microsoft Elsa Desktop SAPI5`).
+     - Approvata la voce neurale da studio **Giuseppe Calmo** (`it-IT-GiuseppeMultilingualNeural`) calibrata con `rate: -5%` e `pitch: -5Hz` (timbro baritonale pacato, stile istruttore di volo, zero picchi acuti).
+     - Corretta la pronuncia delle opzioni in puro stile cockpit italiano (*"Uno. [testo]"*, *"Due. [testo]"*, *"Tre. [testo]"*) eliminando collisioni fonetiche con l'inglese (*"Option 1"*).
+  2. **Pipeline Batch di Generazione Completa (504 Quiz)**:
+     - Creato lo script concorrente `scripts/generate_audio_database.py` per generare tutti i 5 segmenti discreti per ciascuna domanda: domanda (`_q.mp3`), tre opzioni (`_1.mp3`, `_2.mp3`, `_3.mp3`) e spiegazione didattica su errore (`_e.mp3`).
+     - Generati con successo **tutti i 2.520 segmenti audio** per l'intero catalogo dei 504 quiz in `public/audio/` (~167 MB).
+  3. **Normalizzatore Fonetico Aeronautico (`src/utils/aviationPhonetics.ts`)**:
+     - Sostituzione di acronimi e unità di misura con pronuncia naturale: `D.P.R. 133/2010`, `VDS/VL`, `AeCI`, `RCT`, `QNH`, `QFE`, `hPa`, `FL`, `km/h`, `m/s`, `kt`, gradi e punteggiatura morbida per evitare intonazioni interrogative stridule.
+     - Suite di 7 unit test dedicati con Vitest (`src/utils/aviationPhonetics.test.ts`), tutti superati.
+  4. **Servizio Audio Centrale & MediaSession (`src/services/voiceService.ts` & `src/hooks/useAviationVoice.ts`)**:
+     - Riproduzione atomica di singoli frammenti e sequenza continua con highlighting visivo sincronizzato.
+     - Supporto `navigator.mediaSession` per riproduzione e metadati a schermo spento con auricolari Bluetooth.
+  5. **Integrazione UI Cockpit in [QuestionCard.tsx](file:///c:/github/Quiz_VDS-VL/src/components/QuestionCard.tsx) & [ArchiveScreen.tsx](file:///c:/github/Quiz_VDS-VL/src/components/ArchiveScreen.tsx)**:
+     - Header: tasto sequenziale "Ascolta / Ascolto..." con animazione d'onda.
+     - Domanda: micro-icona speaker per ascolto atomico del solo testo domanda (tasto `Q`).
+     - Opzioni 1, 2, 3: micro-icona per ascolto della singola opzione (tasti `Alt+1`, `Alt+2`, `Alt+3`).
+     - Feedback su errore: trigger vocale automatico della risposta corretta, della regola e del tranello.
+     - Box spiegazione didattica: pulsante "Ascolta Spiegazione" per risentire la motivazione.
+  6. **Impostazioni in [SettingsModal.tsx](file:///c:/github/Quiz_VDS-VL/src/components/SettingsModal.tsx)**:
+     - Toggle Voce Istruttore (On/Off).
+     - Toggle Spiegazione Vocale Automatica su Errore.
+     - Toggle Lettura Automatica all'apertura del quiz.
+     - Selettore velocità parlato (`0.9x`, `1.0x`, `1.15x`, `1.25x`).
+- **Scelte architetturali & Rationale**:
+  - *Segmentazione discreta vs Audio Sprites monolitici*: 5 file per quiz evitano problemi di buffer range seek sui browser mobile e consentono una gestione dello stato pulita e immediata.
+  - *Normalizzazione fonetica a monte*: Garantisce che termini complessi come "QNH 1013 hPa" o "D.P.R. 133/2010" vengano pronunciati con perfetta dizione aeronautica.
+- **Impatto sul Desiderata**:
+  - PWA completamente accessibile e fruibile a mani libere, con supporto studio durante tragitti o passeggiate (cuffie Bluetooth e schermo spento).
+
+### [2026-09-27] - Configurazione GitHub Pages & CI/CD Pipeline (.github/workflows/deploy.yml)
+- **Cosa abbiamo fatto**:
+  1. **Configurazione Base Path per GitHub Pages**:
+     - In `vite.config.ts`, impostato `base: process.env.BASE_PATH || (process.env.GITHUB_ACTIONS ? '/Quiz_VDS-VL/' : '/')`. In questo modo in sviluppo locale il server risponde sempre su `/` (compatibilità con test CDP e porte standard), mentre nei runner di build GitHub Pages imposta il subpath del repository.
+     - Nel manifest PWA (`vite.config.ts`), convertite le icone in percorsi relativi (`'icons/icon-192x192.png'`) per evitare che cerchino la cartella icons nella root del dominio host (`username.github.io/icons`).
+  2. **Risoluzione Path Audio per Deployment Subpath**:
+     - In `src/services/voiceService.ts`, aggiornato `getAudioUrl` con `import.meta.env.BASE_URL` dinamico, garantendo che gli stream audio ICAO vengano risolti correttamente sia in locale che su GitHub Pages.
+  3. **Automazione CI/CD con GitHub Actions**:
+     - Creato il workflow standard `.github/workflows/deploy.yml` con trigger su `push` al branch `main` e `workflow_dispatch`. Il job esegue `npm ci`, la suite di test Vitest (`npm test`), il build PWA (`npm run build` con `BASE_PATH: '/Quiz_VDS-VL/'`), il packaging dell'artifact `dist` e il deployment su GitHub Pages tramite le action ufficiali `actions/deploy-pages@v4`.
+- **Scelte architetturali & Rationale**:
+  - *GitHub Pages come Hosting Ideale*: L'app è una Single Page Application 100% client-side senza backend proprietario. GitHub Pages fornisce HTTPS nativo e permanente (prerequisito obbligatorio per Service Worker e Web App Install Banner), zero costi e zero manutenzione server.
+  - *Automazione GitHub Actions vs Branch Orfano*: Adottato il deployment moderno nativo via artifact Actions (`actions/deploy-pages@v4`), evitando l'inquinamento del repository con branch sporchi come `gh-pages` o build committati manualmente nel repo.
+- **Impatto sul Desiderata**:
+  - Preparata la PWA per la distribuzione pubblica e l'installazione su dispositivi reali (smartphone Android, iOS, tablet e desktop) con Service Worker e cache offline operativi.
+
 ### [2026-09-27] - Risoluzione Difetti: Visibilità Note Personali & Protezione Esame Attivo (Navigation Guard)
 - **Cosa abbiamo fatto**:
   1. **Visualizzazione, Modifica ed Eliminazione Note Personali**:
