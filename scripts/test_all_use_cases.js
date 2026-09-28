@@ -42,12 +42,23 @@ async function run() {
     throw new Error('Nessun browser Chrome/Edge trovato per il collaudo.');
   }
 
-  const preview = spawn('npx', ['vite', 'preview', '--port', '4173'], {
+  const preview = spawn('npx', ['vite', 'preview', '--port', '5173'], {
     shell: true,
     stdio: 'ignore'
   });
 
-  await sleep(1500);
+  // Attendi che il server sia pronto
+  for (let i = 0; i < 40; i++) {
+    try {
+      const res = await fetch('http://localhost:5173/');
+      if (res.ok) {
+        break;
+      }
+    } catch {
+      await sleep(250);
+    }
+  }
+  await sleep(500);
 
   const port = 9336;
   const tempProfile = path.join(os.tmpdir(), `chrome_quiz_full_test_${Date.now()}`);
@@ -125,7 +136,7 @@ async function run() {
     };
 
     // Naviga alla PWA
-    await sendCDP('Page.navigate', { url: 'http://localhost:4173/' });
+    await sendCDP('Page.navigate', { url: 'http://localhost:5173/' });
     await sleep(2000);
 
     // =================================================================
@@ -254,11 +265,44 @@ async function run() {
     console.log(`  -> Chiusura sicura Drive Mode e rientro: ${driveClosed ? '✅ SÌ' : '❌ NO'}`);
 
     // =================================================================
-    // CONTESTO 3: CAMPO DI VOLO / SOLE DIRETTO (HANGAR LIGHT)
+    // CONTESTO 3: CAMPO DI VOLO / SOLE DIRETTO (HANGAR LIGHT) & IMPOSTAZIONI A SCHEDE
     // =================================================================
-    console.log('\n📌 [CONTESTO 3] Verifica Contrasto & Visibilità Solare (Hangar Light)');
+    console.log('\n📌 [CONTESTO 3] Verifica Contrasto & Visibilità Solare (Hangar Light) & Nuovi Menu');
+    
+    // 3.1 Test Quick Speech Menu (1-Click Popover in Navbar)
+    await evalJS(`document.getElementById('btn-voice-quick-menu').click()`);
+    await sleep(300);
+    const popoverOpen = await evalJS(`Boolean(document.getElementById('voice-quick-popover'))`);
+    console.log(`  -> Quick Speech Menu popover aperto con 1 clic: ${popoverOpen ? '✅ SÌ' : '❌ NO'}`);
+    
+    // Switch rapido voce Elsa
+    await evalJS(`document.getElementById('quick-voice-elsa')?.click()`);
+    await sleep(200);
+    // Chiudi popover
+    await evalJS(`document.getElementById('btn-voice-quick-menu').click()`);
+    await sleep(300);
+
+    // 3.2 Test Impostazioni a Schede Tematiche (Zero-Scroll)
     await evalJS(`document.getElementById('btn-settings').click()`);
     await sleep(300);
+
+    const hasAllTabs = await evalJS(`
+      Boolean(document.getElementById('tab-appearance') &&
+              document.getElementById('tab-voice') &&
+              document.getElementById('tab-drive') &&
+              document.getElementById('tab-cloud') &&
+              document.getElementById('tab-data'))
+    `);
+    console.log(`  -> 5 Schede tematiche impostazioni presenti: ${hasAllTabs ? '✅ SÌ' : '❌ NO'}`);
+
+    // Switch tra le schede
+    await evalJS(`document.getElementById('tab-voice')?.click()`);
+    await sleep(200);
+    await evalJS(`document.getElementById('tab-drive')?.click()`);
+    await sleep(200);
+    await evalJS(`document.getElementById('tab-appearance')?.click()`);
+    await sleep(200);
+
     await evalJS(`document.getElementById('theme-btn-light').click()`);
     await sleep(300);
     await evalJS(`document.getElementById('btn-close-settings').click()`);

@@ -13,6 +13,7 @@ import {
 } from 'lucide-react';
 import { useTheme } from '../context/ThemeContext';
 import { useQuiz } from '../context/QuizContext';
+import { VoiceQuickMenu } from './VoiceQuickMenu';
 
 export type NavTab = 'exam' | 'topics' | 'mistakes' | 'archive' | 'stats';
 
@@ -76,6 +77,9 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab, openSet
               <Car className="w-4 h-4 text-amber-400 light:text-amber-700" />
               <span className="hidden sm:inline">Alla Guida</span>
             </button>
+
+            {/* Quick Voice / Speech Menu */}
+            <VoiceQuickMenu />
 
             {/* Theme quick toggle */}
             <button
