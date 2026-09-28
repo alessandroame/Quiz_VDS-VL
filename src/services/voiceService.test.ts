@@ -39,12 +39,24 @@ class MockAudio {
   }
 }
 
+const setNavigatorOnline = (online: boolean) => {
+  if (typeof globalThis.navigator === 'undefined') {
+    (globalThis as any).navigator = {};
+  }
+  Object.defineProperty(globalThis.navigator, 'onLine', {
+    value: online,
+    configurable: true,
+    writable: true,
+  });
+};
+
 describe('VoiceService (src/services/voiceService.ts)', () => {
   let service: VoiceService;
   let mockAudio: MockAudio;
 
   beforeEach(() => {
     vi.restoreAllMocks();
+    setNavigatorOnline(true);
     mockAudio = new MockAudio();
     (globalThis as any).Audio = vi.fn().mockImplementation(function () {
       return mockAudio;
@@ -54,6 +66,7 @@ describe('VoiceService (src/services/voiceService.ts)', () => {
 
   afterEach(() => {
     service.stop();
+    setNavigatorOnline(true);
   });
 
   it('VOICE-01: initializes with idle state', () => {
@@ -311,13 +324,13 @@ describe('VoiceService (src/services/voiceService.ts)', () => {
   });
 
   it('VOICE-15: resolveEffectiveVoice uses target voice when online', () => {
-    Object.defineProperty(navigator, 'onLine', { value: true, configurable: true });
+    setNavigatorOnline(true);
     expect(service.resolveEffectiveVoice('elsa')).toBe('elsa');
     expect(service.resolveEffectiveVoice('giuseppe')).toBe('giuseppe');
   });
 
   it('VOICE-16: resolveEffectiveVoice falls back to available voice when offline and target is not downloaded', () => {
-    Object.defineProperty(navigator, 'onLine', { value: false, configurable: true });
+    setNavigatorOnline(false);
 
     // Mock giuseppe as ready, elsa as not ready
     vi.spyOn(audioDownloadManager, 'isVoiceReady').mockImplementation(v => v === 'giuseppe');
@@ -332,7 +345,7 @@ describe('VoiceService (src/services/voiceService.ts)', () => {
   });
 
   it('VOICE-17: onFallback notifies registered listeners when voice falls back', () => {
-    Object.defineProperty(navigator, 'onLine', { value: false, configurable: true });
+    setNavigatorOnline(false);
     vi.spyOn(audioDownloadManager, 'isVoiceReady').mockImplementation(v => v === 'giuseppe');
     vi.spyOn(audioDownloadManager, 'getAvailableOfflineVoice').mockReturnValue('giuseppe');
 
@@ -348,7 +361,7 @@ describe('VoiceService (src/services/voiceService.ts)', () => {
   });
 
   it('VOICE-18: playSinglePart uses fallback voice URL when offline', async () => {
-    Object.defineProperty(navigator, 'onLine', { value: false, configurable: true });
+    setNavigatorOnline(false);
     vi.spyOn(audioDownloadManager, 'isVoiceReady').mockImplementation(v => v === 'giuseppe');
     vi.spyOn(audioDownloadManager, 'getAvailableOfflineVoice').mockReturnValue('giuseppe');
 

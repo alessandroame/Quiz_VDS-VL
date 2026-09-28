@@ -10,12 +10,23 @@ vi.mock('../db', () => ({
   setSetting: vi.fn()
 }));
 
+const setNavigatorOnline = (online: boolean) => {
+  if (typeof globalThis.navigator === 'undefined') {
+    (globalThis as any).navigator = {};
+  }
+  Object.defineProperty(globalThis.navigator, 'onLine', {
+    value: online,
+    configurable: true,
+    writable: true,
+  });
+};
+
 describe('SyncEngine service', () => {
   let engine: SyncEngine;
 
   beforeEach(() => {
     vi.clearAllMocks();
-    Object.defineProperty(navigator, 'onLine', { value: true, configurable: true });
+    setNavigatorOnline(true);
     vi.mocked(dbModule.getSetting).mockResolvedValue(false as any);
     vi.mocked(dbModule.setSetting).mockResolvedValue(undefined as any);
     vi.mocked(dbModule.exportDatabaseBackup).mockResolvedValue('{"version":2,"stats":[]}');
@@ -71,18 +82,17 @@ describe('SyncEngine service', () => {
   });
 
   it('should handle pushNow when offline', async () => {
-    const originalOnline = navigator.onLine;
-    Object.defineProperty(navigator, 'onLine', { value: false, configurable: true });
+    setNavigatorOnline(false);
 
     const result = await engine.pushNow();
     expect(result.success).toBe(false);
     expect(engine.getState().status).toBe('offline');
 
-    Object.defineProperty(navigator, 'onLine', { value: originalOnline, configurable: true });
+    setNavigatorOnline(true);
   });
 
   it('should perform pushNow successfully when online', async () => {
-    Object.defineProperty(navigator, 'onLine', { value: true, configurable: true });
+    setNavigatorOnline(true);
 
     const result = await engine.pushNow();
     expect(result.success).toBe(true);
@@ -91,7 +101,7 @@ describe('SyncEngine service', () => {
   });
 
   it('should perform pullNow and smart merge successfully', async () => {
-    Object.defineProperty(navigator, 'onLine', { value: true, configurable: true });
+    setNavigatorOnline(true);
     vi.spyOn(googleDrive, 'downloadBackup').mockResolvedValue({
       success: true,
       data: '{"version":2,"stats":[]}',
@@ -105,7 +115,7 @@ describe('SyncEngine service', () => {
   });
 
   it('should perform fullSync seamlessly', async () => {
-    Object.defineProperty(navigator, 'onLine', { value: true, configurable: true });
+    setNavigatorOnline(true);
     vi.spyOn(googleDrive, 'downloadBackup').mockResolvedValue({
       success: true,
       data: '{"version":2,"stats":[]}',

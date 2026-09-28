@@ -12,6 +12,12 @@ export interface SyncEngineState {
 
 type SyncStateListener = (state: SyncEngineState) => void;
 
+const isDeviceOnline = (): boolean => {
+  return typeof navigator !== 'undefined' && typeof navigator.onLine === 'boolean'
+    ? navigator.onLine
+    : true;
+};
+
 export class SyncEngine {
   private status: SyncStatus = 'idle';
   private lastSyncedAt: number | null = null;
@@ -76,7 +82,7 @@ export class SyncEngine {
 
       // Network lifecycle listeners
       window.addEventListener('online', () => {
-        if (!navigator.onLine) return;
+        if (!isDeviceOnline()) return;
         if (this.isAutoSyncEnabled) {
           this.fullSync();
         } else {
@@ -88,7 +94,7 @@ export class SyncEngine {
         this.setStatus('offline');
       });
 
-      if (!navigator.onLine) {
+      if (!isDeviceOnline()) {
         this.setStatus('offline');
       }
     }
@@ -100,7 +106,7 @@ export class SyncEngine {
     this.isAutoSyncEnabled = enabled;
     setSetting('autoSyncDrive', enabled);
     this.notify();
-    if (enabled && triggerImmediateSync && navigator.onLine) {
+    if (enabled && triggerImmediateSync && isDeviceOnline()) {
       this.fullSync().catch(err => {
         console.warn('SyncEngine background fullSync error:', err);
       });
@@ -113,7 +119,7 @@ export class SyncEngine {
   public schedulePush(delayMs = 15000): void {
     if (!this.isAutoSyncEnabled) return;
 
-    if (!navigator.onLine) {
+    if (!isDeviceOnline()) {
       this.setStatus('offline');
       return;
     }
@@ -132,7 +138,7 @@ export class SyncEngine {
    * Performs an immediate upload of the current database state to Google Drive.
    */
   public async pushNow(): Promise<{ success: boolean; message: string }> {
-    if (!navigator.onLine) {
+    if (!isDeviceOnline()) {
       this.setStatus('offline');
       return { success: false, message: 'Dispositivo offline' };
     }
@@ -168,7 +174,7 @@ export class SyncEngine {
    * Downloads latest backup from Google Drive and merges it into local Dexie database.
    */
   public async pullNow(): Promise<{ success: boolean; message: string }> {
-    if (!navigator.onLine) {
+    if (!isDeviceOnline()) {
       this.setStatus('offline');
       return { success: false, message: 'Dispositivo offline' };
     }
@@ -209,7 +215,7 @@ export class SyncEngine {
    * then pushes the unified result back to Google Drive so both are in complete parity.
    */
   public async fullSync(): Promise<{ success: boolean; message: string }> {
-    if (!navigator.onLine) {
+    if (!isDeviceOnline()) {
       this.setStatus('offline');
       return { success: false, message: 'Dispositivo offline' };
     }

@@ -18,6 +18,21 @@ Questo documento registra in ordine cronologico tutte le lavorazioni svolte nel 
 
 ## Registro Cronologico
 
+### [2026-09-28] - Risoluzione ReferenceError navigator nei test CI e aggiornamento Node.js 22
+- **Cosa abbiamo fatto**:
+  - Risolto il fallimento degli 11 test su GitHub Actions (`ReferenceError: navigator is not defined` in `syncEngine.test.ts` e `voiceService.test.ts`):
+    * Creato il file di setup globale Vitest [src/test/setup.ts](file:///d:/Github/Quiz_VDS-VL/src/test/setup.ts) che definisce ed esporta in modo sicuro `globalThis.navigator` con `onLine: true` negli ambienti Node (come Node 20, dove `navigator` non è disponibile come globale built-in).
+    * Registrato `setupFiles: ['./src/test/setup.ts']` in [vitest.config.ts](file:///d:/Github/Quiz_VDS-VL/vitest.config.ts) ed esclusa la cartella `src/test/**` dal coverage.
+    * In [src/services/syncEngine.ts](file:///d:/Github/Quiz_VDS-VL/src/services/syncEngine.ts), isolato l'accesso a `navigator.onLine` tramite l'helper sicuro `isDeviceOnline()`, prevenendo `ReferenceError` a runtime in contesti privi di `navigator`.
+    * In [src/services/syncEngine.test.ts](file:///d:/Github/Quiz_VDS-VL/src/services/syncEngine.test.ts) e [src/services/voiceService.test.ts](file:///d:/Github/Quiz_VDS-VL/src/services/voiceService.test.ts), sostituite le chiamate dirette `Object.defineProperty(navigator, 'onLine', ...)` con un helper modulare `setNavigatorOnline(online: boolean)` che opera in sicurezza su `globalThis.navigator`.
+    * Aggiornata la versione di Node.js in [.github/workflows/deploy.yml](file:///d:/Github/Quiz_VDS-VL/.github/workflows/deploy.yml) da `node-version: 20` (ormai deprecata su GitHub Actions) a `node-version: 22` (Active LTS).
+  - Validata l'esecuzione completa della suite di test: 15 suite e 129 test passati al 100%, con esito positivo anche per la build di produzione (`tsc && vite build`).
+- **Scelte architetturali & Rationale**:
+  - *SetupFiles Pattern in Vitest*: Invece di confidare nel runtime host Node (introdotto solo in Node 21+), una PWA che testa codice browser in ambiente `node` deve fornire shim leggeri e deterministici in `setupFiles` per le API web minime utilizzate (`navigator.onLine`).
+  - *Helper difensivo isDeviceOnline*: In `syncEngine.ts`, evitare sempre l'accesso diretto non presidiato a globali del browser per garantire la massima stabilità in qualunque runtime o contesto di esecuzione.
+- **Impatto sul Desiderata**:
+  - Pipeline di Continuous Integration (CI/CD) su GitHub Actions ripristinata e verde al 100%, eliminando anche i warning di deprecazione su Node 20.
+
 ### [2026-09-28] - Rimozione Buzzword, Slogan e Allineamento Microcopy Sobrio ed Essenziale
 - **Cosa abbiamo fatto**:
   - Eliminati tutti gli slogan di marketing, le diciture ridondanti e i testi autoreferenziali ("Cockpit Avionics Design", "Zero-Blue Theme", "Avionics Ready") che non apportavano reale valore all'utente:
