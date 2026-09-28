@@ -36,14 +36,41 @@
         0%, 100% { opacity: 0.88; transform: scale(1); }
         50% { opacity: 1; transform: scale(1.02); }
       }
+      .splash-icon-container {
+        width: min(240px, 62vw);
+        height: min(240px, 62vw);
+        min-width: 160px;
+        min-height: 160px;
+        max-width: 280px;
+        max-height: 280px;
+        filter: drop-shadow(0 20px 45px rgba(245, 158, 11, 0.35)) drop-shadow(0 0 30px rgba(245, 158, 11, 0.2));
+      }
+      .splash-title {
+        font-size: clamp(22px, 5.5vw, 32px);
+        font-weight: 800;
+        letter-spacing: 0.05em;
+        color: #f4f4f5;
+        text-transform: uppercase;
+        margin-top: 24px;
+        text-align: center;
+      }
+      .splash-sub {
+        font-size: clamp(11px, 2.8vw, 13px);
+        font-weight: 600;
+        color: #a1a1aa;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+        margin-top: 6px;
+        text-align: center;
+      }
       .splash-bar {
-        width: 130px;
-        height: 3px;
+        width: min(180px, 48vw);
+        height: 3.5px;
         background: #27272a;
         border-radius: 999px;
         overflow: hidden;
         position: relative;
-        margin-top: 18px;
+        margin-top: 24px;
       }
       .splash-bar-fill {
         position: absolute;
@@ -66,8 +93,8 @@
       <!-- Zero-Latency First-Paint Cockpit Splash Screen (0ms FCP, auto-replaced on React mount) -->
       <div id="splash-screen">
         <div class="splash-pulse" style="display:flex; flex-direction:column; align-items:center;">
-          <div style="width: 84px; height: 84px; margin-bottom: 16px; filter: drop-shadow(0 10px 20px rgba(245, 158, 11, 0.25));">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="84" height="84">
+          <div class="splash-icon-container">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="100%" height="100%">
               <defs>
                 <radialGradient id="splashBg" cx="50%" cy="45%" r="60%">
                   <stop offset="0%" stop-color="#18181b"/>
@@ -102,17 +129,17 @@
               <path d="M 274,386 L 268,396" stroke="#fef08a" stroke-width="2.5" stroke-linecap="round"/>
             </svg>
           </div>
-          <div style="font-size: 19px; font-weight: 800; letter-spacing: 0.04em; color: #f4f4f5; text-transform: uppercase;">
+          <div class="splash-title">
             VDS-VL <span style="color: #f59e0b;">Quiz Master</span>
           </div>
-          <div style="font-size: 11px; font-weight: 600; color: #a1a1aa; letter-spacing: 0.14em; text-transform: uppercase; margin-top: 4px;">
+          <div class="splash-sub">
             Volo Libero • AeCI
           </div>
         </div>
         <div class="splash-bar">
           <div class="splash-bar-fill"></div>
         </div>
-        <div style="font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; font-size: 10px; color: #71717a; letter-spacing: 0.18em; margin-top: 10px; text-transform: uppercase;">
+        <div style="font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; font-size: 11px; color: #71717a; letter-spacing: 0.22em; margin-top: 12px; text-transform: uppercase;">
           Avionics Ready
         </div>
       </div>
