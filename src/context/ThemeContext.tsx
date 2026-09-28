@@ -51,7 +51,7 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
 
       const metaTheme = document.querySelector("meta[name='theme-color']");
       if (metaTheme) {
-        metaTheme.setAttribute('content', isDark ? '#090d16' : '#f8fafc');
+        metaTheme.setAttribute('content', isDark ? '#09090b' : '#f8fafc');
       }
     };
 

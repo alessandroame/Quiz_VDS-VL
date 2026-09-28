@@ -72,7 +72,8 @@ Questo documento rappresenta la **bussola strategica e funzionale** del progetto
    - Tre macro-fasce tattili ad altissima leggibilità e contrasto elevato (Fitts's Law estrema).
    - Screen Wake Lock API integrato per prevenire lo spegnimento dello schermo su supporto/cruscotto.
    - Pilota Automatico ("Radio Quiz") continuo per studio e ripasso a mani libere senza tocco fisico.
-   - Comandi vocali in lingua italiana tramite Web Speech Recognition ("Uno", "Due", "Tre", "Avanti", "Ripeti", "Pausa").
+   - Comandi vocali in lingua italiana tramite Web Speech Recognition ("Uno", "Due", "Tre", "Avanti", "Ripeti", "Pausa", "Aiuto").
+   - **Guida Contestuale Comandi Vocali**: HUD rotativo live durante l'ascolto, pulsante '?' (Cheat Sheet rapido), trigger vocale "Aiuto" e box integrato nella scheda Guida delle Impostazioni e nel Quick Speech Menu.
 
 8. **Impostazioni Modulari per Argomenti (Zero-Scroll Settings)**:
    - Modale impostazioni suddiviso rigorosamente a schede tematiche (Voce, Guida, Aspetto, Cloud/Backup, Dati & Reset).
@@ -112,6 +113,7 @@ Questo documento rappresenta la **bussola strategica e funzionale** del progetto
 | Modalità Alla Guida | 🟢 Completato | Layout zero-scroll, Screen Wake Lock, Pilota Auto Radio Quiz e Speech Recognition. |
 | Quick Speech Menu (1-Click) | 🟢 Completato | Flyout compatto in Navbar per controllo vocale rapido senza navigazione. |
 | Impostazioni a Schede Tematiche | 🟢 Completato | Segmented tabs per argomenti con eliminazione dello scrolling verticale. |
+| Guida Contestuale Comandi Vocali | 🟢 Completato | HUD live rotativo, Cheat Sheet modale a 1 tocco, trigger 'Aiuto' e box in Impostazioni. |
 
 
 ---

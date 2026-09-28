@@ -7,7 +7,8 @@ export type VoiceCommand =
   | 'repeat'
   | 'flag'
   | 'pause'
-  | 'resume';
+  | 'resume'
+  | 'help';
 
 /**
  * Parser deterministico per i comandi vocali in italiano della Modalità Alla Guida.
@@ -72,6 +73,12 @@ export function parseVoiceCommand(raw: string): VoiceCommand | null {
 
   if (/\b(continua|riprendi|vai|play|riavvia|avvia)\b/i.test(t)) {
     return 'resume';
+  }
+
+  // 6. Guida e Aiuto Contestuale
+  // Riconosce: "aiuto", "guida", "comandi", "istruzioni", "cosa posso dire", "help"
+  if (/\b(aiuto|guida|comandi|istruzioni|cosa posso dire|help)\b/i.test(t)) {
+    return 'help';
   }
 
   return null;

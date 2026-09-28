@@ -18,7 +18,8 @@ import {
   Flame,
   Radio,
   RotateCcw,
-  Check
+  Check,
+  HelpCircle
 } from 'lucide-react';
 import type { Question } from '../types/quiz';
 import type { ExamSession } from '../types/database';
@@ -31,6 +32,7 @@ import { useAviationVoice } from '../hooks/useAviationVoice';
 import { useWakeLock } from '../hooks/useWakeLock';
 import { useDriveVoiceCommands } from '../hooks/useDriveVoiceCommands';
 import type { VoiceCommand } from '../utils/voiceCommandParser';
+import { VoiceCommandsModal } from './VoiceCommandsModal';
 
 export interface DriveModeSessionContext {
   questions: Question[];
@@ -51,6 +53,15 @@ interface DriveModeScreenProps {
   onClose: () => void;
   sessionContext?: DriveModeSessionContext;
 }
+
+const VOICE_HINTS = [
+  'Dì "Uno", "Due" o "Tre" per scegliere la risposta',
+  'Dì "Ripeti" per riascoltare domanda e opzioni',
+  'Dì "Avanti" o "Indietro" per scorrere i quesiti',
+  'Dì "Pausa" o "Continua" per il pilota automatico',
+  'Dì "Bandiera" per contrassegnare il quiz',
+  'Dì "Aiuto" o "Comandi" per aprire la guida a voce'
+];
 
 export const DriveModeScreen: React.FC<DriveModeScreenProps> = ({
   isOpen,
@@ -96,6 +107,17 @@ export const DriveModeScreen: React.FC<DriveModeScreenProps> = ({
   const [voiceToast, setVoiceToast] = useState<string | null>(null);
   const [waitingCountdown, setWaitingCountdown] = useState<number | null>(null);
   const [revealedQuestionId, setRevealedQuestionId] = useState<number | null>(null);
+  const [isVoiceGuideOpen, setIsVoiceGuideOpen] = useState<boolean>(false);
+  const [voiceHintIndex, setVoiceHintIndex] = useState<number>(0);
+
+  // Rotazione periodica suggerimenti vocali nell'HUD (ogni 4.5s)
+  useEffect(() => {
+    if (!isOpen || internalMode !== 'running' || !isVoiceCommandsEnabled) return;
+    const interval = setInterval(() => {
+      setVoiceHintIndex(prev => (prev + 1) % VOICE_HINTS.length);
+    }, 4500);
+    return () => clearInterval(interval);
+  }, [isOpen, internalMode, isVoiceCommandsEnabled]);
 
   const countdownTimerRef = useRef<any>(null);
   const touchStartXRef = useRef<number | null>(null);
@@ -126,11 +148,17 @@ export const DriveModeScreen: React.FC<DriveModeScreenProps> = ({
 
   const {
     isThisQuestionActive,
+    isPlaying,
+    isPaused,
     isSequencePlaying,
     isPartPlaying,
+    togglePlayPause,
+    restartFullSequence,
     playFullSequence,
     playExplanation,
-    stop: stopVoice
+    stop: stopVoice,
+    pause: pauseVoice,
+    resume: resumeVoice
   } = useAviationVoice(currentQ?.id);
 
   // Countdown timer per esame attivo
@@ -350,19 +378,28 @@ export const DriveModeScreen: React.FC<DriveModeScreenProps> = ({
       handlePrevQuestion();
     } else if (cmd === 'repeat') {
       showToast('🗣️ "Ripeti"');
-      playFullSequence();
+      restartFullSequence();
     } else if (cmd === 'flag') {
       handleToggleFlag();
     } else if (cmd === 'pause') {
       showToast('🗣️ "Pausa"');
       setIsAutopilotEnabled(false);
-      stopVoice();
+      pauseVoice();
     } else if (cmd === 'resume') {
       showToast('🗣️ "Riprendi"');
       setIsAutopilotEnabled(true);
-      playFullSequence();
+      if (isPaused) {
+        resumeVoice();
+      } else {
+        playFullSequence();
+      }
+    } else if (cmd === 'help') {
+      showToast('🗣️ "Aiuto" - Guida Comandi');
+      setIsVoiceGuideOpen(true);
+      setIsAutopilotEnabled(false);
+      pauseVoice();
     }
-  }, [currentQ, handleSelectAnswer, handleNextQuestion, handlePrevQuestion, playFullSequence, handleToggleFlag, stopVoice]);
+  }, [currentQ, handleSelectAnswer, handleNextQuestion, handlePrevQuestion, playFullSequence, restartFullSequence, handleToggleFlag, pauseVoice, resumeVoice, isPaused]);
 
   // Hook Comandi Vocali
   const { isSupported: isVoiceSupported } = useDriveVoiceCommands({
@@ -413,16 +450,24 @@ export const DriveModeScreen: React.FC<DriveModeScreenProps> = ({
       else if (e.key === 'ArrowRight' || e.key === ' ') handleNextQuestion();
       else if (e.key === 'ArrowLeft') handlePrevQuestion();
       else if (e.key.toLowerCase() === 'f') handleToggleFlag();
-      else if (e.key.toLowerCase() === 'r' || e.key.toLowerCase() === 'q') playFullSequence();
+      else if (e.key.toLowerCase() === 'r' || e.key.toLowerCase() === 'q') restartFullSequence();
       else if (e.key.toLowerCase() === 'p') {
-        setIsAutopilotEnabled(prev => !prev);
-        stopVoice();
+        if (isPlaying) {
+          setIsAutopilotEnabled(false);
+          pauseVoice();
+        } else if (isPaused) {
+          setIsAutopilotEnabled(true);
+          resumeVoice();
+        } else {
+          setIsAutopilotEnabled(prev => !prev);
+          togglePlayPause();
+        }
       }
     };
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [isOpen, internalMode, currentQ, currentIndex, totalCount, isAutopilotEnabled]);
+  }, [isOpen, internalMode, currentQ, currentIndex, totalCount, isAutopilotEnabled, isPlaying, isPaused, restartFullSequence, togglePlayPause, pauseVoice, resumeVoice]);
 
   // Gestione Swipe Touch a schermo intero
   const handleTouchStart = (e: React.TouchEvent) => {
@@ -582,6 +627,18 @@ export const DriveModeScreen: React.FC<DriveModeScreenProps> = ({
             </button>
           </div>
 
+          {/* Link Guida Comandi Vocali */}
+          <div className="flex justify-center -mt-1 mb-2">
+            <button
+              type="button"
+              onClick={() => setIsVoiceGuideOpen(true)}
+              className="px-3.5 py-1.5 rounded-full bg-slate-900 border border-slate-800 hover:border-emerald-500/50 text-slate-400 hover:text-emerald-300 text-xs font-semibold flex items-center gap-1.5 transition-colors"
+            >
+              <HelpCircle className="w-3.5 h-3.5 text-emerald-400" />
+              <span>Cosa posso dire a voce? Consulta la Guida Rapida</span>
+            </button>
+          </div>
+
           {/* Opzioni di Avvio Rapido */}
           <div className="flex-1 flex flex-col justify-center gap-3.5">
             <button
@@ -701,19 +758,30 @@ export const DriveModeScreen: React.FC<DriveModeScreenProps> = ({
                 <span className="hidden sm:inline">{isAutopilotEnabled ? 'Pilota ON' : 'Manuale'}</span>
               </button>
 
-              {/* Toggle Comandi Vocali */}
+              {/* Toggle Comandi Vocali & Guida Rapida */}
               {isVoiceSupported && (
-                <button
-                  onClick={() => setIsVoiceCommandsEnabled(!isVoiceCommandsEnabled)}
-                  className={`p-1.5 rounded-lg text-xs font-bold transition-colors ${
-                    isVoiceCommandsEnabled
-                      ? 'bg-emerald-500/30 text-emerald-300 ring-1 ring-emerald-500/50'
-                      : 'bg-slate-900 text-slate-500 border border-slate-800'
-                  }`}
-                  title="Comandi vocali"
-                >
-                  {isVoiceCommandsEnabled ? <Mic className="w-3.5 h-3.5" /> : <MicOff className="w-3.5 h-3.5" />}
-                </button>
+                <div className="flex items-center gap-1">
+                  <button
+                    onClick={() => setIsVoiceCommandsEnabled(!isVoiceCommandsEnabled)}
+                    className={`p-1.5 rounded-lg text-xs font-bold transition-colors ${
+                      isVoiceCommandsEnabled
+                        ? 'bg-emerald-500/30 text-emerald-300 ring-1 ring-emerald-500/50'
+                        : 'bg-slate-900 text-slate-500 border border-slate-800'
+                    }`}
+                    title={isVoiceCommandsEnabled ? 'Disattiva comandi vocali' : 'Attiva comandi vocali'}
+                  >
+                    {isVoiceCommandsEnabled ? <Mic className="w-3.5 h-3.5" /> : <MicOff className="w-3.5 h-3.5" />}
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => setIsVoiceGuideOpen(true)}
+                    className="p-1.5 rounded-lg text-xs font-bold bg-slate-900 hover:bg-slate-800 text-slate-400 hover:text-white border border-slate-800 transition-colors"
+                    title="Guida comandi vocali"
+                  >
+                    <HelpCircle className="w-3.5 h-3.5" />
+                  </button>
+                </div>
               )}
             </div>
           </div>
@@ -738,25 +806,62 @@ export const DriveModeScreen: React.FC<DriveModeScreenProps> = ({
               </h2>
             </div>
 
-            <button
-              onClick={() => playFullSequence()}
-              className={`p-3 rounded-xl flex-shrink-0 transition-all ${
-                isSequencePlaying && isThisQuestionActive
-                  ? 'bg-sky-500 text-white animate-pulse'
-                  : 'bg-slate-800 text-slate-300 hover:text-white'
-              }`}
-              title="Riascolta quesito (Tasto Q)"
-            >
-              <Volume2 className="w-6 h-6" />
-            </button>
+            <div className="flex flex-col gap-1.5 flex-shrink-0">
+              <button
+                onClick={() => togglePlayPause()}
+                className={`p-3 rounded-xl transition-all ${
+                  isPlaying
+                    ? 'bg-sky-500 text-white animate-pulse'
+                    : isPaused
+                    ? 'bg-amber-500 text-white ring-2 ring-amber-400'
+                    : 'bg-slate-800 text-slate-300 hover:text-white'
+                }`}
+                title={isPlaying ? 'Pausa (Tasto P)' : isPaused ? 'Riprendi (Tasto P)' : 'Ascolta quesito (Tasto Q)'}
+              >
+                {isPlaying ? <Pause className="w-6 h-6" /> : isPaused ? <Play className="w-6 h-6" /> : <Volume2 className="w-6 h-6" />}
+              </button>
+
+              {(isPlaying || isPaused) && (
+                <button
+                  onClick={() => restartFullSequence()}
+                  className="p-2 rounded-lg bg-slate-800/80 hover:bg-slate-700 text-slate-400 hover:text-white transition-colors flex items-center justify-center animate-in fade-in"
+                  title="Ricomincia da capo dall'inizio (Tasto R)"
+                >
+                  <RotateCcw className="w-4 h-4" />
+                </button>
+              )}
+            </div>
           </div>
 
           {/* Countdown attesa Pilota Automatico */}
           {waitingCountdown !== null && (
-            <div className="flex items-center justify-between px-3 py-1 bg-amber-500/20 border border-amber-500/40 rounded-lg text-amber-300 text-xs font-bold animate-pulse">
-              <span>In attesa di risposta...</span>
+            <div className="flex items-center justify-between px-3 py-1.5 bg-amber-500/20 border border-amber-500/40 rounded-xl text-amber-300 text-xs font-bold animate-pulse">
+              <div className="flex items-center gap-1.5">
+                <span className="w-2 h-2 rounded-full bg-amber-400 animate-ping" />
+                <span>In attesa di risposta... dì "Uno", "Due" o "Tre"</span>
+              </div>
               <span className="font-mono text-sm">{waitingCountdown}s</span>
             </div>
+          )}
+
+          {/* HUD Suggerimento Vocale Live (Rotativo) */}
+          {waitingCountdown === null && isVoiceCommandsEnabled && isVoiceSupported && (
+            <button
+              type="button"
+              onClick={() => setIsVoiceGuideOpen(true)}
+              className="flex items-center justify-between px-3 py-1 bg-emerald-950/40 border border-emerald-500/30 hover:border-emerald-500/60 rounded-xl text-emerald-300 text-xs font-medium transition-colors cursor-pointer"
+              title="Tocca per visualizzare tutti i comandi vocali"
+            >
+              <div className="flex items-center gap-1.5 truncate">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse flex-shrink-0" />
+                <span className="font-bold text-emerald-400 flex-shrink-0">Microfono ON:</span>
+                <span className="text-emerald-200/90 truncate">{VOICE_HINTS[voiceHintIndex]}</span>
+              </div>
+              <div className="flex items-center gap-1 text-[11px] text-emerald-400/80 font-bold ml-2 flex-shrink-0">
+                <HelpCircle className="w-3.5 h-3.5" />
+                <span className="hidden sm:inline">Guida</span>
+              </div>
+            </button>
           )}
 
           {/* 3 Macro-Fasce di Risposta (Riempiono lo spazio verticale uniformemente) */}
@@ -926,6 +1031,12 @@ export const DriveModeScreen: React.FC<DriveModeScreenProps> = ({
           </div>
         </div>
       )}
+
+      {/* Modale Guida Comandi Vocali (Cheat Sheet) */}
+      <VoiceCommandsModal
+        isOpen={isVoiceGuideOpen}
+        onClose={() => setIsVoiceGuideOpen(false)}
+      />
     </div>
   );
 };

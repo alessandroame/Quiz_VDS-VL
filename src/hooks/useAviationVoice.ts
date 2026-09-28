@@ -11,11 +11,19 @@ export function useAviationVoice(questionId?: number) {
 
   const isThisQuestionActive = questionId !== undefined && state.currentQuestionId === questionId;
   const isPartPlaying = (part: AudioPart) => isThisQuestionActive && state.activePart === part && state.isPlaying;
+  const isPartPaused = (part: AudioPart) => isThisQuestionActive && state.activePart === part && state.isPaused;
 
   return {
     ...state,
     isThisQuestionActive,
     isPartPlaying,
+    isPartPaused,
+    togglePlayPause: () => {
+      if (questionId) voiceService.togglePlayPause(questionId);
+    },
+    restartFullSequence: () => {
+      if (questionId) voiceService.restartFullSequence(questionId);
+    },
     playFullSequence: () => {
       if (questionId) voiceService.playFullSequence(questionId);
     },
@@ -30,6 +38,8 @@ export function useAviationVoice(questionId?: number) {
     playExplanation: () => {
       if (questionId) voiceService.playSinglePart(questionId, 'explanation');
     },
+    pause: () => voiceService.pause(),
+    resume: () => voiceService.resume(),
     stop: () => voiceService.stop()
   };
 }

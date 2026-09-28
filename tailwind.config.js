@@ -9,12 +9,12 @@ export default {
     extend: {
       colors: {
         cockpit: {
-          bg: '#090d16',
-          card: '#111827',
-          surface: '#1e293b',
-          border: '#334155',
-          text: '#f8fafc',
-          muted: '#94a3b8'
+          bg: '#09090b',
+          card: '#18181b',
+          surface: '#27272a',
+          border: '#3f3f46',
+          text: '#f4f4f5',
+          muted: '#a1a1aa'
         },
         hangar: {
           bg: '#f8fafc',
@@ -28,7 +28,7 @@ export default {
           ok: '#10b981',      // Emerald Green (OK)
           danger: '#ef4444',  // Alert Red
           warning: '#f59e0b', // Amber Flag
-          horizon: '#0284c7'  // Sky Blue Horizon
+          horizon: '#f59e0b'  // Aviation Amber (Zero-Blue)
         }
       }
     },

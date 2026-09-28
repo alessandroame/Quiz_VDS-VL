@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Bookmark, Flag, Edit3, CheckCircle2, XCircle, Volume2, FileText, Trash2 } from 'lucide-react';
+import { Bookmark, Flag, Edit3, CheckCircle2, XCircle, Volume2, Play, Pause, RotateCcw, Square, FileText, Trash2 } from 'lucide-react';
 import type { Question } from '../types/quiz';
 import { useQuiz } from '../context/QuizContext';
 import { soundFX } from '../utils/audio';
@@ -38,9 +38,12 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({
   }, [question.id, stat?.userNote]);
 
   const {
+    isPlaying,
+    isPaused,
     isThisQuestionActive,
-    isSequencePlaying,
     isPartPlaying,
+    togglePlayPause,
+    restartFullSequence,
     playFullSequence,
     playQuestion,
     playOption,
@@ -50,7 +53,7 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({
 
   const isBookmarked = stat?.isBookmarked || false;
 
-  // Interrompe l'audio quando si cambia domanda, o avvia autoplay se impostato
+  // Stops audio on question change, or starts autoplay if enabled
   useEffect(() => {
     if (settings.ttsEnabled && settings.ttsAutoPlayQuestion) {
       playFullSequence();
@@ -60,19 +63,24 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({
     };
   }, [question.id]);
 
-  // Gestione scorciatoie da tastiera dedicate al parlato (V: full, Q: domanda, Alt+1/2/3: opzioni)
+  // Speech keyboard shortcuts (V: Play/Pause, R or Shift+V: Restart from start, Q: Question, Alt+1/2/3: Options, Esc: Stop)
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (showNoteEditor) return;
+      if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) return;
 
       if ((e.key === 'v' || e.key === 'V') && !e.altKey && !e.ctrlKey) {
-        if (isSequencePlaying && isThisQuestionActive) {
-          stop();
+        if (e.shiftKey) {
+          restartFullSequence();
         } else {
-          playFullSequence();
+          togglePlayPause();
         }
+      } else if ((e.key === 'r' || e.key === 'R') && !e.altKey && !e.ctrlKey && !e.metaKey) {
+        restartFullSequence();
       } else if ((e.key === 'q' || e.key === 'Q') && !e.altKey && !e.ctrlKey) {
         playQuestion();
+      } else if (e.key === 'Escape' && isThisQuestionActive && (isPlaying || isPaused)) {
+        stop();
       } else if (e.altKey && e.key === '1') {
         e.preventDefault();
         playOption(1);
@@ -87,7 +95,7 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [question.id, isSequencePlaying, isThisQuestionActive, showNoteEditor]);
+  }, [question.id, isPlaying, isPaused, isThisQuestionActive, showNoteEditor, togglePlayPause, restartFullSequence, playQuestion, playOption, stop]);
 
   const handleSelect = (idx: 1 | 2 | 3) => {
     if (showFeedback && selectedAnswer) return; // Non cambiare se già verificato in modalità feedback
@@ -120,40 +128,84 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({
   };
 
   return (
-    <div className="w-full bg-slate-900 border border-slate-800 rounded-xl p-4 sm:p-6 shadow-md dark:bg-slate-900 dark:border-slate-800 light:bg-white light:border-slate-200 light:shadow-sm transition-all">
+    <div className="w-full bg-zinc-900 border border-zinc-800 rounded-xl p-4 sm:p-6 shadow-md dark:bg-zinc-900 dark:border-zinc-800 light:bg-white light:border-slate-200 light:shadow-sm transition-all">
       {/* Top Header Card */}
-      <div className="flex items-center justify-between gap-2 mb-3 pb-2 border-b border-slate-800/80 light:border-slate-100 text-xs">
+      <div className="flex items-center justify-between gap-2 mb-3 pb-2 border-b border-zinc-800/80 light:border-slate-100 text-xs">
         <div className="flex items-center gap-2">
-          <span className="font-mono font-bold text-sky-400 light:text-sky-600 bg-sky-500/10 px-2 py-0.5 rounded">
+          <span className="font-mono font-bold text-amber-400 light:text-amber-600 bg-amber-500/10 px-2 py-0.5 rounded">
             #{question.id}
           </span>
-          <span className="text-slate-400 light:text-slate-500 truncate max-w-[150px] sm:max-w-xs font-medium">
+          <span className="text-zinc-400 light:text-slate-500 truncate max-w-[150px] sm:max-w-xs font-medium">
             {question.subjectName}
           </span>
           {indexNumber !== undefined && totalNumber !== undefined && (
-            <span className="text-slate-500 light:text-slate-400">
+            <span className="text-zinc-500 light:text-slate-400">
               ({indexNumber}/{totalNumber})
             </span>
           )}
         </div>
 
         <div className="flex items-center gap-1">
-          {/* TTS Audio Sequenziale Completo */}
+          {/* TTS Audio Controls: Play, Pause, Restart, Stop */}
           {settings.ttsEnabled && (
-            <button
-              onClick={() => isSequencePlaying && isThisQuestionActive ? stop() : playFullSequence()}
-              className={`p-1.5 rounded-lg text-xs flex items-center gap-1 transition-colors ${
-                isSequencePlaying && isThisQuestionActive
-                  ? 'bg-sky-500/20 text-sky-400 font-semibold ring-1 ring-sky-500/40'
-                  : 'text-slate-400 light:text-slate-500 hover:text-slate-200 light:hover:text-slate-800'
-              }`}
-              title="Ascolta domanda e opzioni in sequenza (Tasto V)"
-            >
-              <Volume2 className={`w-3.5 h-3.5 ${isSequencePlaying && isThisQuestionActive ? 'animate-pulse text-sky-400' : ''}`} />
-              <span className="hidden sm:inline">
-                {isSequencePlaying && isThisQuestionActive ? 'Ascolto...' : 'Ascolta'}
-              </span>
-            </button>
+            isThisQuestionActive && (isPlaying || isPaused) ? (
+              <div className="inline-flex items-center bg-zinc-800/80 light:bg-slate-100 border border-zinc-700/80 light:border-slate-300 rounded-lg p-0.5 gap-0.5 shadow-sm animate-in fade-in duration-150">
+                {/* Play / Pausa */}
+                <button
+                  id="btn-tts-toggle-play-pause"
+                  onClick={togglePlayPause}
+                  className={`px-2 py-1 rounded-md text-xs flex items-center gap-1 font-semibold transition-colors ${
+                    isPlaying
+                      ? 'bg-amber-500/20 text-amber-400 ring-1 ring-amber-500/50'
+                      : 'bg-zinc-700/50 text-zinc-300 ring-1 ring-zinc-600'
+                  }`}
+                  title={isPlaying ? 'Metti in pausa (Tasto V)' : 'Riprendi ascolto (Tasto V)'}
+                >
+                  {isPlaying ? (
+                    <>
+                      <Pause className="w-3.5 h-3.5 text-amber-400 animate-pulse" />
+                      <span className="hidden sm:inline">Pausa</span>
+                    </>
+                  ) : (
+                    <>
+                      <Play className="w-3.5 h-3.5 text-amber-400" />
+                      <span className="hidden sm:inline">Riprendi</span>
+                    </>
+                  )}
+                </button>
+
+                {/* Ricomincia da capo */}
+                <button
+                  id="btn-tts-restart"
+                  onClick={restartFullSequence}
+                  className="px-1.5 py-1 rounded-md text-xs flex items-center gap-1 text-zinc-300 light:text-slate-700 hover:text-white light:hover:text-black hover:bg-zinc-700/60 light:hover:bg-slate-200 transition-colors"
+                  title="Ricomincia da capo dall'inizio (Tasto R o Shift+V)"
+                >
+                  <RotateCcw className="w-3.5 h-3.5" />
+                  <span className="hidden sm:inline">Da capo</span>
+                </button>
+
+                {/* Ferma / Stop */}
+                <button
+                  id="btn-tts-stop"
+                  onClick={stop}
+                  className="p-1 rounded-md text-xs text-zinc-500 hover:text-rose-400 light:text-slate-400 light:hover:text-rose-600 hover:bg-zinc-700/40 light:hover:bg-slate-200 transition-colors"
+                  title="Interrompi ascolto (Esc)"
+                >
+                  <Square className="w-3 h-3 fill-current" />
+                </button>
+              </div>
+            ) : (
+              <button
+                id="btn-tts-play"
+                onClick={togglePlayPause}
+                className="p-1.5 rounded-lg text-xs flex items-center gap-1 text-zinc-400 light:text-slate-500 hover:text-zinc-200 light:hover:text-slate-800 hover:bg-zinc-800/50 light:hover:bg-slate-100 transition-colors"
+                title="Ascolta domanda e opzioni in sequenza (Tasto V)"
+              >
+                <Volume2 className="w-3.5 h-3.5" />
+                <span className="hidden sm:inline">Ascolta</span>
+              </button>
+            )
           )}
 
           {/* Flag button */}
@@ -163,7 +215,7 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({
               className={`p-1.5 rounded-lg text-xs flex items-center gap-1 transition-colors ${
                 isFlagged
                   ? 'bg-amber-500/20 text-amber-400 light:bg-amber-100 light:text-amber-700 font-semibold'
-                  : 'text-slate-400 light:text-slate-500 hover:text-slate-200 light:hover:text-slate-800'
+                  : 'text-zinc-400 light:text-slate-500 hover:text-zinc-200 light:hover:text-slate-800'
               }`}
               title="⚑ Rivedi più tardi"
             >
@@ -178,7 +230,7 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({
             className={`p-1.5 rounded-lg text-xs transition-colors ${
               isBookmarked
                 ? 'text-amber-400 fill-amber-400'
-                : 'text-slate-400 light:text-slate-500 hover:text-slate-200'
+                : 'text-zinc-400 light:text-slate-500 hover:text-zinc-200'
             }`}
             title="Preferita"
           >
@@ -193,8 +245,8 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({
             }}
             className={`p-1.5 rounded-lg text-xs transition-colors ${
               stat?.userNote
-                ? 'text-sky-400 light:text-sky-600 bg-sky-500/10'
-                : 'text-slate-400 light:text-slate-500 hover:text-slate-200 light:hover:text-slate-800'
+                ? 'text-amber-400 light:text-amber-600 bg-amber-500/10'
+                : 'text-zinc-400 light:text-slate-500 hover:text-zinc-200 light:hover:text-slate-800'
             }`}
             title="Nota personale"
           >
@@ -205,9 +257,9 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({
 
       {/* Note view if existing and editor closed */}
       {stat?.userNote && !showNoteEditor && (
-        <div className="mb-4 p-3 rounded-xl border bg-sky-950/40 border-sky-800/60 dark:bg-sky-950/40 dark:border-sky-800/60 dark:text-sky-100 light:bg-sky-50 light:border-sky-200 light:text-sky-950 text-xs shadow-sm space-y-1.5 animate-in fade-in duration-150">
-          <div className="flex items-center justify-between border-b border-sky-800/40 dark:border-sky-800/40 light:border-sky-200/80 pb-1.5">
-            <span className="font-bold flex items-center gap-1.5 text-sky-400 light:text-sky-700 text-[11px] uppercase tracking-wider">
+        <div className="mb-4 p-3 rounded-xl border bg-amber-950/20 border-amber-800/40 dark:bg-amber-950/20 dark:border-amber-800/40 dark:text-zinc-100 light:bg-amber-50 light:border-amber-200 light:text-amber-950 text-xs shadow-sm space-y-1.5 animate-in fade-in duration-150">
+          <div className="flex items-center justify-between border-b border-amber-800/40 dark:border-amber-800/40 light:border-amber-200/80 pb-1.5">
+            <span className="font-bold flex items-center gap-1.5 text-amber-400 light:text-amber-700 text-[11px] uppercase tracking-wider">
               <FileText className="w-3.5 h-3.5" />
               Nota Personale
             </span>
@@ -217,7 +269,7 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({
                   setNoteText(stat.userNote || '');
                   setShowNoteEditor(true);
                 }}
-                className="px-2 py-0.5 rounded text-[11px] text-sky-400 hover:text-sky-200 light:text-sky-700 light:hover:text-sky-950 hover:bg-sky-900/40 light:hover:bg-sky-100 transition-colors flex items-center gap-1 font-medium"
+                className="px-2 py-0.5 rounded text-[11px] text-amber-400 hover:text-amber-200 light:text-amber-700 light:hover:text-amber-950 hover:bg-amber-900/40 light:hover:bg-amber-100 transition-colors flex items-center gap-1 font-medium"
                 title="Modifica nota"
               >
                 <Edit3 className="w-3 h-3" />
@@ -236,7 +288,7 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({
               </button>
             </div>
           </div>
-          <p className="whitespace-pre-wrap leading-relaxed text-slate-200 dark:text-slate-200 light:text-slate-800 text-xs font-normal">
+          <p className="whitespace-pre-wrap leading-relaxed text-zinc-200 dark:text-zinc-200 light:text-slate-800 text-xs font-normal">
             {stat.userNote}
           </p>
         </div>
@@ -244,9 +296,9 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({
 
       {/* Note Editor */}
       {showNoteEditor && (
-        <div className="mb-4 p-3 rounded-xl border bg-slate-950/90 border-slate-800 dark:bg-slate-950/90 dark:border-slate-800 light:bg-slate-50 light:border-slate-300 space-y-2.5 animate-in fade-in duration-150">
+        <div className="mb-4 p-3 rounded-xl border bg-zinc-950/90 border-zinc-800 dark:bg-zinc-950/90 dark:border-zinc-800 light:bg-slate-50 light:border-slate-300 space-y-2.5 animate-in fade-in duration-150">
           <div className="flex items-center justify-between text-xs">
-            <span className="font-bold text-sky-400 light:text-sky-700 text-[11px] uppercase tracking-wider flex items-center gap-1">
+            <span className="font-bold text-amber-400 light:text-amber-700 text-[11px] uppercase tracking-wider flex items-center gap-1">
               <Edit3 className="w-3.5 h-3.5" />
               {stat?.userNote ? 'Modifica Nota Personale' : 'Nuova Nota Personale'}
             </span>
@@ -269,19 +321,19 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({
             value={noteText}
             onChange={e => setNoteText(e.target.value)}
             placeholder="Scrivi qui la tua nota o appunto didattico sul quesito..."
-            className="w-full bg-slate-900 dark:bg-slate-900 border border-slate-800 dark:border-slate-800 rounded-lg p-2.5 text-xs text-slate-100 dark:text-slate-100 light:bg-white light:border-slate-200 light:text-slate-900 resize-none outline-none focus:border-sky-500 focus:ring-1 focus:ring-sky-500"
+            className="w-full bg-zinc-900 dark:bg-zinc-900 border border-zinc-800 dark:border-zinc-800 rounded-lg p-2.5 text-xs text-zinc-100 dark:text-zinc-100 light:bg-white light:border-slate-200 light:text-slate-900 resize-none outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500"
             rows={3}
           />
           <div className="flex justify-end gap-2">
             <button
               onClick={() => setShowNoteEditor(false)}
-              className="text-xs px-3 py-1.5 rounded-lg border border-slate-800 dark:border-slate-800 text-slate-400 hover:text-slate-200 light:border-slate-300 light:text-slate-700 hover:bg-slate-800/40 light:hover:bg-slate-100 transition-colors"
+              className="text-xs px-3 py-1.5 rounded-lg border border-zinc-800 dark:border-zinc-800 text-zinc-400 hover:text-zinc-200 light:border-slate-300 light:text-slate-700 hover:bg-zinc-800/40 light:hover:bg-slate-100 transition-colors"
             >
               Annulla
             </button>
             <button
               onClick={handleSaveNote}
-              className="text-xs px-3.5 py-1.5 rounded-lg bg-sky-600 hover:bg-sky-500 text-white font-bold shadow-sm transition-all"
+              className="text-xs px-3.5 py-1.5 rounded-lg bg-amber-600 hover:bg-amber-500 text-white font-bold shadow-sm transition-all"
             >
               Salva Nota
             </button>
@@ -293,8 +345,8 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({
       <div className="flex items-start gap-2 mb-5">
         <h3 className={`text-base sm:text-lg font-medium leading-snug flex-1 transition-colors ${
           isPartPlaying('question')
-            ? 'text-sky-300 light:text-sky-700'
-            : 'text-slate-100 light:text-slate-900'
+            ? 'text-amber-300 light:text-amber-700'
+            : 'text-zinc-100 light:text-slate-900'
         }`}>
           {question.question}
         </h3>
@@ -303,12 +355,12 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({
             onClick={() => playQuestion()}
             className={`p-1.5 rounded-lg flex-shrink-0 transition-colors ${
               isPartPlaying('question')
-                ? 'bg-sky-500/20 text-sky-400 ring-1 ring-sky-500/40'
-                : 'text-slate-500 hover:text-slate-300 light:hover:text-slate-700'
+                ? 'bg-amber-500/20 text-amber-400 ring-1 ring-amber-500/40'
+                : 'text-zinc-500 hover:text-zinc-300 light:hover:text-slate-700'
             }`}
             title="Riascolta solo la domanda (Tasto Q)"
           >
-            <Volume2 className={`w-4 h-4 ${isPartPlaying('question') ? 'animate-pulse text-sky-400' : ''}`} />
+            <Volume2 className={`w-4 h-4 ${isPartPlaying('question') ? 'animate-pulse text-amber-400' : ''}`} />
           </button>
         )}
       </div>
@@ -322,7 +374,7 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({
           const isCurrentOptPlaying = isPartPlaying(`opt${optNum}` as any);
 
           // Stili in base al feedback immediato o selezione neutra
-          let btnStyle = 'border-slate-800 hover:border-slate-700 bg-slate-950/60 light:border-slate-200 light:bg-slate-50 light:hover:bg-slate-100';
+          let btnStyle = 'border-zinc-800 hover:border-zinc-700 bg-zinc-950/60 light:border-slate-200 light:bg-slate-50 light:hover:bg-slate-100';
 
           if (showFeedback && selectedAnswer) {
             if (isCorrectAnswer) {
@@ -330,12 +382,12 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({
             } else if (isSelected && !isCorrectAnswer) {
               btnStyle = 'border-rose-500/80 bg-rose-950/30 text-rose-200 light:border-rose-600 light:bg-rose-50 light:text-rose-900';
             } else {
-              btnStyle = 'opacity-50 border-slate-800 bg-slate-950/20 light:border-slate-200 light:bg-white';
+              btnStyle = 'opacity-50 border-zinc-800 bg-zinc-950/20 light:border-slate-200 light:bg-white';
             }
           } else if (isSelected) {
-            btnStyle = 'border-sky-500 bg-sky-950/40 text-sky-200 light:border-sky-600 light:bg-sky-50 light:text-sky-950 font-medium ring-1 ring-sky-500';
+            btnStyle = 'border-amber-500 bg-amber-500/10 text-amber-100 light:border-amber-600 light:bg-amber-50 light:text-amber-950 font-medium ring-1 ring-amber-500';
           } else if (isCurrentOptPlaying) {
-            btnStyle = 'border-sky-500/60 bg-sky-950/20 text-sky-200 ring-1 ring-sky-500/30';
+            btnStyle = 'border-amber-500/60 bg-amber-500/10 text-amber-200 ring-1 ring-amber-500/30';
           }
 
           return (
@@ -354,12 +406,12 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({
                       ? 'bg-emerald-500 text-white'
                       : isSelected
                       ? 'bg-rose-500 text-white'
-                      : 'bg-slate-800 light:bg-slate-200 text-slate-400'
+                      : 'bg-zinc-800 light:bg-slate-200 text-zinc-400'
                     : isSelected
-                    ? 'bg-sky-500 text-white'
+                    ? 'bg-amber-500 text-zinc-950'
                     : isCurrentOptPlaying
-                    ? 'bg-sky-500 text-white'
-                    : 'bg-slate-800 light:bg-slate-200 text-slate-300 light:text-slate-700'
+                    ? 'bg-amber-500 text-zinc-950'
+                    : 'bg-zinc-800 light:bg-slate-200 text-zinc-300 light:text-slate-700'
                 }`}
               >
                 {optNum}
@@ -386,12 +438,12 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({
                   }}
                   className={`p-1 rounded transition-colors flex-shrink-0 ${
                     isCurrentOptPlaying
-                      ? 'text-sky-400 bg-sky-500/20'
-                      : 'text-slate-600 hover:text-slate-300 light:text-slate-400 light:hover:text-slate-600'
+                      ? 'text-amber-400 bg-amber-500/20'
+                      : 'text-zinc-600 hover:text-zinc-300 light:text-slate-400 light:hover:text-slate-600'
                   }`}
                   title={`Riascolta opzione ${optNum} (Alt+${optNum})`}
                 >
-                  <Volume2 className={`w-3.5 h-3.5 ${isCurrentOptPlaying ? 'animate-pulse text-sky-400' : ''}`} />
+                  <Volume2 className={`w-3.5 h-3.5 ${isCurrentOptPlaying ? 'animate-pulse text-amber-400' : ''}`} />
                 </span>
               )}
 
@@ -408,7 +460,7 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({
 
       {/* Spiegazione Sintetica (visibile se feedback attivo e risposta data) */}
       {showFeedback && selectedAnswer && (
-        <div className="mt-4 pt-3 border-t border-slate-800 light:border-slate-200 text-xs animate-in fade-in duration-200">
+        <div className="mt-4 pt-3 border-t border-zinc-800 light:border-slate-200 text-xs animate-in fade-in duration-200">
           <div className="flex items-center justify-between font-bold mb-1.5">
             <div className="flex items-center gap-1.5">
               {selectedAnswer === question.correctAnswer ? (
@@ -427,20 +479,20 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({
                 onClick={() => playExplanation()}
                 className={`px-2 py-1 rounded-lg text-[11px] flex items-center gap-1 transition-colors ${
                   isPartPlaying('explanation')
-                    ? 'bg-sky-500/20 text-sky-400 ring-1 ring-sky-500/40 font-semibold'
-                    : 'text-slate-400 hover:text-slate-200 bg-slate-800/50 hover:bg-slate-800'
+                    ? 'bg-amber-500/20 text-amber-400 ring-1 ring-amber-500/40 font-semibold'
+                    : 'text-zinc-400 hover:text-zinc-200 bg-zinc-800/50 hover:bg-zinc-800'
                 }`}
                 title="Riascolta spiegazione vocale della risposta corretta"
               >
-                <Volume2 className={`w-3 h-3 ${isPartPlaying('explanation') ? 'animate-pulse text-sky-400' : ''}`} />
+                <Volume2 className={`w-3 h-3 ${isPartPlaying('explanation') ? 'animate-pulse text-amber-400' : ''}`} />
                 <span>{isPartPlaying('explanation') ? 'Spiegazione in corso...' : 'Ascolta Spiegazione'}</span>
               </button>
             )}
           </div>
 
-          <div className="space-y-1.5 text-slate-300 light:text-slate-700 bg-slate-950/60 light:bg-slate-50 p-2.5 rounded-lg border border-slate-800/60 light:border-slate-200">
+          <div className="space-y-1.5 text-zinc-300 light:text-slate-700 bg-zinc-950/60 light:bg-slate-50 p-2.5 rounded-lg border border-zinc-800/60 light:border-slate-200">
             <div>
-              <strong className="text-sky-400 light:text-sky-600">Regola: </strong>
+              <strong className="text-emerald-400 light:text-emerald-600">Regola: </strong>
               <span>{question.explanation.rule}</span>
             </div>
             <div>

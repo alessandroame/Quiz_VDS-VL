@@ -1,22 +1,24 @@
-// Servizio Audio Neurale Singleton per VDS-VL Quiz Master
-// Gestisce la riproduzione atomica dei frammenti e la sequenza completa
+// Singleton neural voice service for VDS-VL Quiz Master
+// Manages atomic playback of audio snippets, full question-option sequences, play/pause and restarts
 
 import type { AudioPart, VoicePlaybackState } from '../types/audio';
 
 type StateListener = (state: VoicePlaybackState) => void;
 
-class VoiceService {
+export class VoiceService {
   private audio: HTMLAudioElement | null = null;
   private currentQuestionId: number | null = null;
   private activePart: AudioPart | null = null;
   private isSequencePlaying: boolean = false;
+  private isPaused: boolean = false;
+  private pendingSequencePart: AudioPart | null = null;
   private listeners: Set<StateListener> = new Set();
   private playbackRate: number = 1.0;
   private voiceName: 'giuseppe' | 'elsa' = 'giuseppe';
   private sequenceTimeout: any = null;
 
   constructor() {
-    if (typeof window !== 'undefined') {
+    if (typeof Audio !== 'undefined') {
       this.audio = new Audio();
       this.audio.preload = 'auto';
 
@@ -25,14 +27,15 @@ class VoiceService {
       });
 
       this.audio.addEventListener('error', (e) => {
-        console.warn('File audio non disponibile o errore riproduzione:', e);
+        console.warn('Audio snippet unavailable or playback error:', e);
         this.stop();
       });
 
-      // Configurazione MediaSession per ascolto a schermo spento
-      if ('mediaSession' in navigator) {
+      // MediaSession API integration for background & lockscreen playback
+      if (typeof navigator !== 'undefined' && 'mediaSession' in navigator) {
         navigator.mediaSession.setActionHandler('stop', () => this.stop());
-        navigator.mediaSession.setActionHandler('pause', () => this.stop());
+        navigator.mediaSession.setActionHandler('pause', () => this.pause());
+        navigator.mediaSession.setActionHandler('play', () => this.resume());
       }
     }
   }
@@ -49,8 +52,16 @@ class VoiceService {
   }
 
   public getState(): VoicePlaybackState {
+    const isPlaying = Boolean(
+      this.audio &&
+      !this.audio.paused &&
+      !this.isPaused &&
+      this.currentQuestionId !== null
+    );
+
     return {
-      isPlaying: Boolean(this.audio && !this.audio.paused && this.audio.currentTime > 0),
+      isPlaying,
+      isPaused: this.isPaused,
       currentQuestionId: this.currentQuestionId,
       activePart: this.activePart,
       isSequencePlaying: this.isSequencePlaying
@@ -67,8 +78,8 @@ class VoiceService {
   public setVoice(voice: 'giuseppe' | 'elsa') {
     if (this.voiceName !== voice) {
       this.voiceName = voice;
-      // Se c'era audio in corso, fermiamo per evitare mismatch
-      if (this.getState().isPlaying) {
+      // Stop ongoing playback on voice change to prevent voice mismatch
+      if (this.getState().isPlaying || this.isPaused) {
         this.stop();
       }
     }
@@ -86,12 +97,12 @@ class VoiceService {
       opt3: '3',
       explanation: 'e'
     };
-    const baseUrl = (import.meta.env.BASE_URL || '/').replace(/\/+$/, '');
+    const baseUrl = (import.meta.env?.BASE_URL || '/').replace(/\/+$/, '');
     return `${baseUrl}/audio/${this.voiceName}/${questionId}_${suffixMap[part]}.mp3`;
   }
 
   private updateMediaSession(questionId: number, titlePart: string) {
-    if ('mediaSession' in navigator) {
+    if (typeof navigator !== 'undefined' && 'mediaSession' in navigator && typeof MediaMetadata !== 'undefined') {
       navigator.mediaSession.metadata = new MediaMetadata({
         title: `Quiz #${questionId} - ${titlePart}`,
         artist: 'VDS-VL Quiz Master',
@@ -102,20 +113,27 @@ class VoiceService {
   }
 
   /**
-   * Riproduce un singolo frammento atomico (es. sola domanda o opzione 2)
+   * Plays a single atomic fragment (e.g. question text only, or option 2)
    */
   public async playSinglePart(questionId: number, part: AudioPart): Promise<void> {
     this.clearSequence();
 
-    // Se stiamo già riproducendo esattamente questo frammento, fermiamo
+    // If currently playing this exact fragment -> pause
     if (this.currentQuestionId === questionId && this.activePart === part && this.getState().isPlaying) {
-      this.stop();
+      this.pause();
+      return;
+    }
+
+    // If currently paused on this exact fragment -> resume
+    if (this.currentQuestionId === questionId && this.activePart === part && this.isPaused) {
+      await this.resume();
       return;
     }
 
     this.currentQuestionId = questionId;
     this.activePart = part;
     this.isSequencePlaying = false;
+    this.isPaused = false;
 
     if (!this.audio) return;
 
@@ -126,22 +144,107 @@ class VoiceService {
       this.updateMediaSession(questionId, part.toUpperCase());
       this.notify();
     } catch (err) {
-      console.warn(`Impossibile riprodurre frammento ${part} per quiz #${questionId}:`, err);
+      console.warn(`Could not play fragment ${part} for question #${questionId}:`, err);
       this.stop();
     }
   }
 
   /**
-   * Avvia l'ascolto della sequenza completa: Domanda -> Opzione 1 -> Opzione 2 -> Opzione 3
+   * Toggles play/pause for the full sequence of a given question.
+   * - If playing for this question: pauses without losing current progress.
+   * - If paused for this question: resumes from the exact position.
+   * - If idle or for a different question: starts the full sequence from the beginning.
    */
-  public async playFullSequence(questionId: number): Promise<void> {
-    // Se la sequenza per questa domanda è già attiva, facciamo toggle (Stop)
-    if (this.currentQuestionId === questionId && this.isSequencePlaying && this.getState().isPlaying) {
-      this.stop();
+  public async togglePlayPause(questionId: number): Promise<void> {
+    if (this.currentQuestionId === questionId && this.getState().isPlaying) {
+      this.pause();
       return;
     }
 
+    if (this.currentQuestionId === questionId && this.isPaused) {
+      await this.resume();
+      return;
+    }
+
+    await this.playFullSequence(questionId);
+  }
+
+  /**
+   * Pauses playback at the current exact position without resetting.
+   */
+  public pause(): void {
+    if (!this.currentQuestionId) return;
+
+    if (this.sequenceTimeout) {
+      clearTimeout(this.sequenceTimeout);
+      this.sequenceTimeout = null;
+    }
+
+    if (this.audio && !this.audio.paused) {
+      this.audio.pause();
+    }
+
+    this.isPaused = true;
+    if (typeof navigator !== 'undefined' && 'mediaSession' in navigator) {
+      navigator.mediaSession.playbackState = 'paused';
+    }
+    this.notify();
+  }
+
+  /**
+   * Resumes playback from the paused position or continues the sequence.
+   */
+  public async resume(): Promise<void> {
+    if (!this.isPaused || !this.currentQuestionId) return;
+
+    this.isPaused = false;
+
+    // If paused during the 350ms pause between sequence snippets, proceed to pending part
+    if (this.pendingSequencePart && this.isSequencePlaying) {
+      const next = this.pendingSequencePart;
+      this.pendingSequencePart = null;
+      await this.stepSequence(next);
+      return;
+    }
+
+    if (this.audio) {
+      try {
+        await this.audio.play();
+        if (typeof navigator !== 'undefined' && 'mediaSession' in navigator) {
+          navigator.mediaSession.playbackState = 'playing';
+        }
+        this.notify();
+      } catch (err) {
+        console.warn('Error during voice resume:', err);
+        this.stop();
+      }
+    }
+  }
+
+  /**
+   * Starts or restarts the full question sequence from the beginning:
+   * Question -> Option 1 -> Option 2 -> Option 3
+   */
+  public async playFullSequence(questionId: number): Promise<void> {
     this.clearSequence();
+    this.isPaused = false;
+    this.pendingSequencePart = null;
+    this.currentQuestionId = questionId;
+    this.isSequencePlaying = true;
+    await this.stepSequence('question');
+  }
+
+  /**
+   * Restarts the full sequence from the very beginning while playing or paused.
+   */
+  public async restartFullSequence(questionId: number): Promise<void> {
+    this.clearSequence();
+    this.isPaused = false;
+    this.pendingSequencePart = null;
+    if (this.audio) {
+      this.audio.pause();
+      this.audio.currentTime = 0;
+    }
     this.currentQuestionId = questionId;
     this.isSequencePlaying = true;
     await this.stepSequence('question');
@@ -158,7 +261,7 @@ class VoiceService {
       this.updateMediaSession(this.currentQuestionId, part.toUpperCase());
       this.notify();
     } catch (err) {
-      console.warn(`Errore sequenza al passaggio ${part}:`, err);
+      console.warn(`Error during voice sequence step ${part}:`, err);
       this.stop();
     }
   }
@@ -173,13 +276,16 @@ class VoiceService {
       question: 'opt1',
       opt1: 'opt2',
       opt2: 'opt3',
-      opt3: null // La sequenza termina dopo la 3a opzione (non rivela la risposta prima della selezione!)
+      opt3: null // Sequence completes after option 3 without revealing the answer
     };
 
     const next = nextStep[this.activePart || ''];
     if (next) {
-      // Breve pausa di 350ms tra le parti per naturalezza
+      this.pendingSequencePart = next;
+      // 350ms natural pause between question and options
       this.sequenceTimeout = setTimeout(() => {
+        this.sequenceTimeout = null;
+        this.pendingSequencePart = null;
         this.stepSequence(next);
       }, 350);
     } else {
@@ -192,6 +298,7 @@ class VoiceService {
       clearTimeout(this.sequenceTimeout);
       this.sequenceTimeout = null;
     }
+    this.pendingSequencePart = null;
   }
 
   public stop(): void {
@@ -200,12 +307,13 @@ class VoiceService {
       this.audio.pause();
       this.audio.currentTime = 0;
     }
-    if ('mediaSession' in navigator) {
+    if (typeof navigator !== 'undefined' && 'mediaSession' in navigator) {
       navigator.mediaSession.playbackState = 'none';
     }
     this.currentQuestionId = null;
     this.activePart = null;
     this.isSequencePlaying = false;
+    this.isPaused = false;
     this.notify();
   }
 }

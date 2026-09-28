@@ -63,7 +63,16 @@ describe('Suite: voiceCommandParser (Parser comandi vocali Modalità Guida)', ()
     expect(parseVoiceCommand('vai')).toBe('resume');
   });
 
-  it('VC-06: ignora input vuoti o frasi non correlate', () => {
+  it('VC-06: riconosce richiesta aiuto e guida', () => {
+    expect(parseVoiceCommand('aiuto')).toBe('help');
+    expect(parseVoiceCommand('guida')).toBe('help');
+    expect(parseVoiceCommand('comandi')).toBe('help');
+    expect(parseVoiceCommand('istruzioni')).toBe('help');
+    expect(parseVoiceCommand('cosa posso dire')).toBe('help');
+    expect(parseVoiceCommand('help')).toBe('help');
+  });
+
+  it('VC-07: ignora input vuoti o frasi non correlate', () => {
     expect(parseVoiceCommand('')).toBeNull();
     expect(parseVoiceCommand('buongiorno')).toBeNull();
     expect(parseVoiceCommand('che tempo fa oggi')).toBeNull();

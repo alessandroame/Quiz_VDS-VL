@@ -3,14 +3,17 @@ import {
   VolumeX,
   Headphones,
   Check,
-  X
+  X,
+  Mic
 } from 'lucide-react';
 import { useQuiz } from '../context/QuizContext';
 import { voiceService } from '../services/voiceService';
+import { VoiceCommandsModal } from './VoiceCommandsModal';
 
 export const VoiceQuickMenu: React.FC = () => {
   const { settings, updateSetting } = useQuiz();
   const [isOpen, setIsOpen] = useState(false);
+  const [isVoiceGuideOpen, setIsVoiceGuideOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
 
   // Close when clicking outside
@@ -226,8 +229,29 @@ export const VoiceQuickMenu: React.FC = () => {
               />
             </label>
           </div>
+
+          {/* Quick Voice Commands Link */}
+          <div className="pt-2 border-t border-slate-800/80 light:border-slate-100 flex justify-center">
+            <button
+              type="button"
+              onClick={() => {
+                setIsOpen(false);
+                setIsVoiceGuideOpen(true);
+              }}
+              className="text-[11px] font-semibold text-emerald-400 light:text-emerald-600 hover:underline flex items-center gap-1.5 py-0.5"
+            >
+              <Mic className="w-3.5 h-3.5" />
+              <span>Guida Comandi Vocali (Hands-Free)</span>
+            </button>
+          </div>
         </div>
       )}
+
+      {/* Modale Guida Comandi Vocali (Cheat Sheet) */}
+      <VoiceCommandsModal
+        isOpen={isVoiceGuideOpen}
+        onClose={() => setIsVoiceGuideOpen(false)}
+      />
     </div>
   );
 };

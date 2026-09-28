@@ -21,8 +21,8 @@ export default defineConfig({
         name: 'VDS-VL Quiz Master',
         short_name: 'VDS Quiz',
         description: 'Simulatore e studio per esame attestato VDS-VL Volo Libero AeCI',
-        theme_color: '#090d16',
-        background_color: '#090d16',
+        theme_color: '#09090b',
+        background_color: '#09090b',
         display: 'standalone',
         orientation: 'portrait-primary',
         icons: [
