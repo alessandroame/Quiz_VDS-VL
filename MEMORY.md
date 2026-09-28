@@ -36,9 +36,9 @@ Questo file costituisce la **memoria tecnica permanente** del progetto. Raccogli
 - **Cockpit Style**: Zero preamboli, etichette essenziali (**Esame**, **Materie**, **Errori**, **Archivio**, **Stats**).
 - **Feedback**: Secco e chiaro (`Esatta`, `Errata`, `⚑ Rivedi`, `IDONEO`, `NON IDONEO`).
 - **Desktop Keyboard**: Tasti `1`, `2`, `3` per risposta, `F` per flag, frecce o `Spazio` per navigazione.
-- **Iconografia Ufficiale PWA (Aero Shield)**:
-  * **Concept**: Sintesi geometrica del Volo Libero che fonde l'arco a celle cassonate del parapendio con l'ala triangolare a freccia del deltaplano (trave di chiglia e barra di controllo A-frame) a formare uno scudo alare 'V'.
-  * **Asset**: Vettore SVG di precisione ([favicon.svg](file:///d:/Github/Quiz_VDS-VL/public/favicon.svg)), icone raster pixel-perfect [icon-192x192.png](file:///d:/Github/Quiz_VDS-VL/public/icons/icon-192x192.png) e [icon-512x512.png](file:///d:/Github/Quiz_VDS-VL/public/icons/icon-512x512.png) renderizzate via CDP.
+- **Iconografia Ufficiale PWA (Paraglider Question Mark)**:
+  * **Concept**: Sintesi concettuale che unisce in un unico simbolo il Volo Libero e lo studio dei quiz: l'arco aerodinamico a celle cassonate del parapendio forma la testa del punto interrogativo (`?`), mentre il pilota imbracato con i comandi ne costituisce il punto inferiore.
+  * **Asset**: Vettore SVG di precisione ([favicon.svg](file:///d:/Github/Quiz_VDS-VL/public/favicon.svg)), icone raster pixel-perfect [icon-192x192.png](file:///d:/Github/Quiz_VDS-VL/public/icons/icon-192x192.png), [icon-512x512.png](file:///d:/Github/Quiz_VDS-VL/public/icons/icon-512x512.png) e [apple-touch-icon.png](file:///d:/Github/Quiz_VDS-VL/public/apple-touch-icon.png) renderizzate via CDP.
 - **Sistema Temi & Palette (Zero-Blue Carbon Cockpit / Hangar Light)**:
   * **Carbon Cockpit (Dark Mode)**: Dominante blu categoricamente azzerata (0% cool hue). Sfondo carbon `#09090b` (`zinc-950`), superfici `#18181b` (`zinc-900`), bordi `#27272a` (`zinc-800`), testo `#f4f4f5` (`zinc-100`) e accento primario avionico **Aviation Amber** (`amber-500` / `amber-600`, bagliore cockpit).
   * **Hangar Light (Outdoor High-Contrast)**: Registrata variante `light:` in `tailwind.config.js` (`addVariant('light', ':is(.light &)')`). Tutte le classi chiare sono confinate a `light:*` (`light:bg-white`, `light:border-slate-200`, `light:text-slate-900`).
