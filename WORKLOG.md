@@ -18,6 +18,38 @@ Questo documento registra in ordine cronologico tutte le lavorazioni svolte nel 
 
 ## Registro Cronologico
 
+### [2026-09-28] - Integrazione Scheda About nelle Impostazioni e Protocollo di Collaudo Manuale Completo nei TODO
+- **Cosa abbiamo fatto**:
+  - Esteso il componente modale [src/components/SettingsModal.tsx](file:///d:/Github/Quiz_VDS-VL/src/components/SettingsModal.tsx):
+    - Aggiunto il tipo `'about'` a `SettingsTab` e introdotto la sesta scheda tematica **About** (`id="tab-about"`) con icona `Info` da Lucide React.
+    - Implementato il layout avionico completo per la scheda About:
+      * Banner identità software con badge versione (`v1.0.0 · PWA Cockpit Edition`).
+      * Card normativa AeCI: riferimento al D.P.R. 9 luglio 2010 n. 133, catalogo ufficiale di 504 quiz (edizione 2017), formato esame 30 quiz / 45 minuti, soglia di idoneità (max 3 errori, ≥27/30) e quote canoniche per le 9 materie.
+      * Card architettura & privacy: architettura 100% Offline-First (IndexedDB/Dexie + CacheStorage Service Worker), Fair Coverage Randomizer, Spaced Repetition Leitner, motore vocale neurale multi-voce e sovranità assoluta dei dati personali.
+      * Footer didattico con dedica agli allievi piloti italiani di Volo Libero.
+    - Riorganizzata la scheda Dati focalizzandola sull'Archivio Locale IndexedDB e l'Area Reset.
+    - Implementato `scrollIntoView` fluido (`tabRefs`) sulla barra dei selettori per garantire che la scheda attiva sia sempre visibile e centrata anche su schermi mobili stretti (390x844).
+  - Aggiornato [TODO.md](file:///d:/Github/Quiz_VDS-VL/TODO.md):
+    - Aggiunta la **Fase 7: Protocollo di Collaudo Manuale Completo E2E (Checklist Operativa Pilota)** suddivisa in 9 aree operative dettagliate e complete di criteri di accettazione BVA:
+      1. Avvio, Installazione PWA, Temi & Interfaccia Avionica
+      2. Simulatore d'Esame Ufficiale AeCI (30 Quiz / 45 Minuti, Max 3 Errori)
+      3. Studio per Materie & Didattica Immediata
+      4. Quaderno Errori (Ripetizione Spaziata Leitner a 2 successi consecutivi)
+      5. Archivio Completo & Ricerca Full-Text
+      6. Motore Audio Vocale Cockpit & Quick Speech Menu
+      7. Modalità Alla Guida (Truck & Cockpit Drive Mode, Wake Lock, Briefing Run-Once, Comandi Vocali)
+      8. Gestione Offline & Audio CacheStorage
+      9. Backup Cloud Google Drive & Esportazione File JSON
+  - Creato lo script di collaudo headless [scripts/test_settings_about.js](file:///d:/Github/Quiz_VDS-VL/scripts/test_settings_about.js) via CDP:
+    - Verificata l'apertura delle impostazioni, la navigazione alla tab About, la presenza di tutti i nodi di testo e regolamento nel DOM e l'assenza assoluta di errori in console JavaScript.
+    - Generato lo screenshot di collaudo [public/test_settings_about_screenshot.png](file:///d:/Github/Quiz_VDS-VL/public/test_settings_about_screenshot.png).
+  - Aggiornati [README.md](file:///d:/Github/Quiz_VDS-VL/README.md) e [DESIDERATA.md](file:///d:/Github/Quiz_VDS-VL/DESIDERATA.md).
+- **Scelte architetturali & Rationale**:
+  - *Scheda Dedicata About Rationale*: L'allievo pilota che si prepara all'esame di volo libero necessita di certezze assolute sulle fonti normative dei quiz (D.P.R. 133/2010, edizione AeCI 2017) e sui criteri d'esame. Inserire una scheda About pulita e dedicata, anziché comprimere le note nella scheda Dati, conferisce autorevolezza istituzionale e trasparenza all'app.
+  - *Auto Scroll Tab Bar Rationale*: Su viewport mobili da 390px, 6 schede con icona e testo superano leggermente la larghezza orizzontale disponibile. L'uso di `ref` + `scrollIntoView({ inline: 'nearest' })` assicura che al tocco o all'apertura la scheda selezionata scivoli fluidamente in primo piano senza troncare le etichette.
+- **Impatto sul Desiderata**:
+  - Pieno allineamento delle impostazioni modulari e disponibilità di una checklist di collaudo manuale esaustiva per la certificazione sul campo.
+
 ### [2026-09-28] - Incorporamento Icona Master Esatta nello Splash Screen e Risoluzione Screenshot
 - **Cosa abbiamo fatto**:
   - Risolto il difetto di rendering negli screenshot precedenti: il tag `<img src="/icons/icon-512x512.png">` in ambiente di collaudo headless isolato via protocollo `file:///` non risolveva la root web, generando un'immagine vuota/incompleta.

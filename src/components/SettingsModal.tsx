@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   X,
   Sun,
@@ -58,6 +58,13 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
   const [audioStatuses, setAudioStatuses] = useState<Record<VoiceName, VoiceDownloadProgress>>(
     audioDownloadManager.getAllStatuses()
   );
+  const tabRefs = useRef<Record<string, HTMLButtonElement | null>>({});
+
+  useEffect(() => {
+    if (isOpen) {
+      tabRefs.current[activeTab]?.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'nearest' });
+    }
+  }, [activeTab, isOpen]);
 
   useEffect(() => {
     const unsub = audioDownloadManager.subscribe(newStatuses => {
@@ -183,6 +190,9 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
             return (
               <button
                 key={tab.id}
+                ref={el => {
+                  tabRefs.current[tab.id] = el;
+                }}
                 id={`tab-${tab.id}`}
                 onClick={() => setActiveTab(tab.id)}
                 className={`flex-1 py-1.5 px-1.5 sm:px-2 rounded-xl text-xs font-semibold flex items-center justify-center gap-1 sm:gap-1.5 transition-all whitespace-nowrap min-w-fit sm:min-w-0 ${

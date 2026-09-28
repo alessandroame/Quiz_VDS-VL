@@ -129,8 +129,9 @@
   - Icona geometrica originale per il Volo Libero che unisce l'arco a celle cassonate del parapendio e l'ala a freccia triangolare del deltaplano (con trave di chiglia centrale e barra di controllo A-frame) a formare uno scudo alare 'V'.
   - Disponibile in formato vettoriale ad altissima precisione ([favicon.svg](file:///d:/Github/Quiz_VDS-VL/public/favicon.svg)) e rasterizzata per il manifest PWA a 192x192 e 512x512 px.
 - **Pannello Impostazioni a Schede Tematiche (Zero-Scroll)**:
-  - Riorganizzazione modulare suddivisa in 5 argomenti dedicati: **🎨 Aspetto**, **🎙️ Voce**, **🚗 Guida**, **☁️ Backup**, **⚙️ Dati**.
+  - Riorganizzazione modulare suddivisa in 6 argomenti dedicati: **🎨 Aspetto**, **🎙️ Voce**, **🚗 Guida**, **☁️ Backup**, **⚙️ Dati**, **ℹ️ About**.
   - Eliminazione totale dello scrolling verticale continuo: ogni scheda presenta controlli compatti e accessibili a colpo d'occhio sia su smartphone che su desktop.
+  - **Scheda About Dedicata**: consultazione immediata dei riferimenti normativi ufficiali (D.P.R. 9 luglio 2010, n. 133 e regolamenti AeCI), database dei 504 quiz, regole d'esame (30 quiz, 45 min, max 3 errori), principi architetturali (Offline-First, Fair Coverage, Leitner) e garanzie di privacy.
 - **Palette Cockpit Bimodale**:
   - **Carbon Cockpit (Dark Mode Zero-Blue)**: Sfondo grafite profondo e carbonio neutro (`#09090b` / `zinc-950`, superfici `zinc-900`, bordi `zinc-800`, testo `zinc-100`), **con dominante blu categoricamente rimossa (0% cool hue)**. Accento avionico caldo **Aviation Amber** (`amber-500` / `amber-600`) per indicatori, selezioni e bagliore cockpit, ottimizzato per riposo visivo e cockpit notturni.
   - **Hangar Light (Outdoor High-Contrast)**: Sfondo diurno ad altissimo contrasto per perfetta leggibilità sul campo di volo o sotto la luce solare diretta in decollo.

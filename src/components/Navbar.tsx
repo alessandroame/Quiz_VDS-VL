@@ -80,8 +80,7 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab, openSet
                 {isExamRunning && (
                   <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-rose-500/20 text-rose-400 border border-rose-500/40 font-bold flex items-center gap-1 animate-pulse flex-shrink-0">
                     <span className="w-1.5 h-1.5 rounded-full bg-rose-500 flex-shrink-0" />
-                    <span className="hidden sm:inline">ESAME </span>
-                    <span>IN CORSO</span>
+                    <span>IN ESAME</span>
                   </span>
                 )}
               </div>
