@@ -220,7 +220,7 @@ export const VoiceQuickMenu: React.FC = () => {
             </label>
 
             <label className="flex items-center justify-between cursor-pointer py-0.5">
-              <span className="text-zinc-300 light:text-slate-700">Effetti sonori cockpit</span>
+              <span className="text-zinc-300 light:text-slate-700">Effetti sonori</span>
               <input
                 type="checkbox"
                 checked={settings.soundEnabled}

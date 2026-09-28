@@ -216,7 +216,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
             <div className="space-y-4 animate-in fade-in duration-150">
               <div className="space-y-2">
                 <label className="text-xs font-bold text-zinc-400 uppercase tracking-wider block">
-                  Tema Visivo Cockpit
+                  Tema dell'applicazione
                 </label>
                 <div className="grid grid-cols-3 gap-2">
                   {[
@@ -549,14 +549,14 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                 </>
               )}
 
-              {/* Effetti Sonori Cockpit */}
+              {/* Effetti Sonori */}
               <div className="flex items-center justify-between p-2.5 rounded-xl border border-zinc-800 bg-zinc-950/60 light:bg-slate-50 light:border-slate-200">
                 <div>
                   <span className="text-zinc-300 light:text-slate-700 font-medium block text-xs">
-                    Effetti Sonori Cockpit
+                    Effetti sonori
                   </span>
                   <span className="text-[11px] text-zinc-500 block">
-                    Suoni avionici di tocco e conferma risposta
+                    Feedback sonoro per tocco e conferma delle risposte
                   </span>
                 </div>
                 <button
@@ -893,7 +893,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                       </span>
                     </div>
                     <p className="text-[11px] text-zinc-400 light:text-slate-600 mt-1 leading-relaxed">
-                      Progressive Web App avionica per la preparazione dell'esame teorico di Volo da Diporto o Sportivo (VDS/VL - Parapendio e Deltaplano).
+                      Applicazione per la preparazione all'esame teorico di Volo da Diporto o Sportivo (VDS/VL - Parapendio e Deltaplano).
                     </p>
                   </div>
                 </div>
@@ -930,53 +930,50 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                 </div>
               </div>
 
-              {/* Tecnologie & Principi Guida */}
+              {/* Caratteristiche & Privacy */}
               <div className="space-y-2">
                 <label className="text-xs font-bold text-zinc-400 uppercase tracking-wider flex items-center gap-1.5">
                   <ShieldCheck className="w-3.5 h-3.5 text-amber-400" />
-                  <span>Architettura & Privacy</span>
+                  <span>Funzionalità & Privacy</span>
                 </label>
                 <div className="p-3 rounded-xl border border-zinc-800 bg-zinc-950/60 light:bg-slate-50 light:border-slate-200 space-y-2 text-[11px] text-zinc-300 light:text-slate-700">
                   <div className="flex items-start gap-2">
                     <span className="w-1.5 h-1.5 rounded-full bg-amber-400 mt-1.5 flex-shrink-0" />
                     <span>
-                      <strong className="text-zinc-200 light:text-slate-900">100% Offline-First:</strong> Nessun server esterno; funzionamento garantito senza connessione (Service Worker + Dexie IndexedDB).
+                      <strong className="text-zinc-200 light:text-slate-900">Funzionamento Offline:</strong> Tutti i quiz e le funzioni sono disponibili anche in assenza di connessione internet.
                     </span>
                   </div>
                   <div className="flex items-start gap-2">
                     <span className="w-1.5 h-1.5 rounded-full bg-amber-400 mt-1.5 flex-shrink-0" />
                     <span>
-                      <strong className="text-zinc-200 light:text-slate-900">Fair Coverage Randomizer:</strong> Copertura uniforme di tutti i 504 quiz evitando doppioni statistici.
+                      <strong className="text-zinc-200 light:text-slate-900">Copertura Completa:</strong> Estrazione bilanciata per assicurare la pratica su tutti i 504 quesiti ufficiali.
                     </span>
                   </div>
                   <div className="flex items-start gap-2">
                     <span className="w-1.5 h-1.5 rounded-full bg-amber-400 mt-1.5 flex-shrink-0" />
                     <span>
-                      <strong className="text-zinc-200 light:text-slate-900">Spaced Repetition Leitner:</strong> Quaderno errori con uscita vincolata a 2 risposte corrette consecutive.
+                      <strong className="text-zinc-200 light:text-slate-900">Quaderno Errori:</strong> Ripasso mirato delle domande sbagliate fino a due risposte corrette consecutive.
                     </span>
                   </div>
                   <div className="flex items-start gap-2">
                     <span className="w-1.5 h-1.5 rounded-full bg-amber-400 mt-1.5 flex-shrink-0" />
                     <span>
-                      <strong className="text-zinc-200 light:text-slate-900">Voce Neurale & Modalità Guida:</strong> Voci Giuseppe ed Elsa con fonetica ICAO, autopilot e comandi vocali a mani libere.
+                      <strong className="text-zinc-200 light:text-slate-900">Supporto Vocale:</strong> Lettura audio dei quiz per lo studio e modalità alla guida a mani libere.
                     </span>
                   </div>
                   <div className="flex items-start gap-2">
                     <span className="w-1.5 h-1.5 rounded-full bg-amber-400 mt-1.5 flex-shrink-0" />
                     <span>
-                      <strong className="text-zinc-200 light:text-slate-900">Privacy & Sovranità Dati:</strong> Nessun tracciamento o cookie di terze parti. Dati sul tuo dispositivo, con backup privato opzionale su Google Drive.
+                      <strong className="text-zinc-200 light:text-slate-900">Privacy dei Dati:</strong> Nessun tracciamento o invio a server esterni; i progressi restano sul tuo dispositivo con backup opzionale su Google Drive.
                     </span>
                   </div>
                 </div>
               </div>
 
-              {/* Riconoscimenti & Note */}
-              <div className="p-3 rounded-xl border border-zinc-800/80 bg-zinc-900/40 light:bg-slate-50 light:border-slate-200 text-center space-y-1">
+              {/* Dedica */}
+              <div className="p-3 rounded-xl border border-zinc-800/80 bg-zinc-900/40 light:bg-slate-50 light:border-slate-200 text-center">
                 <p className="text-[11px] text-zinc-400 light:text-slate-500">
                   Progettato per gli allievi piloti di Volo Libero italiani 🪂🦅
-                </p>
-                <p className="text-[10px] text-zinc-500 font-mono">
-                  Cockpit Avionics Design · Zero-Blue Theme · Fast & Offline
                 </p>
               </div>
             </div>

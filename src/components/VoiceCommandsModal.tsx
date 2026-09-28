@@ -191,7 +191,7 @@ export const VoiceCommandsModal: React.FC<VoiceCommandsModalProps> = ({
           <div className="mt-3 p-3 rounded-xl bg-amber-950/30 border border-amber-800/40 space-y-1.5">
             <div className="flex items-center gap-1.5 text-xs font-bold text-amber-300">
               <Headphones className="w-4 h-4 text-amber-400" />
-              <span>Consigli Cockpit per la Guida</span>
+              <span>Consigli per la guida</span>
             </div>
             <ul className="text-[11px] text-amber-200/80 space-y-1 pl-5 list-disc">
               <li>

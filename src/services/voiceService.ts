@@ -449,7 +449,7 @@ export class VoiceService {
         navigator.mediaSession.metadata = new MediaMetadata({
           title: 'Guida Vocale - Modalità Alla Guida',
           artist: 'VDS-VL Quiz Master',
-          album: 'Istruzioni Avioniche'
+          album: 'Guida Vocale'
         });
         navigator.mediaSession.playbackState = 'playing';
       }

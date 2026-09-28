@@ -32,8 +32,9 @@ Questo file costituisce la **memoria tecnica permanente** del progetto. Raccogli
 
 ---
 
-## 3. UI/UX Avionico, Iconografia & Sistema Temi
-- **Cockpit Style**: Zero preamboli, etichette essenziali (**Esame**, **Materie**, **Errori**, **Archivio**, **Stats**).
+## 3. UI/UX, Iconografia & Sistema Temi
+- **Divieto Assoluto di Slogan e Buzzword Inutili**: Evitare categoricamente diciture come "Cockpit Avionics Design", "Zero-Blue Theme", "Cockpit Edition" o altri slogan di facciata/marketing. L'interfaccia deve essere sobria, pulita, diretta e incentrata unicamente su informazioni utili e pratiche per l'allievo pilota.
+- **Stile Diretto ed Essenziale**: Zero preamboli, etichette essenziali (**Esame**, **Materie**, **Errori**, **Archivio**, **Stats**).
 - **Feedback**: Secco e chiaro (`Esatta`, `Errata`, `⚑ Rivedi`, `IDONEO`, `NON IDONEO`).
 - **Desktop Keyboard**: Tasti `1`, `2`, `3` per risposta, `F` per flag, frecce o `Spazio` per navigazione.
 - **Iconografia Ufficiale PWA (Paraglider Question Mark)**:

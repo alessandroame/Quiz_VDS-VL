@@ -18,6 +18,25 @@ Questo documento registra in ordine cronologico tutte le lavorazioni svolte nel 
 
 ## Registro Cronologico
 
+### [2026-09-28] - Rimozione Buzzword, Slogan e Allineamento Microcopy Sobrio ed Essenziale
+- **Cosa abbiamo fatto**:
+  - Eliminati tutti gli slogan di marketing, le diciture ridondanti e i testi autoreferenziali ("Cockpit Avionics Design", "Zero-Blue Theme", "Avionics Ready") che non apportavano reale valore all'utente:
+    * In [src/components/SettingsModal.tsx](file:///d:/Github/Quiz_VDS-VL/src/components/SettingsModal.tsx):
+      - Scheda Aspetto: convertito "Tema Visivo Cockpit" in "Tema dell'applicazione".
+      - Scheda Voce: convertito "Effetti Sonori Cockpit" in "Effetti sonori", con spiegazione essenziale "Feedback sonoro per tocco e conferma delle risposte".
+      - Scheda About: rimossa completamente la riga `Cockpit Avionics Design · Zero-Blue Theme · Fast & Offline`. Riorganizzati e riscritti i punti dell'elenco caratteristiche in linguaggio chiaro, sobrio e orientato ai benefici concreti dell'utente (*Funzionamento Offline*, *Copertura Completa*, *Quaderno Errori*, *Supporto Vocale*, *Privacy dei Dati*).
+    * In [src/components/VoiceQuickMenu.tsx](file:///d:/Github/Quiz_VDS-VL/src/components/VoiceQuickMenu.tsx): convertito "Effetti sonori cockpit" in "Effetti sonori".
+    * In [src/components/VoiceCommandsModal.tsx](file:///d:/Github/Quiz_VDS-VL/src/components/VoiceCommandsModal.tsx): convertito "Consigli Cockpit per la Guida" in "Consigli per la guida".
+    * In [src/services/voiceService.ts](file:///d:/Github/Quiz_VDS-VL/src/services/voiceService.ts): convertito l'album dei metadati audio MediaSession da "Istruzioni Avioniche" in "Guida Vocale".
+    * In [index.html](file:///d:/Github/Quiz_VDS-VL/index.html): sostituito "Avionics Ready" nello splash screen con "Caricamento...".
+  - Aggiornato [MEMORY.md](file:///d:/Github/Quiz_VDS-VL/MEMORY.md) codificando la regola permanente vincolante: **Divieto Assoluto di Slogan e Buzzword Inutili**.
+  - Verificato con test CDP headless [scripts/test_settings_about.js](file:///d:/Github/Quiz_VDS-VL/scripts/test_settings_about.js) e generato nuovo screenshot visivo [public/test_settings_about_screenshot.png](file:///d:/Github/Quiz_VDS-VL/public/test_settings_about_screenshot.png).
+  - Superati tutti i 129 test unitari (`npm run test:unit`) e la compilazione del bundle di produzione (`npm run build`).
+- **Scelte architetturali & Rationale**:
+  - *Comunicazione Utile e Non-Pretenziosa Rationale*: L'allievo pilota che si prepara all'esame cerca chiarezza e affidabilità, non vuoti slogan di marketing ("Cockpit Avionics Design", "Zero-Blue"). L'applicazione deve mantenere un'interfaccia impeccabile e pulita, con testi che descrivono fedelmente solo le funzioni reali senza ridondanze.
+- **Impatto sul Desiderata**:
+  - Massima fruibilità, rispetto per l'utente ed eliminazione di qualsiasi attrito percettivo.
+
 ### [2026-09-28] - Iniezione Metadati di Build e Tracciamento Build Number in Console DevTools
 - **Cosa abbiamo fatto**:
   - Configurato [vite.config.ts](file:///d:/Github/Quiz_VDS-VL/vite.config.ts) con iniezione a compile-time tramite `define`:
