@@ -108,7 +108,7 @@ async function main() {
     await sleep(1000);
 
     // Verifica presenza del banner Guida Vocale Iniziale
-    const check1 = await send('Runtime.evaluate', {
+    const eval1 = await send('Runtime.evaluate', {
       expression: `(() => {
         const banner = document.getElementById('btn-skip-drive-intro');
         const replay = document.getElementById('btn-replay-drive-intro');
@@ -117,9 +117,10 @@ async function main() {
       returnByValue: true
     });
 
-    console.log('Verifica 1 (Primo avvio):', check1.value);
-    if (!check1.value.hasBanner || !check1.value.hasReplay) {
-      throw new Error(`Banner introduttivo non rilevato al primo avvio: ${JSON.stringify(check1.value)}`);
+    const check1 = eval1?.result?.value;
+    console.log('Verifica 1 (Primo avvio):', check1);
+    if (!check1 || !check1.hasBanner || !check1.hasReplay) {
+      throw new Error(`Banner introduttivo non rilevato al primo avvio: ${JSON.stringify(check1)}`);
     }
 
     console.log('3. Test tasto Salta per completare l\'introduzione...');
@@ -129,12 +130,13 @@ async function main() {
     await sleep(500);
 
     // Verifica che il banner sia scomparso
-    const check2 = await send('Runtime.evaluate', {
+    const eval2 = await send('Runtime.evaluate', {
       expression: `!document.getElementById('btn-skip-drive-intro')`,
       returnByValue: true
     });
-    console.log('Verifica 2 (Banner scomparso dopo Salta):', check2.value);
-    if (!check2.value) {
+    const check2 = eval2?.result?.value;
+    console.log('Verifica 2 (Banner scomparso dopo Salta):', check2);
+    if (!check2) {
       throw new Error('Il banner non è scomparso dopo il click su Salta');
     }
 
@@ -155,12 +157,13 @@ async function main() {
     await sleep(1000);
 
     // Verifica che il banner NON appaia più automaticamente
-    const check3 = await send('Runtime.evaluate', {
+    const eval3 = await send('Runtime.evaluate', {
       expression: `!document.getElementById('btn-skip-drive-intro')`,
       returnByValue: true
     });
-    console.log('Verifica 3 (Non viene rieseguito automaticamente):', check3.value);
-    if (!check3.value) {
+    const check3 = eval3?.result?.value;
+    console.log('Verifica 3 (Non viene rieseguito automaticamente):', check3);
+    if (!check3) {
       throw new Error('Il banner è riapparso automaticamente nonostante fosse già stato eseguito!');
     }
 
@@ -171,12 +174,13 @@ async function main() {
     });
     await sleep(600);
 
-    const check4 = await send('Runtime.evaluate', {
+    const eval4 = await send('Runtime.evaluate', {
       expression: `!!document.getElementById('btn-skip-drive-intro')`,
       returnByValue: true
     });
-    console.log('Verifica 4 (Riascolto on-demand attivato):', check4.value);
-    if (!check4.value) {
+    const check4 = eval4?.result?.value;
+    console.log('Verifica 4 (Riascolto on-demand attivato):', check4);
+    if (!check4) {
       throw new Error('Il pulsante Riascolta Spiegazione non ha riattivato il banner');
     }
 
@@ -210,7 +214,7 @@ async function main() {
     });
     await sleep(500);
 
-    const checkSettings = await send('Runtime.evaluate', {
+    const evalSettings = await send('Runtime.evaluate', {
       expression: `(() => {
         const replay = document.getElementById('btn-settings-replay-intro');
         const toggle = document.getElementById('btn-settings-toggle-intro');
@@ -222,9 +226,10 @@ async function main() {
       })()`,
       returnByValue: true
     });
-    console.log('Verifica 5 (Scheda Impostazioni Guida):', checkSettings.value);
-    if (!checkSettings.value.hasReplay || !checkSettings.value.hasToggle) {
-      throw new Error(`Controlli impostazioni non trovati: ${JSON.stringify(checkSettings.value)}`);
+    const checkSettings = evalSettings?.result?.value;
+    console.log('Verifica 5 (Scheda Impostazioni Guida):', checkSettings);
+    if (!checkSettings || !checkSettings.hasReplay || !checkSettings.hasToggle) {
+      throw new Error(`Controlli impostazioni non trovati: ${JSON.stringify(checkSettings)}`);
     }
 
     // Clicca "Riattiva all'avvio"
@@ -236,7 +241,7 @@ async function main() {
     // Chiudi impostazioni
     await send('Runtime.evaluate', {
       expression: `(() => {
-        const closeBtn = document.querySelector('button[title="Chiudi"]');
+        const closeBtn = document.querySelector('button[title="Chiudi impostazioni"]') || document.querySelector('button svg.lucide-x')?.parentElement;
         if (closeBtn) closeBtn.click();
       })()`
     });
@@ -252,12 +257,13 @@ async function main() {
     });
     await sleep(1000);
 
-    const checkReactivated = await send('Runtime.evaluate', {
+    const evalReactivated = await send('Runtime.evaluate', {
       expression: `!!document.getElementById('btn-skip-drive-intro')`,
       returnByValue: true
     });
-    console.log('Verifica 6 (Ripartita automaticamente dopo riattivazione):', checkReactivated.value);
-    if (!checkReactivated.value) {
+    const checkReactivated = evalReactivated?.result?.value;
+    console.log('Verifica 6 (Ripartita automaticamente dopo riattivazione):', checkReactivated);
+    if (!checkReactivated) {
       throw new Error('La spiegazione non è ripartita automaticamente dopo la riattivazione!');
     }
 
