@@ -67,7 +67,7 @@ describe('Suite 6: Calcolo Metriche & Quaderno Errori (src/utils/analytics.ts)',
     });
   });
 
-  describe('Indice di Prontezza Esame (calculateReadinessScore)', () => {
+  describe('Indice di Preparazione Esame (calculateReadinessScore)', () => {
     it('STAT-02: restituisce 0 con catalogo vuoto o 0 domande viste', () => {
       expect(calculateReadinessScore(0, 0, [], [])).toBe(0);
       expect(calculateReadinessScore(504, 0, [], [])).toBe(0);

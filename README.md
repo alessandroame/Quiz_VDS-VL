@@ -13,7 +13,7 @@
   - [3. Studio Guidato per Materie](#3-studio-guidato-per-materie)
   - [4. Quaderno Errori con Ripetizione Spaziata](#4-quaderno-errori-con-ripetizione-spaziata)
   - [5. Archivio Completo, Ricerca & Note Personali](#5-archivio-completo-ricerca--note-personali)
-  - [6. Statistiche Avanzate & Indice di Prontezza](#6-statistiche-avanzate--indice-di-prontezza)
+  - [6. Statistiche Avanzate & Indice di Preparazione](#6-statistiche-avanzate--indice-di-preparazione)
   - [7. Modalità Alla Guida (Truck & Cockpit Drive Mode)](#7-modalità-alla-guida-truck--cockpit-drive-mode)
   - [8. Motore Vocale Neurale (TTS Multi-Voce Offline) & Audio Cockpit](#8-motore-vocale-neurale-tts-multi-voce-offline--audio-cockpit)
   - [9. Ergonomia Cockpit, Temi & Scorciatoie da Tastiera](#9-ergonomia-cockpit-temi--scorciatoie-da-tastiera)
@@ -71,8 +71,8 @@
 - **Preferiti (Segnalibri)**: memorizzazione delle domande più importanti o dubbie per un ripasso dedicato.
 - **Note Personali (CRUD Completo)**: possibilità di aggiungere, consultare, modificare ed eliminare annotazioni personali su ciascun quesito, con pill di visualizzazione rapida sia nell'Archivio che nelle schede di quiz.
 
-### 6. Statistiche Avanzate & Indice di Prontezza
-- **Indice di Prontezza Esame**: percentuale calcolata sull'accuratezza globale e sulla copertura delle materie.
+### 6. Statistiche Avanzate & Indice di Preparazione
+- **Indice di Preparazione Esame**: percentuale calcolata sull'accuratezza globale e sulla copertura delle materie.
 - **Radar Chart delle 9 Materie**: visualizzazione grafica poligonale per identificare all'istante le materie forti e i punti deboli su cui concentrare lo studio.
 - **Registro Storico Sessioni**: cronologia delle simulazioni svolte con esito (`IDONEO` / `NON IDONEO`), punteggio e tempo impiegato.
 - **Top 10 Domande Più Ostiche**: graduatoria dei quesiti che hanno registrato il maggior numero di risposte errate.

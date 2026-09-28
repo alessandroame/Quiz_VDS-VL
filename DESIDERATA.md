@@ -57,7 +57,7 @@ Questo documento rappresenta la **bussola strategica e funzionale** del progetto
    - Possibilità di aggiungere domande ai **Preferiti** e inserire **Note personali** persistenti.
 
 5. **Statistiche & Analytics**:
-   - Indice di prontezza complessivo per l'esame.
+   - Indice di preparazione complessivo per l'esame.
    - Radar di rendimento sulle 9 materie (individuazione immediata dei punti deboli).
    - Storico temporale delle sessioni d'esame e grafico di tendenza.
    - Elenco dei quiz più sbagliati (Top 10 ostacoli).
@@ -111,7 +111,7 @@ Questo documento rappresenta la **bussola strategica e funzionale** del progetto
 | Modalità Materie | 🟢 Completato | Filtro 9 materie con spiegazioni Regola + Tranello. |
 | Quaderno Errori Leitner | 🟢 Completato | Uscita vincolata a 2 risposte esatte consecutive. |
 | Archivio & Ricerca Full-Text | 🟢 Completato | Ricerca istantanea, preferiti e note personali salvate in Dexie. |
-| Dashboard Statistiche | 🟢 Completato | Radar materie, prontezza esame e storico sessioni. |
+| Dashboard Statistiche | 🟢 Completato | Radar materie, preparazione esame e storico sessioni. |
 | Temi Carbon Cockpit & Hangar Light, Icona Aero Shield | 🟢 Completato | Zero dominante blu (`zinc` + `amber`), icona Aero Shield vettoriale e PNG 192/512. |
 | Suite Vitest (Unit & BVA) | 🟢 Completato | 129 test attivi su 15 suite, soglie limite verificate, isolamento in-memory. |
 | Supporto Audio Avionico | 🟢 Completato | Sintesi vocale neurale con controlli Play/Pausa e Da Capo universali su domanda, singole opzioni e spiegazione; feedback cockpit Web Audio API e fonetica ICAO. |

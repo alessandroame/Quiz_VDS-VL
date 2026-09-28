@@ -85,7 +85,7 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab, openSet
                 )}
               </div>
               <div className="text-[11px] text-zinc-400 light:text-slate-500">
-                Prontezza: <strong className="text-amber-400 light:text-amber-600">{readinessScore}%</strong>
+                Preparazione: <strong className="text-amber-400 light:text-amber-600">{readinessScore}%</strong>
               </div>
             </div>
           </div>

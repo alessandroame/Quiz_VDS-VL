@@ -50,7 +50,7 @@ export const StatsScreen: React.FC = () => {
         <div className="flex items-center justify-between">
           <div className="space-y-1">
             <span className="text-xs font-bold text-zinc-400 light:text-slate-500 uppercase tracking-wider">
-              Prontezza Esame
+              Preparazione Esame
             </span>
             <div className="text-3xl sm:text-4xl font-black text-amber-400 light:text-amber-600">
               {readinessScore}%
