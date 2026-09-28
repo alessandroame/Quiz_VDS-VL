@@ -53,6 +53,8 @@ export function useAviationVoice(questionId?: number) {
     },
     pause: () => voiceService.pause(),
     resume: () => voiceService.resume(),
-    stop: () => voiceService.stop()
+    stop: () => voiceService.stop(),
+    playDriveIntro: () => voiceService.playDriveIntro(),
+    stopDriveIntro: () => voiceService.stopDriveIntro()
   };
 }
