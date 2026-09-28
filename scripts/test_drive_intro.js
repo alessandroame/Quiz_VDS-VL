@@ -197,11 +197,7 @@ async function main() {
 
     // Seleziona tab Guida
     await send('Runtime.evaluate', {
-      expression: `(() => {
-        const buttons = Array.from(document.querySelectorAll('button'));
-        const driveTab = buttons.find(b => b.textContent && b.textContent.includes('Guida'));
-        if (driveTab) driveTab.click();
-      })()`
+      expression: `document.getElementById('tab-drive')?.click()`
     });
     await sleep(500);
 
@@ -231,10 +227,7 @@ async function main() {
 
     // Chiudi impostazioni
     await send('Runtime.evaluate', {
-      expression: `(() => {
-        const closeBtn = document.querySelector('button[title="Chiudi impostazioni"]') || document.querySelector('button svg.lucide-x')?.parentElement;
-        if (closeBtn) closeBtn.click();
-      })()`
+      expression: `document.getElementById('btn-close-settings')?.click()`
     });
     await sleep(500);
 
