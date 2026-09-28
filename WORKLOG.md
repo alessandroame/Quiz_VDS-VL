@@ -30,7 +30,7 @@ Questo documento registra in ordine cronologico tutte le lavorazioni svolte nel 
     - Introdotto il comando vocale `"stop"` e il tasto `[■]` dedicato per arresto immediato del pilota automatico e del countdown.
     - Aggiornato `"ripeti"` e tasto `[R]` a `restartCurrentOrSequence()` per un riascolto coerente dell'elemento attivo.
   - Eseguiti e superati con successo:
-    - **125/125 test unitari Vitest** (`npm run test:unit`).
+    - **129/129 test unitari Vitest** (`npm run test:unit`) su 15 test suite.
     - Build di produzione PWA (`tsc && vite build`) a 0 errori.
     - Collaudo headless CDP a 0 errori console su mobile portrait, mobile landscape e desktop.
 - **Scelte architetturali & Rationale**:
