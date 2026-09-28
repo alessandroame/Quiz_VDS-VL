@@ -18,6 +18,28 @@ Questo documento registra in ordine cronologico tutte le lavorazioni svolte nel 
 
 ## Registro Cronologico
 
+### [2026-09-28] - Identità Visiva PWA: Adozione Icona Ufficiale "Paraglider Question Mark" ed Estensione Test Suite
+- **Cosa abbiamo fatto**:
+  - Adottata la nuova icona ufficiale PWA: concept *Paraglider Question Mark* (testa del punto interrogativo formata dalla cupola aerodinamica a celle del parapendio in volo e punto inferiore formato dalla sagoma del pilota nel bozzolo con comandi).
+  - Generati gli asset ad alta fedeltà con script CDP dedicato [scripts/apply_paraglider_question_icon.cjs](file:///d:/Github/Quiz_VDS-VL/scripts/apply_paraglider_question_icon.cjs):
+    - [public/icons/icon-512x512.png](file:///d:/Github/Quiz_VDS-VL/public/icons/icon-512x512.png) (512x512 PWA master)
+    - [public/icons/icon-192x192.png](file:///d:/Github/Quiz_VDS-VL/public/icons/icon-192x192.png) (192x192 PWA homescreen)
+    - [public/apple-touch-icon.png](file:///d:/Github/Quiz_VDS-VL/public/apple-touch-icon.png) (180x180 iOS Safari touch icon)
+    - [public/favicon.svg](file:///d:/Github/Quiz_VDS-VL/public/favicon.svg) (Favicon vettoriale con ghiera bussola avionica, profilo cassonato e pilota)
+    - Collegato `apple-touch-icon` in [index.html](file:///d:/Github/Quiz_VDS-VL/index.html).
+  - Archiviati i 5 concept di icona in [public/proposals/](file:///d:/Github/Quiz_VDS-VL/public/proposals/) e lo script visuale [scripts/build_gallery.cjs](file:///d:/Github/Quiz_VDS-VL/scripts/build_gallery.cjs).
+  - Estesi i test di unità portando la suite Vitest da 121 a **125 test superati** su 15 test suite:
+    - [src/services/voiceService.test.ts](file:///d:/Github/Quiz_VDS-VL/src/services/voiceService.test.ts): aggiunti `VOICE-19`, `VOICE-20` e `VOICE-21` per la gestione completa di `playDriveIntro`, `stopDriveIntro` e reset su evento `ended`.
+    - [src/utils/voiceCommandParser.test.ts](file:///d:/Github/Quiz_VDS-VL/src/utils/voiceCommandParser.test.ts): aggiunti i trigger vocali `spiegazione` e `tutorial` per il comando vocale `help`.
+    - [src/db/database.test.ts](file:///d:/Github/Quiz_VDS-VL/src/db/database.test.ts): aggiunto `DB-12` per la persistenza e il toggle di `driveModeIntroPlayed` su Dexie IndexedDB.
+  - Verificato con successo `npm run build` (zero errori TypeScript, bundle PWA ottimizzato) e `npm run test:unit` (125/125 passing).
+- **Scelte architetturali & Rationale**:
+  - *Metacognizione Visiva Rationale*: L'icona unisce in un unico simbolo concettuale la componente aeronautica del volo libero (la vela del parapendio con i cordini e il pilota) con la componente didattica (il punto interrogativo del quiz), rendendo l'icona immediatamente riconoscibile e memorabile sia nella homescreen degli smartphone (PWA) che nella tab del browser desktop.
+  - *Apple Touch Icon Dedicata Rationale*: iOS Safari richiede un link esplicito `<link rel="apple-touch-icon" href="/apple-touch-icon.png" />` per visualizzare correttamente l'icona senza bordi neri o glitch durante l'aggiunta alla schermata Home.
+- **Impatto sul Desiderata**:
+  - Consolidamento dell'identità visiva e perfezionamento della qualità percepita della PWA VDS-VL Quiz Master.
+
+
 ### [2026-09-28] - Indicatore di Stato Offline Avionico (Cockpit Offline HUD & Briefing)
 - **Cosa abbiamo fatto**:
   - Creato il servizio puro [src/services/networkStatus.ts](file:///d:/Github/Quiz_VDS-VL/src/services/networkStatus.ts) con gestione reattiva degli eventi `online`/`offline`, listener immediati al boot, tracking temporale di disconnessione e finestra temporale di riconnessione (3.5s).

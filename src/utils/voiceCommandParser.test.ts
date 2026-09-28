@@ -68,6 +68,8 @@ describe('Suite: voiceCommandParser (Parser comandi vocali Modalità Guida)', ()
     expect(parseVoiceCommand('guida')).toBe('help');
     expect(parseVoiceCommand('comandi')).toBe('help');
     expect(parseVoiceCommand('istruzioni')).toBe('help');
+    expect(parseVoiceCommand('spiegazione')).toBe('help');
+    expect(parseVoiceCommand('tutorial')).toBe('help');
     expect(parseVoiceCommand('cosa posso dire')).toBe('help');
     expect(parseVoiceCommand('help')).toBe('help');
   });

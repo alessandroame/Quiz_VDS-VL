@@ -1,78 +1,80 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" fill="none">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="100%" height="100%">
   <defs>
-    <!-- Background Gradient: Deep Carbon Zinc (Zero Blue) -->
-    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#141416"/>
-      <stop offset="100%" stop-color="#09090b"/>
-    </linearGradient>
+    <!-- Background Gradient -->
+    <radialGradient id="bgGrad" cx="50%" cy="45%" r="60%">
+      <stop offset="0%" stop-color="#18181b"/>
+      <stop offset="85%" stop-color="#09090b"/>
+      <stop offset="100%" stop-color="#040405"/>
+    </radialGradient>
 
-    <!-- Glowing Aviation Amber Gradient -->
-    <linearGradient id="amberPrimary" x1="0%" y1="0%" x2="100%" y2="100%">
+    <!-- Warm Aviation Amber Gradient -->
+    <linearGradient id="amberGrad" x1="0%" y1="0%" x2="100%" y2="100%">
       <stop offset="0%" stop-color="#fef08a"/>
       <stop offset="25%" stop-color="#fbbf24"/>
-      <stop offset="75%" stop-color="#f59e0b"/>
-      <stop offset="100%" stop-color="#b45309"/>
+      <stop offset="70%" stop-color="#f59e0b"/>
+      <stop offset="100%" stop-color="#d97706"/>
     </linearGradient>
 
-    <!-- Delta Body Shading -->
-    <linearGradient id="deltaBody" x1="50%" y1="0%" x2="50%" y2="100%">
-      <stop offset="0%" stop-color="#27272a" stop-opacity="0.85"/>
-      <stop offset="100%" stop-color="#18181b" stop-opacity="0.95"/>
-    </linearGradient>
+    <!-- Soft Ambient Glow -->
+    <filter id="softGlow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="8" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
 
-    <!-- Subtle Avionics Instrument Glow Filter -->
-    <filter id="amberGlow" x="-20%" y="-20%" width="140%" height="140%">
-      <feGaussianBlur stdDeviation="6" result="blur"/>
-      <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+    <!-- Intense Outer Glow -->
+    <filter id="outerGlow" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur in="SourceGraphic" stdDeviation="16" result="blur1"/>
+      <feGaussianBlur in="SourceGraphic" stdDeviation="6" result="blur2"/>
+      <feMerge>
+        <feMergeNode in="blur1"/>
+        <feMergeNode in="blur2"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
     </filter>
   </defs>
 
-  <!-- Squircle Base Canvas -->
-  <rect width="512" height="512" rx="112" fill="url(#bgGrad)"/>
-  
-  <!-- Outer Precision Cockpit Bezel -->
-  <rect x="12" y="12" width="488" height="488" rx="100" stroke="#27272a" stroke-width="4"/>
-  <rect x="20" y="20" width="472" height="472" rx="92" stroke="#18181b" stroke-width="2"/>
+  <!-- Base Squircle Container -->
+  <rect x="16" y="16" width="480" height="480" rx="108" fill="url(#bgGrad)" stroke="#27272a" stroke-width="4"/>
 
-  <!-- Instrument Tick Marks at Cardinal Points -->
-  <line x1="256" y1="28" x2="256" y2="44" stroke="#f59e0b" stroke-width="4" stroke-linecap="round"/>
-  <line x1="256" y1="468" x2="256" y2="484" stroke="#f59e0b" stroke-width="4" stroke-linecap="round"/>
-  <line x1="28" y1="256" x2="44" y2="256" stroke="#f59e0b" stroke-width="4" stroke-linecap="round"/>
-  <line x1="468" y1="256" x2="484" y2="256" stroke="#f59e0b" stroke-width="4" stroke-linecap="round"/>
+  <!-- Instrument Precision Ring & Compass Marks -->
+  <circle cx="256" cy="256" r="218" fill="none" stroke="#27272a" stroke-width="1.5" stroke-dasharray="3 7" opacity="0.5"/>
+  <line x1="256" y1="20" x2="256" y2="34" stroke="#f59e0b" stroke-width="3" stroke-linecap="round" opacity="0.8"/>
+  <line x1="256" y1="478" x2="256" y2="492" stroke="#71717a" stroke-width="2" stroke-linecap="round" opacity="0.6"/>
+  <line x1="20" y1="256" x2="34" y2="256" stroke="#71717a" stroke-width="2" stroke-linecap="round" opacity="0.6"/>
+  <line x1="478" y1="256" x2="492" y2="256" stroke="#71717a" stroke-width="2" stroke-linecap="round" opacity="0.6"/>
 
-  <!-- PARAGLIDER CANOPY (Arco Calotta Parapendio) -->
-  <path d="M 96 192 C 144 82, 368 82, 416 192 C 360 150, 152 150, 96 192 Z"
-        fill="url(#amberPrimary)" filter="url(#amberGlow)"/>
+  <!-- Glowing Glow Layer underneath -->
+  <g filter="url(#outerGlow)" opacity="0.35">
+    <!-- Paraglider Wing Canopy Hook -->
+    <path d="M 148,225 C 142,165 195,108 268,108 C 345,108 392,156 375,230 C 362,284 308,298 288,326 C 278,340 278,352 278,356 L 244,356 C 244,340 248,324 262,306 C 282,280 326,268 334,228 C 344,180 315,146 265,146 C 215,146 178,180 182,224 Z" fill="#f59e0b"/>
+    <!-- Pilot Dot -->
+    <circle cx="260" cy="404" r="16" fill="#f59e0b"/>
+  </g>
 
-  <!-- Cell Ribs (Centine cassoni) -->
-  <path d="M 168 144 Q 182 162 192 172" stroke="#78350f" stroke-width="3" stroke-linecap="round"/>
-  <path d="M 256 124 L 256 166" stroke="#78350f" stroke-width="3.5" stroke-linecap="round"/>
-  <path d="M 344 144 Q 330 162 320 172" stroke="#78350f" stroke-width="3" stroke-linecap="round"/>
+  <!-- Main Paraglider Question Mark (Crisp Vector) -->
+  <g filter="url(#softGlow)">
+    <!-- Aerodynamic Paraglider Canopy (Top Loop of Question Mark) -->
+    <path d="M 148,222 C 142,160 196,104 270,104 C 348,104 394,154 378,226 C 365,280 312,296 292,324 C 282,338 281,348 281,354 L 243,354 C 243,338 248,322 262,302 C 282,274 328,264 336,224 C 346,176 317,142 267,142 C 215,142 180,178 184,222 Z" fill="url(#amberGrad)" stroke="#fef08a" stroke-width="1.5"/>
 
-  <!-- Suspension Lines (Fasci Funicelle coniche al baricentro) -->
-  <line x1="112" y1="188" x2="256" y2="272" stroke="#f59e0b" stroke-width="3.5" stroke-opacity="0.4" stroke-linecap="round"/>
-  <line x1="186" y1="172" x2="256" y2="272" stroke="#f59e0b" stroke-width="3.5" stroke-opacity="0.4" stroke-linecap="round"/>
-  <line x1="326" y1="172" x2="256" y2="272" stroke="#f59e0b" stroke-width="3.5" stroke-opacity="0.4" stroke-linecap="round"/>
-  <line x1="400" y1="188" x2="256" y2="272" stroke="#f59e0b" stroke-width="3.5" stroke-opacity="0.4" stroke-linecap="round"/>
+    <!-- Paraglider Cell Ribs (Inner Wing Structure) -->
+    <path d="M 215,116 C 210,126 206,140 205,158" stroke="#fbbf24" stroke-width="2.5" stroke-linecap="round" opacity="0.6"/>
+    <path d="M 268,105 L 268,142" stroke="#fef08a" stroke-width="3" stroke-linecap="round" opacity="0.8"/>
+    <path d="M 320,118 C 324,128 326,144 324,162" stroke="#fbbf24" stroke-width="2.5" stroke-linecap="round" opacity="0.6"/>
 
-  <!-- DELTAPLANO WING (Ala a Delta / Shield V) -->
-  <polygon points="256,220 424,304 256,424 88,304"
-           fill="url(#deltaBody)"
-           stroke="url(#amberPrimary)"
-           stroke-width="12"
-           stroke-linejoin="round"
-           filter="url(#amberGlow)"/>
+    <!-- Suspension Lines (Cordini di Fascio) -->
+    <line x1="247" y1="354" x2="242" y2="384" stroke="#fbbf24" stroke-width="2.5" stroke-linecap="round" opacity="0.85"/>
+    <line x1="277" y1="354" x2="274" y2="384" stroke="#fbbf24" stroke-width="2.5" stroke-linecap="round" opacity="0.85"/>
 
-  <!-- Keel Tube (Tubo di Chiglia centrale) -->
-  <line x1="256" y1="220" x2="256" y2="424" stroke="#fbbf24" stroke-width="7" stroke-linecap="round"/>
-
-  <!-- Crossbar Struts (Traversa strutturale) -->
-  <line x1="172" y1="364" x2="256" y2="304" stroke="#f59e0b" stroke-width="5" stroke-linecap="round"/>
-  <line x1="340" y1="364" x2="256" y2="304" stroke="#f59e0b" stroke-width="5" stroke-linecap="round"/>
-
-  <!-- Control Frame Trapezoid (Trapezio di pilotaggio deltaplano) -->
-  <polygon points="256,280 298,348 214,348" fill="none" stroke="#fef08a" stroke-width="5" stroke-linejoin="round"/>
-
-  <!-- Center Instrument Pivot / Flight Attitude Dot -->
-  <circle cx="256" cy="304" r="8" fill="#fef08a" filter="url(#amberGlow)"/>
+    <!-- Pilot Silhouette (Bottom Dot of Question Mark) -->
+    <!-- Helmet -->
+    <circle cx="258" cy="385" r="10" fill="url(#amberGrad)" stroke="#fef08a" stroke-width="1"/>
+    <!-- Pilot Body / Harness (Cocoon Pod) -->
+    <path d="M 242,392 C 238,405 244,424 262,424 C 274,424 280,414 276,402 L 268,392 Z" fill="url(#amberGrad)"/>
+    <!-- Arms holding toggles -->
+    <path d="M 242,386 L 248,396" stroke="#fef08a" stroke-width="2.5" stroke-linecap="round"/>
+    <path x="0" d="M 274,386 L 268,396" stroke="#fef08a" stroke-width="2.5" stroke-linecap="round"/>
+  </g>
 </svg>

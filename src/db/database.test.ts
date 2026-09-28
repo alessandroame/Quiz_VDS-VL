@@ -249,4 +249,20 @@ describe('Suite 4: Persistenza Dexie IndexedDB (src/db/index.ts)', () => {
     expect(res2.success).toBe(false);
     expect(res2.message).toContain('non valido');
   });
+
+  it('DB-12: default e aggiornamento dell\'impostazione driveModeIntroPlayed', async () => {
+    // Act 1: default value
+    const all = await getAllSettings();
+    expect(all.driveModeIntroPlayed).toBe(false);
+
+    // Act 2: save true
+    await setSetting('driveModeIntroPlayed', true);
+    const updated = await getSetting('driveModeIntroPlayed', false);
+    expect(updated).toBe(true);
+
+    // Act 3: toggle back to false
+    await setSetting('driveModeIntroPlayed', false);
+    const reverted = await getSetting('driveModeIntroPlayed', true);
+    expect(reverted).toBe(false);
+  });
 });

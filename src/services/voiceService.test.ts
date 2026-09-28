@@ -358,5 +358,39 @@ describe('VoiceService (src/services/voiceService.ts)', () => {
     // Should play giuseppe audio since elsa is not offline-ready
     expect(mockAudio.src).toContain('/audio/giuseppe/1001_q.mp3');
   });
+
+  it('VOICE-19: playDriveIntro plays drive_intro.mp3 for selected voice and sets isDriveIntroPlaying', async () => {
+    service.setVoice('giuseppe');
+    await service.playDriveIntro();
+
+    expect(mockAudio.src).toContain('/audio/giuseppe/drive_intro.mp3');
+    expect(service.getState().isPlaying).toBe(true);
+    expect(service.getState().isDriveIntroPlaying).toBe(true);
+    expect(service.getState().activePart).toBe('intro');
+
+    // Switching voice to elsa
+    service.setVoice('elsa');
+    await service.playDriveIntro();
+    expect(mockAudio.src).toContain('/audio/elsa/drive_intro.mp3');
+  });
+
+  it('VOICE-20: stopDriveIntro and stop cleanly halt drive intro', async () => {
+    await service.playDriveIntro();
+    expect(service.getState().isDriveIntroPlaying).toBe(true);
+
+    service.stopDriveIntro();
+    expect(service.getState().isDriveIntroPlaying).toBe(false);
+    expect(service.getState().isPlaying).toBe(false);
+    expect(mockAudio.paused).toBe(true);
+  });
+
+  it('VOICE-21: audio ended on drive intro completes and resets state', async () => {
+    await service.playDriveIntro();
+    expect(service.getState().isDriveIntroPlaying).toBe(true);
+
+    mockAudio.triggerEnded();
+    expect(service.getState().isDriveIntroPlaying).toBe(false);
+    expect(service.getState().isPlaying).toBe(false);
+  });
 });
 

@@ -16,7 +16,7 @@ export default defineConfig({
     react(),
     VitePWA({
       registerType: 'autoUpdate',
-      includeAssets: ['favicon.svg', 'robots.txt', 'data/questions.json', 'icons/*.png'],
+      includeAssets: ['favicon.svg', 'apple-touch-icon.png', 'robots.txt', 'data/questions.json', 'icons/*.png'],
       manifest: {
         name: 'VDS-VL Quiz Master',
         short_name: 'VDS Quiz',
