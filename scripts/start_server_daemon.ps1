@@ -1,17 +1,20 @@
 # Persistent background web server daemon for VDS-VL Quiz Master
-# Keeps Vite running continuously until system reboot or explicit termination
+# Keeps Vite running continuously in the background until system reboot or explicit termination
 
 $ErrorActionPreference = 'SilentlyContinue'
 $rootDir = "d:\Github\Quiz_VDS-VL"
 Set-Location -Path $rootDir
 
 $logFile = Join-Path $rootDir "server.log"
-"[{0}] Starting persistent Vite web server daemon..." -f (Get-Date -Format "yyyy-MM-dd HH:mm:ss") | Out-File -FilePath $logFile -Encoding utf8 -Append
+$pidFile = Join-Path $rootDir "server.pid"
+
+$PID | Out-File -FilePath $pidFile -Encoding utf8 -Force
+"[{0}] Starting persistent Vite web server daemon (Watchdog PID: {1})..." -f (Get-Date -Format "yyyy-MM-dd HH:mm:ss"), $PID | Out-File -FilePath $logFile -Encoding utf8 -Append
 
 while ($true) {
     try {
-        "[{0}] Launching 'npx vite --host 0.0.0.0 --port 5173'..." -f (Get-Date -Format "yyyy-MM-dd HH:mm:ss") | Out-File -FilePath $logFile -Encoding utf8 -Append
-        & npx vite --host 0.0.0.0 --port 5173 *>> $logFile
+        "[{0}] Launching Vite dev server on 0.0.0.0:5173..." -f (Get-Date -Format "yyyy-MM-dd HH:mm:ss") | Out-File -FilePath $logFile -Encoding utf8 -Append
+        & node "node_modules/vite/bin/vite.js" --host 0.0.0.0 --port 5173 *>> $logFile
     } catch {
         "[{0}] Server encountered error: {1}" -f (Get-Date -Format "yyyy-MM-dd HH:mm:ss"), $_ | Out-File -FilePath $logFile -Encoding utf8 -Append
     }
