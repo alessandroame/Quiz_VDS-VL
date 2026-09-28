@@ -18,6 +18,18 @@ Questo documento registra in ordine cronologico tutte le lavorazioni svolte nel 
 
 ## Registro Cronologico
 
+### [2026-09-28] - Avvio e Persistenza Demone Server Web Locale & Rete (Watchdog Resurrezione Automatica)
+- **Cosa abbiamo fatto**:
+  - Creato lo script demone [scripts/start_server_daemon.ps1](file:///d:/Github/Quiz_VDS-VL/scripts/start_server_daemon.ps1) per l'esecuzione continua di Vite (`0.0.0.0:5173`) con ciclo di watchdog infinito e auto-restart in caso di crash o arresto imprevisto.
+  - Creato lo script di controllo e stop pulito [scripts/stop_server_daemon.ps1](file:///d:/Github/Quiz_VDS-VL/scripts/stop_server_daemon.ps1) che gestisce l'interruzione selettiva del watchdog e dei processi collegati alla porta 5173.
+  - Avviato il demone come processo nativo Windows completamente distaccato tramite Windows Management Instrumentation (`Invoke-CimMethod -ClassName Win32_Process -MethodName Create` con parent `WmiPrvSE.exe`).
+  - Verificato il binding completo su `0.0.0.0:5173` sia per localhost (`http://localhost:5173/`, `http://127.0.0.1:5173/`) che per l'interfaccia Wi-Fi locale (`http://192.168.1.13:5173/` per collaudo diretto da smartphone).
+  - Testata e validata la tolleranza ai guasti (Fault Tolerance / Watchdog): terminando forzatamente il processo `node` su porta 5173, il watchdog ha riavviato automaticamente il server in meno di 2 secondi con nuovo PID garantendo disponibilità ininterrotta fino al prossimo riavvio del sistema.
+- **Scelte architetturali & Rationale**:
+  - *WMI / CIM Detached Process Rationale*: L'avvio tramite CIM `Win32_Process.Create` isola il server dal ciclo di vita della sessione dell'IDE/agente Antigravity, agganciandolo al sottosistema dei servizi Windows (`WmiPrvSE.exe`). Questo assicura che il server continui a funzionare senza interruzioni anche al termine delle sessioni dell'assistente, fino allo spegnimento o riavvio del sistema operativo.
+- **Impatto sul Desiderata**:
+  - PWA sempre raggiungibile in tempo reale su browser desktop e dispositivi fisici mobili (come Pixel 9 su rete Wi-Fi) senza necessità di rieseguire manualmente comandi da terminale.
+
 ### [2026-09-28] - Splash Screen Cockpit a Latenza Zero (0ms First Paint) e Perfezionamento Comandi Audio
 - **Cosa abbiamo fatto**:
   - Implementato in [index.html](file:///d:/Github/Quiz_VDS-VL/index.html) il First-Paint Splash Screen a zero latenza direttamente all'interno di `<div id="root">`:
