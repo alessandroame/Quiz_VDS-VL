@@ -18,7 +18,10 @@ import {
   Mic,
   HelpCircle,
   CloudOff,
-  RotateCcw
+  RotateCcw,
+  Info,
+  Award,
+  ShieldCheck
 } from 'lucide-react';
 import { useTheme } from '../context/ThemeContext';
 import { useQuiz } from '../context/QuizContext';
@@ -29,7 +32,7 @@ import type { ThemeMode } from '../types/database';
 import { VoiceCommandsModal } from './VoiceCommandsModal';
 import { audioDownloadManager, VoiceName, VoiceDownloadProgress } from '../services/audioDownloadManager';
 
-export type SettingsTab = 'appearance' | 'voice' | 'drive' | 'cloud' | 'data';
+export type SettingsTab = 'appearance' | 'voice' | 'drive' | 'cloud' | 'data' | 'about';
 
 interface SettingsModalProps {
   isOpen: boolean;
@@ -150,7 +153,8 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
     { id: 'voice', label: 'Voce', icon: Headphones },
     { id: 'drive', label: 'Guida', icon: Car },
     { id: 'cloud', label: 'Backup', icon: Cloud },
-    { id: 'data', label: 'Dati', icon: Database }
+    { id: 'data', label: 'Dati', icon: Database },
+    { id: 'about', label: 'About', icon: Info }
   ];
 
   return (
@@ -181,7 +185,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                 key={tab.id}
                 id={`tab-${tab.id}`}
                 onClick={() => setActiveTab(tab.id)}
-                className={`flex-1 py-1.5 px-2 rounded-xl text-xs font-semibold flex items-center justify-center gap-1.5 transition-all whitespace-nowrap ${
+                className={`flex-1 py-1.5 px-1.5 sm:px-2 rounded-xl text-xs font-semibold flex items-center justify-center gap-1 sm:gap-1.5 transition-all whitespace-nowrap min-w-fit sm:min-w-0 ${
                   isActive
                     ? 'bg-amber-500/20 text-amber-400 border border-amber-500/40 light:bg-amber-50 light:border-amber-500 light:text-amber-700 shadow-sm'
                     : 'text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800/40 light:text-slate-600 light:hover:bg-slate-100'

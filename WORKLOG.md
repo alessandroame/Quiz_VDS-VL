@@ -18,6 +18,22 @@ Questo documento registra in ordine cronologico tutte le lavorazioni svolte nel 
 
 ## Registro Cronologico
 
+### [2026-09-28] - Incorporamento Icona Master Esatta nello Splash Screen e Risoluzione Screenshot
+- **Cosa abbiamo fatto**:
+  - Risolto il difetto di rendering negli screenshot precedenti: il tag `<img src="/icons/icon-512x512.png">` in ambiente di collaudo headless isolato via protocollo `file:///` non risolveva la root web, generando un'immagine vuota/incompleta.
+  - Sostituito l'approccio con l'incorporamento diretto della stringa base64 JPEG ottimizzata a 512x512 dell'icona master *Paraglider Question Mark* sia in [index.html](file:///d:/Github/Quiz_VDS-VL/index.html) sia nel master [public/favicon.svg](file:///d:/Github/Quiz_VDS-VL/public/favicon.svg):
+    - Zero dipendenze di rete sul caricamento a freddo.
+    - Resa istantanea dell'icona master completa di texture carbonio a micro-rete e bagliore ambra avionico organico.
+  - Rigenerati gli screenshot verificando programmaticamente via CDP che `img.naturalWidth === 512`, `img.complete === true` e `img.clientWidth === 240`:
+    - [public/splash_screen_mobile.png](file:///d:/Github/Quiz_VDS-VL/public/splash_screen_mobile.png) (286 KB, resa mobile reale iPhone 390x844).
+    - [public/splash_screen_desktop.png](file:///d:/Github/Quiz_VDS-VL/public/splash_screen_desktop.png) (111 KB, resa desktop reale 1440x900).
+  - Aggiornato il visualizzatore interattivo [splash_viewer.html](file:///C:/Users/aless/.gemini/antigravity/brain/7895f15b-0ae5-48a0-a929-6b6e8b3cc02a/splash_viewer.html).
+  - Verificato con successo `npm run test:unit` (129/129 passing) e `npm run build` (zero errori TypeScript).
+- **Scelte architetturali & Rationale**:
+  - *Self-Contained Data URI Rationale*: L'inlining del JPEG 512x512 a qualità 92% dentro il tag dello splash screen elimina qualsiasi race condition o ritardo di rendering durante il Cold Start su qualsiasi host (Vite locale, PWA standalone, GitHub Pages o WebView).
+- **Impatto sul Desiderata**:
+  - Allineamento estetico al 100% con l'icona master scelta dall'utente.
+
 ### [2026-09-28] - Interruzione Simulazione d'Esame con Conferma Guidata (ExamScreen & DriveMode)
 - **Cosa abbiamo fatto**:
   - Implementato in [src/components/ExamScreen.tsx](file:///d:/Github/Quiz_VDS-VL/src/components/ExamScreen.tsx) un flusso esplicito e accessibile per interrompere la simulazione d'esame in qualsiasi momento:
