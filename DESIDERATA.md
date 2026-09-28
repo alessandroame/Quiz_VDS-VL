@@ -120,6 +120,7 @@ Questo documento rappresenta la **bussola strategica e funzionale** del progetto
 | Quick Speech Menu (1-Click) | 🟢 Completato | Flyout compatto in Navbar per controllo vocale rapido senza navigazione. |
 | Impostazioni a Schede Tematiche | 🟢 Completato | Segmented tabs per argomenti con eliminazione dello scrolling verticale. |
 | Guida Contestuale Comandi Vocali | 🟢 Completato | HUD live rotativo, Cheat Sheet modale a 1 tocco, trigger 'Aiuto' e box in Impostazioni. |
+| Indicatore Stato Offline & HUD Rete | 🟢 Completato | Pillola ambra in Navbar e HUD Guida, banner informativo e modale di briefing via createPortal con feedback di riconnessione ONLINE. |
 
 
 ---

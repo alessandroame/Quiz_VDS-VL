@@ -18,6 +18,26 @@ Questo documento registra in ordine cronologico tutte le lavorazioni svolte nel 
 
 ## Registro Cronologico
 
+### [2026-09-28] - Indicatore di Stato Offline Avionico (Cockpit Offline HUD & Briefing)
+- **Cosa abbiamo fatto**:
+  - Creato il servizio puro [src/services/networkStatus.ts](file:///d:/Github/Quiz_VDS-VL/src/services/networkStatus.ts) con gestione reattiva degli eventi `online`/`offline`, listener immediati al boot, tracking temporale di disconnessione e finestra temporale di riconnessione (3.5s).
+  - Creato il hook [src/hooks/useOnlineStatus.ts](file:///d:/Github/Quiz_VDS-VL/src/hooks/useOnlineStatus.ts) per esporre lo stato di connettività reattivo a tutta l'applicazione.
+  - Sviluppato [src/components/OfflineIndicator.tsx](file:///d:/Github/Quiz_VDS-VL/src/components/OfflineIndicator.tsx) esportando 3 componenti conformi al design avionico:
+    - `OfflineIndicator`: pillola avionica ambra `[⚡ OFFLINE]` nella barra superiore con apertura della modale informativa Cockpit Briefing via `createPortal` (spiegazione dei 504 quiz 100% offline, salvataggio locale IndexedDB e sync differita).
+    - `OfflineBanner`: banner discreto sotto l'header con pulsante di chiusura e feedback automatico di riconnessione `[ONLINE]` in verde smeraldo.
+    - `OfflineHUDTag`: tag compatto ad alto contrasto per la top bar HUD della Modalità Alla Guida (`DriveModeScreen.tsx`).
+  - Integrato `OfflineIndicator` in [src/components/Navbar.tsx](file:///d:/Github/Quiz_VDS-VL/src/components/Navbar.tsx).
+  - Integrato `OfflineBanner` in [src/App.tsx](file:///d:/Github/Quiz_VDS-VL/src/App.tsx).
+  - Integrato `OfflineHUDTag` in [src/components/DriveModeScreen.tsx](file:///d:/Github/Quiz_VDS-VL/src/components/DriveModeScreen.tsx).
+  - Creata la suite unit test [src/services/networkStatus.test.ts](file:///d:/Github/Quiz_VDS-VL/src/services/networkStatus.test.ts) (8 test per fallback SSR, disconnessione, riconnessione temporizzata, multi-subscriber e cancellazione timer).
+  - Realizzato lo script di collaudo headless [scripts/test_offline_indicator.js](file:///d:/Github/Quiz_VDS-VL/scripts/test_offline_indicator.js) via CDP (`Network.emulateNetworkConditions`), verificando con successo la comparsa di badge, banner, modale, HUD guida, feedback di riconnessione e 0 errori in console.
+  - Aggiornati [README.md](file:///d:/Github/Quiz_VDS-VL/README.md) e [DESIDERATA.md](file:///d:/Github/Quiz_VDS-VL/DESIDERATA.md).
+- **Scelte architetturali & Rationale**:
+  - *Cockpit Zero Clutter Rationale*: Quando la connessione è nominale (`isOnline` e non recentemente offline), i componenti offline renderizzano `null`, occupando 0 pixel e non distraendo l'utente sul cruscotto o durante l'esame.
+  - *createPortal per la Modale Rationale*: Poiché l'header dell'app adotta `backdrop-blur`, gli elementi con `position: fixed` discendenti verrebbero confinati al containing block dell'header (56px) tagliando il layout della modale. Con `createPortal(..., document.body)` la modale viene renderizzata direttamente su `document.body` garantendo un centraggio verticale e orizzontale impeccabile su qualsiasi viewport (desktop e mobile 390x844).
+- **Impatto sul Desiderata**:
+  - Risolve l'incertezza dello studente quando studia offline sul campo di volo o in decollo montano: l'allievo vede all'istante lo stato offline e viene rassicurato sulla piena autonomia dei 504 quiz e sulla conservazione di tutti i risultati.
+
 ### [2026-09-28] - Gestione Offline del Parlato: Download Background Non Bloccante, Prompt Guida e Fallback Intelligente
 - **Cosa abbiamo fatto**:
   - Creato il singleton service [src/services/audioDownloadManager.ts](file:///d:/Github/Quiz_VDS-VL/src/services/audioDownloadManager.ts) per il download in background non bloccante dei 2.520 file MP3 per voce verso CacheStorage (`vds-audio-giuseppe` e `vds-audio-elsa`) con pool di 8 connessioni concorrenti, resume automatico dei file già presenti, throttling non bloccante via `setTimeout` e supporto cancellazione/abort.

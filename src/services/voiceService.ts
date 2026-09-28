@@ -19,6 +19,7 @@ export class VoiceService {
   private playbackRate: number = 1.0;
   private voiceName: 'giuseppe' | 'elsa' = 'giuseppe';
   private effectiveVoice: 'giuseppe' | 'elsa' | null = null;
+  private isDriveIntroPlaying: boolean = false;
   private sequenceTimeout: any = null;
 
   constructor() {
@@ -32,6 +33,10 @@ export class VoiceService {
 
       this.audio.addEventListener('error', (e) => {
         console.warn('Audio snippet unavailable or playback error:', e);
+        if (this.isDriveIntroPlaying) {
+          this.playSpeechSynthesisFallback();
+          return;
+        }
         // Fallback retry if the other voice is available offline
         const currentActive = this.effectiveVoice || this.voiceName;
         const otherVoice = currentActive === 'giuseppe' ? 'elsa' : 'giuseppe';
@@ -104,7 +109,7 @@ export class VoiceService {
       this.audio &&
       !this.audio.paused &&
       !this.isPaused &&
-      this.currentQuestionId !== null
+      (this.currentQuestionId !== null || this.isDriveIntroPlaying)
     );
 
     return {
@@ -112,7 +117,8 @@ export class VoiceService {
       isPaused: this.isPaused,
       currentQuestionId: this.currentQuestionId,
       activePart: this.activePart,
-      isSequencePlaying: this.isSequencePlaying
+      isSequencePlaying: this.isSequencePlaying,
+      isDriveIntroPlaying: this.isDriveIntroPlaying
     };
   }
 
@@ -148,11 +154,18 @@ export class VoiceService {
       opt1: '1',
       opt2: '2',
       opt3: '3',
-      explanation: 'e'
+      explanation: 'e',
+      intro: 'drive_intro'
     };
     const voice = voiceOverride || this.effectiveVoice || this.voiceName;
     const baseUrl = (import.meta.env?.BASE_URL || '/').replace(/\/+$/, '');
     return `${baseUrl}/audio/${voice}/${questionId}_${suffixMap[part]}.mp3`;
+  }
+
+  public getDriveIntroAudioUrl(voiceOverride?: 'giuseppe' | 'elsa'): string {
+    const voice = voiceOverride || this.effectiveVoice || this.voiceName;
+    const baseUrl = (import.meta.env?.BASE_URL || '/').replace(/\/+$/, '');
+    return `${baseUrl}/audio/${voice}/drive_intro.mp3`;
   }
 
   private updateMediaSession(questionId: number, titlePart: string) {
@@ -368,6 +381,11 @@ export class VoiceService {
   }
 
   private handleAudioEnded() {
+    if (this.isDriveIntroPlaying) {
+      this.stop();
+      return;
+    }
+
     if (!this.isSequencePlaying || !this.currentQuestionId) {
       this.stop();
       return;
@@ -394,6 +412,67 @@ export class VoiceService {
     }
   }
 
+  public async playDriveIntro(): Promise<void> {
+    this.stop();
+    this.isDriveIntroPlaying = true;
+    this.activePart = 'intro';
+    this.currentQuestionId = null;
+    this.isPaused = false;
+    this.effectiveVoice = this.resolveEffectiveVoice(this.voiceName);
+
+    if (!this.audio) return;
+
+    try {
+      this.audio.src = this.getDriveIntroAudioUrl();
+      this.audio.playbackRate = this.playbackRate;
+      await this.audio.play();
+      if (typeof navigator !== 'undefined' && 'mediaSession' in navigator && typeof MediaMetadata !== 'undefined') {
+        navigator.mediaSession.metadata = new MediaMetadata({
+          title: 'Guida Vocale - Modalità Alla Guida',
+          artist: 'VDS-VL Quiz Master',
+          album: 'Istruzioni Avioniche'
+        });
+        navigator.mediaSession.playbackState = 'playing';
+      }
+      this.notify();
+    } catch (err) {
+      console.warn('Could not play drive intro audio file, checking speechSynthesis fallback:', err);
+      this.playSpeechSynthesisFallback();
+    }
+  }
+
+  public stopDriveIntro(): void {
+    if (this.isDriveIntroPlaying) {
+      this.stop();
+    }
+  }
+
+  private playSpeechSynthesisFallback(): void {
+    if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
+      try {
+        window.speechSynthesis.cancel();
+        const text =
+          "Benvenuto nella modalità alla guida. Lo schermo rimarrà sempre acceso sul tuo cruscotto. Le domande e le opzioni verranno lette automaticamente. Puoi rispondere toccando i tre grandi pulsanti sullo schermo, oppure usando i comandi vocali pronunciando Uno, Due o Tre. Puoi dire Ripeti per riascoltare, oppure Aiuto per l'elenco dei comandi. Tocca lo schermo per iniziare.";
+        const utterance = new SpeechSynthesisUtterance(text);
+        utterance.lang = 'it-IT';
+        utterance.rate = this.playbackRate;
+        utterance.onend = () => {
+          this.stop();
+        };
+        utterance.onerror = () => {
+          this.stop();
+        };
+        window.speechSynthesis.speak(utterance);
+        this.notify();
+      } catch (err) {
+        console.warn('Speech synthesis error:', err);
+        this.stop();
+      }
+    } else {
+      this.stop();
+    }
+  }
+
   private clearSequence() {
     if (this.sequenceTimeout) {
       clearTimeout(this.sequenceTimeout);
@@ -404,6 +483,14 @@ export class VoiceService {
 
   public stop(): void {
     this.clearSequence();
+    if (this.isDriveIntroPlaying && typeof window !== 'undefined' && 'speechSynthesis' in window) {
+      try {
+        window.speechSynthesis.cancel();
+      } catch {
+        // Ignore synthesis cancel error
+      }
+    }
+    this.isDriveIntroPlaying = false;
     if (this.audio) {
       this.audio.pause();
       this.audio.currentTime = 0;

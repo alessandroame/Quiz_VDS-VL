@@ -151,6 +151,12 @@
 - **Smart Merge Deterministico**: motore di fusione intelligente per sincronizzare più dispositivi (es. PC a casa e smartphone sul campo) senza sovrascritture cieche: tutti gli esami sostenuti vengono preservati (unione cronologica) e per ciascun quesito viene adottato lo stato di apprendimento più recente.
 - **Ripresa Rapida della Sessione (Cross-Device Resume)**: persistenza continua della sessione attiva (esame, materia o quaderno errori) con cursore esatto, risposte parziali e timer; all'apertura su un nuovo dispositivo, un banner avionico consente di riprendere con un tocco esattamente da dove ci si era fermati.
 - **Resilienza Offline con Invio Differito**: studio fluido anche in decollo o in viaggio senza connettività; al rientro della rete (`online`), l'engine sincronizza silenziosamente le modifiche con Google Drive.
+- **Indicatore Offline Avionico (Cockpit Offline HUD & Briefing)**:
+  - Rilevamento in tempo reale della connettività tramite `NetworkStatus` e `useOnlineStatus`.
+  - Pillola avionica ambra `[⚡ OFFLINE]` sempre visibile nell'header e nell'HUD della Modalità Alla Guida quando si è senza connessione.
+  - Banner informativo dismissibile con rassicurazione didattica: tutti i 504 quiz, risposte, esami e note sono 100% disponibili in locale su IndexedDB.
+  - Modale di briefing a 1 tocco che spiega nel dettaglio la persistenza autonoma e la sincronizzazione in coda.
+  - Transizione e badge di riconnessione verde `[ONLINE]` (3.5s) al ripristino della copertura.
 - **Indicatore di Stato Cockpit in Header**: icona discreta nella barra superiore per visualizzare all'istante lo stato della sincronizzazione (verde = sincronizzato, animato = in corso, ambra = necessita accesso, grigio = offline).
 - **Salva o Carica da File (.json)**: esportazione e importazione con Smart Merge deterministico per il backup offline indipendente dal cloud.
 
