@@ -18,6 +18,19 @@ Questo documento registra in ordine cronologico tutte le lavorazioni svolte nel 
 
 ## Registro Cronologico
 
+### [2026-09-28] - Estensione Suite Test Audio Vocale e Integrazione Indicatore Offline
+- **Cosa abbiamo fatto**:
+  - Aggiunti i test di unità `VOICE-11`, `VOICE-12`, `VOICE-13` e `VOICE-14` in [src/services/voiceService.test.ts](file:///d:/Github/Quiz_VDS-VL/src/services/voiceService.test.ts), validando:
+    - Toggle play/pausa e riavvio da capo (`restartSinglePart`) sui singoli pulsanti delle opzioni di risposta (`opt1`, `opt2`, `opt3`).
+    - Mantenimento del flag `isSequencePlaying` durante la messa in pausa di una singola opzione all'interno della sequenza automatica, con prosecuzione fluida alla risposta successiva alla fine del brano.
+  - Integrato `<OfflineBanner />` in [src/App.tsx](file:///d:/Github/Quiz_VDS-VL/src/App.tsx) e `<OfflineHUDTag />` nella schermata [src/components/DriveModeScreen.tsx](file:///d:/Github/Quiz_VDS-VL/src/components/DriveModeScreen.tsx).
+  - Esteso [scripts/test_audio_play_pause.js](file:///d:/Github/Quiz_VDS-VL/scripts/test_audio_play_pause.js) con collaudo interattivo CDP dei pulsanti dedicati ai singoli segmenti.
+  - Suite Vitest portata a **110/110 test superati** su 14 file di test (`npm run test:unit`).
+- **Scelte architetturali & Rationale**:
+  - Assicurata la totale copertura dei flussi di interruzione e ripresa delle singole opzioni, eliminando qualsiasi rischio di race condition o desincronizzazione della coda audio.
+- **Impatto sul Desiderata**:
+  - Resilienza e robustezza massima della fruizione vocale sia in modalità standard che in Drive Mode.
+
 ### [2026-09-28] - Identità Visiva PWA: Icona Ufficiale "Aero Shield" e Tema Dark "Carbon Cockpit" (Zero-Blue)
 - **Cosa abbiamo fatto**:
   - **Ideazione e Creazione Icona PWA "Aero Shield"**:
