@@ -4,6 +4,14 @@ import { VitePWA } from 'vite-plugin-pwa';
 
 export default defineConfig({
   base: process.env.BASE_PATH || (process.env.GITHUB_ACTIONS ? '/Quiz_VDS-VL/' : '/'),
+  server: {
+    port: 5173,
+    strictPort: true
+  },
+  preview: {
+    port: 5173,
+    strictPort: true
+  },
   plugins: [
     react(),
     VitePWA({

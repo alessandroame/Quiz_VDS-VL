@@ -28,6 +28,7 @@ Questo file costituisce la **memoria tecnica permanente** del progetto. Raccogli
 - **Fair Coverage Randomizer**: Priorità assoluta a `times_seen == 0` (Bucket 0), poi a domande con minimo `times_seen` (Bucket 1). Nessun coupon collector problem.
 - **Single Source of Truth (SSOT)**: Persistenza affidata a Dexie (IndexedDB) per lo stato reattivo e dati quiz; non duplicare o disallineare lo stato su variabili globali effimere.
 - **Offline First**: L'app deve funzionare al 100% offline via Service Worker; nessuna funzionalità core deve dipendere dalla connessione di rete (a eccezione del backup manuale Google Drive).
+- **Porta Locale Obbligatoria (5173)**: Utilizzare sempre ed esclusivamente `http://localhost:5173` sia per `npm run dev` che per `npm run preview`. In `vite.config.ts` è impostato `strictPort: true` per entrambi. Il Client ID OAuth di Google autorizza specificamente l'origine `http://localhost:5173`; qualsiasi altra porta (es. 4173) impedisce il funzionamento del backup cloud Google Drive per errore di mismatch dell'origine autorizzata.
 
 ---
 

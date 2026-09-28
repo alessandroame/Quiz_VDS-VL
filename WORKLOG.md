@@ -18,16 +18,19 @@ Questo documento registra in ordine cronologico tutte le lavorazioni svolte nel 
 
 ## Registro Cronologico
 
-### [2026-09-28] - Verifica Integrità Suite, Build PWA & Avvio Server Anteprima Locale
+### [2026-09-28] - Vincolo Porta 5173 per Google Drive OAuth, Suite Vitest & Anteprima Locale
 - **Cosa abbiamo fatto**:
+  - Configurato `vite.config.ts` bloccando sia `server.port` che `preview.port` su **5173** con `strictPort: true`, impedendo l'uso accidentale della porta 4173 o porte casuali.
+  - Riavviamo il server di anteprima PWA su [http://localhost:5173/](http://localhost:5173/) con esito HTTP 200 OK.
+  - Sancito il vincolo operativo e architetturale in [MEMORY.md](file:///d:/Github/Quiz_VDS-VL/MEMORY.md) (Sezione 2) per evitare disallineamenti di origine OAuth.
   - Ripristinate le dipendenze di progetto tramite installazione deterministica `npm ci`.
   - Eseguita e validata l'intera suite di unit & integration test Vitest: **65/65 test superati** al 100% (10 test file).
   - Compilato il bundle PWA di produzione con `npm run build` (typecheck `tsc` superato con zero errori, bundle Vite e manifest PWA generati con successo).
-  - Avviato e verificato il server di anteprima locale (`npm run preview`) su [http://localhost:4173/](http://localhost:4173/) con risposta HTTP 200 OK.
 - **Scelte architetturali & Rationale**:
-  - *Zero Drift & Determinismo*: Esecuzione di `npm ci` con lockfile congelato e verifica preventiva di typecheck e test prima di qualsiasi sessione d'uso o deploy.
+  - *Google OAuth Authorized JavaScript Origin Strictness*: Il Client ID OAuth di Google autorizza specificamente `http://localhost:5173`. L'uso della porta di default di Vite preview (4173) provocava il blocco delle richieste verso le API di Google Drive per discrepanza di origine. Il vincolo `strictPort: true` a livello di configurazione Vite garantisce che l'anteprima locale funzioni sempre in modo trasparente e conforme per il backup cloud.
 - **Impatto sul Desiderata**:
-  - Piena conformità confermata per tutti i 13 moduli del [DESIDERATA.md](file:///d:/Github/Quiz_VDS-VL/DESIDERATA.md). L'applicazione è pronta e fruibile in locale.
+  - Funzionalità Google Drive Cloud Sync pienamente fruibile sia in ambiente `dev` che in `preview` su `http://localhost:5173/`.
+
 
 ### [2026-09-27] - Analisi Funzionale Approfondita & Collaudo Multi-Contesto d'Uso
 - **Cosa abbiamo fatto**:
