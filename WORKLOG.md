@@ -18,6 +18,27 @@ Questo documento registra in ordine cronologico tutte le lavorazioni svolte nel 
 
 ## Registro Cronologico
 
+### [2026-09-28] - Iniezione Metadati di Build e Tracciamento Build Number in Console DevTools
+- **Cosa abbiamo fatto**:
+  - Configurato [vite.config.ts](file:///d:/Github/Quiz_VDS-VL/vite.config.ts) con iniezione a compile-time tramite `define`:
+    * `__APP_VERSION__`: versione semantica letta dinamicamente da `package.json`.
+    * `__APP_BUILD_NUMBER__`: contatore incrementale calcolato via `git rev-list --count HEAD` (es. `#61`, `#62`).
+    * `__APP_COMMIT_HASH__`: hash sintetico del commit corrente (`git rev-parse --short HEAD`).
+    * `__APP_BUILD_TIME__`: timestamp ISO della generazione bundle.
+    * `__APP_BUILD_ID__`: stringa descrittiva completa `Build #<N> (<hash>) - <timestamp>`.
+  - Creato il file di definizioni TypeScript ambientali [src/vite-env.d.ts](file:///d:/Github/Quiz_VDS-VL/src/vite-env.d.ts) con estensione dell'interfaccia globale `window.__APP_BUILD_INFO__`.
+  - Aggiornato il bootstrap dell'applicazione in [src/main.tsx](file:///d:/Github/Quiz_VDS-VL/src/main.tsx):
+    * Emette un banner stilizzato con badge cockpit in console browser all'avvio.
+    * Emette una riga plain-text `[VDS-VL Build ID] ...` facilmente filtrabile in console.
+    * Espone l'oggetto completo dei metadati su `window.__APP_BUILD_INFO__` per consultazione istantanea nel terminale DevTools.
+  - Verificato con successo tramite script CDP headless il corretto output dei log di build e la presenza dell'oggetto in runtime.
+  - Eseguiti con successo tutti i 129 test unitari (`npm run test:unit`) e la compilazione completa del bundle di produzione (`npm run build`).
+- **Scelte architetturali & Rationale**:
+  - *Build Number Deterministico da Git rev-list Rationale*: L'uso del numero cumulativo di commit Git assicura un identificativo progressivo intero naturale, immediatamente comprensibile dall'utente per accertarsi che il browser stia eseguendo la versione aggiornata e non una copia memorizzata nella cache del Service Worker.
+  - *Doppio Canale Console + Window Rationale*: La visualizzazione automatica in console garantisce feedback visivo immediato a ogni apertura di pagina o refresh, mentre la disponibilità su `window.__APP_BUILD_INFO__` consente verifiche programmatiche o manuali rapide in qualsiasi momento.
+- **Impatto sul Desiderata**:
+  - Elimina l'ambiguità sullo stato di aggiornamento della PWA, consentendo diagnosi istantanea di eventuali disallineamenti di cache locale o Service Worker.
+
 ### [2026-09-28] - Integrazione Scheda About nelle Impostazioni e Protocollo di Collaudo Manuale Completo nei TODO
 - **Cosa abbiamo fatto**:
   - Esteso il componente modale [src/components/SettingsModal.tsx](file:///d:/Github/Quiz_VDS-VL/src/components/SettingsModal.tsx):

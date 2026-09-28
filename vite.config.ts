@@ -1,8 +1,37 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import { VitePWA } from 'vite-plugin-pwa';
+import { readFileSync } from 'fs';
+import { execSync } from 'child_process';
+
+const pkg = JSON.parse(readFileSync(new URL('./package.json', import.meta.url), 'utf-8'));
+
+const commitHash = (() => {
+  try {
+    return execSync('git rev-parse --short HEAD').toString().trim();
+  } catch {
+    return 'unknown';
+  }
+})();
+
+const commitCount = (() => {
+  try {
+    return execSync('git rev-list --count HEAD').toString().trim();
+  } catch {
+    return '0';
+  }
+})();
+
+const buildTime = new Date().toISOString();
 
 export default defineConfig({
+  define: {
+    __APP_VERSION__: JSON.stringify(pkg.version),
+    __APP_BUILD_ID__: JSON.stringify(`Build #${commitCount} (${commitHash}) - ${buildTime}`),
+    __APP_BUILD_NUMBER__: JSON.stringify(commitCount),
+    __APP_COMMIT_HASH__: JSON.stringify(commitHash),
+    __APP_BUILD_TIME__: JSON.stringify(buildTime),
+  },
   base: process.env.BASE_PATH || (process.env.GITHUB_ACTIONS ? '/Quiz_VDS-VL/' : '/'),
   server: {
     port: 5173,

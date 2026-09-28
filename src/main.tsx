@@ -3,7 +3,27 @@ import ReactDOM from 'react-dom/client';
 import App from './App';
 import './index.css';
 
-// vite-plugin-pwa gestisce automaticamente la registrazione del Service Worker con scope e base path corretti tramite registerSW.js
+// vite-plugin-pwa handles Service Worker registration automatically via registerSW.js
+
+// Log build info to browser console for verification and cache invalidation diagnosis
+const buildInfo = {
+  version: typeof __APP_VERSION__ !== 'undefined' ? __APP_VERSION__ : '1.0.0',
+  buildNumber: typeof __APP_BUILD_NUMBER__ !== 'undefined' ? __APP_BUILD_NUMBER__ : '0',
+  commitHash: typeof __APP_COMMIT_HASH__ !== 'undefined' ? __APP_COMMIT_HASH__ : 'dev',
+  buildTime: typeof __APP_BUILD_TIME__ !== 'undefined' ? __APP_BUILD_TIME__ : new Date().toISOString(),
+  buildId: typeof __APP_BUILD_ID__ !== 'undefined' ? __APP_BUILD_ID__ : 'dev',
+};
+
+if (typeof window !== 'undefined') {
+  window.__APP_BUILD_INFO__ = buildInfo;
+}
+
+console.log(
+  `%c[VDS-VL Quiz Master]%c v${buildInfo.version} (Build #${buildInfo.buildNumber} • ${buildInfo.commitHash}) - Built: ${buildInfo.buildTime}`,
+  'background: #0284c7; color: #ffffff; font-weight: bold; padding: 2px 6px; border-radius: 4px;',
+  'color: #38bdf8; font-weight: bold; margin-left: 4px;'
+);
+console.log(`[VDS-VL Build ID] ${buildInfo.buildId}`);
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
