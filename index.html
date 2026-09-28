@@ -4,6 +4,7 @@
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="apple-touch-startup-image" href="/icons/icon-512x512.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
     <title>VDS-VL Quiz Master</title>
     <meta name="description" content="Simulatore esame e studio quiz VDS-VL Volo Libero AeCI" />
@@ -14,9 +15,108 @@
     <meta name="apple-mobile-web-app-title" content="VDS Quiz" />
     <!-- Google Identity Services per Google Drive Cloud Backup -->
     <script src="https://accounts.google.com/gsi/client" async defer></script>
+    <style>
+      #splash-screen {
+        position: fixed;
+        inset: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        background-color: #09090b;
+        color: #f4f4f5;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        user-select: none;
+        z-index: 99999;
+      }
+      .splash-pulse {
+        animation: splashPulse 1.8s ease-in-out infinite;
+      }
+      @keyframes splashPulse {
+        0%, 100% { opacity: 0.88; transform: scale(1); }
+        50% { opacity: 1; transform: scale(1.02); }
+      }
+      .splash-bar {
+        width: 130px;
+        height: 3px;
+        background: #27272a;
+        border-radius: 999px;
+        overflow: hidden;
+        position: relative;
+        margin-top: 18px;
+      }
+      .splash-bar-fill {
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        left: -40%;
+        width: 60%;
+        background: linear-gradient(90deg, transparent, #f59e0b, #fbbf24, transparent);
+        border-radius: 999px;
+        animation: splashSweep 1.2s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+      }
+      @keyframes splashSweep {
+        0% { left: -60%; }
+        100% { left: 100%; }
+      }
+    </style>
   </head>
   <body class="bg-zinc-950 text-zinc-100 light:bg-slate-50 light:text-slate-900 antialiased selection:bg-amber-500 selection:text-black transition-colors">
-    <div id="root"></div>
+    <div id="root">
+      <!-- Zero-Latency First-Paint Cockpit Splash Screen (0ms FCP, auto-replaced on React mount) -->
+      <div id="splash-screen">
+        <div class="splash-pulse" style="display:flex; flex-direction:column; align-items:center;">
+          <div style="width: 84px; height: 84px; margin-bottom: 16px; filter: drop-shadow(0 10px 20px rgba(245, 158, 11, 0.25));">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="84" height="84">
+              <defs>
+                <radialGradient id="splashBg" cx="50%" cy="45%" r="60%">
+                  <stop offset="0%" stop-color="#18181b"/>
+                  <stop offset="85%" stop-color="#09090b"/>
+                </radialGradient>
+                <linearGradient id="splashAmber" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stop-color="#fef08a"/>
+                  <stop offset="30%" stop-color="#fbbf24"/>
+                  <stop offset="75%" stop-color="#f59e0b"/>
+                  <stop offset="100%" stop-color="#d97706"/>
+                </linearGradient>
+              </defs>
+              <rect x="16" y="16" width="480" height="480" rx="108" fill="url(#splashBg)" stroke="#27272a" stroke-width="4"/>
+              <circle cx="256" cy="256" r="218" fill="none" stroke="#27272a" stroke-width="2" stroke-dasharray="4 8" opacity="0.5"/>
+              <line x1="256" y1="20" x2="256" y2="34" stroke="#f59e0b" stroke-width="3" stroke-linecap="round"/>
+              <line x1="256" y1="478" x2="256" y2="492" stroke="#71717a" stroke-width="2" stroke-linecap="round"/>
+              <line x1="20" y1="256" x2="34" y2="256" stroke="#71717a" stroke-width="2" stroke-linecap="round"/>
+              <line x1="478" y1="256" x2="492" y2="256" stroke="#71717a" stroke-width="2" stroke-linecap="round"/>
+              <!-- Paraglider Wing Canopy Hook -->
+              <path d="M 148,222 C 142,160 196,104 270,104 C 348,104 394,154 378,226 C 365,280 312,296 292,324 C 282,338 281,348 281,354 L 243,354 C 243,338 248,322 262,302 C 282,274 328,264 336,224 C 346,176 317,142 267,142 C 215,142 180,178 184,222 Z" fill="url(#splashAmber)" stroke="#fef08a" stroke-width="1.5"/>
+              <!-- Cell Ribs -->
+              <path d="M 215,116 C 210,126 206,140 205,158" stroke="#fbbf24" stroke-width="2.5" stroke-linecap="round" opacity="0.6"/>
+              <path d="M 268,105 L 268,142" stroke="#fef08a" stroke-width="3" stroke-linecap="round" opacity="0.8"/>
+              <path d="M 320,118 C 324,128 326,144 324,162" stroke="#fbbf24" stroke-width="2.5" stroke-linecap="round" opacity="0.6"/>
+              <!-- Suspension Lines -->
+              <line x1="247" y1="354" x2="242" y2="384" stroke="#fbbf24" stroke-width="2.5" stroke-linecap="round" opacity="0.85"/>
+              <line x1="277" y1="354" x2="274" y2="384" stroke="#fbbf24" stroke-width="2.5" stroke-linecap="round" opacity="0.85"/>
+              <!-- Pilot Dot -->
+              <circle cx="258" cy="385" r="10" fill="url(#splashAmber)" stroke="#fef08a" stroke-width="1"/>
+              <path d="M 242,392 C 238,405 244,424 262,424 C 274,424 280,414 276,402 L 268,392 Z" fill="url(#splashAmber)"/>
+              <path d="M 242,386 L 248,396" stroke="#fef08a" stroke-width="2.5" stroke-linecap="round"/>
+              <path d="M 274,386 L 268,396" stroke="#fef08a" stroke-width="2.5" stroke-linecap="round"/>
+            </svg>
+          </div>
+          <div style="font-size: 19px; font-weight: 800; letter-spacing: 0.04em; color: #f4f4f5; text-transform: uppercase;">
+            VDS-VL <span style="color: #f59e0b;">Quiz Master</span>
+          </div>
+          <div style="font-size: 11px; font-weight: 600; color: #a1a1aa; letter-spacing: 0.14em; text-transform: uppercase; margin-top: 4px;">
+            Volo Libero • AeCI
+          </div>
+        </div>
+        <div class="splash-bar">
+          <div class="splash-bar-fill"></div>
+        </div>
+        <div style="font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; font-size: 10px; color: #71717a; letter-spacing: 0.18em; margin-top: 10px; text-transform: uppercase;">
+          Avionics Ready
+        </div>
+      </div>
+    </div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

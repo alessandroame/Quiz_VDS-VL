@@ -75,6 +75,7 @@ Questo documento rappresenta la **bussola strategica e funzionale** del progetto
    - Pilota Automatico ("Radio Quiz") continuo per studio e ripasso a mani libere senza tocco fisico.
    - Comandi vocali in lingua italiana tramite Web Speech Recognition ("Uno", "Due", "Tre", "Avanti", "Ripeti", "Pausa", "Aiuto").
    - **Guida Contestuale Comandi Vocali**: HUD rotativo live durante l'ascolto, pulsante '?' (Cheat Sheet rapido), trigger vocale "Aiuto" e box integrato nella scheda Guida delle Impostazioni e nel Quick Speech Menu.
+   - **Spiegazione Vocale di Benvenuto (Audio Briefing Run-Once)**: All'avvio della modalità alla guida, un audio neurale conciso illustra il funzionamento a mani libere (Wake Lock, lettura automatica quesiti, risposte touch e comandi vocali "Uno", "Due", "Tre", "Ripeti", "Aiuto"). Eseguito una sola volta in automatico (`driveModeIntroPlayed: true`), con possibilità di riascolto on-demand (Launcher, Cheat Sheet) o riattivazione all'avvio dalle Impostazioni.
 
 8. **Impostazioni Modulari per Argomenti (Zero-Scroll Settings)**:
    - Modale impostazioni suddiviso rigorosamente a schede tematiche (Voce, Guida, Aspetto, Cloud/Backup, Dati & Reset).
@@ -112,7 +113,7 @@ Questo documento rappresenta la **bussola strategica e funzionale** del progetto
 | Archivio & Ricerca Full-Text | 🟢 Completato | Ricerca istantanea, preferiti e note personali salvate in Dexie. |
 | Dashboard Statistiche | 🟢 Completato | Radar materie, prontezza esame e storico sessioni. |
 | Temi Carbon Cockpit & Hangar Light, Icona Aero Shield | 🟢 Completato | Zero dominante blu (`zinc` + `amber`), icona Aero Shield vettoriale e PNG 192/512. |
-| Suite Vitest (Unit & BVA) | 🟢 Completato | 121 test attivi, soglie limite verificate, isolamento in-memory. |
+| Suite Vitest (Unit & BVA) | 🟢 Completato | 125 test attivi, soglie limite verificate, isolamento in-memory. |
 | Supporto Audio Avionico | 🟢 Completato | Sintesi vocale neurale con controlli Play/Pausa e Da Capo universali su domanda, singole opzioni e spiegazione; feedback cockpit Web Audio API e fonetica ICAO. |
 | Gestione Offline Audio & Fallback | 🟢 Completato | Download in background non bloccante via CacheStorage, prompt non invasivo al primo avvio Guida, gestione granulare Impostazioni, fallback automatico offline su voce scaricata e Range Requests Safari. |
 | Google Drive Cloud Sync | 🟢 Completato | Integrazione GIS con `appDataFolder` privata e fallback JSON export/import. |
@@ -121,6 +122,7 @@ Questo documento rappresenta la **bussola strategica e funzionale** del progetto
 | Impostazioni a Schede Tematiche | 🟢 Completato | Segmented tabs per argomenti con eliminazione dello scrolling verticale. |
 | Guida Contestuale Comandi Vocali | 🟢 Completato | HUD live rotativo, Cheat Sheet modale a 1 tocco, trigger 'Aiuto' e box in Impostazioni. |
 | Indicatore Stato Offline & HUD Rete | 🟢 Completato | Pillola ambra in Navbar e HUD Guida, banner informativo e modale di briefing via createPortal con feedback di riconnessione ONLINE. |
+| Spiegazione Vocale Modalità Guida | 🟢 Completato | Audio briefing iniziale run-once con Edge-TTS (Giuseppe/Elsa), tasto Salta, persistenza Dexie, riascolto 1-click e riattivazione in Impostazioni. |
 
 
 ---

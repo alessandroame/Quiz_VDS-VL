@@ -26,6 +26,9 @@ export function useAviationVoice(questionId?: number) {
     restartFullSequence: () => {
       if (questionId) voiceService.restartFullSequence(questionId);
     },
+    restartCurrentOrSequence: () => {
+      if (questionId) voiceService.restartCurrentOrSequence(questionId);
+    },
     playFullSequence: () => {
       if (questionId) voiceService.playFullSequence(questionId);
     },

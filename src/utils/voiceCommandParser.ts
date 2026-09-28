@@ -7,6 +7,7 @@ export type VoiceCommand =
   | 'repeat'
   | 'flag'
   | 'pause'
+  | 'stop'
   | 'resume'
   | 'help';
 
@@ -66,8 +67,12 @@ export function parseVoiceCommand(raw: string): VoiceCommand | null {
     return 'flag';
   }
 
-  // 5. Controllo Pilota Automatico (Pausa / Play)
-  if (/\b(pausa|ferma|stop|alt|aspett|attendi)\b/i.test(t)) {
+  // 5. Controllo Pilota Automatico (Pausa / Stop / Play)
+  if (/\b(stop|ferma|basta|azzera|interrompi)\b/i.test(t)) {
+    return 'stop';
+  }
+
+  if (/\b(pausa|alt|aspett|attendi|sospendi)\b/i.test(t)) {
     return 'pause';
   }
 

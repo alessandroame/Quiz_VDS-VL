@@ -45,7 +45,7 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({
     isPartPaused,
     isPartActive,
     togglePlayPause,
-    restartFullSequence,
+    restartCurrentOrSequence,
     playFullSequence,
     playQuestion,
     restartQuestion,
@@ -76,12 +76,12 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({
 
       if ((e.key === 'v' || e.key === 'V') && !e.altKey && !e.ctrlKey) {
         if (e.shiftKey) {
-          restartFullSequence();
+          restartCurrentOrSequence();
         } else {
           togglePlayPause();
         }
       } else if ((e.key === 'r' || e.key === 'R') && !e.altKey && !e.ctrlKey && !e.metaKey) {
-        restartFullSequence();
+        restartCurrentOrSequence();
       } else if ((e.key === 'q' || e.key === 'Q') && !e.altKey && !e.ctrlKey) {
         if (e.shiftKey) {
           restartQuestion();
@@ -131,7 +131,7 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({
     showFeedback,
     selectedAnswer,
     togglePlayPause,
-    restartFullSequence,
+    restartCurrentOrSequence,
     playQuestion,
     restartQuestion,
     playOption,
@@ -218,15 +218,15 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({
                   )}
                 </button>
 
-                {/* Ricomincia da capo */}
+                {/* Ripeti elemento corrente */}
                 <button
                   id="btn-tts-restart"
-                  onClick={restartFullSequence}
+                  onClick={restartCurrentOrSequence}
                   className="px-1.5 py-1 rounded-md text-xs flex items-center gap-1 text-zinc-300 light:text-slate-700 hover:text-white light:hover:text-black hover:bg-zinc-700/60 light:hover:bg-slate-200 transition-colors"
-                  title="Ricomincia da capo dall'inizio (Tasto R o Shift+V)"
+                  title="Ripeti elemento corrente (Tasto R o Shift+V)"
                 >
                   <RotateCcw className="w-3.5 h-3.5" />
-                  <span className="hidden sm:inline">Da capo</span>
+                  <span className="hidden sm:inline">Ripeti</span>
                 </button>
 
                 {/* Ferma / Stop */}

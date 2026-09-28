@@ -66,7 +66,7 @@ export const VoiceCommandsModal: React.FC<VoiceCommandsModalProps> = ({
       title: 'Riascolta Audio',
       primaryPhrase: '"Ripeti"',
       alternatives: ['"Ascolta"', '"Rileggi"', '"Riparti"', '"Ancora"'],
-      description: 'Rilegge dall\'inizio la domanda attiva e le tre opzioni di risposta.'
+      description: 'Rilegge l\'elemento attivo (domanda o opzione corrente) proseguendo la sequenza.'
     },
     {
       icon: <Flag className="w-5 h-5 text-purple-400" />,
@@ -78,9 +78,9 @@ export const VoiceCommandsModal: React.FC<VoiceCommandsModalProps> = ({
     {
       icon: <Play className="w-5 h-5 text-rose-400" />,
       title: 'Pilota Automatico',
-      primaryPhrase: '"Pausa" • "Continua"',
-      alternatives: ['"Ferma"', '"Stop"', '"Attendi"', '"Riprendi"', '"Vai"'],
-      description: 'Sospende o riavvia la riproduzione automatica sequenziale.'
+      primaryPhrase: '"Pausa" • "Stop" • "Continua"',
+      alternatives: ['"Ferma"', '"Basta"', '"Attendi"', '"Riprendi"', '"Vai"'],
+      description: 'Mette in pausa, ferma l\'audio (il riavvio riparte dalla domanda) o riprende la lettura.'
     },
     {
       icon: <HelpCircle className="w-5 h-5 text-indigo-400" />,

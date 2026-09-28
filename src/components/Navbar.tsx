@@ -72,15 +72,16 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab, openSet
           <div className="flex items-center gap-2.5 cursor-pointer" onClick={() => setActiveTab('exam')}>
             <img src="/favicon.svg" alt="VDS-VL" className="w-8 h-8 rounded-lg shadow-sm flex-shrink-0" />
             <div>
-              <div className="font-bold text-sm tracking-wide flex items-center gap-1.5">
-                <span>VDS-VL</span>
-                <span className="text-[10px] px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-400 font-mono">2017</span>
+              <div className="font-bold text-sm tracking-wide flex items-center gap-1.5 whitespace-nowrap">
+                <span className="flex-shrink-0">VDS-VL</span>
+                <span className="text-[10px] px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-400 font-mono flex-shrink-0">2017</span>
                 {/* Indicatore Stato Offline adiacente al logo */}
                 <OfflineIndicator />
                 {isExamRunning && (
-                  <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-rose-500/20 text-rose-400 border border-rose-500/40 font-bold flex items-center gap-1 animate-pulse">
-                    <span className="w-1.5 h-1.5 rounded-full bg-rose-500" />
-                    <span>ESAME IN CORSO</span>
+                  <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-rose-500/20 text-rose-400 border border-rose-500/40 font-bold flex items-center gap-1 animate-pulse flex-shrink-0">
+                    <span className="w-1.5 h-1.5 rounded-full bg-rose-500 flex-shrink-0" />
+                    <span className="hidden sm:inline">ESAME </span>
+                    <span>IN CORSO</span>
                   </span>
                 )}
               </div>

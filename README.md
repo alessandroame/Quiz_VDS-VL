@@ -93,6 +93,13 @@
 - **Guida Contestuale Comandi Vocali (Cheat Sheet)**:
   - **HUD Live Rotativo**: indicatore visivo discreto durante l'ascolto che suggerisce i comandi disponibili ("Microfono ON: Dì 'Uno', 'Avanti' o 'Aiuto'").
   - **Cheat Sheet a 1 Tocco**: pulsante `?` sempre accessibile nella schermata di guida, nel Quick Speech Menu e nella scheda Impostazioni (🚗 Guida) con la tabella ordinata dei comandi e i consigli per l'uso in auto e casco/auricolare Bluetooth.
+- **Spiegazione Vocale di Benvenuto (Spoken Audio Briefing & Run-Once Guard)**:
+  - **Briefing Vocale Cockpit**: spiegazione parlata chiara e sintetica all'apertura della Modalità Alla Guida che illustra lo schermo sempre attivo (Wake Lock), l'ascolto hands-free, le 3 macro-zone di tocco e i comandi vocali essenziali.
+  - **Esecuzione Singola (Run-Once)**: persistenza su Dexie IndexedDB (`driveModeIntroPlayed: true`). Completato o saltato il briefing, non viene mai più rieseguito automaticamente per non disturbare la routine di studio.
+  - **Banner Cockpit con Tasto Salta**: visualizzazione di un banner con indicatore di riproduzione audio animato e pulsante `[⏭ Salta]` per passare subito al primo quesito senza interruzioni.
+  - **Riascolto On-Demand a 1 Tocco**: pulsante dedicato `[🔊 Spiegazione Vocale]` nel Launcher della Guida e pulsante d'ascolto diretto nella scheda Comandi Vocali (`VoiceCommandsModal`).
+  - **Gestione e Riattivazione nelle Impostazioni (🚗 Guida)**: card dedicata per riascoltare subito il briefing o riabilitare la riproduzione automatica al prossimo avvio della guida.
+  - **Audio Neurale Offline & Fallback**: file MP3 dedicati per entrambe le voci (`giuseppe/drive_intro.mp3` ed `elsa/drive_intro.mp3`) con fallback trasparente su Web Speech API.
 
 ### 8. Motore Vocale Neurale (TTS Multi-Voce Offline) & Audio Cockpit
 - **Oltre 5.000 Segmenti Audio Neurale Pre-Generati**: catalogo audio completo memorizzato localmente e funzionante al 100% offline.

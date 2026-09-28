@@ -87,6 +87,11 @@ Questo file costituisce la **memoria tecnica permanente** del progetto. Raccogli
   - Gestione granulare nelle Impostazioni (Voce): stato download, progress bar, storage size, pulsante scarica ed elimina per voce.
   - Fallback offline automatico in `voiceService`: se l'app è offline (`!navigator.onLine`) e la voce selezionata non è presente nella cache del dispositivo, il motore commuta in modo trasparente e immediato sull'altra voce scaricata con notifica cockpit.
   - PWA Service Worker: regole Workbox dedicate con `rangeRequests: true` per garantire compatibilità con lo streaming audio su iOS Safari.
+- **Spiegazione Vocale Modalità Guida (`drive_intro.mp3`)**:
+  - Traccia audio di briefing in `public/audio/{voice}/drive_intro.mp3` generata con Edge-TTS (Giuseppe/Elsa) con fallback a `window.speechSynthesis`.
+  - Riproduzione automatica al primo accesso (nel Launcher o all'avvio del quiz), con banner cockpit e tasto `[Salta]`.
+  - Logica run-once: una volta riprodotta o saltata, salva `driveModeIntroPlayed: true` in Dexie settings e non si ripete più automaticamente.
+  - Riascolto on-demand (Launcher `btn-replay-drive-intro`, modale comandi `VoiceCommandsModal`) e riattivazione all'avvio da `SettingsModal` (scheda Guida).
 
 ---
 

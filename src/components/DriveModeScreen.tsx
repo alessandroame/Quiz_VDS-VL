@@ -19,7 +19,8 @@ import {
   Radio,
   RotateCcw,
   Check,
-  HelpCircle
+  HelpCircle,
+  Square
 } from 'lucide-react';
 import type { Question } from '../types/quiz';
 import type { ExamSession } from '../types/database';
@@ -61,9 +62,9 @@ interface DriveModeScreenProps {
 
 const VOICE_HINTS = [
   'Dì "Uno", "Due" o "Tre" per scegliere la risposta',
-  'Dì "Ripeti" per riascoltare domanda e opzioni',
+  'Dì "Ripeti" per riascoltare l\'elemento attivo',
   'Dì "Avanti" o "Indietro" per scorrere i quesiti',
-  'Dì "Pausa" o "Continua" per il pilota automatico',
+  'Dì "Pausa", "Stop" o "Continua" per il pilota automatico',
   'Dì "Bandiera" per contrassegnare il quiz',
   'Dì "Aiuto" o "Comandi" per aprire la guida a voce'
 ];
@@ -181,7 +182,7 @@ export const DriveModeScreen: React.FC<DriveModeScreenProps> = ({
     isPartPlaying,
     isDriveIntroPlaying,
     togglePlayPause,
-    restartFullSequence,
+    restartCurrentOrSequence,
     playFullSequence,
     playExplanation,
     playDriveIntro,
@@ -450,13 +451,27 @@ export const DriveModeScreen: React.FC<DriveModeScreenProps> = ({
       handlePrevQuestion();
     } else if (cmd === 'repeat') {
       showToast('🗣️ "Ripeti"');
-      restartFullSequence();
+      if (countdownTimerRef.current) {
+        clearInterval(countdownTimerRef.current);
+        countdownTimerRef.current = null;
+      }
+      setWaitingCountdown(null);
+      restartCurrentOrSequence();
     } else if (cmd === 'flag') {
       handleToggleFlag();
     } else if (cmd === 'pause') {
       showToast('🗣️ "Pausa"');
       setIsAutopilotEnabled(false);
       pauseVoice();
+    } else if (cmd === 'stop') {
+      showToast('🗣️ "Stop"');
+      setIsAutopilotEnabled(false);
+      stopVoice();
+      if (countdownTimerRef.current) {
+        clearInterval(countdownTimerRef.current);
+        countdownTimerRef.current = null;
+      }
+      setWaitingCountdown(null);
     } else if (cmd === 'resume') {
       showToast('🗣️ "Riprendi"');
       setIsAutopilotEnabled(true);
@@ -471,7 +486,7 @@ export const DriveModeScreen: React.FC<DriveModeScreenProps> = ({
       setIsAutopilotEnabled(false);
       pauseVoice();
     }
-  }, [currentQ, handleSelectAnswer, handleNextQuestion, handlePrevQuestion, playFullSequence, restartFullSequence, handleToggleFlag, pauseVoice, resumeVoice, isPaused]);
+  }, [currentQ, handleSelectAnswer, handleNextQuestion, handlePrevQuestion, playFullSequence, restartCurrentOrSequence, handleToggleFlag, pauseVoice, stopVoice, resumeVoice, isPaused]);
 
   // Hook Comandi Vocali
   const { isSupported: isVoiceSupported } = useDriveVoiceCommands({
@@ -522,7 +537,23 @@ export const DriveModeScreen: React.FC<DriveModeScreenProps> = ({
       else if (e.key === 'ArrowRight' || e.key === ' ') handleNextQuestion();
       else if (e.key === 'ArrowLeft') handlePrevQuestion();
       else if (e.key.toLowerCase() === 'f') handleToggleFlag();
-      else if (e.key.toLowerCase() === 'r' || e.key.toLowerCase() === 'q') restartFullSequence();
+      else if (e.key.toLowerCase() === 'r' || e.key.toLowerCase() === 'q') {
+        if (countdownTimerRef.current) {
+          clearInterval(countdownTimerRef.current);
+          countdownTimerRef.current = null;
+        }
+        setWaitingCountdown(null);
+        restartCurrentOrSequence();
+      }
+      else if (e.key === 'Escape') {
+        setIsAutopilotEnabled(false);
+        stopVoice();
+        if (countdownTimerRef.current) {
+          clearInterval(countdownTimerRef.current);
+          countdownTimerRef.current = null;
+        }
+        setWaitingCountdown(null);
+      }
       else if (e.key.toLowerCase() === 'p') {
         if (isPlaying) {
           setIsAutopilotEnabled(false);
@@ -539,7 +570,7 @@ export const DriveModeScreen: React.FC<DriveModeScreenProps> = ({
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [isOpen, internalMode, currentQ, currentIndex, totalCount, isAutopilotEnabled, isPlaying, isPaused, restartFullSequence, togglePlayPause, pauseVoice, resumeVoice]);
+  }, [isOpen, internalMode, currentQ, currentIndex, totalCount, isAutopilotEnabled, isPlaying, isPaused, restartCurrentOrSequence, togglePlayPause, pauseVoice, stopVoice, resumeVoice]);
 
   // Gestione Swipe Touch a schermo intero
   const handleTouchStart = (e: React.TouchEvent) => {
@@ -988,6 +1019,7 @@ export const DriveModeScreen: React.FC<DriveModeScreenProps> = ({
 
             <div className="flex flex-col gap-1.5 flex-shrink-0">
               <button
+                id="btn-drive-play-pause"
                 onClick={() => togglePlayPause()}
                 className={`p-3 rounded-xl transition-all ${
                   isPlaying
@@ -1001,14 +1033,41 @@ export const DriveModeScreen: React.FC<DriveModeScreenProps> = ({
                 {isPlaying ? <Pause className="w-6 h-6" /> : isPaused ? <Play className="w-6 h-6" /> : <Volume2 className="w-6 h-6" />}
               </button>
 
-              {(isPlaying || isPaused) && (
-                <button
-                  onClick={() => restartFullSequence()}
-                  className="p-2 rounded-lg bg-zinc-800/80 hover:bg-zinc-700 text-zinc-400 hover:text-white transition-colors flex items-center justify-center animate-in fade-in"
-                  title="Ricomincia da capo dall'inizio (Tasto R)"
-                >
-                  <RotateCcw className="w-4 h-4" />
-                </button>
+              {(isPlaying || isPaused || waitingCountdown !== null) && (
+                <div className="flex items-center gap-1 animate-in fade-in">
+                  <button
+                    id="btn-drive-repeat"
+                    onClick={() => {
+                      if (countdownTimerRef.current) {
+                        clearInterval(countdownTimerRef.current);
+                        countdownTimerRef.current = null;
+                      }
+                      setWaitingCountdown(null);
+                      restartCurrentOrSequence();
+                    }}
+                    className="p-2 rounded-lg bg-zinc-800/80 hover:bg-zinc-700 text-zinc-400 hover:text-white transition-colors flex items-center justify-center flex-1"
+                    title="Ripeti elemento attivo (Tasto R)"
+                  >
+                    <RotateCcw className="w-4 h-4" />
+                  </button>
+
+                  <button
+                    id="btn-drive-stop"
+                    onClick={() => {
+                      setIsAutopilotEnabled(false);
+                      stopVoice();
+                      if (countdownTimerRef.current) {
+                        clearInterval(countdownTimerRef.current);
+                        countdownTimerRef.current = null;
+                      }
+                      setWaitingCountdown(null);
+                    }}
+                    className="p-2 rounded-lg bg-zinc-800/80 hover:bg-rose-950/40 text-zinc-400 hover:text-rose-400 border border-transparent hover:border-rose-800/50 transition-colors flex items-center justify-center"
+                    title="Ferma audio (Esc)"
+                  >
+                    <Square className="w-3.5 h-3.5" />
+                  </button>
+                </div>
               )}
             </div>
           </div>

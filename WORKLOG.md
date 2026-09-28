@@ -18,6 +18,51 @@ Questo documento registra in ordine cronologico tutte le lavorazioni svolte nel 
 
 ## Registro Cronologico
 
+### [2026-09-28] - Splash Screen Cockpit a Latenza Zero (0ms First Paint) e Perfezionamento Comandi Audio
+- **Cosa abbiamo fatto**:
+  - Implementato in [index.html](file:///d:/Github/Quiz_VDS-VL/index.html) il First-Paint Splash Screen a zero latenza direttamente all'interno di `<div id="root">`:
+    - Vettore SVG inline del logo ufficiale *Paraglider Question Mark* (`#09090b` carbonio e `#f59e0b` ambra avionica) a 0 richieste HTTP aggiuntive.
+    - Tipografia avionica e barra a sweep con gradient ambra (`splashSweep` CSS animation).
+    - Risoluzione immediata a T=0ms del caricamento iniziale a freddo (Cold Start) su qualsiasi connessione e browser.
+    - Sostituzione istantanea (zero delay, zero timer artificiali) nel momento esatto in cui React idrata `<App />`.
+    - Aggiunto `<link rel="apple-touch-startup-image" href="/icons/icon-512x512.png" />` per azzerare sfarfallii su iOS standalone.
+  - Perfezionati i controlli vocali in [src/components/DriveModeScreen.tsx](file:///d:/Github/Quiz_VDS-VL/src/components/DriveModeScreen.tsx) e [src/components/QuestionCard.tsx](file:///d:/Github/Quiz_VDS-VL/src/components/QuestionCard.tsx):
+    - Introdotto il comando vocale `"stop"` e il tasto `[■]` dedicato per arresto immediato del pilota automatico e del countdown.
+    - Aggiornato `"ripeti"` e tasto `[R]` a `restartCurrentOrSequence()` per un riascolto coerente dell'elemento attivo.
+  - Eseguiti e superati con successo:
+    - **125/125 test unitari Vitest** (`npm run test:unit`).
+    - Build di produzione PWA (`tsc && vite build`) a 0 errori.
+    - Collaudo headless CDP a 0 errori console su mobile portrait, mobile landscape e desktop.
+- **Scelte architetturali & Rationale**:
+  - *Zero-Latency In-DOM Splash Screen Rationale*: Evita l'anti-pattern del timer fittizio da 2-3 secondi che fa perdere tempo agli allievi piloti, fornendo al contempo un'esperienza visiva premium dal primissimo byte di rendering dell'HTML.
+- **Impatto sul Desiderata**:
+  - Esperienza nativa PWA impeccabile su iOS, Android e Desktop, preservando la massima velocità di utilizzo.
+
+### [2026-09-28] - Spiegazione Vocale di Benvenuto in Modalità Alla Guida (Run-Once & Riascolto On-Demand)
+- **Cosa abbiamo fatto**:
+  - Creato lo script [scripts/generate_drive_intro.py](file:///d:/Github/Quiz_VDS-VL/scripts/generate_drive_intro.py) e generato i file audio neurali ad alta fedeltà [public/audio/giuseppe/drive_intro.mp3](file:///d:/Github/Quiz_VDS-VL/public/audio/giuseppe/drive_intro.mp3) (155 KB) e [public/audio/elsa/drive_intro.mp3](file:///d:/Github/Quiz_VDS-VL/public/audio/elsa/drive_intro.mp3) (144 KB) con testo didattico ottimizzato cockpit.
+  - Aggiornato il modello dati e Dexie SSOT in [src/types/database.ts](file:///d:/Github/Quiz_VDS-VL/src/types/database.ts) e [src/db/index.ts](file:///d:/Github/Quiz_VDS-VL/src/db/index.ts) aggiungendo `driveModeIntroPlayed: boolean` (default `false`).
+  - Aggiornato [src/types/audio.ts](file:///d:/Github/Quiz_VDS-VL/src/types/audio.ts) con frammento `'intro'` e flag `isDriveIntroPlaying`.
+  - Esteso il motore vocale [src/services/voiceService.ts](file:///d:/Github/Quiz_VDS-VL/src/services/voiceService.ts) con i metodi `playDriveIntro()`, `stopDriveIntro()`, fallback automatico su Web Speech API (`speechSynthesis`) e gestione ciclo vita audio (`handleAudioEnded`, `stop`).
+  - Aggiornato il hook [src/hooks/useAviationVoice.ts](file:///d:/Github/Quiz_VDS-VL/src/hooks/useAviationVoice.ts) esponendo `playDriveIntro` e `stopDriveIntro`.
+  - Aggiornato [src/utils/voiceCommandParser.ts](file:///d:/Github/Quiz_VDS-VL/src/utils/voiceCommandParser.ts) abilitando i termini `"spiegazione"` e `"tutorial"` per il comando vocale `'help'`.
+  - Implementato in [src/components/DriveModeScreen.tsx](file:///d:/Github/Quiz_VDS-VL/src/components/DriveModeScreen.tsx):
+    - Trigger automatico condizionato a `!settings.driveModeIntroPlayed` sia all'avvio da Launcher che all'apertura diretta da sessione attiva.
+    - Banner avionico con indicatore audio animato e pulsante rapido `[⏭ Salta]`.
+    - Guard sul sequence autopilot (`!isIntroActive`) per impedire la sovrapposizione tra la spiegazione vocale e la lettura della prima domanda.
+    - Marcatura `driveModeIntroPlayed: true` al termine o al salto del briefing e avvio fluido della prima domanda.
+    - Pulsante on-demand `[🔊 Spiegazione Vocale]` nel Launcher della Guida.
+  - Aggiornato [src/components/VoiceCommandsModal.tsx](file:///d:/Github/Quiz_VDS-VL/src/components/VoiceCommandsModal.tsx) integrando la card di riascolto on-demand della spiegazione parlata con pulsante `Ascolta`.
+  - Aggiornato [src/components/SettingsModal.tsx](file:///d:/Github/Quiz_VDS-VL/src/components/SettingsModal.tsx) nella scheda 🚗 Guida aggiungendo la card "Spiegazione Vocale Iniziale" con stato, ascolto immediato e toggle di riattivazione all'avvio (`driveModeIntroPlayed = false`).
+  - Creato lo script di collaudo headless [scripts/test_drive_intro.js](file:///d:/Github/Quiz_VDS-VL/scripts/test_drive_intro.js) con 6 verifiche complete via CDP (avvio automatico, tasto salta, mancata ripetizione alla riapertura, riascolto on-demand, riarmo da impostazioni e riesecuzione post-riarmo), tutte superate con 0 errori in console.
+  - Aggiornato [README.md](file:///d:/Github/Quiz_VDS-VL/README.md), [DESIDERATA.md](file:///d:/Github/Quiz_VDS-VL/DESIDERATA.md) e [MEMORY.md](file:///d:/Github/Quiz_VDS-VL/MEMORY.md).
+- **Scelte architetturali & Rationale**:
+  - *Run-Once Dexie SSOT Rationale*: Memorizzare lo stato in `AppSettings.driveModeIntroPlayed` su IndexedDB garantisce che il briefing venga riprodotto una sola volta all'allievo pilota, evitando qualsiasi ripetizione fastidiosa nelle sessioni di guida successive senza richiedere account o backend esterno.
+  - *Cockpit Banner con Salta Rationale*: Il pilota in viaggio deve avere sempre il pieno controllo. Il pulsante `[⏭ Salta]` permette di interrompere immediatamente il parlato e passare all'istante al primo quiz se l'utente conosce già il funzionamento.
+  - *Autopilot Sequence Guard Rationale*: Il timer di auto-advance della Modalità Guida leggerebbe la domanda 1 dopo il mount del componente; inserendo la guardia `!isIntroActive`, si garantisce che la lettura del quesito inizi solo a conclusione o annullamento dell'audio di benvenuto, azzerando sovrapposizioni sonore.
+- **Impatto sul Desiderata**:
+  - Soddisfazione completa del requisito di onboarding vocale per la Modalità Alla Guida, migliorando sicurezza ed ergonomia d'uso al volante.
+
 ### [2026-09-28] - Identità Visiva PWA: Adozione Icona Ufficiale "Paraglider Question Mark" ed Estensione Test Suite
 - **Cosa abbiamo fatto**:
   - Adottata la nuova icona ufficiale PWA: concept *Paraglider Question Mark* (testa del punto interrogativo formata dalla cupola aerodinamica a celle del parapendio in volo e punto inferiore formato dalla sagoma del pilota nel bozzolo con comandi).

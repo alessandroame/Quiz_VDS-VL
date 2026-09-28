@@ -364,6 +364,25 @@ export class VoiceService {
     await this.stepSequence('question');
   }
 
+  /**
+   * Repeats the currently active fragment (question, or specific option).
+   * If a sequence was playing, it restarts the active fragment and continues the rest
+   * of the sequence upon completion.
+   * If idle, stopped, or the sequence already finished (activePart is null),
+   * it restarts the full sequence starting from the question.
+   */
+  public async restartCurrentOrSequence(questionId: number): Promise<void> {
+    if (
+      this.currentQuestionId === questionId &&
+      this.activePart &&
+      this.activePart !== 'intro'
+    ) {
+      await this.restartSinglePart(questionId, this.activePart);
+    } else {
+      await this.playFullSequence(questionId);
+    }
+  }
+
   private async stepSequence(part: AudioPart): Promise<void> {
     if (!this.isSequencePlaying || !this.audio || !this.currentQuestionId) return;
 

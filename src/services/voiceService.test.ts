@@ -392,5 +392,121 @@ describe('VoiceService (src/services/voiceService.ts)', () => {
     expect(service.getState().isDriveIntroPlaying).toBe(false);
     expect(service.getState().isPlaying).toBe(false);
   });
+
+  it('VOICE-22: restartCurrentOrSequence repeats active option and preserves sequence continuity', async () => {
+    vi.useFakeTimers();
+    try {
+      await service.playFullSequence(1001);
+      expect(service.getState().activePart).toBe('question');
+
+      // Finish question -> advance to opt1
+      mockAudio.triggerEnded();
+      vi.advanceTimersByTime(350);
+      expect(service.getState().activePart).toBe('opt1');
+
+      // Finish opt1 -> advance to opt2
+      mockAudio.triggerEnded();
+      vi.advanceTimersByTime(350);
+      expect(service.getState().activePart).toBe('opt2');
+      mockAudio.currentTime = 1.8;
+
+      // Repeat while reading opt2
+      await service.restartCurrentOrSequence(1001);
+      expect(service.getState().activePart).toBe('opt2');
+      expect(mockAudio.src).toContain('/audio/giuseppe/1001_2.mp3');
+      expect(mockAudio.currentTime).toBe(0);
+
+      // When opt2 finishes, sequence should naturally continue to opt3
+      mockAudio.triggerEnded();
+      vi.advanceTimersByTime(350);
+      expect(service.getState().activePart).toBe('opt3');
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  it('VOICE-23: restartCurrentOrSequence repeats question when reading question and advances to opt1', async () => {
+    vi.useFakeTimers();
+    try {
+      await service.playFullSequence(1001);
+      expect(service.getState().activePart).toBe('question');
+      mockAudio.currentTime = 2.4;
+
+      await service.restartCurrentOrSequence(1001);
+      expect(service.getState().activePart).toBe('question');
+      expect(mockAudio.currentTime).toBe(0);
+      expect(mockAudio.src).toContain('/audio/giuseppe/1001_q.mp3');
+
+      // When question finishes, advances to opt1
+      mockAudio.triggerEnded();
+      vi.advanceTimersByTime(350);
+      expect(service.getState().activePart).toBe('opt1');
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  it('VOICE-24: after stop(), any restart always begins from the question', async () => {
+    vi.useFakeTimers();
+    try {
+      await service.playFullSequence(1001);
+      // Advance to opt2
+      mockAudio.triggerEnded();
+      vi.advanceTimersByTime(350);
+      mockAudio.triggerEnded();
+      vi.advanceTimersByTime(350);
+      expect(service.getState().activePart).toBe('opt2');
+
+      // Explicit stop
+      service.stop();
+      expect(service.getState().isPlaying).toBe(false);
+      expect(service.getState().currentQuestionId).toBeNull();
+      expect(service.getState().activePart).toBeNull();
+
+      // Restarting via restartCurrentOrSequence must start from question
+      await service.restartCurrentOrSequence(1001);
+      expect(service.getState().activePart).toBe('question');
+      expect(mockAudio.src).toContain('/audio/giuseppe/1001_q.mp3');
+
+      // Stop again
+      service.stop();
+
+      // Starting via togglePlayPause must also start from question
+      await service.togglePlayPause(1001);
+      expect(service.getState().activePart).toBe('question');
+      expect(mockAudio.src).toContain('/audio/giuseppe/1001_q.mp3');
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  it('VOICE-25: restartCurrentOrSequence while paused unpauses and rewinds current snippet', async () => {
+    vi.useFakeTimers();
+    try {
+      await service.playFullSequence(1001);
+      // Advance to opt1
+      mockAudio.triggerEnded();
+      vi.advanceTimersByTime(350);
+      expect(service.getState().activePart).toBe('opt1');
+
+      // Pause while on opt1
+      service.pause();
+      expect(service.getState().isPaused).toBe(true);
+
+      // Repeat current while paused
+      await service.restartCurrentOrSequence(1001);
+      expect(service.getState().isPaused).toBe(false);
+      expect(service.getState().isPlaying).toBe(true);
+      expect(service.getState().activePart).toBe('opt1');
+      expect(mockAudio.currentTime).toBe(0);
+
+      // Natural continuation to opt2
+      mockAudio.triggerEnded();
+      vi.advanceTimersByTime(350);
+      expect(service.getState().activePart).toBe('opt2');
+    } finally {
+      vi.useRealTimers();
+    }
+  });
 });
 
