@@ -829,18 +829,19 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
             </div>
           )}
 
-          {/* TAB 5: DATI & INFO */}
+          {/* TAB 5: ARCHIVIO DATI & RESET */}
           {activeTab === 'data' && (
             <div className="space-y-3.5 animate-in fade-in duration-150">
-              <div className="p-3 rounded-xl border border-zinc-800 bg-zinc-950/60 light:bg-slate-50 light:border-slate-200 space-y-1">
-                <div className="text-xs font-bold text-zinc-200 light:text-slate-800">
-                  VDS-VL Quiz Master 🛩️
+              <div className="p-3.5 rounded-xl border border-zinc-800 bg-zinc-950/60 light:bg-slate-50 light:border-slate-200 space-y-1.5">
+                <div className="text-xs font-bold text-zinc-200 light:text-slate-800 flex items-center justify-between">
+                  <span>Archivio Locale IndexedDB</span>
+                  <span className="text-[10px] text-amber-400 font-mono px-2 py-0.5 rounded-md bg-amber-500/10 border border-amber-500/20">Dexie SSOT</span>
                 </div>
-                <div className="text-[11px] text-zinc-400 light:text-slate-500">
-                  Database Ufficiale AeCI 2017: 504 quiz completi.
-                </div>
-                <div className="text-[10px] text-amber-400/80 font-mono">
-                  100% Offline-First (IndexedDB + Service Worker)
+                <p className="text-[11px] text-zinc-400 light:text-slate-500 leading-relaxed">
+                  Tutti i progressi, le sessioni d'esame, gli errori, le note e le impostazioni sono salvati in locale nel database del tuo browser (nessun dato inviato a server esterni).
+                </p>
+                <div className="text-[10px] text-zinc-500 font-mono pt-1">
+                  Database: <span className="text-zinc-400 light:text-slate-600">VDSQuizDB</span> · Versione: <span className="text-zinc-400 light:text-slate-600">1</span> · Quiz: <span className="text-zinc-400 light:text-slate-600">504 AeCI</span>
                 </div>
               </div>
 
@@ -852,12 +853,121 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                   Azzera lo storico delle simulazioni, il quaderno errori e le note per ricominciare la preparazione da zero.
                 </p>
                 <button
+                  id="btn-reset-data"
                   onClick={handleResetData}
                   className="w-full py-2.5 rounded-xl border border-rose-500/20 bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 text-xs font-semibold flex items-center justify-center gap-1.5 transition-colors"
                 >
                   <Trash2 className="w-3.5 h-3.5" />
                   <span>Cancella tutti i dati e ricomincia da zero</span>
                 </button>
+              </div>
+            </div>
+          )}
+
+          {/* TAB 6: ABOUT & REGOLAMENTO */}
+          {activeTab === 'about' && (
+            <div className="space-y-4 animate-in fade-in duration-150">
+              {/* App Identity Banner */}
+              <div className="p-3.5 rounded-2xl border border-amber-500/30 bg-gradient-to-br from-amber-500/10 via-zinc-950 to-zinc-950 light:from-amber-50/80 light:via-white light:to-white light:border-amber-400/40 shadow-sm">
+                <div className="flex items-start gap-3">
+                  <div className="w-10 h-10 rounded-xl bg-amber-500/20 border border-amber-500/40 flex items-center justify-center flex-shrink-0 text-amber-400 shadow-inner">
+                    <span className="text-xl">🛩️</span>
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-center gap-1.5 flex-wrap">
+                      <span className="text-sm font-bold text-zinc-100 light:text-slate-900 tracking-tight">
+                        VDS-VL Quiz Master
+                      </span>
+                      <span className="px-1.5 py-0.5 rounded text-[10px] font-mono font-semibold bg-amber-500/20 text-amber-400 border border-amber-500/30 light:bg-amber-100 light:text-amber-800">
+                        v1.0.0
+                      </span>
+                    </div>
+                    <p className="text-[11px] text-zinc-400 light:text-slate-600 mt-1 leading-relaxed">
+                      Progressive Web App avionica per la preparazione dell'esame teorico di Volo da Diporto o Sportivo (VDS/VL - Parapendio e Deltaplano).
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Riferimenti Normativi AeCI & D.P.R. 133/2010 */}
+              <div className="space-y-2">
+                <label className="text-xs font-bold text-zinc-400 uppercase tracking-wider flex items-center gap-1.5">
+                  <Award className="w-3.5 h-3.5 text-amber-400" />
+                  <span>Conformità Esame Ufficiale AeCI</span>
+                </label>
+                <div className="p-3 rounded-xl border border-zinc-800 bg-zinc-950/60 light:bg-slate-50 light:border-slate-200 space-y-2 text-[11px]">
+                  <div className="grid grid-cols-2 gap-2 text-zinc-300 light:text-slate-700">
+                    <div className="p-2 rounded-lg bg-zinc-900/80 border border-zinc-800/80 light:bg-white light:border-slate-200">
+                      <span className="text-[10px] text-zinc-500 block">Norma di Legge</span>
+                      <span className="font-semibold text-zinc-200 light:text-slate-800">D.P.R. 133/2010</span>
+                    </div>
+                    <div className="p-2 rounded-lg bg-zinc-900/80 border border-zinc-800/80 light:bg-white light:border-slate-200">
+                      <span className="text-[10px] text-zinc-500 block">Database Ufficiale</span>
+                      <span className="font-semibold text-zinc-200 light:text-slate-800">504 Quiz (Ed. 2017)</span>
+                    </div>
+                    <div className="p-2 rounded-lg bg-zinc-900/80 border border-zinc-800/80 light:bg-white light:border-slate-200">
+                      <span className="text-[10px] text-zinc-500 block">Regola Esame</span>
+                      <span className="font-semibold text-zinc-200 light:text-slate-800">30 Quiz · 45 Minuti</span>
+                    </div>
+                    <div className="p-2 rounded-lg bg-zinc-900/80 border border-zinc-800/80 light:bg-white light:border-slate-200">
+                      <span className="text-[10px] text-zinc-500 block">Soglia Idoneità</span>
+                      <span className="font-semibold text-emerald-400 light:text-emerald-700">Max 3 errori (≥27/30)</span>
+                    </div>
+                  </div>
+                  <div className="text-[10px] text-zinc-400 light:text-slate-500 pt-1 border-t border-zinc-800/60 light:border-slate-200">
+                    Quote canoniche per materia: Aerodinamica (9), Meteo (8), Tecnica (5), Normativa (2), Sicurezza (2), Primo Soccorso (1), Fisiopatologia (1), Strumenti (1), Materiali (1).
+                  </div>
+                </div>
+              </div>
+
+              {/* Tecnologie & Principi Guida */}
+              <div className="space-y-2">
+                <label className="text-xs font-bold text-zinc-400 uppercase tracking-wider flex items-center gap-1.5">
+                  <ShieldCheck className="w-3.5 h-3.5 text-amber-400" />
+                  <span>Architettura & Privacy</span>
+                </label>
+                <div className="p-3 rounded-xl border border-zinc-800 bg-zinc-950/60 light:bg-slate-50 light:border-slate-200 space-y-2 text-[11px] text-zinc-300 light:text-slate-700">
+                  <div className="flex items-start gap-2">
+                    <span className="w-1.5 h-1.5 rounded-full bg-amber-400 mt-1.5 flex-shrink-0" />
+                    <span>
+                      <strong className="text-zinc-200 light:text-slate-900">100% Offline-First:</strong> Nessun server esterno; funzionamento garantito senza connessione (Service Worker + Dexie IndexedDB).
+                    </span>
+                  </div>
+                  <div className="flex items-start gap-2">
+                    <span className="w-1.5 h-1.5 rounded-full bg-amber-400 mt-1.5 flex-shrink-0" />
+                    <span>
+                      <strong className="text-zinc-200 light:text-slate-900">Fair Coverage Randomizer:</strong> Copertura uniforme di tutti i 504 quiz evitando doppioni statistici.
+                    </span>
+                  </div>
+                  <div className="flex items-start gap-2">
+                    <span className="w-1.5 h-1.5 rounded-full bg-amber-400 mt-1.5 flex-shrink-0" />
+                    <span>
+                      <strong className="text-zinc-200 light:text-slate-900">Spaced Repetition Leitner:</strong> Quaderno errori con uscita vincolata a 2 risposte corrette consecutive.
+                    </span>
+                  </div>
+                  <div className="flex items-start gap-2">
+                    <span className="w-1.5 h-1.5 rounded-full bg-amber-400 mt-1.5 flex-shrink-0" />
+                    <span>
+                      <strong className="text-zinc-200 light:text-slate-900">Voce Neurale & Modalità Guida:</strong> Voci Giuseppe ed Elsa con fonetica ICAO, autopilot e comandi vocali a mani libere.
+                    </span>
+                  </div>
+                  <div className="flex items-start gap-2">
+                    <span className="w-1.5 h-1.5 rounded-full bg-amber-400 mt-1.5 flex-shrink-0" />
+                    <span>
+                      <strong className="text-zinc-200 light:text-slate-900">Privacy & Sovranità Dati:</strong> Nessun tracciamento o cookie di terze parti. Dati sul tuo dispositivo, con backup privato opzionale su Google Drive.
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Riconoscimenti & Note */}
+              <div className="p-3 rounded-xl border border-zinc-800/80 bg-zinc-900/40 light:bg-slate-50 light:border-slate-200 text-center space-y-1">
+                <p className="text-[11px] text-zinc-400 light:text-slate-500">
+                  Progettato per gli allievi piloti di Volo Libero italiani 🪂🦅
+                </p>
+                <p className="text-[10px] text-zinc-500 font-mono">
+                  Cockpit Avionics Design · Zero-Blue Theme · Fast & Offline
+                </p>
               </div>
             </div>
           )}
