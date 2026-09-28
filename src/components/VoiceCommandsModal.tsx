@@ -8,12 +8,14 @@ import {
   Flag,
   Play,
   HelpCircle,
-  Headphones
+  Headphones,
+  Volume2
 } from 'lucide-react';
 
 interface VoiceCommandsModalProps {
   isOpen: boolean;
   onClose: () => void;
+  onReplaySpokenGuide?: () => void;
 }
 
 interface CommandItem {
@@ -24,7 +26,11 @@ interface CommandItem {
   description: string;
 }
 
-export const VoiceCommandsModal: React.FC<VoiceCommandsModalProps> = ({ isOpen, onClose }) => {
+export const VoiceCommandsModal: React.FC<VoiceCommandsModalProps> = ({
+  isOpen,
+  onClose,
+  onReplaySpokenGuide
+}) => {
   useEffect(() => {
     if (!isOpen) return;
 
@@ -154,6 +160,32 @@ export const VoiceCommandsModal: React.FC<VoiceCommandsModalProps> = ({ isOpen, 
               </div>
             ))}
           </div>
+
+          {/* Riascolto Spiegazione Vocale */}
+          {onReplaySpokenGuide && (
+            <div className="mt-3 p-3 rounded-xl bg-zinc-900 border border-zinc-800 flex items-center justify-between gap-3">
+              <div className="flex items-center gap-2.5">
+                <div className="p-2 rounded-lg bg-amber-500/20 text-amber-400">
+                  <Volume2 className="w-4 h-4" />
+                </div>
+                <div>
+                  <div className="text-xs font-bold text-white">Spiegazione Vocale di Benvenuto</div>
+                  <div className="text-[11px] text-zinc-400">Riascolta l'introduzione su come funziona la guida</div>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => {
+                  onClose();
+                  onReplaySpokenGuide();
+                }}
+                className="px-3 py-1.5 rounded-lg bg-amber-600 hover:bg-amber-500 text-white font-bold text-xs flex items-center gap-1 shadow-sm transition-colors flex-shrink-0"
+              >
+                <Volume2 className="w-3.5 h-3.5" />
+                <span>Ascolta</span>
+              </button>
+            </div>
+          )}
 
           {/* Cockpit Tips Box */}
           <div className="mt-3 p-3 rounded-xl bg-amber-950/30 border border-amber-800/40 space-y-1.5">

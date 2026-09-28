@@ -73,7 +73,7 @@ export const DriveModeScreen: React.FC<DriveModeScreenProps> = ({
   onClose,
   sessionContext
 }) => {
-  const { questions, statsMap, saveExam, recordAnswer, settings } = useQuiz();
+  const { questions, statsMap, saveExam, recordAnswer, settings, updateSetting } = useQuiz();
 
   // Screen Wake Lock API sempre attivo in Modalità Guida
   const { isActive: isWakeLockActive } = useWakeLock(isOpen);
@@ -115,6 +115,7 @@ export const DriveModeScreen: React.FC<DriveModeScreenProps> = ({
   const [isVoiceGuideOpen, setIsVoiceGuideOpen] = useState<boolean>(false);
   const [voiceHintIndex, setVoiceHintIndex] = useState<number>(0);
   const [showOfflinePrompt, setShowOfflinePrompt] = useState<boolean>(false);
+  const [isIntroActive, setIsIntroActive] = useState<boolean>(false);
 
   // Trigger prompt audio offline al primo avvio della Guida se la voce attiva non è scaricata
   useEffect(() => {
@@ -178,14 +179,59 @@ export const DriveModeScreen: React.FC<DriveModeScreenProps> = ({
     isPaused,
     isSequencePlaying,
     isPartPlaying,
+    isDriveIntroPlaying,
     togglePlayPause,
     restartFullSequence,
     playFullSequence,
     playExplanation,
+    playDriveIntro,
+    stopDriveIntro,
     stop: stopVoice,
     pause: pauseVoice,
     resume: resumeVoice
   } = useAviationVoice(currentQ?.id);
+
+  // Auto-trigger della spiegazione vocale alla partenza solo se non ancora ascoltata
+  const hasTriggeredInitialIntroRef = useRef<boolean>(false);
+
+  useEffect(() => {
+    if (!isOpen) {
+      hasTriggeredInitialIntroRef.current = false;
+      setIsIntroActive(false);
+      return;
+    }
+
+    if (!settings.driveModeIntroPlayed && !hasTriggeredInitialIntroRef.current) {
+      hasTriggeredInitialIntroRef.current = true;
+      setIsIntroActive(true);
+      const t = setTimeout(() => {
+        playDriveIntro();
+      }, 350);
+      return () => clearTimeout(t);
+    }
+  }, [isOpen, settings.driveModeIntroPlayed, playDriveIntro]);
+
+  // Rileva quando la guida vocale finisce di parlare
+  const prevIntroPlayingRef = useRef<boolean>(false);
+  useEffect(() => {
+    if (prevIntroPlayingRef.current && !isDriveIntroPlaying && isIntroActive) {
+      setIsIntroActive(false);
+      updateSetting('driveModeIntroPlayed', true);
+    }
+    prevIntroPlayingRef.current = !!isDriveIntroPlaying;
+  }, [isDriveIntroPlaying, isIntroActive, updateSetting]);
+
+  const handleDismissIntro = useCallback(() => {
+    stopDriveIntro();
+    setIsIntroActive(false);
+    updateSetting('driveModeIntroPlayed', true);
+  }, [stopDriveIntro, updateSetting]);
+
+  const handleReplayIntro = useCallback(() => {
+    stopVoice();
+    setIsIntroActive(true);
+    playDriveIntro();
+  }, [stopVoice, playDriveIntro]);
 
   // Countdown timer per esame attivo
   useEffect(() => {
@@ -207,7 +253,7 @@ export const DriveModeScreen: React.FC<DriveModeScreenProps> = ({
   const autoPlayTriggeredForRef = useRef<number | null>(null);
 
   useEffect(() => {
-    if (!isOpen || internalMode !== 'running' || !currentQ) return;
+    if (!isOpen || internalMode !== 'running' || !currentQ || isIntroActive) return;
 
     // Reset stati di attesa per la nuova domanda
     setWaitingCountdown(null);
@@ -225,7 +271,7 @@ export const DriveModeScreen: React.FC<DriveModeScreenProps> = ({
       }, 250);
       return () => clearTimeout(t);
     }
-  }, [isOpen, internalMode, currentQ?.id, isAutopilotEnabled]);
+  }, [isOpen, internalMode, currentQ?.id, isAutopilotEnabled, isIntroActive]);
 
   // Gestione termine sequenza audio vocale -> avvio countdown attesa risposta
   const prevSequencePlayingRef = useRef<boolean>(false);
@@ -566,6 +612,8 @@ export const DriveModeScreen: React.FC<DriveModeScreenProps> = ({
 
   const handleClose = () => {
     stopVoice();
+    stopDriveIntro();
+    setIsIntroActive(false);
     if (countdownTimerRef.current) {
       clearInterval(countdownTimerRef.current);
       countdownTimerRef.current = null;
@@ -656,15 +704,64 @@ export const DriveModeScreen: React.FC<DriveModeScreenProps> = ({
             </button>
           </div>
 
-          {/* Link Guida Comandi Vocali */}
-          <div className="flex justify-center -mt-1 mb-2">
+          {/* Spiegazione Vocale Briefing Banner (se attiva) */}
+          {isIntroActive && (
+            <div className="p-3.5 rounded-2xl bg-amber-950/80 border-2 border-amber-500/80 text-amber-100 shadow-2xl animate-in fade-in slide-in-from-top-2 mb-2">
+              <div className="flex items-center justify-between gap-3">
+                <div className="flex items-center gap-2.5 min-w-0">
+                  <div className="relative flex items-center justify-center w-9 h-9 rounded-xl bg-amber-500 text-zinc-950 font-black flex-shrink-0">
+                    <Volume2 className="w-5 h-5 animate-pulse" />
+                    <span className="absolute -top-1 -right-1 flex h-2.5 w-2.5">
+                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
+                      <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-amber-500"></span>
+                    </span>
+                  </div>
+                  <div className="min-w-0">
+                    <div className="text-xs font-black text-amber-200 uppercase tracking-wider flex items-center gap-1.5">
+                      <span>Guida Vocale Iniziale</span>
+                      <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-300">AUDIO</span>
+                    </div>
+                    <p className="text-[11px] text-zinc-300 truncate">
+                      Ascolto spiegazione: comandi vocali e risposte touch...
+                    </p>
+                  </div>
+                </div>
+                <button
+                  id="btn-skip-drive-intro"
+                  onClick={handleDismissIntro}
+                  className="px-3 py-1.5 rounded-xl bg-amber-500 hover:bg-amber-400 active:scale-95 text-zinc-950 font-bold text-xs flex items-center gap-1 shadow-md transition-all flex-shrink-0"
+                  title="Salta introduzione vocale"
+                >
+                  <span>Salta</span>
+                  <ArrowRight className="w-3.5 h-3.5" />
+                </button>
+              </div>
+            </div>
+          )}
+
+          {/* Link Guida Comandi Vocali & Riascolto Spiegazione */}
+          <div className="flex items-center justify-center gap-2 -mt-1 mb-2">
+            <button
+              id="btn-replay-drive-intro"
+              type="button"
+              onClick={handleReplayIntro}
+              className={`px-3 py-1.5 rounded-full border text-xs font-semibold flex items-center gap-1.5 transition-colors ${
+                isIntroActive
+                  ? 'bg-amber-500/20 border-amber-500 text-amber-300 animate-pulse'
+                  : 'bg-zinc-900 border-zinc-800 hover:border-amber-500/50 text-zinc-300 hover:text-amber-300'
+              }`}
+              title="Riascolta spiegazione vocale"
+            >
+              <Volume2 className="w-3.5 h-3.5 text-amber-400" />
+              <span>Spiegazione Vocale</span>
+            </button>
             <button
               type="button"
               onClick={() => setIsVoiceGuideOpen(true)}
               className="px-3.5 py-1.5 rounded-full bg-zinc-900 border border-zinc-800 hover:border-emerald-500/50 text-zinc-400 hover:text-emerald-300 text-xs font-semibold flex items-center gap-1.5 transition-colors"
             >
               <HelpCircle className="w-3.5 h-3.5 text-emerald-400" />
-              <span>Cosa posso dire a voce? Consulta la Guida Rapida</span>
+              <span>Guida Comandi</span>
             </button>
           </div>
 
@@ -742,6 +839,23 @@ export const DriveModeScreen: React.FC<DriveModeScreenProps> = ({
       {/* --- STATO 2: QUIZ ATTIVO IN MODALITÀ GUIDA (ZERO-SCROLL 100dvh) --- */}
       {internalMode === 'running' && currentQ && (
         <div className="flex-1 flex flex-col justify-between p-3 sm:p-5 max-w-2xl mx-auto w-full h-full overflow-hidden">
+          {/* Spoken Intro Active HUD Banner */}
+          {isIntroActive && (
+            <div className="mb-2 p-2.5 rounded-xl bg-amber-500/20 border border-amber-500/40 flex items-center justify-between gap-2 animate-in fade-in">
+              <div className="flex items-center gap-2 text-xs text-amber-200">
+                <Volume2 className="w-4 h-4 text-amber-400 animate-pulse flex-shrink-0" />
+                <span>Introduzione vocale in corso... Ascolta o tocca Salta</span>
+              </div>
+              <button
+                type="button"
+                onClick={handleDismissIntro}
+                className="px-2.5 py-1 rounded-lg bg-zinc-900 border border-zinc-700 text-zinc-300 hover:text-white text-xs font-bold transition-colors"
+              >
+                Salta
+              </button>
+            </div>
+          )}
+
           {/* Top Bar HUD */}
           <div className="flex items-center justify-between gap-2 pb-2 border-b border-zinc-800/90 text-xs">
             <button
@@ -816,6 +930,41 @@ export const DriveModeScreen: React.FC<DriveModeScreenProps> = ({
               )}
             </div>
           </div>
+
+          {/* Banner Spiegazione Vocale Iniziale in Running Mode */}
+          {isIntroActive && (
+            <div className="my-2 p-3 sm:p-4 rounded-2xl bg-amber-950/90 border-2 border-amber-500 text-amber-100 shadow-2xl animate-in fade-in slide-in-from-top-2">
+              <div className="flex items-center justify-between gap-3">
+                <div className="flex items-center gap-2.5 min-w-0">
+                  <div className="relative flex items-center justify-center w-10 h-10 rounded-xl bg-amber-500 text-zinc-950 font-black flex-shrink-0">
+                    <Volume2 className="w-5 h-5 animate-pulse" />
+                    <span className="absolute -top-1 -right-1 flex h-2.5 w-2.5">
+                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
+                      <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-amber-500"></span>
+                    </span>
+                  </div>
+                  <div className="min-w-0">
+                    <div className="text-xs font-black text-amber-200 uppercase tracking-wider flex items-center gap-1.5">
+                      <span>Guida Vocale Iniziale</span>
+                      <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-300">AUDIO</span>
+                    </div>
+                    <p className="text-xs text-zinc-300 mt-0.5 truncate sm:text-clip">
+                      Ascolto briefing: rispondi a voce ("Uno", "Due", "Tre") o tocca le fasce.
+                    </p>
+                  </div>
+                </div>
+                <button
+                  id="btn-skip-running-intro"
+                  onClick={handleDismissIntro}
+                  className="px-3.5 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 active:scale-95 text-zinc-950 font-bold text-xs flex items-center gap-1 shadow-md transition-all flex-shrink-0"
+                  title="Inizia subito il quiz"
+                >
+                  <span>Inizia Quiz</span>
+                  <ArrowRight className="w-3.5 h-3.5" />
+                </button>
+              </div>
+            </div>
+          )}
 
           {/* Area Domanda (Zero Scroll) */}
           <div className="my-2 p-3 sm:p-4 rounded-2xl bg-zinc-900/90 border border-zinc-800/80 flex items-start gap-3">
@@ -1067,6 +1216,7 @@ export const DriveModeScreen: React.FC<DriveModeScreenProps> = ({
       <VoiceCommandsModal
         isOpen={isVoiceGuideOpen}
         onClose={() => setIsVoiceGuideOpen(false)}
+        onReplaySpokenGuide={handleReplayIntro}
       />
 
       {/* Modale Prompt Download Audio Offline (Primo Accesso Guida) */}

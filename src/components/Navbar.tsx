@@ -75,10 +75,12 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab, openSet
               <div className="font-bold text-sm tracking-wide flex items-center gap-1.5">
                 <span>VDS-VL</span>
                 <span className="text-[10px] px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-400 font-mono">2017</span>
+                {/* Indicatore Stato Offline adiacente al logo */}
+                <OfflineIndicator />
                 {isExamRunning && (
                   <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-rose-500/20 text-rose-400 border border-rose-500/40 font-bold flex items-center gap-1 animate-pulse">
                     <span className="w-1.5 h-1.5 rounded-full bg-rose-500" />
-                    <span>IN CORSO</span>
+                    <span>ESAME IN CORSO</span>
                   </span>
                 )}
               </div>
@@ -91,9 +93,6 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab, openSet
           <div className="flex items-center gap-1.5">
             {/* Indicatore Download Audio Background */}
             <AudioDownloadProgressHUD />
-
-            {/* Indicatore Stato Connessione Offline */}
-            <OfflineIndicator />
 
             {/* Modalità Alla Guida */}
             <button

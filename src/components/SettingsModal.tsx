@@ -17,11 +17,13 @@ import {
   Check,
   Mic,
   HelpCircle,
-  CloudOff
+  CloudOff,
+  RotateCcw
 } from 'lucide-react';
 import { useTheme } from '../context/ThemeContext';
 import { useQuiz } from '../context/QuizContext';
 import { googleDrive } from '../services/googleDrive';
+import { voiceService } from '../services/voiceService';
 import { exportDatabaseBackup, importDatabaseBackup, db } from '../db';
 import type { ThemeMode } from '../types/database';
 import { VoiceCommandsModal } from './VoiceCommandsModal';
@@ -648,6 +650,56 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                         {sec}s
                       </button>
                     ))}
+                  </div>
+                </div>
+
+                {/* Spiegazione Vocale Iniziale */}
+                <div className="p-2.5 rounded-xl border border-zinc-800 bg-zinc-950/60 light:bg-slate-50 light:border-slate-200 space-y-2">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <span className="text-zinc-300 light:text-slate-700 font-medium block">
+                        Spiegazione Vocale Iniziale
+                      </span>
+                      <span className="text-[11px] text-zinc-500">
+                        {settings.driveModeIntroPlayed
+                          ? 'Completata (non si ripeterà all\'avvio)'
+                          : "Verrà riprodotta all'apertura della guida"}
+                      </span>
+                    </div>
+                    <span className={`text-[10px] font-bold px-2 py-0.5 rounded-md ${
+                      settings.driveModeIntroPlayed
+                        ? 'bg-zinc-800 text-zinc-400 light:bg-slate-200 light:text-slate-600'
+                        : 'bg-amber-500/20 text-amber-300 border border-amber-500/40'
+                    }`}>
+                      {settings.driveModeIntroPlayed ? 'Completata' : 'All\'avvio'}
+                    </span>
+                  </div>
+
+                  <div className="flex gap-1.5 pt-0.5">
+                    <button
+                      type="button"
+                      id="btn-settings-replay-intro"
+                      onClick={() => voiceService.playDriveIntro()}
+                      className="flex-1 py-1.5 px-2.5 rounded-lg bg-zinc-800 hover:bg-zinc-700 light:bg-slate-200 light:hover:bg-slate-300 text-zinc-200 light:text-slate-800 text-xs font-semibold flex items-center justify-center gap-1.5 transition-colors"
+                      title="Ascolta adesso la spiegazione vocale"
+                    >
+                      <Volume2 className="w-3.5 h-3.5 text-amber-400" />
+                      <span>Riascolta adesso</span>
+                    </button>
+                    <button
+                      type="button"
+                      id="btn-settings-toggle-intro"
+                      onClick={() => updateSetting('driveModeIntroPlayed', !settings.driveModeIntroPlayed ? true : false)}
+                      className={`flex-1 py-1.5 px-2.5 rounded-lg text-xs font-semibold flex items-center justify-center gap-1.5 transition-colors border ${
+                        !settings.driveModeIntroPlayed
+                          ? 'bg-amber-500/20 border-amber-500 text-amber-300'
+                          : 'bg-zinc-800/80 border-zinc-700 hover:border-amber-500/50 text-zinc-300 light:bg-slate-200 light:border-slate-300 light:text-slate-700'
+                      }`}
+                      title="Riattiva la spiegazione vocale al prossimo avvio della modalità guida"
+                    >
+                      <RotateCcw className="w-3.5 h-3.5" />
+                      <span>{settings.driveModeIntroPlayed ? "Riattiva all'avvio" : "Già attiva all'avvio"}</span>
+                    </button>
                   </div>
                 </div>
               </div>
