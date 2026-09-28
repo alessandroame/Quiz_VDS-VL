@@ -10,7 +10,7 @@ async def test():
     pitch = "-5Hz"
     
     segments = [
-        ("1001_q.mp3", "Domanda 1001. Normativa e Legislazione. Chi può praticare autonomamente il volo libero."),
+        ("1001_q.mp3", "Chi può praticare autonomamente il volo libero."),
         ("1001_1.mp3", "Uno. Chiunque può praticare quest'attività sportiva purché abbia frequentato un apposito corso."),
         ("1001_2.mp3", "Due. Chiunque, munito dei requisiti richiesti dalle norme in vigore: Attestato V D S in corso di validità e copertura assicurativa R C T."),
         ("1001_3.mp3", "Tre. Chiunque può praticare quest'attività purché abbia superato un esame Aero Club d'Italia."),

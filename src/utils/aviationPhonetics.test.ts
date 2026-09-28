@@ -1,6 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import {
   normalizeAviationPhonetics,
+  formatQuestionForSpeech,
   formatOptionForSpeech,
   formatExplanationForSpeech
 } from './aviationPhonetics';
@@ -65,6 +66,24 @@ describe('aviationPhonetics', () => {
       expect(text).toContain('Risposta errata. La risposta esatta è la due: Attestato V D S valido..');
       expect(text).toContain('Regola: Decreto del Presidente della Repubblica 133 del 2010');
       expect(text).toContain('Tranello: Non confondere con il volo commerciale.');
+    });
+  });
+
+  describe('formatQuestionForSpeech', () => {
+    it('returns normalized question text without question ID or category preamble', () => {
+      const questionText = 'Secondo il D.P.R. 133/2010, chi è responsabile della navigazione?';
+      const output = formatQuestionForSpeech(questionText);
+
+      expect(output).toBe('Secondo il Decreto del Presidente della Repubblica 133 del 2010, chi è responsabile della navigazione.');
+      expect(output).not.toMatch(/^Domanda\s+\d+/i);
+      expect(output).not.toContain('Normativa');
+    });
+
+    it('handles aviation units and soft punctuation correctly', () => {
+      const questionText = 'A quale quota QNH corrisponde il livello FL 195?';
+      const output = formatQuestionForSpeech(questionText);
+
+      expect(output).toBe('A quale quota Q N H corrisponde il livello Livello di volo 195.');
     });
   });
 });

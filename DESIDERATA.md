@@ -64,7 +64,8 @@ Questo documento rappresenta la **bussola strategica e funzionale** del progetto
 
 6. **Audio & Feedback Sonoro Avionico**:
    - Suoni cockpit di conferma/allerta opzionali.
-   - Sintesi vocale italiana per lettura domande e annunci telegrafici secondo fonetica aeronautica ICAO.
+   - Sintesi vocale neurale italiana (voci Giuseppe/Elsa) con fonetica aeronautica ICAO ed estrema concisione (pronuncia del solo testo della domanda, omettendo numero e materia per azzerare i preamboli verbali).
+   - Quick Speech Menu sempre accessibile nell'header: controllo istantaneo a 1 clic per voce istruttore (Giuseppe/Elsa), velocità di riproduzione, lettura automatica e muting senza interruzioni o modali pesanti.
 
 7. **Modalità Alla Guida (Truck & Cockpit Drive Mode)**:
    - Vista a tutto schermo con viewport bloccato (`100dvh`) e zero-scroll.
@@ -72,6 +73,10 @@ Questo documento rappresenta la **bussola strategica e funzionale** del progetto
    - Screen Wake Lock API integrato per prevenire lo spegnimento dello schermo su supporto/cruscotto.
    - Pilota Automatico ("Radio Quiz") continuo per studio e ripasso a mani libere senza tocco fisico.
    - Comandi vocali in lingua italiana tramite Web Speech Recognition ("Uno", "Due", "Tre", "Avanti", "Ripeti", "Pausa").
+
+8. **Impostazioni Modulari per Argomenti (Zero-Scroll Settings)**:
+   - Modale impostazioni suddiviso rigorosamente a schede tematiche (Voce, Guida, Aspetto, Cloud/Backup, Dati & Reset).
+   - Eliminazione totale dello scrolling verticale continuo su dispositivi mobili e desktop.
 
 ---
 
@@ -101,10 +106,12 @@ Questo documento rappresenta la **bussola strategica e funzionale** del progetto
 | Archivio & Ricerca Full-Text | 🟢 Completato | Ricerca istantanea, preferiti e note personali salvate in Dexie. |
 | Dashboard Statistiche | 🟢 Completato | Radar materie, prontezza esame e storico sessioni. |
 | Temi Cockpit Dark & Hangar Light | 🟢 Completato | Gestione contrasto, icone responsive e switch istantaneo. |
-| Suite Vitest (Unit & BVA) | 🟢 Completato | 63 test attivi, soglie limite verificate, simulazione Monte Carlo. |
+| Suite Vitest (Unit & BVA) | 🟢 Completato | 65 test attivi, soglie limite verificate, simulazione Monte Carlo. |
 | Supporto Audio Avionico | 🟢 Completato | Sintesi vocale, feedback sonoro cockpit Web Audio API e fonetica ICAO integrata. |
 | Google Drive Cloud Sync | 🟢 Completato | Integrazione GIS con `appDataFolder` privata e fallback JSON export/import. |
 | Modalità Alla Guida | 🟢 Completato | Layout zero-scroll, Screen Wake Lock, Pilota Auto Radio Quiz e Speech Recognition. |
+| Quick Speech Menu (1-Click) | 🟢 Completato | Flyout compatto in Navbar per controllo vocale rapido senza navigazione. |
+| Impostazioni a Schede Tematiche | 🟢 Completato | Segmented tabs per argomenti con eliminazione dello scrolling verticale. |
 
 
 ---

@@ -52,8 +52,16 @@ export function normalizeAviationPhonetics(text: string): string {
   // con punti fermi per evitare intonazioni acute stridule
   cleaned = cleaned.replace(/\?\s*$/g, '.');
 
-  // Rimuove spazi doppi
+  // Remove double spaces
   return cleaned.replace(/\s+/g, ' ').trim();
+}
+
+/**
+ * Formats a question text for speech output, strictly returning the normalized question
+ * without question ID or subject category preambles.
+ */
+export function formatQuestionForSpeech(questionText: string): string {
+  return normalizeAviationPhonetics(questionText);
 }
 
 export function formatOptionForSpeech(index: 1 | 2 | 3, optionText: string): string {

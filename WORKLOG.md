@@ -18,6 +18,66 @@ Questo documento registra in ordine cronologico tutte le lavorazioni svolte nel 
 
 ## Registro Cronologico
 
+### [2026-09-28] - Rilascio: Quick Speech Menu (1-Click) & Impostazioni a Schede Tematiche (Zero-Scroll)
+- **Cosa abbiamo fatto**:
+  - Creato il nuovo componente [src/components/VoiceQuickMenu.tsx](file:///d:/Github/Quiz_VDS-VL/src/components/VoiceQuickMenu.tsx) per il controllo vocale rapido a 1 clic:
+    - Master toggle Voce Guida ON/OFF con arresto vocale immediato su disattivazione.
+    - Selezione istantanea a un tocco dell'istruttore: 👨‍✈️ Giuseppe (tono cockpit calmo) e 👩‍✈️ Elsa (dizione brillante).
+    - Regolazione al volo della velocità: `0.9x`, `1.0x`, `1.15x`, `1.25x`.
+    - Toggle rapidi per lettura automatica quesiti, spiegazione didattica automatica su errore ed effetti sonori cockpit.
+    - Chiusura automatica al click esterno e tasto ESC.
+  - Integrato il `VoiceQuickMenu` nella barra superiore di [src/components/Navbar.tsx](file:///d:/Github/Quiz_VDS-VL/src/components/Navbar.tsx) con badge dinamico (`1.0x` / `Muto`) sempre accessibile da qualsiasi schermata dell'app.
+  - Eseguito il refactoring completo di [src/components/SettingsModal.tsx](file:///d:/Github/Quiz_VDS-VL/src/components/SettingsModal.tsx) a navigazione per schede tematiche (segmented control):
+    - **🎨 Aspetto**: Tema visivo (Scuro, Chiaro, Auto) e feedback immediato nelle Materie.
+    - **🎙️ Voce**: Impostazioni complete assistente vocale e suoni cockpit.
+    - **🚗 Guida**: Opzioni Modalità Alla Guida (Radio Quiz, comandi vocali, tempo per pensare).
+    - **☁️ Backup**: Salvataggio/Ripristino Google Drive e download/upload copie JSON offline.
+    - **⚙️ Dati**: Riepilogo versione database AeCI e reset progressi con conferma di sicurezza.
+    - Eliminato completamente lo scrolling verticale continuo: ogni scheda si adatta all'altezza viewport.
+  - Aggiornato [scripts/test_all_use_cases.js](file:///d:/Github/Quiz_VDS-VL/scripts/test_all_use_cases.js) collaudando il Quick Speech Menu e le 5 schede tematiche via CDP.
+  - Eseguiti e validati con successo al 100%:
+    - **67/67 unit test Vitest** (`npm run test:unit`) superati in 383ms.
+    - Bundle di produzione PWA compilato senza avvisi (`npm run build`).
+    - Collaudo multi-contesto headless a 0 errori in console JavaScript.
+  - Aggiornati [DESIDERATA.md](file:///d:/Github/Quiz_VDS-VL/DESIDERATA.md) e [README.md](file:///d:/Github/Quiz_VDS-VL/README.md).
+- **Scelte architetturali & Rationale**:
+  - *Zero-Friction Audio Cockpit*: In volo o durante lo studio intensivo, cambiare voce o mutare la lettura non deve mai richiedere l'apertura di schermate modali invasive né più di un singolo tap. Il popover leggero ancorato alla Navbar consente regolazioni a caldo senza perdere il focus sul quiz.
+  - *Segmented Tabs Navigation per Impostazioni*: Suddividere le preferenze in 5 argomenti chiari e focalizzati ha ridotto l'altezza necessaria per schermata a meno di 300px, eliminando la frustrazione del dover scrollare liste lunghe sia su smartphone che su tablet e desktop.
+- **Impatto sul Desiderata**:
+  - Piena soddisfazione di entrambi i requisiti richiesti dall'utente. Matrice di stato in [DESIDERATA.md](file:///d:/Github/Quiz_VDS-VL/DESIDERATA.md) aggiornata a 🟢 Completato.
+
+### [2026-09-28] - Parlato Vocale Conciso: Rimozione Prefisso Domanda/Materia & Rigenerazione Audio Batch
+- **Cosa abbiamo fatto**:
+  - Aggiornato lo script batch di generazione audio [scripts/generate_audio_database.py](file:///d:/Github/Quiz_VDS-VL/scripts/generate_audio_database.py):
+    - Rimosso il preambolo verboso `Domanda {qid}. {sub_name}.` da `build_segments(q)`, facendo pronunciare alle tracce `_q.mp3` unicamente il testo normalizzato della domanda.
+    - Introdotti i parametri CLI `--part {all,q,options,explanation}` e `--force` per consentire la rigenerazione selettiva chirurgica delle sole domande senza riscaricare le 4.032 opzioni didattiche intatte.
+  - Rigenerati con successo tutti i **1.008 segmenti audio delle domande** (`_q.mp3`) per entrambe le voci:
+    - 504 segmenti in `public/audio/giuseppe/` (voce maschile cockpit).
+    - 504 segmenti in `public/audio/elsa/` (voce femminile cristallina).
+  - Allineato lo script di collaudo [scripts/test_discrete.py](file:///d:/Github/Quiz_VDS-VL/scripts/test_discrete.py).
+  - Esteso il modulo [src/utils/aviationPhonetics.ts](file:///d:/Github/Quiz_VDS-VL/src/utils/aviationPhonetics.ts) esportando la funzione `formatQuestionForSpeech(questionText: string): string` ed estendendo la suite Vitest [src/utils/aviationPhonetics.test.ts](file:///d:/Github/Quiz_VDS-VL/src/utils/aviationPhonetics.test.ts) con test dedicati in lingua inglese.
+  - Aggiornato [MEMORY.md](file:///d:/Github/Quiz_VDS-VL/MEMORY.md) (Sezione 6) e [DESIDERATA.md](file:///d:/Github/Quiz_VDS-VL/DESIDERATA.md) (Sezione 2.6) documentando la direttiva del parlato conciso Cockpit Minimalist.
+  - Verificato il superamento al 100% di tutti i **67 test unitari Vitest** (`npm run test:unit`) e compilato con successo il bundle di produzione PWA (`npm run build`).
+- **Scelte architetturali & Rationale**:
+  - *Cockpit Style Minimalist Audio (Zero Preamboli)*: Durante la simulazione d'esame o la modalità di guida a mani libere ("Pilota Automatico"), ascoltare "Domanda 1001. Normativa e Legislazione." prima di ciascun quesito aggiungeva tra i 3 e i 5 secondi di latenza a vuoto (pari a oltre 2 minuti di attesa cumulativa in un esame di 30 quesiti). Il numero domanda e la materia sono già visibili a colpo d'occhio nell'UI; il parlato deve concentrarsi puramente sull'enunciato del problema.
+  - *Rigenerazione Selettiva (--part q --force)*: Filtrare unicamente i segmenti `_q.mp3` ha evitato 4.032 chiamate API ridondanti per opzioni e spiegazioni, riducendo dell'80% l'utilizzo di rete e i tempi di esecuzione.
+- **Impatto sul Desiderata**:
+  - Esperienza didattica e audio molto più fluida e immediata in [QuestionCard.tsx](file:///d:/Github/Quiz_VDS-VL/src/components/QuestionCard.tsx) e [DriveModeScreen.tsx](file:///d:/Github/Quiz_VDS-VL/src/components/DriveModeScreen.tsx). Risparmio tangibile di tempo e concentrazione per l'allievo pilota.
+
+### [2026-09-28] - Piano Architetturale: Quick Speech Menu (1-Click) & Impostazioni a Schede (Zero-Scroll)
+- **Cosa abbiamo fatto**:
+  - Formulato il piano esecutivo e architetturale nell'artefatto `plan_speech_menu_and_categorized_settings.md` per l'introduzione di un menu del parlato rapido a 1 clic e la riorganizzazione a schede tematiche compatte delle impostazioni.
+  - Aggiornato [DESIDERATA.md](file:///d:/Github/Quiz_VDS-VL/DESIDERATA.md) introducendo:
+    - Sezione 2.6: specifica del *Quick Speech Menu* accessibile dall'header per regolazione istantanea senza modali invasivi.
+    - Sezione 2.8: specifica delle *Impostazioni Modulari per Argomenti* con eliminazione dello scrolling continuo.
+    - Sezione 4 (Matrice di Stato): aggiunti i due moduli in stato 🟡 Pianificato con relative note tecniche.
+  - Eseguita e convalidata la suite Vitest: 65/65 test superati con successo in 1.47s.
+- **Scelte architetturali & Rationale**:
+  - *Cockpit Quick-Control Popover vs Nested Modals*: Il controllo vocale deve essere immediato durante lo studio o l'esame; dover aprire un intero modale di impostazioni e scrollare genera attrito cognitivo. Un flyout/popover compatto ancorato alla barra superiore consente la regolazione istantanea (1 clic) di voce e velocità preservando il contesto di studio.
+  - *Segmented Tabs Navigation per Impostazioni*: La suddivisione in 5 argomenti (Voce, Guida, Aspetto, Backup, Dati) azzera la necessità di scorrimento verticale, massimizzando l'ergonomia sia su smartphone che su tablet/desktop.
+- **Impatto sul Desiderata**:
+  - Pieno allineamento della roadmap di sviluppo con le preferenze di usabilità e comfort espresse dall'utente.
+
 ### [2026-09-28] - Vincolo Porta 5173 per Google Drive OAuth, Suite Vitest & Anteprima Locale
 - **Cosa abbiamo fatto**:
   - Configurato `vite.config.ts` bloccando sia `server.port` che `preview.port` su **5173** con `strictPort: true`, impedendo l'uso accidentale della porta 4173 o porte casuali.

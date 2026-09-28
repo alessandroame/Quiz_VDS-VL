@@ -73,6 +73,7 @@ Questo file costituisce la **memoria tecnica permanente** del progetto. Raccogli
   - 2.520 segmenti per ciascuna voce (504 quiz x 5 file), totale 5.040 segmenti audio.
 - **Normalizzazione Fonetica Aeronautica (`src/utils/aviationPhonetics.ts`)**:
   - Tutti i testi passano dal normalizzatore per espansione acronimi (`D.P.R. 133/2010`, `VDS/VL`, `AeCI`, `hPa`, `FL`, `km/h`, `kt`, `m/s`).
+  - Pronuncia domanda concisa (Cockpit Minimalist): le tracce audio delle domande (`_q.mp3`) contengono esclusivamente il testo della domanda normalizzato, omettendo tassativamente prefissi verbali come il numero (*"Domanda X"*) o il nome della materia/categoria per azzerare la latenza d'ascolto.
   - Pronuncia opzioni in stile cockpit standard: *"Uno. [testo]"*, *"Due. [testo]"*, *"Tre. [testo]"*.
 - **Persistenza & Switch**: Selezione della voce salvata in Dexie (`settings.ttsVoice: 'giuseppe' | 'elsa'`) e commutabile istantaneamente dalle impostazioni.
 
