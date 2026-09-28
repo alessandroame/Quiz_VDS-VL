@@ -18,6 +18,20 @@ Questo documento registra in ordine cronologico tutte le lavorazioni svolte nel 
 
 ## Registro Cronologico
 
+### [2026-09-28] - Normalizzazione Microcopy: da "Prontezza" a "Preparazione"
+- **Cosa abbiamo fatto**:
+  - Sostituito il termine "Prontezza" con il più naturale ed efficace "Preparazione":
+    * In [src/components/Navbar.tsx](file:///d:/Github/Quiz_VDS-VL/src/components/Navbar.tsx): convertita la label sotto al logo da `Prontezza: {score}%` a `Preparazione: {score}%`.
+    * In [src/components/StatsScreen.tsx](file:///d:/Github/Quiz_VDS-VL/src/components/StatsScreen.tsx): convertito il titolo della card principale da `Prontezza Esame` a `Preparazione Esame`.
+    * In [src/utils/analytics.test.ts](file:///d:/Github/Quiz_VDS-VL/src/utils/analytics.test.ts): aggiornato il titolo della suite test `Indice di Preparazione Esame`.
+    * In [README.md](file:///d:/Github/Quiz_VDS-VL/README.md) e [DESIDERATA.md](file:///d:/Github/Quiz_VDS-VL/DESIDERATA.md): allineata la documentazione e la matrice di stato delle feature a "Indice di Preparazione Esame".
+  - Verificato il rendering visivo tramite screenshot CDP headless [public/navbar_preparazione_screenshot.png](file:///d:/Github/Quiz_VDS-VL/public/navbar_preparazione_screenshot.png).
+  - Superati tutti i 129 test unitari (`npm run test:unit`) e completata la compilazione del bundle di produzione (`npm run build`).
+- **Scelte architetturali & Rationale**:
+  - *Linguaggio Naturale & Didattico Rationale*: Per un allievo pilota che studia per l'esame teorico di volo libero, il termine "Preparazione" descrive esattamente e chiaramente lo stato di avanzamento e consolidamento delle nozioni rispetto a "Prontezza", che richiamava impropriamente una terminologia militare ("readiness") non in linea con un'esperienza di studio accogliente e pulita.
+- **Impatto sul Desiderata**:
+  - Piena coerenza e immediatezza di comprensione del microcopy per gli utenti finali.
+
 ### [2026-09-28] - Risoluzione ReferenceError navigator nei test CI e aggiornamento Node.js 22
 - **Cosa abbiamo fatto**:
   - Risolto il fallimento degli 11 test su GitHub Actions (`ReferenceError: navigator is not defined` in `syncEngine.test.ts` e `voiceService.test.ts`):
