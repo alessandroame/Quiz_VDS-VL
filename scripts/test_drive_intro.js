@@ -100,10 +100,7 @@ async function main() {
     console.log('2. Apertura Modalità Alla Guida per la prima volta...');
     // Clicca sul pulsante auto nella Navbar
     await send('Runtime.evaluate', {
-      expression: `(() => {
-        const btn = document.querySelector('button[title="Modalità Alla Guida"]');
-        if (btn) btn.click();
-      })()`
+      expression: `document.getElementById('btn-drive-mode')?.click()`
     });
     await sleep(1000);
 
@@ -149,10 +146,7 @@ async function main() {
 
     // Riapri Modalità Guida
     await send('Runtime.evaluate', {
-      expression: `(() => {
-        const btn = document.querySelector('button[title="Modalità Alla Guida"]');
-        if (btn) btn.click();
-      })()`
+      expression: `document.getElementById('btn-drive-mode')?.click()`
     });
     await sleep(1000);
 
@@ -197,10 +191,7 @@ async function main() {
     // Test Scheda Impostazioni -> Guida
     console.log('6. Test scheda Impostazioni (Guida) e Riattiva all\'avvio...');
     await send('Runtime.evaluate', {
-      expression: `(() => {
-        const btn = document.querySelector('button[title="Impostazioni"]');
-        if (btn) btn.click();
-      })()`
+      expression: `document.getElementById('btn-settings')?.click()`
     });
     await sleep(500);
 
@@ -250,10 +241,7 @@ async function main() {
     // Riapri Modalità Guida: deve partire di nuovo automaticamente perché è stata riattivata!
     console.log('7. Riapertura Modalità Guida dopo averla riattivata da impostazioni...');
     await send('Runtime.evaluate', {
-      expression: `(() => {
-        const btn = document.querySelector('button[title="Modalità Alla Guida"]');
-        if (btn) btn.click();
-      })()`
+      expression: `document.getElementById('btn-drive-mode')?.click()`
     });
     await sleep(1000);
 
