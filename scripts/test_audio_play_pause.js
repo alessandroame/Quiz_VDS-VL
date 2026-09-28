@@ -194,6 +194,62 @@ async function runTest() {
     });
     console.log('  -> Stato dopo click su Stop:', stoppedCheck?.result?.value);
 
+    // 7. Test parlante Opzione 1: Play, Pausa e Restart
+    console.log('  -> Test Audio Opzione 1...');
+    await send('Runtime.evaluate', {
+      expression: `document.getElementById('btn-tts-opt-1')?.click()`
+    });
+    await sleep(400);
+
+    const optActiveCheck = await send('Runtime.evaluate', {
+      expression: `(() => {
+        const btnToggle = document.getElementById('btn-tts-opt-1-toggle');
+        const btnRestart = document.getElementById('btn-tts-opt-1-restart');
+        return {
+          hasOptToggle: Boolean(btnToggle),
+          hasOptRestart: Boolean(btnRestart)
+        };
+      })()`,
+      returnByValue: true
+    });
+    console.log('  -> Opzione 1 attiva (Pausa/Da capo visibili):', optActiveCheck?.result?.value);
+
+    // Click pausa su opzione 1
+    await send('Runtime.evaluate', {
+      expression: `document.getElementById('btn-tts-opt-1-toggle')?.click()`
+    });
+    await sleep(300);
+
+    // Click restart su opzione 1
+    await send('Runtime.evaluate', {
+      expression: `document.getElementById('btn-tts-opt-1-restart')?.click()`
+    });
+    await sleep(300);
+
+    // 8. Test parlante Testo Domanda: Play, Pausa e Restart
+    console.log('  -> Test Audio Testo Domanda...');
+    await send('Runtime.evaluate', {
+      expression: `document.getElementById('btn-tts-question')?.click()`
+    });
+    await sleep(400);
+
+    const questionActiveCheck = await send('Runtime.evaluate', {
+      expression: `(() => {
+        const btnToggle = document.getElementById('btn-tts-question-toggle');
+        const btnRestart = document.getElementById('btn-tts-question-restart');
+        return {
+          hasQuestionToggle: Boolean(btnToggle),
+          hasQuestionRestart: Boolean(btnRestart)
+        };
+      })()`,
+      returnByValue: true
+    });
+    console.log('  -> Domanda attiva (Pausa/Da capo visibili):', questionActiveCheck?.result?.value);
+
+    // Interrompi audio con Esc
+    await send('Input.dispatchKeyEvent', { type: 'rawKeyDown', key: 'Escape', code: 'Escape' });
+    await sleep(300);
+
     console.log('✅ TUTTI I TEST PLAY / PAUSE / RESTART COLLAUDATI CON SUCCESSO!');
     ws.close();
   } finally {

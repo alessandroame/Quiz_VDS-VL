@@ -33,6 +33,7 @@ import { useWakeLock } from '../hooks/useWakeLock';
 import { useDriveVoiceCommands } from '../hooks/useDriveVoiceCommands';
 import type { VoiceCommand } from '../utils/voiceCommandParser';
 import { VoiceCommandsModal } from './VoiceCommandsModal';
+import { OfflineHUDTag } from './OfflineIndicator';
 
 export interface DriveModeSessionContext {
   questions: Question[];
@@ -733,6 +734,7 @@ export const DriveModeScreen: React.FC<DriveModeScreenProps> = ({
                   ⏱ {formatTime(secondsRemaining)}
                 </span>
               )}
+              <OfflineHUDTag />
             </div>
 
             <div className="flex items-center gap-1.5">

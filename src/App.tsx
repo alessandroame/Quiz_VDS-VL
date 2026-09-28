@@ -9,6 +9,7 @@ import { ArchiveScreen } from './components/ArchiveScreen';
 import { StatsScreen } from './components/StatsScreen';
 import { SettingsModal } from './components/SettingsModal';
 import { DriveModeScreen } from './components/DriveModeScreen';
+import { OfflineBanner } from './components/OfflineIndicator';
 import { Download, AlertTriangle, Play, ArrowRight, X } from 'lucide-react';
 import { voiceService } from './services/voiceService';
 
@@ -106,6 +107,9 @@ function AppContent() {
         setActiveTab={handleSelectTab}
         openSettings={() => setIsSettingsOpen(true)}
       />
+
+      {/* Avviso Notifica Stato Offline */}
+      <OfflineBanner />
 
       {/* Banner Ripresa Rapida Sessione Cross-Device */}
       {activeSession && !isExamRunning && activeTab !== activeSession.type && (

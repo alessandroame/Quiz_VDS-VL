@@ -211,4 +211,101 @@ describe('VoiceService (src/services/voiceService.ts)', () => {
     expect(mockAudio.src).toContain('/audio/elsa/1005_2.mp3');
     expect(mockAudio.playbackRate).toBe(1.25);
   });
+
+  it('VOICE-11: playSinglePart toggles play and pause on individual options', async () => {
+    // Start option 2
+    await service.playSinglePart(1001, 'opt2');
+    expect(service.getState().isPlaying).toBe(true);
+    expect(service.getState().isPaused).toBe(false);
+    expect(service.getState().activePart).toBe('opt2');
+    expect(mockAudio.src).toContain('/audio/giuseppe/1001_2.mp3');
+
+    // Simulate playback progress
+    mockAudio.currentTime = 1.8;
+
+    // Toggle again while playing -> PAUSE
+    await service.playSinglePart(1001, 'opt2');
+    expect(service.getState().isPlaying).toBe(false);
+    expect(service.getState().isPaused).toBe(true);
+    expect(service.getState().activePart).toBe('opt2');
+    expect(mockAudio.paused).toBe(true);
+    expect(mockAudio.currentTime).toBe(1.8); // Exact position preserved
+
+    // Toggle again while paused -> RESUME
+    await service.playSinglePart(1001, 'opt2');
+    expect(service.getState().isPlaying).toBe(true);
+    expect(service.getState().isPaused).toBe(false);
+    expect(service.getState().activePart).toBe('opt2');
+    expect(mockAudio.paused).toBe(false);
+  });
+
+  it('VOICE-12: restartSinglePart rewinds active option to start', async () => {
+    await service.playSinglePart(1001, 'opt1');
+    mockAudio.currentTime = 2.5;
+
+    await service.restartSinglePart(1001, 'opt1');
+    expect(service.getState().isPlaying).toBe(true);
+    expect(service.getState().isPaused).toBe(false);
+    expect(service.getState().activePart).toBe('opt1');
+    expect(mockAudio.currentTime).toBe(0);
+  });
+
+  it('VOICE-13: pausing an option during sequence preserves isSequencePlaying and resumes sequence seamlessly', async () => {
+    vi.useFakeTimers();
+    try {
+      await service.playFullSequence(1001);
+      // Question ends -> sequence proceeds to opt1
+      mockAudio.triggerEnded();
+      vi.advanceTimersByTime(350);
+      expect(service.getState().activePart).toBe('opt1');
+      expect(service.getState().isSequencePlaying).toBe(true);
+
+      mockAudio.currentTime = 1.2;
+
+      // User pauses option 1
+      await service.playSinglePart(1001, 'opt1');
+      expect(service.getState().isPlaying).toBe(false);
+      expect(service.getState().isPaused).toBe(true);
+      expect(service.getState().isSequencePlaying).toBe(true); // sequence preserved!
+      expect(mockAudio.currentTime).toBe(1.2);
+
+      // User resumes option 1
+      await service.playSinglePart(1001, 'opt1');
+      expect(service.getState().isPlaying).toBe(true);
+      expect(service.getState().isPaused).toBe(false);
+      expect(service.getState().isSequencePlaying).toBe(true);
+
+      // Option 1 ends -> sequence should seamlessly proceed to opt2
+      mockAudio.triggerEnded();
+      vi.advanceTimersByTime(350);
+      expect(service.getState().activePart).toBe('opt2');
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  it('VOICE-14: restartSinglePart during sequence preserves sequence continuity', async () => {
+    vi.useFakeTimers();
+    try {
+      await service.playFullSequence(1001);
+      mockAudio.triggerEnded();
+      vi.advanceTimersByTime(350);
+      expect(service.getState().activePart).toBe('opt1');
+
+      mockAudio.currentTime = 2.0;
+
+      // User clicks restart on option 1
+      await service.restartSinglePart(1001, 'opt1');
+      expect(mockAudio.currentTime).toBe(0);
+      expect(service.getState().isPlaying).toBe(true);
+      expect(service.getState().isSequencePlaying).toBe(true);
+
+      // When restarted option 1 finishes, sequence advances to opt2
+      mockAudio.triggerEnded();
+      vi.advanceTimersByTime(350);
+      expect(service.getState().activePart).toBe('opt2');
+    } finally {
+      vi.useRealTimers();
+    }
+  });
 });
