@@ -65,6 +65,7 @@ Questo documento rappresenta la **bussola strategica e funzionale** del progetto
 6. **Audio & Feedback Sonoro Avionico**:
    - Suoni cockpit di conferma/allerta opzionali.
    - Sintesi vocale neurale italiana (voci Giuseppe/Elsa) con fonetica aeronautica ICAO ed estrema concisione (pronuncia del solo testo della domanda, omettendo numero e materia per azzerare i preamboli verbali).
+   - **Controlli Parlato Interattivi**: Riproduzione flessibile con Play, Pausa (con preservazione della posizione esatta senza ricominciare da capo), Riprendi, e Riavvio istantaneo dall'inizio ("Da capo" / tasto `R` o `Shift+V`) anche mentre l'audio sta parlando.
    - Quick Speech Menu sempre accessibile nell'header: controllo istantaneo a 1 clic per voce istruttore (Giuseppe/Elsa), velocità di riproduzione, lettura automatica e muting senza interruzioni o modali pesanti.
 
 7. **Modalità Alla Guida (Truck & Cockpit Drive Mode)**:

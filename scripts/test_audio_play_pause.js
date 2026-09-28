@@ -32,6 +32,7 @@ async function runTest() {
     '--headless=new',
     '--disable-gpu',
     '--no-sandbox',
+    '--autoplay-policy=no-user-gesture-required',
     'about:blank'
   ]);
 

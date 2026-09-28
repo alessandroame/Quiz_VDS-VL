@@ -18,6 +18,39 @@ Questo documento registra in ordine cronologico tutte le lavorazioni svolte nel 
 
 ## Registro Cronologico
 
+### [2026-09-28] - Controlli Parlato Interattivi: Play, Pausa, Riprendi e Riavvio dall'Inizio (Da Capo)
+- **Cosa abbiamo fatto**:
+  - Esteso [src/types/audio.ts](file:///d:/Github/Quiz_VDS-VL/src/types/audio.ts) introducendo il campo `isPaused: boolean` nell'interfaccia `VoicePlaybackState`.
+  - Riprogettato [src/services/voiceService.ts](file:///d:/Github/Quiz_VDS-VL/src/services/voiceService.ts) per implementare:
+    - `togglePlayPause(questionId)`: se in riproduzione, mette in pausa l'audio preservando il secondo esatto; se in pausa, riprende la riproduzione dallo stesso istante; se inattivo, avvia la sequenza completa.
+    - `pause()` e `resume()`: gestione dello stato di pausa atomica dell'elemento HTMLAudioElement, supporto alla pausa durante l'intervallo naturale di 350ms tra domanda e opzioni (con memorizzazione della parte pendente `pendingSequencePart`), e allineamento di `navigator.mediaSession.playbackState` ('playing' / 'paused' / 'none').
+    - `restartFullSequence(questionId)`: arresto immediato del frammento in corso, azzeramento a `currentTime = 0` e riavvio deterministico dall'inizio della domanda sia mentre l'audio sta parlando sia in stato di pausa.
+  - Aggiornato [src/hooks/useAviationVoice.ts](file:///d:/Github/Quiz_VDS-VL/src/hooks/useAviationVoice.ts) esponendo `isPaused`, `isPartPaused`, `togglePlayPause`, `restartFullSequence`, `pause` e `resume`.
+  - Evoluto il componente [src/components/QuestionCard.tsx](file:///d:/Github/Quiz_VDS-VL/src/components/QuestionCard.tsx):
+    - Trasformato il pulsante statico "Ascolta" in una pillola multimediale cockpit dinamica:
+      - Quando inattivo: pulsante singolo essenziale `[🔊 Ascolta]`.
+      - Quando attivo (in riproduzione o in pausa): gruppo controlli con:
+        1. Pulsante **Play/Pausa** (`[⏸ Pausa]` con badge ciano pulsante / `[▶ Riprendi]` con badge ambra).
+        2. Pulsante **Da capo** (`[↺ Da capo]`) per ricominciare istantaneamente dall'inizio della domanda mentre parla o in pausa.
+        3. Pulsante **Stop** (`[⏹]`) per interrompere l'ascolto e ripristinare il pulsante singolo.
+    - Introdotte scorciatoie da tastiera desktop dedicate:
+      - Tasto `V`: toggle Play / Pausa.
+      - Tasto `R` o `Shift + V`: ricomincia dall'inizio (Da capo).
+      - Tasto `Esc`: interrompe e chiude i controlli audio.
+  - Allineato il rendering dell'audio modulare anche in [src/components/ArchiveScreen.tsx](file:///d:/Github/Quiz_VDS-VL/src/components/ArchiveScreen.tsx) e in [src/components/DriveModeScreen.tsx](file:///d:/Github/Quiz_VDS-VL/src/components/DriveModeScreen.tsx).
+  - Creata la suite completa di unit test in [src/services/voiceService.test.ts](file:///d:/Github/Quiz_VDS-VL/src/services/voiceService.test.ts) (10 test dedicati che coprono transizioni, pausa/ripresa, ricomincia, cambi voce e gestione gap temporali).
+  - Creato ed eseguito il test di integrazione CDP reale [scripts/test_audio_play_pause.js](file:///d:/Github/Quiz_VDS-VL/scripts/test_audio_play_pause.js) con browser headless a 0 errori.
+  - Validati con successo:
+    - **98/98 unit test Vitest** (`npm run test:unit`) superati al 100% in 531ms.
+    - Bundle di produzione PWA compilato senza avvisi (`npm run build`).
+  - Aggiornati [README.md](file:///d:/Github/Quiz_VDS-VL/README.md) e [DESIDERATA.md](file:///d:/Github/Quiz_VDS-VL/DESIDERATA.md).
+- **Scelte architetturali & Rationale**:
+  - *Evitare il reset forzato (Zero Frustrazione)*: In precedenza, un secondo clic sul pulsante audio fermava completamente la riproduzione azzerando il cursore a 0. Se l'allievo desiderava un attimo di pausa durante la lettura dell'opzione 2 o 3, al tocco successivo doveva riascoltare l'intera domanda e l'opzione 1 da capo. La differenziazione netta tra Pausa/Ripresa (freeze/unfreeze al millisecondo esatto) e Da capo (reset volontario a inizio quesito) risolve radicalmente il problema.
+  - *Pillola Cockpit Contestuale (Zero Invasività)*: Mantenere un unico pulsante `[Ascolta]` quando l'audio non è in uso preserva la pulizia visiva e gli spazi limitati su mobile. Solo all'avvio della riproduzione il controllo si espande mostrando i tasti dedicati `[Pausa/Riprendi]`, `[Da capo]` e `[Stop]`, che tornano a scomparire automaticamente al termine delle opzioni.
+  - *Doppio Accesso Keyboard (Tasto R e Shift+V)*: Per l'uso ergonomico da tastiera su desktop, sia `Shift+V` (variante naturale di `V`) che il tasto mnemonico `R` ("Restart / Ripeti") consentono di far ripartire la voce all'istante senza toccare il mouse.
+- **Impatto sul Desiderata**:
+  - Piena aderenza alla richiesta utente e ai principi di Cockpit Style & Audio Ergonomics (cfr. DESIDERATA.md sez. 2.6).
+
 ### [2026-09-28] - Rilascio: Guida Contestuale Comandi Vocali (Hands-Free HUD & Cheat Sheet Modale)
 - **Cosa abbiamo fatto**:
   - Creato il nuovo componente [src/components/VoiceCommandsModal.tsx](file:///d:/Github/Quiz_VDS-VL/src/components/VoiceCommandsModal.tsx):

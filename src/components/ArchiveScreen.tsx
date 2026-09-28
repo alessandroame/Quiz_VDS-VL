@@ -235,9 +235,9 @@ const ArchiveItem: React.FC<ArchiveItemProps> = ({ question: q, isExpanded, onTo
 
           {/* Sezione Nota Personale */}
           {stat?.userNote && !isEditingNote && (
-            <div className="p-3 rounded-xl border bg-sky-950/40 border-sky-800/60 dark:bg-sky-950/40 dark:border-sky-800/60 dark:text-sky-100 light:bg-sky-50 light:border-sky-200 light:text-sky-950 text-xs space-y-1.5 shadow-sm">
-              <div className="flex items-center justify-between border-b border-sky-800/40 light:border-sky-200/80 pb-1.5">
-                <span className="font-bold flex items-center gap-1.5 text-sky-400 light:text-sky-700 text-[11px] uppercase tracking-wider">
+            <div className="p-3 rounded-xl border bg-amber-950/40 border-amber-800/40 dark:bg-amber-950/40 dark:border-amber-800/40 dark:text-zinc-100 light:bg-amber-50 light:border-amber-200 light:text-amber-950 text-xs space-y-1.5 shadow-sm">
+              <div className="flex items-center justify-between border-b border-amber-800/40 light:border-amber-200/80 pb-1.5">
+                <span className="font-bold flex items-center gap-1.5 text-amber-400 light:text-amber-700 text-[11px] uppercase tracking-wider">
                   <FileText className="w-3.5 h-3.5" />
                   Nota Personale
                 </span>
@@ -247,7 +247,7 @@ const ArchiveItem: React.FC<ArchiveItemProps> = ({ question: q, isExpanded, onTo
                       setNoteText(stat.userNote || '');
                       setIsEditingNote(true);
                     }}
-                    className="text-[11px] text-sky-400 hover:text-sky-200 light:text-sky-700 light:hover:text-sky-950 flex items-center gap-1 font-medium"
+                    className="text-[11px] text-amber-400 hover:text-amber-200 light:text-amber-700 light:hover:text-amber-950 flex items-center gap-1 font-medium"
                     title="Modifica nota"
                   >
                     <Edit3 className="w-3 h-3" />
@@ -266,16 +266,16 @@ const ArchiveItem: React.FC<ArchiveItemProps> = ({ question: q, isExpanded, onTo
                   </button>
                 </div>
               </div>
-              <p className="whitespace-pre-wrap leading-relaxed text-slate-200 dark:text-slate-200 light:text-slate-800 text-xs font-normal">
+              <p className="whitespace-pre-wrap leading-relaxed text-zinc-200 dark:text-zinc-200 light:text-slate-800 text-xs font-normal">
                 {stat.userNote}
               </p>
             </div>
           )}
 
           {isEditingNote && (
-            <div className="p-3 rounded-xl border bg-slate-950/90 border-slate-800 dark:bg-slate-950/90 dark:border-slate-800 light:bg-slate-50 light:border-slate-300 space-y-2.5">
+            <div className="p-3 rounded-xl border bg-zinc-950/90 border-zinc-800 dark:bg-zinc-950/90 dark:border-zinc-800 light:bg-slate-50 light:border-slate-300 space-y-2.5">
               <div className="flex items-center justify-between text-xs">
-                <span className="font-bold text-sky-400 light:text-sky-700 text-[11px] uppercase tracking-wider flex items-center gap-1">
+                <span className="font-bold text-amber-400 light:text-amber-700 text-[11px] uppercase tracking-wider flex items-center gap-1">
                   <Edit3 className="w-3.5 h-3.5" />
                   {stat?.userNote ? 'Modifica Nota Personale' : 'Aggiungi Nota Personale'}
                 </span>
@@ -299,13 +299,13 @@ const ArchiveItem: React.FC<ArchiveItemProps> = ({ question: q, isExpanded, onTo
                 value={noteText}
                 onChange={e => setNoteText(e.target.value)}
                 placeholder="Scrivi qui la tua nota personale per questo quesito..."
-                className="w-full bg-slate-900 dark:bg-slate-900 border border-slate-800 dark:border-slate-800 rounded-lg p-2.5 text-xs text-slate-100 dark:text-slate-100 light:bg-white light:border-slate-200 light:text-slate-900 resize-none outline-none focus:border-sky-500 focus:ring-1 focus:ring-sky-500"
+                className="w-full bg-zinc-900 dark:bg-zinc-900 border border-zinc-800 dark:border-zinc-800 rounded-lg p-2.5 text-xs text-zinc-100 dark:text-zinc-100 light:bg-white light:border-slate-200 light:text-slate-900 resize-none outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500"
                 rows={3}
               />
               <div className="flex justify-end gap-2">
                 <button
                   onClick={() => setIsEditingNote(false)}
-                  className="text-xs px-3 py-1.5 rounded-lg border border-slate-800 dark:border-slate-800 text-slate-400 hover:text-slate-200 light:border-slate-300 light:text-slate-700 hover:bg-slate-800/40 light:hover:bg-slate-100 transition-colors"
+                  className="text-xs px-3 py-1.5 rounded-lg border border-zinc-800 dark:border-zinc-800 text-zinc-400 hover:text-zinc-200 light:border-slate-300 light:text-slate-700 hover:bg-zinc-800/40 light:hover:bg-slate-100 transition-colors"
                 >
                   Annulla
                 </button>
@@ -315,7 +315,7 @@ const ArchiveItem: React.FC<ArchiveItemProps> = ({ question: q, isExpanded, onTo
                     await saveNote(q.id, noteText);
                     setIsEditingNote(false);
                   }}
-                  className="text-xs px-3.5 py-1.5 rounded-lg bg-sky-600 hover:bg-sky-500 text-white font-bold shadow-sm transition-all"
+                  className="text-xs px-3.5 py-1.5 rounded-lg bg-amber-600 hover:bg-amber-500 text-white font-bold shadow-sm transition-all"
                 >
                   Salva Nota
                 </button>
@@ -330,7 +330,7 @@ const ArchiveItem: React.FC<ArchiveItemProps> = ({ question: q, isExpanded, onTo
                 setNoteText('');
                 setIsEditingNote(true);
               }}
-              className="w-full py-2 px-3 rounded-lg border border-dashed border-slate-800 dark:border-slate-800 hover:border-sky-500/60 light:border-slate-300 light:hover:border-sky-600 text-slate-400 hover:text-sky-400 light:text-slate-500 light:hover:text-sky-700 text-xs font-medium flex items-center justify-center gap-1.5 transition-colors"
+              className="w-full py-2 px-3 rounded-lg border border-dashed border-zinc-800 dark:border-zinc-800 hover:border-amber-500/60 light:border-slate-300 light:hover:border-amber-600 text-zinc-400 hover:text-amber-400 light:text-slate-500 light:hover:text-amber-700 text-xs font-medium flex items-center justify-center gap-1.5 transition-colors"
             >
               <Plus className="w-3.5 h-3.5" />
               <span>Aggiungi una nota personale sulla domanda #{q.id}</span>
@@ -383,26 +383,26 @@ export const ArchiveScreen: React.FC = () => {
     <div className="max-w-2xl mx-auto px-4 py-6 space-y-4">
       <div>
         <h1 className="text-xl font-bold tracking-tight">Archivio Completo</h1>
-        <p className="text-xs text-slate-400 light:text-slate-600">
+        <p className="text-xs text-zinc-400 light:text-slate-600">
           Tutti i 504 quiz ufficiali AeCI: cerca, leggi e ascolta qualsiasi domanda
         </p>
       </div>
 
       {/* Barra di Ricerca */}
       <div className="relative">
-        <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+        <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400" />
         <input
           id="archive-search-input"
           type="text"
           value={searchQuery}
           onChange={e => setSearchQuery(e.target.value)}
           placeholder="Cerca per testo, parola chiave o #ID (es. #1001)..."
-          className="w-full pl-10 pr-4 py-2.5 bg-slate-900 border border-slate-800 rounded-xl text-xs text-slate-100 placeholder-slate-500 outline-none focus:border-sky-500 light:bg-white light:border-slate-200 light:text-slate-900 transition-colors"
+          className="w-full pl-10 pr-4 py-2.5 bg-zinc-900 border border-zinc-800 rounded-xl text-xs text-zinc-100 placeholder-zinc-500 outline-none focus:border-amber-500 light:bg-white light:border-slate-200 light:text-slate-900 transition-colors"
         />
         {searchQuery && (
           <button
             onClick={() => setSearchQuery('')}
-            className="absolute right-3.5 top-1/2 -translate-y-1/2 text-xs text-slate-500 hover:text-slate-300"
+            className="absolute right-3.5 top-1/2 -translate-y-1/2 text-xs text-zinc-500 hover:text-zinc-300"
           >
             ✕
           </button>
@@ -414,7 +414,7 @@ export const ArchiveScreen: React.FC = () => {
         <select
           value={selectedSubject}
           onChange={e => setSelectedSubject(e.target.value === 'all' ? 'all' : Number(e.target.value))}
-          className="bg-slate-900 border border-slate-800 rounded-lg px-2.5 py-1.5 text-xs text-slate-300 outline-none light:bg-white light:border-slate-200 light:text-slate-700"
+          className="bg-zinc-900 border border-zinc-800 rounded-lg px-2.5 py-1.5 text-xs text-zinc-300 outline-none light:bg-white light:border-slate-200 light:text-slate-700"
         >
           <option value="all">Tutte le materie (9)</option>
           <option value="1">Normativa e Legislazione (40)</option>
@@ -433,7 +433,7 @@ export const ArchiveScreen: React.FC = () => {
           className={`px-2.5 py-1.5 rounded-lg border text-xs font-semibold flex items-center gap-1.5 transition-colors ${
             onlyBookmarks
               ? 'border-amber-500/50 bg-amber-500/20 text-amber-400'
-              : 'border-slate-800 bg-slate-900 text-slate-400 hover:text-slate-200 light:bg-white light:border-slate-200'
+              : 'border-zinc-800 bg-zinc-900 text-zinc-400 hover:text-zinc-200 light:bg-white light:border-slate-200'
           }`}
         >
           <Bookmark className="w-3 h-3" />
@@ -445,15 +445,15 @@ export const ArchiveScreen: React.FC = () => {
           onClick={() => setOnlyWithNotes(!onlyWithNotes)}
           className={`px-2.5 py-1.5 rounded-lg border text-xs font-semibold flex items-center gap-1.5 transition-colors ${
             onlyWithNotes
-              ? 'border-sky-500/50 bg-sky-500/20 text-sky-400'
-              : 'border-slate-800 bg-slate-900 text-slate-400 hover:text-slate-200 light:bg-white light:border-slate-200'
+              ? 'border-amber-500/50 bg-amber-500/20 text-amber-400'
+              : 'border-zinc-800 bg-zinc-900 text-zinc-400 hover:text-zinc-200 light:bg-white light:border-slate-200'
           }`}
         >
           <FileText className="w-3 h-3" />
           <span>Con Note</span>
         </button>
 
-        <div className="ml-auto text-xs text-slate-500">
+        <div className="ml-auto text-xs text-zinc-500">
           {filteredQuestions.length} quiz
         </div>
       </div>
@@ -461,7 +461,7 @@ export const ArchiveScreen: React.FC = () => {
       {/* Lista Domande */}
       <div className="space-y-2">
         {filteredQuestions.length === 0 ? (
-          <div className="text-center py-12 text-slate-500 text-xs border border-dashed border-slate-800 rounded-xl">
+          <div className="text-center py-12 text-zinc-500 text-xs border border-dashed border-zinc-800 rounded-xl">
             Nessun quiz trovato con i filtri attuali
           </div>
         ) : (

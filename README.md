@@ -101,8 +101,13 @@
   - 👩‍✈️ **Elsa**: dizione cristallina, brillante ed energica.
 - **Normalizzazione Fonetica Aeronautica (`aviationPhonetics.ts`)**: espansione e pronuncia accurata secondo lo standard aeronautico ICAO di sigle e acronimi (`D.P.R. 133/2010`, `VDS/VL`, `AeCI`, `hPa`, `QNH`, `QFE`, `FL`, `km/h`, `kt`, `m/s`).
 - **Ascolto Modulare**: pulsanti per ascolto atomico della singola domanda (tasto `Q`), delle singole opzioni (`Alt+1`, `Alt+2`, `Alt+3`), o dell'intera sequenza con evidenziazione del testo sincronizzata.
+- **Controlli Parlato Interattivi (Play, Pausa, Riprendi, Da Capo)**: Il pulsante audio opera ora come pillola cockpit multimediale avanzata:
+  - Clic su **Ascolta** / **Pausa**: avvia o mette in pausa la riproduzione preservando il punto esatto di lettura (evita di dover ricominciare sempre dall'inizio).
+  - Clic su **Riprendi**: prosegue l'ascolto dal secondo esatto di sospensione.
+  - Clic su **Da capo** (o tasto `R` / `Shift+V`): fa ripartire istantaneamente l'audio dall'inizio del quesito anche mentre la voce sta parlando.
+  - Clic su **Stop** (o tasto `Esc`): azzera l'audio e ripristina il pulsante singolo.
 - **Quick Speech Menu (1-Clic in Header)**: menu rapido sempre visibile nella barra di navigazione superiore per commutare istantaneamente con un singolo tocco la voce (👨‍✈️ Giuseppe / 👩‍✈️ Elsa), la velocità di riproduzione (0.9x - 1.25x), la lettura automatica e gli effetti sonori, senza aprire pesanti schermate o abbandonare la sessione di quiz.
-- **MediaSession API**: controllo della riproduzione vocale dai pulsanti fisici o touch degli auricolari Bluetooth anche a schermo spento.
+- **MediaSession API**: controllo della riproduzione vocale (Play/Pausa/Stop) dai pulsanti fisici o touch degli auricolari Bluetooth anche a schermo spento.
 - **Feedback Sonori Cockpit (Web Audio API)**: click meccanici, segnali di conferma, buzzer di errore e alert timer generati via oscillatori nativi senza pesanti file esterni.
 
 ### 9. Ergonomia Cockpit, Temi & Impostazioni a Schede
@@ -117,8 +122,11 @@
   - `F`: aggiunta o rimozione bandierina (`⚑ Rivedi`).
   - `Spazio` o `Freccia Destra`: domanda successiva.
   - `Freccia Sinistra`: domanda precedente.
-  - `Q`: ascolto audio della domanda.
+  - `V`: Play / Pausa riproduzione vocale sequenziale.
+  - `R` o `Shift + V`: Ricomincia da capo la lettura del quesito (mentre parla o in pausa).
+  - `Q`: riascolto audio della sola domanda.
   - `Alt + 1 / 2 / 3`: ascolto audio della rispettiva opzione.
+  - `Esc`: stop e chiusura controlli audio in corso.
 
 ### 10. Fair Coverage Randomizer
 - Algoritmo a bucket ponderati sviluppato per superare il noto problema statistico del *collezionista di figurine* (*Coupon Collector's Problem*).

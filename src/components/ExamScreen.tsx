@@ -333,10 +333,10 @@ export const ExamScreen: React.FC = () => {
           >
             {isPassed ? 'IDONEO' : 'NON IDONEO'}
           </h2>
-          <div className="text-sm font-semibold text-slate-300 light:text-slate-700">
+          <div className="text-sm font-semibold text-zinc-300 light:text-slate-700">
             {correct}/{total} esatte ({errors} {errors === 1 ? 'errore' : 'errori'})
           </div>
-          <p className="text-xs text-slate-400 light:text-slate-600">
+          <p className="text-xs text-zinc-400 light:text-slate-600">
             {isPassed
               ? 'Complimenti! Hai superato la soglia ufficiale del 90% (max 3 errori).'
               : 'Soglia massima di 3 errori superata. Rivedi subito gli errori qui sotto.'}

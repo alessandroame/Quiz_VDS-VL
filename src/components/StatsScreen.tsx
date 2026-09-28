@@ -40,37 +40,37 @@ export const StatsScreen: React.FC = () => {
     <div className="max-w-2xl mx-auto px-4 py-6 space-y-6">
       <div>
         <h1 className="text-xl font-bold tracking-tight">I tuoi Progressi</h1>
-        <p className="text-xs text-slate-400 light:text-slate-600">
+        <p className="text-xs text-zinc-400 light:text-slate-600">
           Come sta procedendo la tua preparazione per l'esame VDS-VL
         </p>
       </div>
 
       {/* Card Prontezza Esame Principale */}
-      <div className="p-6 rounded-2xl border border-slate-800 bg-slate-900 shadow-md light:bg-white light:border-slate-200 space-y-4">
+      <div className="p-6 rounded-2xl border border-zinc-800 bg-zinc-900 shadow-md light:bg-white light:border-slate-200 space-y-4">
         <div className="flex items-center justify-between">
           <div className="space-y-1">
-            <span className="text-xs font-bold text-slate-400 light:text-slate-500 uppercase tracking-wider">
+            <span className="text-xs font-bold text-zinc-400 light:text-slate-500 uppercase tracking-wider">
               Prontezza Esame
             </span>
-            <div className="text-3xl sm:text-4xl font-black text-sky-400 light:text-sky-600">
+            <div className="text-3xl sm:text-4xl font-black text-amber-400 light:text-amber-600">
               {readinessScore}%
             </div>
           </div>
 
-          <div className="w-16 h-16 rounded-2xl bg-sky-500/10 flex items-center justify-center text-sky-400">
+          <div className="w-16 h-16 rounded-2xl bg-amber-500/10 flex items-center justify-center text-amber-400">
             <Award className="w-9 h-9" />
           </div>
         </div>
 
         {/* Progress bar Prontezza */}
-        <div className="w-full bg-slate-950 light:bg-slate-100 rounded-full h-2.5 overflow-hidden">
+        <div className="w-full bg-zinc-950 light:bg-slate-100 rounded-full h-2.5 overflow-hidden">
           <div
             className={`h-full rounded-full transition-all duration-500 ${
               readinessScore >= 90
                 ? 'bg-emerald-500'
                 : readinessScore >= 70
                 ? 'bg-amber-500'
-                : 'bg-sky-500'
+                : 'bg-amber-600'
             }`}
             style={{ width: `${readinessScore}%` }}
           />
@@ -78,25 +78,25 @@ export const StatsScreen: React.FC = () => {
 
         {/* 3 Metric Box */}
         <div className="grid grid-cols-3 gap-2 pt-2 text-center text-xs">
-          <div className="p-2.5 rounded-xl bg-slate-950/60 light:bg-slate-50 border border-slate-800/80 light:border-slate-200">
-            <div className="text-slate-400 light:text-slate-500 text-[10px]">Quiz Visti</div>
-            <div className="font-bold text-slate-200 light:text-slate-800 mt-0.5">
+          <div className="p-2.5 rounded-xl bg-zinc-950/60 light:bg-slate-50 border border-zinc-800/80 light:border-slate-200">
+            <div className="text-zinc-400 light:text-slate-500 text-[10px]">Quiz Visti</div>
+            <div className="font-bold text-zinc-200 light:text-slate-800 mt-0.5">
               {totalSeen}/{totalQuestionsCount}
             </div>
-            <div className="text-[10px] text-sky-400">{coveragePercent}%</div>
+            <div className="text-[10px] text-amber-400">{coveragePercent}%</div>
           </div>
 
-          <div className="p-2.5 rounded-xl bg-slate-950/60 light:bg-slate-50 border border-slate-800/80 light:border-slate-200">
-            <div className="text-slate-400 light:text-slate-500 text-[10px]">Nel Quaderno</div>
+          <div className="p-2.5 rounded-xl bg-zinc-950/60 light:bg-slate-50 border border-zinc-800/80 light:border-slate-200">
+            <div className="text-zinc-400 light:text-slate-500 text-[10px]">Nel Quaderno</div>
             <div className="font-bold text-rose-400 mt-0.5">
               {mistakesCount}
             </div>
-            <div className="text-[10px] text-slate-500">errori da rivedere</div>
+            <div className="text-[10px] text-zinc-500">errori da rivedere</div>
           </div>
 
-          <div className="p-2.5 rounded-xl bg-slate-950/60 light:bg-slate-50 border border-slate-800/80 light:border-slate-200">
-            <div className="text-slate-400 light:text-slate-500 text-[10px]">Simulazioni</div>
-            <div className="font-bold text-slate-200 light:text-slate-800 mt-0.5">
+          <div className="p-2.5 rounded-xl bg-zinc-950/60 light:bg-slate-50 border border-zinc-800/80 light:border-slate-200">
+            <div className="text-zinc-400 light:text-slate-500 text-[10px]">Simulazioni</div>
+            <div className="font-bold text-zinc-200 light:text-slate-800 mt-0.5">
               {sessions.length}
             </div>
             <div className="text-[10px] text-emerald-400">
@@ -107,9 +107,9 @@ export const StatsScreen: React.FC = () => {
       </div>
 
       {/* Radar / Prestazioni per Materia */}
-      <div className="p-5 rounded-2xl border border-slate-800 bg-slate-900 light:bg-white light:border-slate-200 space-y-3">
-        <h3 className="text-xs font-bold text-slate-400 light:text-slate-600 uppercase tracking-wider flex items-center gap-1.5">
-          <TrendingUp className="w-3.5 h-3.5 text-sky-400" />
+      <div className="p-5 rounded-2xl border border-zinc-800 bg-zinc-900 light:bg-white light:border-slate-200 space-y-3">
+        <h3 className="text-xs font-bold text-zinc-400 light:text-slate-600 uppercase tracking-wider flex items-center gap-1.5">
+          <TrendingUp className="w-3.5 h-3.5 text-amber-400" />
           <span>Risposte Esatte per Materia</span>
         </h3>
 
@@ -118,11 +118,11 @@ export const StatsScreen: React.FC = () => {
             return (
               <div key={sub.id} className="space-y-1">
                 <div className="flex items-center justify-between text-xs">
-                  <span className="text-slate-300 light:text-slate-700 font-medium truncate max-w-[220px]">
+                  <span className="text-zinc-300 light:text-slate-700 font-medium truncate max-w-[220px]">
                     0{sub.id} {sub.name}
                   </span>
                   <div className="flex items-center gap-2">
-                    <span className="text-slate-400 text-[11px]">
+                    <span className="text-zinc-400 text-[11px]">
                       {sub.seen}/{sub.total}
                     </span>
                     <span
@@ -131,7 +131,7 @@ export const StatsScreen: React.FC = () => {
                           ? 'text-emerald-400'
                           : sub.accuracy >= 70
                           ? 'text-amber-400'
-                          : 'text-slate-400'
+                          : 'text-zinc-400'
                       }`}
                     >
                       {sub.seen > 0 ? `${sub.accuracy}%` : '-'}
@@ -139,7 +139,7 @@ export const StatsScreen: React.FC = () => {
                   </div>
                 </div>
 
-                <div className="w-full bg-slate-950 light:bg-slate-100 rounded-full h-1.5 overflow-hidden">
+                <div className="w-full bg-zinc-950 light:bg-slate-100 rounded-full h-1.5 overflow-hidden">
                   <div
                     className={`h-full rounded-full transition-all duration-300 ${
                       sub.accuracy >= 90
@@ -158,14 +158,14 @@ export const StatsScreen: React.FC = () => {
       </div>
 
       {/* Storico Ultime Simulazioni */}
-      <div className="p-5 rounded-2xl border border-slate-800 bg-slate-900 light:bg-white light:border-slate-200 space-y-3">
-        <h3 className="text-xs font-bold text-slate-400 light:text-slate-600 uppercase tracking-wider flex items-center gap-1.5">
-          <Calendar className="w-3.5 h-3.5 text-sky-400" />
+      <div className="p-5 rounded-2xl border border-zinc-800 bg-zinc-900 light:bg-white light:border-slate-200 space-y-3">
+        <h3 className="text-xs font-bold text-zinc-400 light:text-slate-600 uppercase tracking-wider flex items-center gap-1.5">
+          <Calendar className="w-3.5 h-3.5 text-amber-400" />
           <span>Storico Simulazioni d'Esame</span>
         </h3>
 
         {sessions.length === 0 ? (
-          <p className="text-xs text-slate-500 py-3 text-center">
+          <p className="text-xs text-zinc-500 py-3 text-center">
             Nessuna simulazione completata finora.
           </p>
         ) : (
@@ -182,7 +182,7 @@ export const StatsScreen: React.FC = () => {
               return (
                 <div
                   key={s.id || idx}
-                  className="p-3 rounded-xl border border-slate-800 bg-slate-950/60 light:bg-slate-50 light:border-slate-200 flex items-center justify-between text-xs"
+                  className="p-3 rounded-xl border border-zinc-800 bg-zinc-950/60 light:bg-slate-50 light:border-slate-200 flex items-center justify-between text-xs"
                 >
                   <div className="space-y-0.5">
                     <div className="flex items-center gap-2">
@@ -195,11 +195,11 @@ export const StatsScreen: React.FC = () => {
                       >
                         {s.isPassed ? 'IDONEO' : 'NON IDONEO'}
                       </span>
-                      <span className="font-mono font-bold text-slate-200 light:text-slate-800">
+                      <span className="font-mono font-bold text-zinc-200 light:text-slate-800">
                         {s.correctAnswers}/{s.totalQuestions} ({s.wrongAnswers} err)
                       </span>
                     </div>
-                    <div className="text-[10px] text-slate-500 flex items-center gap-2">
+                    <div className="text-[10px] text-zinc-500 flex items-center gap-2">
                       <span>{dateStr}</span>
                       <span>•</span>
                       <span className="flex items-center gap-0.5">
@@ -216,7 +216,7 @@ export const StatsScreen: React.FC = () => {
 
       {/* Top 10 Domande Più Sbagliate */}
       {topWrongQuestions.length > 0 && (
-        <div className="p-5 rounded-2xl border border-slate-800 bg-slate-900 light:bg-white light:border-slate-200 space-y-3">
+        <div className="p-5 rounded-2xl border border-zinc-800 bg-zinc-900 light:bg-white light:border-slate-200 space-y-3">
           <h3 className="text-xs font-bold text-rose-400 uppercase tracking-wider flex items-center gap-1.5">
             <AlertTriangle className="w-3.5 h-3.5" />
             <span>Top 10 Domande con Più Errori</span>
@@ -226,18 +226,18 @@ export const StatsScreen: React.FC = () => {
             {topWrongQuestions.map(item => (
               <div
                 key={item.question.id}
-                className="p-2.5 rounded-lg border border-slate-800/80 bg-slate-950/40 light:bg-slate-50 light:border-slate-200 text-xs flex items-center justify-between gap-3"
+                className="p-2.5 rounded-lg border border-zinc-800/80 bg-zinc-950/40 light:bg-slate-50 light:border-slate-200 text-xs flex items-center justify-between gap-3"
               >
                 <div className="space-y-0.5 truncate">
                   <div className="flex items-center gap-2">
-                    <span className="font-mono font-bold text-sky-400">
+                    <span className="font-mono font-bold text-amber-400">
                       #{item.question.id}
                     </span>
-                    <span className="text-[10px] text-slate-500">
+                    <span className="text-[10px] text-zinc-500">
                       {item.question.subjectName}
                     </span>
                   </div>
-                  <p className="text-slate-300 light:text-slate-700 truncate">
+                  <p className="text-zinc-300 light:text-slate-700 truncate">
                     {item.question.question}
                   </p>
                 </div>
