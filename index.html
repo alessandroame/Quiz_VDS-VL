@@ -15,83 +15,11 @@
     <meta name="apple-mobile-web-app-title" content="VDS Quiz" />
     <!-- Google Identity Services per Google Drive Cloud Backup -->
     <script src="https://accounts.google.com/gsi/client" async defer></script>
-    <style>
-      #splash-screen {
-        position: fixed;
-        inset: 0;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        background-color: #09090b;
-        color: #f4f4f5;
-        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-        user-select: none;
-        z-index: 99999;
-      }
-      .splash-pulse {
-        animation: splashPulse 1.8s ease-in-out infinite;
-      }
-      @keyframes splashPulse {
-        0%, 100% { opacity: 0.88; transform: scale(1); }
-        50% { opacity: 1; transform: scale(1.02); }
-      }
-      .splash-icon-container {
-        width: min(240px, 62vw);
-        height: min(240px, 62vw);
-        min-width: 160px;
-        min-height: 160px;
-        max-width: 280px;
-        max-height: 280px;
-        filter: drop-shadow(0 20px 45px rgba(245, 158, 11, 0.35)) drop-shadow(0 0 30px rgba(245, 158, 11, 0.2));
-      }
-      .splash-title {
-        font-size: clamp(22px, 5.5vw, 32px);
-        font-weight: 800;
-        letter-spacing: 0.05em;
-        color: #f4f4f5;
-        text-transform: uppercase;
-        margin-top: 24px;
-        text-align: center;
-      }
-      .splash-sub {
-        font-size: clamp(11px, 2.8vw, 13px);
-        font-weight: 600;
-        color: #a1a1aa;
-        letter-spacing: 0.18em;
-        text-transform: uppercase;
-        margin-top: 6px;
-        text-align: center;
-      }
-      .splash-bar {
-        width: min(180px, 48vw);
-        height: 3.5px;
-        background: #27272a;
-        border-radius: 999px;
-        overflow: hidden;
-        position: relative;
-        margin-top: 24px;
-      }
-      .splash-bar-fill {
-        position: absolute;
-        top: 0;
-        bottom: 0;
-        left: -40%;
-        width: 60%;
-        background: linear-gradient(90deg, transparent, #f59e0b, #fbbf24, transparent);
-        border-radius: 999px;
-        animation: splashSweep 1.2s cubic-bezier(0.4, 0, 0.2, 1) infinite;
-      }
-      @keyframes splashSweep {
-        0% { left: -60%; }
-        100% { left: 100%; }
-      }
-    </style>
   </head>
   <body class="bg-zinc-950 text-zinc-100 light:bg-slate-50 light:text-slate-900 antialiased selection:bg-amber-500 selection:text-black transition-colors">
     <div id="root">
       <!-- Zero-Latency First-Paint Cockpit Splash Screen (0ms FCP, auto-replaced on React mount) -->
-      <div id="splash-screen">
+      <div id="splash-screen" style="position: fixed; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; background-color: #09090b; color: #f4f4f5; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; user-select: none; z-index: 99999;">
         <div class="splash-pulse" style="display:flex; flex-direction:column; align-items:center;">
           <div class="splash-icon-container">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="100%" height="100%">
