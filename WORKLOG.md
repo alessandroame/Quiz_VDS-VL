@@ -24,6 +24,7 @@ Questo documento registra in ordine cronologico tutte le lavorazioni svolte nel 
     - Vettore SVG inline del logo ufficiale *Paraglider Question Mark* (`#09090b` carbonio e `#f59e0b` ambra avionica) a 0 richieste HTTP aggiuntive.
     - Tipografia avionica e barra a sweep con gradient ambra (`splashSweep` CSS animation).
     - Risoluzione immediata a T=0ms del caricamento iniziale a freddo (Cold Start) su qualsiasi connessione e browser.
+    - Stili critici di posizionamento e background applicati inline su `#splash-screen` e classi/animazioni collocate in [src/index.css](file:///d:/Github/Quiz_VDS-VL/src/index.css), eliminando alla radice l'estrazione `html-proxy` CSS di Vite e azzerando qualsiasi errore PostCSS in fase di sviluppo/HMR.
     - Sostituzione istantanea (zero delay, zero timer artificiali) nel momento esatto in cui React idrata `<App />`.
     - Aggiunto `<link rel="apple-touch-startup-image" href="/icons/icon-512x512.png" />` per azzerare sfarfallii su iOS standalone.
   - Perfezionati i controlli vocali in [src/components/DriveModeScreen.tsx](file:///d:/Github/Quiz_VDS-VL/src/components/DriveModeScreen.tsx) e [src/components/QuestionCard.tsx](file:///d:/Github/Quiz_VDS-VL/src/components/QuestionCard.tsx):
