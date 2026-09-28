@@ -115,7 +115,7 @@ export const VoiceQuickMenu: React.FC = () => {
           <div className="flex items-center justify-between p-2 rounded-xl bg-zinc-950/60 border border-zinc-800/80 light:bg-slate-50 light:border-slate-200">
             <div>
               <span className="text-xs font-semibold text-zinc-200 light:text-slate-800 block">
-                Voce Guida
+                Lettura Vocale
               </span>
               <span className="text-[10px] text-zinc-400 light:text-slate-500">
                 {isEnabled ? 'Attiva (lettura quesiti)' : 'Disattivata'}

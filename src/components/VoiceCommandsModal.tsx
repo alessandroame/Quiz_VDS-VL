@@ -49,7 +49,7 @@ export const VoiceCommandsModal: React.FC<VoiceCommandsModalProps> = ({ isOpen, 
       description: 'Seleziona subito la risposta corrispondente.'
     },
     {
-      icon: <ArrowRight className="w-5 h-5 text-sky-400" />,
+      icon: <ArrowRight className="w-5 h-5 text-amber-400" />,
       title: 'Scorri Domande',
       primaryPhrase: '"Avanti" • "Indietro"',
       alternatives: ['"Successiva"', '"Prossima"', '"Salta"', '"Precedente"', '"Torna indietro"'],
@@ -94,11 +94,11 @@ export const VoiceCommandsModal: React.FC<VoiceCommandsModalProps> = ({ isOpen, 
       aria-labelledby="voice-modal-title"
     >
       <div
-        className="bg-slate-900 border border-slate-700/80 rounded-2xl max-w-lg w-full max-h-[90vh] flex flex-col shadow-2xl overflow-hidden animate-in zoom-in-95 duration-150"
+        className="bg-zinc-900 border border-zinc-700/80 rounded-2xl max-w-lg w-full max-h-[90vh] flex flex-col shadow-2xl overflow-hidden animate-in zoom-in-95 duration-150"
         onClick={e => e.stopPropagation()}
       >
         {/* Header */}
-        <div className="p-4 border-b border-slate-800 flex items-center justify-between bg-slate-950/70">
+        <div className="p-4 border-b border-zinc-800 flex items-center justify-between bg-zinc-950/70">
           <div className="flex items-center gap-2.5">
             <div className="p-2 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-400">
               <Mic className="w-5 h-5" />
@@ -112,14 +112,14 @@ export const VoiceCommandsModal: React.FC<VoiceCommandsModalProps> = ({ isOpen, 
                   Hands-Free
                 </span>
               </div>
-              <p className="text-xs text-slate-400">
+              <p className="text-xs text-zinc-400">
                 Controlla l'app a voce senza distogliere lo sguardo dalla strada
               </p>
             </div>
           </div>
           <button
             onClick={onClose}
-            className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition-colors"
+            className="p-1.5 rounded-lg text-zinc-400 hover:text-white hover:bg-zinc-800 transition-colors"
             title="Chiudi (Esc)"
           >
             <X className="w-5 h-5" />
@@ -132,7 +132,7 @@ export const VoiceCommandsModal: React.FC<VoiceCommandsModalProps> = ({ isOpen, 
             {commandGroups.map((group, idx) => (
               <div
                 key={idx}
-                className="p-3 rounded-xl bg-slate-950/60 border border-slate-800/80 hover:border-slate-700 transition-all flex flex-col justify-between"
+                className="p-3 rounded-xl bg-zinc-950/60 border border-zinc-800/80 hover:border-zinc-700 transition-all flex flex-col justify-between"
               >
                 <div>
                   <div className="flex items-center gap-2 mb-1.5">
@@ -144,24 +144,24 @@ export const VoiceCommandsModal: React.FC<VoiceCommandsModalProps> = ({ isOpen, 
                   <div className="text-sm font-bold text-emerald-300 font-mono mb-1">
                     {group.primaryPhrase}
                   </div>
-                  <p className="text-[11px] text-slate-400 leading-snug mb-2">
+                  <p className="text-[11px] text-zinc-400 leading-snug mb-2">
                     {group.description}
                   </p>
                 </div>
-                <div className="pt-2 border-t border-slate-800/60 text-[10px] text-slate-500 truncate">
-                  Anche: <span className="text-slate-400">{group.alternatives.join(', ')}</span>
+                <div className="pt-2 border-t border-zinc-800/60 text-[10px] text-zinc-500 truncate">
+                  Anche: <span className="text-zinc-400">{group.alternatives.join(', ')}</span>
                 </div>
               </div>
             ))}
           </div>
 
           {/* Cockpit Tips Box */}
-          <div className="mt-3 p-3 rounded-xl bg-sky-950/40 border border-sky-800/40 space-y-1.5">
-            <div className="flex items-center gap-1.5 text-xs font-bold text-sky-300">
-              <Headphones className="w-4 h-4 text-sky-400" />
+          <div className="mt-3 p-3 rounded-xl bg-amber-950/30 border border-amber-800/40 space-y-1.5">
+            <div className="flex items-center gap-1.5 text-xs font-bold text-amber-300">
+              <Headphones className="w-4 h-4 text-amber-400" />
               <span>Consigli Cockpit per la Guida</span>
             </div>
-            <ul className="text-[11px] text-sky-200/80 space-y-1 pl-5 list-disc">
+            <ul className="text-[11px] text-amber-200/80 space-y-1 pl-5 list-disc">
               <li>
                 Compatibile con <strong>vivavoce Bluetooth auto</strong>, auricolari e caschi.
               </li>
@@ -176,7 +176,7 @@ export const VoiceCommandsModal: React.FC<VoiceCommandsModalProps> = ({ isOpen, 
         </div>
 
         {/* Footer */}
-        <div className="p-3 border-t border-slate-800 bg-slate-950/70 flex justify-end">
+        <div className="p-3 border-t border-zinc-800 bg-zinc-950/70 flex justify-end">
           <button
             onClick={onClose}
             className="w-full sm:w-auto px-5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs transition-colors flex items-center justify-center gap-1.5 shadow-lg shadow-emerald-900/30"

@@ -244,7 +244,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
               <div className="flex items-center justify-between p-2.5 rounded-xl border border-slate-800 bg-slate-950/60 light:bg-slate-50 light:border-slate-200">
                 <div>
                   <span className="text-slate-300 light:text-slate-700 font-medium block text-xs">
-                    Attiva Voce Guida
+                    Attiva Lettura Vocale
                   </span>
                   <span className="text-[11px] text-slate-500 block">
                     Ascolta domande e opzioni lette a voce alta
