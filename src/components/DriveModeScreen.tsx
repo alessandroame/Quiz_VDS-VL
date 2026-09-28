@@ -34,6 +34,10 @@ import { useDriveVoiceCommands } from '../hooks/useDriveVoiceCommands';
 import type { VoiceCommand } from '../utils/voiceCommandParser';
 import { VoiceCommandsModal } from './VoiceCommandsModal';
 import { OfflineHUDTag } from './OfflineIndicator';
+import { AudioOfflinePromptModal } from './AudioOfflinePromptModal';
+import { AudioDownloadProgressHUD } from './AudioDownloadProgressHUD';
+import { audioDownloadManager } from '../services/audioDownloadManager';
+import { voiceService } from '../services/voiceService';
 
 export interface DriveModeSessionContext {
   questions: Question[];
@@ -110,6 +114,27 @@ export const DriveModeScreen: React.FC<DriveModeScreenProps> = ({
   const [revealedQuestionId, setRevealedQuestionId] = useState<number | null>(null);
   const [isVoiceGuideOpen, setIsVoiceGuideOpen] = useState<boolean>(false);
   const [voiceHintIndex, setVoiceHintIndex] = useState<number>(0);
+  const [showOfflinePrompt, setShowOfflinePrompt] = useState<boolean>(false);
+
+  // Trigger prompt audio offline al primo avvio della Guida se la voce attiva non è scaricata
+  useEffect(() => {
+    if (isOpen && !settings.audioOfflinePromptDismissed) {
+      const activeVoice = settings.ttsVoice || 'giuseppe';
+      if (!audioDownloadManager.isVoiceReady(activeVoice)) {
+        setShowOfflinePrompt(true);
+      }
+    }
+  }, [isOpen, settings.audioOfflinePromptDismissed, settings.ttsVoice]);
+
+  // Listener notifica fallback vocale cockpit
+  useEffect(() => {
+    return voiceService.onFallback(({ from, to }) => {
+      const fromLabel = from === 'giuseppe' ? 'Giuseppe' : 'Elsa';
+      const toLabel = to === 'giuseppe' ? 'Giuseppe' : 'Elsa';
+      setVoiceToast(`Offline: uso voce ${toLabel} (${fromLabel} non presente)`);
+      setTimeout(() => setVoiceToast(null), 4000);
+    });
+  }, []);
 
   // Rotazione periodica suggerimenti vocali nell'HUD (ogni 4.5s)
   useEffect(() => {
@@ -575,6 +600,8 @@ export const DriveModeScreen: React.FC<DriveModeScreenProps> = ({
               <div>
                 <h1 className="text-xl font-black tracking-tight text-white flex items-center gap-2">
                   <span>Modalità Alla Guida</span>
+                  <AudioDownloadProgressHUD />
+                  <OfflineHUDTag />
                 </h1>
                 <p className="text-xs text-zinc-400 font-medium">
                   Pulsanti giganti • Rispondi a voce • Nessun bisogno di scorrere
@@ -582,6 +609,7 @@ export const DriveModeScreen: React.FC<DriveModeScreenProps> = ({
               </div>
             </div>
             <button
+              id="btn-drive-exit"
               onClick={handleClose}
               className="p-2.5 rounded-xl bg-zinc-900 border border-zinc-800 text-zinc-400 hover:text-white"
               title="Esci dalla modalità guida"
@@ -734,6 +762,7 @@ export const DriveModeScreen: React.FC<DriveModeScreenProps> = ({
                   ⏱ {formatTime(secondsRemaining)}
                 </span>
               )}
+              <AudioDownloadProgressHUD />
               <OfflineHUDTag />
             </div>
 
@@ -1038,6 +1067,12 @@ export const DriveModeScreen: React.FC<DriveModeScreenProps> = ({
       <VoiceCommandsModal
         isOpen={isVoiceGuideOpen}
         onClose={() => setIsVoiceGuideOpen(false)}
+      />
+
+      {/* Modale Prompt Download Audio Offline (Primo Accesso Guida) */}
+      <AudioOfflinePromptModal
+        isOpen={showOfflinePrompt}
+        onClose={() => setShowOfflinePrompt(false)}
       />
     </div>
   );

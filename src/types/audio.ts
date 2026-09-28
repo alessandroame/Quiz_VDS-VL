@@ -1,6 +1,6 @@
 // Tipi per il Motore Audio Neurale PWA
 
-export type AudioPart = 'question' | 'opt1' | 'opt2' | 'opt3' | 'explanation';
+export type AudioPart = 'question' | 'opt1' | 'opt2' | 'opt3' | 'explanation' | 'intro';
 
 export interface VoicePlaybackState {
   isPlaying: boolean;
@@ -8,4 +8,5 @@ export interface VoicePlaybackState {
   currentQuestionId: number | null;
   activePart: AudioPart | null;
   isSequencePlaying: boolean;
+  isDriveIntroPlaying?: boolean;
 }

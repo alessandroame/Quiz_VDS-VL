@@ -112,8 +112,9 @@ Questo documento rappresenta la **bussola strategica e funzionale** del progetto
 | Archivio & Ricerca Full-Text | 🟢 Completato | Ricerca istantanea, preferiti e note personali salvate in Dexie. |
 | Dashboard Statistiche | 🟢 Completato | Radar materie, prontezza esame e storico sessioni. |
 | Temi Carbon Cockpit & Hangar Light, Icona Aero Shield | 🟢 Completato | Zero dominante blu (`zinc` + `amber`), icona Aero Shield vettoriale e PNG 192/512. |
-| Suite Vitest (Unit & BVA) | 🟢 Completato | 98 test attivi, soglie limite verificate, isolamento in-memory. |
-| Supporto Audio Avionico | 🟢 Completato | Sintesi vocale, feedback sonoro cockpit Web Audio API e fonetica ICAO integrata. |
+| Suite Vitest (Unit & BVA) | 🟢 Completato | 121 test attivi, soglie limite verificate, isolamento in-memory. |
+| Supporto Audio Avionico | 🟢 Completato | Sintesi vocale neurale con controlli Play/Pausa e Da Capo universali su domanda, singole opzioni e spiegazione; feedback cockpit Web Audio API e fonetica ICAO. |
+| Gestione Offline Audio & Fallback | 🟢 Completato | Download in background non bloccante via CacheStorage, prompt non invasivo al primo avvio Guida, gestione granulare Impostazioni, fallback automatico offline su voce scaricata e Range Requests Safari. |
 | Google Drive Cloud Sync | 🟢 Completato | Integrazione GIS con `appDataFolder` privata e fallback JSON export/import. |
 | Modalità Alla Guida | 🟢 Completato | Layout zero-scroll, Screen Wake Lock, Pilota Auto Radio Quiz e Speech Recognition. |
 | Quick Speech Menu (1-Click) | 🟢 Completato | Flyout compatto in Navbar per controllo vocale rapido senza navigazione. |

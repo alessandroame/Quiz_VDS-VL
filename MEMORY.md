@@ -80,6 +80,13 @@ Questo file costituisce la **memoria tecnica permanente** del progetto. Raccogli
   - Pronuncia domanda concisa (Cockpit Minimalist): le tracce audio delle domande (`_q.mp3`) contengono esclusivamente il testo della domanda normalizzato, omettendo tassativamente prefissi verbali come il numero (*"Domanda X"*) o il nome della materia/categoria per azzerare la latenza d'ascolto.
   - Pronuncia opzioni in stile cockpit standard: *"Uno. [testo]"*, *"Due. [testo]"*, *"Tre. [testo]"*.
 - **Persistenza & Switch**: Selezione della voce salvata in Dexie (`settings.ttsVoice: 'giuseppe' | 'elsa'`) e commutabile istantaneamente dalle impostazioni.
+- **Gestione Offline & Fallback Intelligente (`src/services/audioDownloadManager.ts`)**:
+  - Prompt non invasivo al primo avvio della Modalità alla Guida (`AudioOfflinePromptModal`) con scelta a un tocco (voce attiva consigliata ~154 MB, entrambe ~302 MB, o skip "Non ora").
+  - Download in background non bloccante via worker a pool concorrente (8 connessioni contemporanee) verso CacheStorage (`vds-audio-giuseppe` e `vds-audio-elsa`).
+  - Progress HUD discreto in Navbar e barra Guida (`AudioDownloadProgressHUD`).
+  - Gestione granulare nelle Impostazioni (Voce): stato download, progress bar, storage size, pulsante scarica ed elimina per voce.
+  - Fallback offline automatico in `voiceService`: se l'app è offline (`!navigator.onLine`) e la voce selezionata non è presente nella cache del dispositivo, il motore commuta in modo trasparente e immediato sull'altra voce scaricata con notifica cockpit.
+  - PWA Service Worker: regole Workbox dedicate con `rangeRequests: true` per garantire compatibilità con lo streaming audio su iOS Safari.
 
 ---
 

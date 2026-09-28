@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { WifiOff, Wifi, X, CheckCircle2, Database, Cloud } from 'lucide-react';
 import { useOnlineStatus } from '../hooks/useOnlineStatus';
 
@@ -51,80 +52,85 @@ export const OfflineIndicator: React.FC = () => {
       </button>
 
       {/* Cockpit Status Briefing Modal */}
-      {showModal && (
-        <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/75 p-4 animate-in fade-in"
-          onClick={() => setShowModal(false)}
-        >
+      {showModal &&
+        typeof document !== 'undefined' &&
+        createPortal(
           <div
-            className="bg-zinc-900 border border-zinc-800 rounded-2xl p-5 max-w-sm w-full space-y-4 shadow-2xl dark:bg-zinc-900 dark:border-zinc-800 light:bg-white light:border-slate-200"
-            onClick={e => e.stopPropagation()}
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/75 p-4 animate-in fade-in"
+            onClick={() => setShowModal(false)}
           >
-            <div className="flex items-center justify-between border-b border-zinc-800 pb-3 light:border-slate-200">
-              <div className="flex items-center gap-2">
-                {!isOnline ? (
-                  <div className="p-2 rounded-xl bg-amber-500/20 text-amber-400 light:bg-amber-100 light:text-amber-700">
-                    <WifiOff className="w-5 h-5" />
+            <div
+              className="bg-zinc-900 border border-zinc-800 rounded-2xl p-5 max-w-sm w-full max-h-[90vh] overflow-y-auto space-y-4 shadow-2xl dark:bg-zinc-900 dark:border-zinc-800 light:bg-white light:border-slate-200"
+              onClick={e => e.stopPropagation()}
+            >
+              <div className="flex items-center justify-between border-b border-zinc-800 pb-3 light:border-slate-200">
+                <div className="flex items-center gap-2">
+                  {!isOnline ? (
+                    <div className="p-2 rounded-xl bg-amber-500/20 text-amber-400 light:bg-amber-100 light:text-amber-700">
+                      <WifiOff className="w-5 h-5" />
+                    </div>
+                  ) : (
+                    <div className="p-2 rounded-xl bg-emerald-500/20 text-emerald-400 light:bg-emerald-100 light:text-emerald-700">
+                      <Wifi className="w-5 h-5" />
+                    </div>
+                  )}
+                  <div>
+                    <h3 className="font-bold text-sm text-zinc-100 dark:text-zinc-100 light:text-slate-900">
+                      {!isOnline ? 'Modalità Offline' : 'Connessione Attiva'}
+                    </h3>
+                    <div className="text-[11px] text-zinc-400 light:text-slate-500 font-mono">
+                      {!isOnline ? `Disconnesso ${formatOfflineDuration()}` : 'Rete disponibile'}
+                    </div>
                   </div>
-                ) : (
-                  <div className="p-2 rounded-xl bg-emerald-500/20 text-emerald-400 light:bg-emerald-100 light:text-emerald-700">
-                    <Wifi className="w-5 h-5" />
+                </div>
+                <button
+                  id="btn-close-offline-modal"
+                  type="button"
+                  onClick={() => setShowModal(false)}
+                  className="p-1 rounded-lg text-zinc-400 hover:text-zinc-200 light:text-slate-500 light:hover:text-slate-800"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
+
+              <div className="space-y-2.5 text-xs text-zinc-300 dark:text-zinc-300 light:text-slate-600">
+                <div className="flex items-start gap-2.5 p-2 rounded-xl bg-zinc-800/50 light:bg-slate-100 border border-zinc-800 light:border-slate-200">
+                  <Database className="w-4 h-4 text-amber-400 light:text-amber-600 flex-shrink-0 mt-0.5" />
+                  <div>
+                    <strong className="text-zinc-100 light:text-slate-900 block font-semibold">100% Autonomo</strong>
+                    I 504 quiz AeCI, risposte, note e quaderno errori risiedono sul dispositivo in IndexedDB.
                   </div>
-                )}
-                <div>
-                  <h3 className="font-bold text-sm text-zinc-100 dark:text-zinc-100 light:text-slate-900">
-                    {!isOnline ? 'Modalità Offline' : 'Connessione Attiva'}
-                  </h3>
-                  <div className="text-[11px] text-zinc-400 light:text-slate-500 font-mono">
-                    {!isOnline ? `Disconnesso ${formatOfflineDuration()}` : 'Rete disponibile'}
+                </div>
+
+                <div className="flex items-start gap-2.5 p-2 rounded-xl bg-zinc-800/50 light:bg-slate-100 border border-zinc-800 light:border-slate-200">
+                  <CheckCircle2 className="w-4 h-4 text-emerald-400 light:text-emerald-600 flex-shrink-0 mt-0.5" />
+                  <div>
+                    <strong className="text-zinc-100 light:text-slate-900 block font-semibold">Esami & Studio Operativi</strong>
+                    Puoi svolgere qualsiasi sessione d'esame e studio senza alcuna limitazione o interruzione.
+                  </div>
+                </div>
+
+                <div className="flex items-start gap-2.5 p-2 rounded-xl bg-zinc-800/50 light:bg-slate-100 border border-zinc-800 light:border-slate-200">
+                  <Cloud className="w-4 h-4 text-sky-400 light:text-sky-600 flex-shrink-0 mt-0.5" />
+                  <div>
+                    <strong className="text-zinc-100 light:text-slate-900 block font-semibold">Sincronizzazione Differita</strong>
+                    Se abilitato il backup Google Drive, i progressi verranno inviati automaticamente al rientro online.
                   </div>
                 </div>
               </div>
+
               <button
+                id="btn-confirm-offline-modal"
                 type="button"
                 onClick={() => setShowModal(false)}
-                className="p-1 rounded-lg text-zinc-400 hover:text-zinc-200 light:text-slate-500 light:hover:text-slate-800"
+                className="w-full py-2.5 rounded-xl bg-amber-600 hover:bg-amber-500 text-white font-bold text-xs transition-colors shadow-md"
               >
-                <X className="w-4 h-4" />
+                Ricevuto, Continua
               </button>
             </div>
-
-            <div className="space-y-2.5 text-xs text-zinc-300 dark:text-zinc-300 light:text-slate-600">
-              <div className="flex items-start gap-2.5 p-2 rounded-xl bg-zinc-800/50 light:bg-slate-100 border border-zinc-800 light:border-slate-200">
-                <Database className="w-4 h-4 text-amber-400 light:text-amber-600 flex-shrink-0 mt-0.5" />
-                <div>
-                  <strong className="text-zinc-100 light:text-slate-900 block font-semibold">100% Autonomo</strong>
-                  I 504 quiz AeCI, risposte, note e quaderno errori risiedono sul dispositivo in IndexedDB.
-                </div>
-              </div>
-
-              <div className="flex items-start gap-2.5 p-2 rounded-xl bg-zinc-800/50 light:bg-slate-100 border border-zinc-800 light:border-slate-200">
-                <CheckCircle2 className="w-4 h-4 text-emerald-400 light:text-emerald-600 flex-shrink-0 mt-0.5" />
-                <div>
-                  <strong className="text-zinc-100 light:text-slate-900 block font-semibold">Esami & Studio Operativi</strong>
-                  Puoi svolgere qualsiasi sessione d'esame e studio senza alcuna limitazione o interruzione.
-                </div>
-              </div>
-
-              <div className="flex items-start gap-2.5 p-2 rounded-xl bg-zinc-800/50 light:bg-slate-100 border border-zinc-800 light:border-slate-200">
-                <Cloud className="w-4 h-4 text-sky-400 light:text-sky-600 flex-shrink-0 mt-0.5" />
-                <div>
-                  <strong className="text-zinc-100 light:text-slate-900 block font-semibold">Sincronizzazione Differita</strong>
-                  Se abilitato il backup Google Drive, i progressi verranno inviati automaticamente al rientro online.
-                </div>
-              </div>
-            </div>
-
-            <button
-              type="button"
-              onClick={() => setShowModal(false)}
-              className="w-full py-2.5 rounded-xl bg-amber-600 hover:bg-amber-500 text-white font-bold text-xs transition-colors shadow-md"
-            >
-              Ricevuto, Continua
-            </button>
-          </div>
-        </div>
-      )}
+          </div>,
+          document.body
+        )}
     </>
   );
 };

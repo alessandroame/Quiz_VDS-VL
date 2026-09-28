@@ -18,7 +18,46 @@ Questo documento registra in ordine cronologico tutte le lavorazioni svolte nel 
 
 ## Registro Cronologico
 
-### [2026-09-28] - Estensione Suite Test Audio Vocale e Integrazione Indicatore Offline
+### [2026-09-28] - Gestione Offline del Parlato: Download Background Non Bloccante, Prompt Guida e Fallback Intelligente
+- **Cosa abbiamo fatto**:
+  - Creato il singleton service [src/services/audioDownloadManager.ts](file:///d:/Github/Quiz_VDS-VL/src/services/audioDownloadManager.ts) per il download in background non bloccante dei 2.520 file MP3 per voce verso CacheStorage (`vds-audio-giuseppe` e `vds-audio-elsa`) con pool di 8 connessioni concorrenti, resume automatico dei file già presenti, throttling non bloccante via `setTimeout` e supporto cancellazione/abort.
+  - Implementato in [src/services/voiceService.ts](file:///d:/Github/Quiz_VDS-VL/src/services/voiceService.ts) il fallback offline deterministico: se l'app è offline (`!navigator.onLine`) o la risorsa non è disponibile e la voce preferita non è scaricata in cache, il motore commuta all'istante sulla voce alternativa scaricata emettendo un evento cockpit dedicato.
+  - Creato il componente modale avionico [src/components/AudioOfflinePromptModal.tsx](file:///d:/Github/Quiz_VDS-VL/src/components/AudioOfflinePromptModal.tsx): presentato al primo avvio della Modalità Guida se la voce attiva non è scaricata, con scelte a 1 tocco (voce attiva consigliata ~154 MB, entrambe ~302 MB, o "Non ora").
+  - Creato il mini-indicatore [src/components/AudioDownloadProgressHUD.tsx](file:///d:/Github/Quiz_VDS-VL/src/components/AudioDownloadProgressHUD.tsx) con percentuale live e popover di dettaglio, integrato nella barra di navigazione [src/components/Navbar.tsx](file:///d:/Github/Quiz_VDS-VL/src/components/Navbar.tsx) e nell'header della Modalità Guida [src/components/DriveModeScreen.tsx](file:///d:/Github/Quiz_VDS-VL/src/components/DriveModeScreen.tsx).
+  - Estesa la scheda *Voce* in [src/components/SettingsModal.tsx](file:///d:/Github/Quiz_VDS-VL/src/components/SettingsModal.tsx) con la sezione dedicata *Archivio Audio Offline (PWA)*: card indipendenti per Giuseppe ed Elsa con monitoraggio avanzamento/dimensione, pulsanti Scarica ed Elimina cache, e ripristino dell'avviso primo avvio.
+  - Configurato Workbox in [vite.config.ts](file:///d:/Github/Quiz_VDS-VL/vite.config.ts) con cache `CacheFirst` per ciascuna voce e `rangeRequests: true` per garantire piena compatibilità con lo streaming audio di iOS Safari.
+  - Aggiunti 7 nuovi unit test in [src/services/audioDownloadManager.test.ts](file:///d:/Github/Quiz_VDS-VL/src/services/audioDownloadManager.test.ts) e 4 nuovi test in [src/services/voiceService.test.ts](file:///d:/Github/Quiz_VDS-VL/src/services/voiceService.test.ts), portando la suite Vitest a **121/121 test superati** in ~600ms.
+  - Realizzato lo script di collaudo headless [scripts/test_offline_audio.js](file:///d:/Github/Quiz_VDS-VL/scripts/test_offline_audio.js) via CDP, con esito 100% positivo e zero errori in console JavaScript.
+- **Scelte architetturali & Rationale**:
+  - *Download Sola Voce Consigliata Rationale*: 1 voce occupa ~154 MB (2.520 richieste HTTP), entrambe ~302 MB (5.040 richieste). Poiché oltre il 90% degli allievi seleziona una singola voce preferita, proporre come default consigliato la voce attiva dimezza i tempi di download (~30-45s) e il traffico dati mobile, lasciando comunque all'utente la libertà di scaricare entrambe le voci o gestirle separatamente nelle Impostazioni.
+  - *CacheStorage Dedicato per Voce Rationale*: Separare le cache in `vds-audio-giuseppe` e `vds-audio-elsa` permette di contare le chiavi scaricate a costo zero (`cache.keys().length`), calcolare la percentuale esatta ed eseguire la cancellazione atomica immediata con `caches.delete(name)` senza dover ciclare ed eliminare 2.520 singoli elementi.
+  - *Non-Blocking Concurrency Rationale*: L'uso di un pool a 8 worker asincroni con pause inter-batch previene il sovraccarico del thread UI, mantenendo 60fps costanti anche durante l'allenamento in Modalità Guida mentre il download procede in background.
+  - *Range Requests iOS Safari Rationale*: I browser basati su WebKit su iOS inviano richieste `Range: bytes=0-` per i tag `<audio>`. L'abilitazione di `rangeRequests: true` in Workbox runtimeCaching garantisce che le risposte parziali 206 vengano generate direttamente dalla cache locale senza fallimenti di riproduzione.
+- **Impatto sul Desiderata**:
+  - Piena realizzazione del requisito di fruizione offline del parlato neurale per la preparazione all'esame, specialmente in vista delle trasferte sui campi di volo e decolli montani privi di copertura cellulare.
+
+### [2026-09-28] - Estensione Universale Controlli Audio: Play/Pausa e Riavvio da Capo su Domande, Opzioni e Spiegazione
+- **Cosa abbiamo fatto**:
+  - Esteso [src/services/voiceService.ts](file:///d:/Github/Quiz_VDS-VL/src/services/voiceService.ts) implementando:
+    - Ristrutturazione di `playSinglePart(questionId, part)`: verifica dello stato di riproduzione/pausa del frammento attivo *prima* di cancellare la coda, garantendo che mettere in pausa una singola opzione (es. `opt2`) durante l'ascolto della sequenza automatica preservi lo stato `isSequencePlaying` e consenta, alla ripresa, di completare l'opzione e avanzare fluidamente alle successive.
+    - Implementazione di `restartSinglePart(questionId, part)`: consente di riavviare istantaneamente da capo (`currentTime = 0`) qualsiasi frammento audio parlato (domanda, opzione 1/2/3 o spiegazione didattica) sia mentre sta parlando sia in stato di pausa.
+  - Aggiornato [src/hooks/useAviationVoice.ts](file:///d:/Github/Quiz_VDS-VL/src/hooks/useAviationVoice.ts) esponendo i metodi e selettori reattivi: `isPartActive`, `restartQuestion`, `restartOption(1 | 2 | 3)`, `restartExplanation`.
+  - Aggiornato [src/components/QuestionCard.tsx](file:///d:/Github/Quiz_VDS-VL/src/components/QuestionCard.tsx):
+    - **Testo Domanda**: visualizzazione di una pillola cockpit con toggle Play/Pausa (`Pause` animata / `Play`), pulsante `[↺]` per riavvio immediato da capo, e scorciatoie `Q` (toggle) e `Shift + Q` (da capo).
+    - **Tre Opzioni di Risposta (1, 2, 3)**: quando un'opzione è attiva (in ascolto o in pausa), il pulsante audio si espande in una mini-pillola ergonomica con toggle Play/Pausa e pulsante `[↺]` per ricominciare da capo l'opzione; scorciatoie `Alt + 1 / 2 / 3` (toggle) e `Alt + Shift + 1 / 2 / 3` (da capo).
+    - **Spiegazione Didattica**: pillola completa con toggle Play/Pausa (`Pause` / `Play`), pulsante `[↺ Da capo]` e pulsante `[⏹ Stop]`; scorciatoie `E` (toggle) e `Shift + E` (da capo).
+  - Aggiornato [src/components/ArchiveScreen.tsx](file:///d:/Github/Quiz_VDS-VL/src/components/ArchiveScreen.tsx) allineando tutti i controlli audio (domanda, opzioni 1/2/3 e spiegazione didattica) alle medesime capacità interattive.
+  - Sviluppati e aggiunti in [src/services/voiceService.test.ts](file:///d:/Github/Quiz_VDS-VL/src/services/voiceService.test.ts) i test `VOICE-11`, `VOICE-12`, `VOICE-13` e `VOICE-14` (copertura completa di toggle, restart e continuità sequenziale).
+  - Esteso e superato al 100% il collaudo headless con Chrome DevTools Protocol in [scripts/test_audio_play_pause.js](file:///d:/Github/Quiz_VDS-VL/scripts/test_audio_play_pause.js).
+  - Validati con successo:
+    - **110/110 test Vitest** (`npm run test:unit`) a esito positivo al 100% in 567ms.
+    - Build di produzione PWA (`npm run build`) a zero avvisi e zero errori TypeScript.
+  - Aggiornati [README.md](file:///d:/Github/Quiz_VDS-VL/README.md) e [DESIDERATA.md](file:///d:/Github/Quiz_VDS-VL/DESIDERATA.md).
+- **Scelte architetturali & Rationale**:
+  - *Coerenza Semantica & Ergonomia Avionica*: L'utente non deve mai essere costretto a riascoltare l'intera domanda se vuole soffermarsi o riascoltare una singola risposta o un dettaglio della regola didattica.
+  - *Stato Sequenza Resiliente*: Preservare `isSequencePlaying` durante la pausa di una risposta garantisce che l'allievo possa interrompere l'ascolto per riflettere, riprendere e far scorrere automaticamente le opzioni rimanenti senza dover reinizializzare la lettura.
+- **Impatto sul Desiderata**:
+  - Completa la modularità totale del motore audio neurale PWA e massimizza l'accessibilità uditiva durante lo studio sia da desktop che da mobile.
 - **Cosa abbiamo fatto**:
   - Aggiunti i test di unità `VOICE-11`, `VOICE-12`, `VOICE-13` e `VOICE-14` in [src/services/voiceService.test.ts](file:///d:/Github/Quiz_VDS-VL/src/services/voiceService.test.ts), validando:
     - Toggle play/pausa e riavvio da capo (`restartSinglePart`) sui singoli pulsanti delle opzioni di risposta (`opt1`, `opt2`, `opt3`).

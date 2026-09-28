@@ -24,6 +24,8 @@ export const DEFAULT_SETTINGS: AppSettings = {
   driveModeAutopilot: true,
   driveModeAutoAdvanceSeconds: 5,
   driveModeVoiceCommands: false,
+  driveModeIntroPlayed: false,
+  audioOfflinePromptDismissed: false,
 };
 
 export class VdsQuizDatabase extends Dexie {

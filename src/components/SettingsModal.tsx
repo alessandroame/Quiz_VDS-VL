@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   X,
   Sun,
@@ -16,7 +16,8 @@ import {
   Database,
   Check,
   Mic,
-  HelpCircle
+  HelpCircle,
+  CloudOff
 } from 'lucide-react';
 import { useTheme } from '../context/ThemeContext';
 import { useQuiz } from '../context/QuizContext';
@@ -24,6 +25,7 @@ import { googleDrive } from '../services/googleDrive';
 import { exportDatabaseBackup, importDatabaseBackup, db } from '../db';
 import type { ThemeMode } from '../types/database';
 import { VoiceCommandsModal } from './VoiceCommandsModal';
+import { audioDownloadManager, VoiceName, VoiceDownloadProgress } from '../services/audioDownloadManager';
 
 export type SettingsTab = 'appearance' | 'voice' | 'drive' | 'cloud' | 'data';
 
@@ -48,6 +50,19 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
   const [syncStatus, setSyncStatus] = useState<string | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
   const [isVoiceGuideOpen, setIsVoiceGuideOpen] = useState(false);
+  const [audioStatuses, setAudioStatuses] = useState<Record<VoiceName, VoiceDownloadProgress>>(
+    audioDownloadManager.getAllStatuses()
+  );
+
+  useEffect(() => {
+    const unsub = audioDownloadManager.subscribe(newStatuses => {
+      setAudioStatuses(newStatuses);
+    });
+    if (isOpen) {
+      audioDownloadManager.checkAllStatuses().catch(console.error);
+    }
+    return unsub;
+  }, [isOpen]);
 
   if (!isOpen) return null;
 
@@ -342,6 +357,178 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                         className="w-4 h-4 accent-amber-500 rounded"
                       />
                     </label>
+                  </div>
+
+                  {/* Sezione Offline Audio TTS */}
+                  <div className="p-3 rounded-xl border border-zinc-800 bg-zinc-950/60 light:bg-slate-50 light:border-slate-200 space-y-3">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <span className="text-zinc-300 light:text-slate-700 font-bold block text-xs">
+                          Archivio Audio Offline (PWA)
+                        </span>
+                        <span className="text-[11px] text-zinc-500 block">
+                          2.520 file audio MP3 per voce salvati nella cache del dispositivo
+                        </span>
+                      </div>
+                      <CloudOff className="w-4 h-4 text-amber-500/70" />
+                    </div>
+
+                    {/* Giuseppe Card */}
+                    <div className="p-2.5 rounded-xl border border-zinc-800/80 bg-zinc-900/60 light:bg-white light:border-slate-200 flex flex-col gap-2">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <div className="flex items-center gap-1.5">
+                            <span className="text-xs font-semibold text-zinc-200 light:text-slate-800">
+                              👨‍✈️ Giuseppe (Maschile)
+                            </span>
+                            {audioStatuses.giuseppe.isComplete && (
+                              <span className="text-[10px] px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-400 font-bold">
+                                Scaricato
+                              </span>
+                            )}
+                          </div>
+                          <span className="text-[11px] text-zinc-400 light:text-slate-500 block">
+                            {audioStatuses.giuseppe.isDownloading
+                              ? `Download in corso: ${audioStatuses.giuseppe.percent}% (${audioStatuses.giuseppe.downloadedCount}/${audioStatuses.giuseppe.totalCount})`
+                              : audioStatuses.giuseppe.isComplete
+                              ? '2.520 quesiti pronti offline (~154 MB)'
+                              : audioStatuses.giuseppe.downloadedCount > 0
+                              ? `Parziale: ${audioStatuses.giuseppe.downloadedCount} di ${audioStatuses.giuseppe.totalCount} file`
+                              : 'Non scaricato (~154 MB)'}
+                          </span>
+                        </div>
+
+                        <div className="flex items-center gap-1.5">
+                          {audioStatuses.giuseppe.isDownloading ? (
+                            <button
+                              type="button"
+                              id="btn-cancel-download-giuseppe"
+                              onClick={() => audioDownloadManager.cancelDownload('giuseppe')}
+                              className="px-2.5 py-1 text-[11px] font-bold text-rose-400 border border-rose-500/40 rounded-lg hover:bg-rose-500/10 transition-colors"
+                            >
+                              Annulla
+                            </button>
+                          ) : audioStatuses.giuseppe.isComplete || audioStatuses.giuseppe.downloadedCount > 0 ? (
+                            <button
+                              type="button"
+                              id="btn-delete-cache-giuseppe"
+                              onClick={() => audioDownloadManager.deleteCache('giuseppe')}
+                              className="px-2.5 py-1 text-[11px] font-bold text-zinc-400 hover:text-rose-400 border border-zinc-800 hover:border-rose-500/40 rounded-lg hover:bg-rose-500/10 transition-colors flex items-center gap-1"
+                              title="Elimina cache audio di Giuseppe"
+                            >
+                              <Trash2 className="w-3 h-3" />
+                              <span>Elimina</span>
+                            </button>
+                          ) : (
+                            <button
+                              type="button"
+                              id="btn-download-giuseppe"
+                              onClick={() => audioDownloadManager.startDownload('giuseppe')}
+                              className="px-2.5 py-1 text-[11px] font-bold text-amber-400 bg-amber-500/10 border border-amber-500/30 rounded-lg hover:bg-amber-500/20 transition-colors flex items-center gap-1"
+                            >
+                              <Download className="w-3 h-3" />
+                              <span>Scarica</span>
+                            </button>
+                          )}
+                        </div>
+                      </div>
+
+                      {audioStatuses.giuseppe.isDownloading && (
+                        <div className="w-full bg-zinc-800 light:bg-slate-200 h-1.5 rounded-full overflow-hidden">
+                          <div
+                            className="bg-amber-500 h-full transition-all duration-300"
+                            style={{ width: `${audioStatuses.giuseppe.percent}%` }}
+                          />
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Elsa Card */}
+                    <div className="p-2.5 rounded-xl border border-zinc-800/80 bg-zinc-900/60 light:bg-white light:border-slate-200 flex flex-col gap-2">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <div className="flex items-center gap-1.5">
+                            <span className="text-xs font-semibold text-zinc-200 light:text-slate-800">
+                              👩‍✈️ Elsa (Femminile)
+                            </span>
+                            {audioStatuses.elsa.isComplete && (
+                              <span className="text-[10px] px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-400 font-bold">
+                                Scaricato
+                              </span>
+                            )}
+                          </div>
+                          <span className="text-[11px] text-zinc-400 light:text-slate-500 block">
+                            {audioStatuses.elsa.isDownloading
+                              ? `Download in corso: ${audioStatuses.elsa.percent}% (${audioStatuses.elsa.downloadedCount}/${audioStatuses.elsa.totalCount})`
+                              : audioStatuses.elsa.isComplete
+                              ? '2.520 quesiti pronti offline (~148 MB)'
+                              : audioStatuses.elsa.downloadedCount > 0
+                              ? `Parziale: ${audioStatuses.elsa.downloadedCount} di ${audioStatuses.elsa.totalCount} file`
+                              : 'Non scaricato (~148 MB)'}
+                          </span>
+                        </div>
+
+                        <div className="flex items-center gap-1.5">
+                          {audioStatuses.elsa.isDownloading ? (
+                            <button
+                              type="button"
+                              id="btn-cancel-download-elsa"
+                              onClick={() => audioDownloadManager.cancelDownload('elsa')}
+                              className="px-2.5 py-1 text-[11px] font-bold text-rose-400 border border-rose-500/40 rounded-lg hover:bg-rose-500/10 transition-colors"
+                            >
+                              Annulla
+                            </button>
+                          ) : audioStatuses.elsa.isComplete || audioStatuses.elsa.downloadedCount > 0 ? (
+                            <button
+                              type="button"
+                              id="btn-delete-cache-elsa"
+                              onClick={() => audioDownloadManager.deleteCache('elsa')}
+                              className="px-2.5 py-1 text-[11px] font-bold text-zinc-400 hover:text-rose-400 border border-zinc-800 hover:border-rose-500/40 rounded-lg hover:bg-rose-500/10 transition-colors flex items-center gap-1"
+                              title="Elimina cache audio di Elsa"
+                            >
+                              <Trash2 className="w-3 h-3" />
+                              <span>Elimina</span>
+                            </button>
+                          ) : (
+                            <button
+                              type="button"
+                              id="btn-download-elsa"
+                              onClick={() => audioDownloadManager.startDownload('elsa')}
+                              className="px-2.5 py-1 text-[11px] font-bold text-amber-400 bg-amber-500/10 border border-amber-500/30 rounded-lg hover:bg-amber-500/20 transition-colors flex items-center gap-1"
+                            >
+                              <Download className="w-3 h-3" />
+                              <span>Scarica</span>
+                            </button>
+                          )}
+                        </div>
+                      </div>
+
+                      {audioStatuses.elsa.isDownloading && (
+                        <div className="w-full bg-zinc-800 light:bg-slate-200 h-1.5 rounded-full overflow-hidden">
+                          <div
+                            className="bg-amber-500 h-full transition-all duration-300"
+                            style={{ width: `${audioStatuses.elsa.percent}%` }}
+                          />
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Note fallback & reset */}
+                    <div className="pt-2 border-t border-zinc-800/80 light:border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-1 text-[11px] text-zinc-400 light:text-slate-500">
+                      <span>
+                        💡 Se sei offline e la voce scelta non è scaricata, l'app usa l'altra voce presente.
+                      </span>
+                      {settings.audioOfflinePromptDismissed && (
+                        <button
+                          type="button"
+                          id="btn-reset-audio-prompt"
+                          onClick={() => updateSetting('audioOfflinePromptDismissed', false)}
+                          className="text-amber-400 hover:underline shrink-0 text-left"
+                        >
+                          Ripristina avviso Guida
+                        </button>
+                      )}
+                    </div>
                   </div>
                 </>
               )}

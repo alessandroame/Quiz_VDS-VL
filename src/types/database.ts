@@ -50,6 +50,8 @@ export interface AppSettings {
   driveModeAutopilot: boolean;
   driveModeAutoAdvanceSeconds: number;
   driveModeVoiceCommands: boolean;
+  driveModeIntroPlayed?: boolean;
+  audioOfflinePromptDismissed?: boolean;
 }
 
 export interface InProgressSession {

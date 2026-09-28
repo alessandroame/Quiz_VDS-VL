@@ -99,13 +99,20 @@
 - **Due Voci Selezionabili**:
   - 👨‍✈️ **Giuseppe**: timbro baritonale calmo, impostato come un istruttore di volo in cockpit (`rate -5%`, `pitch -5Hz`).
   - 👩‍✈️ **Elsa**: dizione cristallina, brillante ed energica.
+- **Gestione Offline del Parlato & Download in Background (`audioDownloadManager`)**:
+  - **Prompt Non Invasivo al Primo Avvio della Guida**: dialog dedicato quando si accede per la prima volta alla Modalità Guida, con scelta a 1 tocco: *Scarica Voce Attiva* (consigliato, ~150 MB per 2.520 quesiti), *Scarica Entrambe* (~300 MB) o *Non ora*.
+  - **Download Non Bloccante**: il download dei file audio avviene in background via CacheStorage (`vds-audio-giuseppe` e `vds-audio-elsa`) con un pool concorrente a 8 connessioni senza freeze della UI o blocchi della navigazione.
+  - **Mini-HUD di Avanzamento**: indicatore discreto (`⤓ 42%`) nella Navbar e nella barra Guida con popover per annullare o visualizzare i file rimanenti.
+  - **Gestione Granulare nelle Impostazioni (🎙️ Voce)**: due card indipendenti per Giuseppe ed Elsa con monitoraggio dello spazio occupato, barra di progresso, pulsante Scarica/Elimina cache e opzione di ripristino del prompt iniziale.
+  - **Fallback Intelligente Offline**: se la voce selezionata non è stata scaricata e ci si trova offline, l'app usa automaticamente la voce scaricata disponibile con notifica informativa cockpit, senza interruzioni.
+  - **PWA Service Worker & iOS Safari**: regole Workbox con `rangeRequests: true` per garantire compatibilità con lo streaming audio parziale di Safari su iOS.
 - **Normalizzazione Fonetica Aeronautica (`aviationPhonetics.ts`)**: espansione e pronuncia accurata secondo lo standard aeronautico ICAO di sigle e acronimi (`D.P.R. 133/2010`, `VDS/VL`, `AeCI`, `hPa`, `QNH`, `QFE`, `FL`, `km/h`, `kt`, `m/s`).
 - **Ascolto Modulare**: pulsanti per ascolto atomico della singola domanda (tasto `Q`), delle singole opzioni (`Alt+1`, `Alt+2`, `Alt+3`), o dell'intera sequenza con evidenziazione del testo sincronizzata.
-- **Controlli Parlato Interattivi (Play, Pausa, Riprendi, Da Capo)**: Il pulsante audio opera ora come pillola cockpit multimediale avanzata:
-  - Clic su **Ascolta** / **Pausa**: avvia o mette in pausa la riproduzione preservando il punto esatto di lettura (evita di dover ricominciare sempre dall'inizio).
-  - Clic su **Riprendi**: prosegue l'ascolto dal secondo esatto di sospensione.
-  - Clic su **Da capo** (o tasto `R` / `Shift+V`): fa ripartire istantaneamente l'audio dall'inizio del quesito anche mentre la voce sta parlando.
-  - Clic su **Stop** (o tasto `Esc`): azzera l'audio e ripristina il pulsante singolo.
+- **Controlli Parlato Interattivi Universali (Play, Pausa, Riprendi, Da Capo)**: Il controllo audio opera ora come pillola cockpit multimediale interattiva estesa a **ogni elemento vocale** (sequenza completa, testo domanda, singole opzioni 1, 2, 3 e spiegazione didattica):
+  - **Play / Pausa su ogni parlato**: Cliccando sull'audio di qualsiasi frammento (domanda, opzione singola o spiegazione) la riproduzione si avvia o va in pausa preservando il millisecondo esatto di lettura, senza ripartire da capo.
+  - **Riprendi in continuità**: Riprende la riproduzione dal secondo esatto di sospensione. Se si mette in pausa una risposta durante l'ascolto della sequenza automatica, la sequenza viene preservata e prosegue fluidamente alle opzioni successive.
+  - **Riavvio da capo su ogni parlato**: Pulsante `[↺]` (o scorciatoie da tastiera dedicate) per far ripartire istantaneamente quel frammento (o l'intera domanda) dall'inizio sia mentre la voce sta parlando sia in stato di pausa.
+  - **Stop e Chiusura rapida**: Clic su `[⏹]` (o tasto `Esc`) per azzerare l'audio e ripristinare lo stato iniziale.
 - **Quick Speech Menu (1-Clic in Header)**: menu rapido sempre visibile nella barra di navigazione superiore per commutare istantaneamente con un singolo tocco la voce (👨‍✈️ Giuseppe / 👩‍✈️ Elsa), la velocità di riproduzione (0.9x - 1.25x), la lettura automatica e gli effetti sonori, senza aprire pesanti schermate o abbandonare la sessione di quiz.
 - **MediaSession API**: controllo della riproduzione vocale (Play/Pausa/Stop) dai pulsanti fisici o touch degli auricolari Bluetooth anche a schermo spento.
 - **Feedback Sonori Cockpit (Web Audio API)**: click meccanici, segnali di conferma, buzzer di errore e alert timer generati via oscillatori nativi senza pesanti file esterni.
@@ -126,9 +133,10 @@
   - `Spazio` o `Freccia Destra`: domanda successiva.
   - `Freccia Sinistra`: domanda precedente.
   - `V`: Play / Pausa riproduzione vocale sequenziale.
-  - `R` o `Shift + V`: Ricomincia da capo la lettura del quesito (mentre parla o in pausa).
-  - `Q`: riascolto audio della sola domanda (Shift+Q per riavviare da capo).
-  - `Alt + 1 / 2 / 3`: ascolto audio della rispettiva opzione (Shift per riavviare).
+  - `R` o `Shift + V`: Ricomincia da capo la sequenza completa del quesito.
+  - `Q`: toggle Play / Pausa della domanda (`Shift + Q` per riavviare da capo).
+  - `Alt + 1 / 2 / 3`: toggle Play / Pausa della rispettiva opzione (`Alt + Shift + 1 / 2 / 3` per riavviare da capo).
+  - `E`: toggle Play / Pausa della spiegazione didattica (`Shift + E` per riavviare da capo).
   - `Esc`: stop e chiusura controlli audio in corso.
 
 ### 10. Fair Coverage Randomizer

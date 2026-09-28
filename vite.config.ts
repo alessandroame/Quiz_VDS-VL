@@ -57,6 +57,36 @@ export default defineConfig({
                 maxAgeSeconds: 60 * 60 * 24 * 365 // 1 anno
               }
             }
+          },
+          {
+            urlPattern: ({ url }) => url.pathname.includes('/audio/giuseppe/'),
+            handler: 'CacheFirst',
+            options: {
+              cacheName: 'vds-audio-giuseppe',
+              expiration: {
+                maxEntries: 3000,
+                maxAgeSeconds: 60 * 60 * 24 * 365
+              },
+              cacheableResponse: {
+                statuses: [0, 200]
+              },
+              rangeRequests: true
+            }
+          },
+          {
+            urlPattern: ({ url }) => url.pathname.includes('/audio/elsa/'),
+            handler: 'CacheFirst',
+            options: {
+              cacheName: 'vds-audio-elsa',
+              expiration: {
+                maxEntries: 3000,
+                maxAgeSeconds: 60 * 60 * 24 * 365
+              },
+              cacheableResponse: {
+                statuses: [0, 200]
+              },
+              rangeRequests: true
+            }
           }
         ]
       }

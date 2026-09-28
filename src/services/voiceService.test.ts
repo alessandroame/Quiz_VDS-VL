@@ -1,5 +1,6 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { VoiceService } from './voiceService';
+import { audioDownloadManager } from './audioDownloadManager';
 
 // Mock HTMLAudioElement
 class MockAudio {
@@ -308,4 +309,54 @@ describe('VoiceService (src/services/voiceService.ts)', () => {
       vi.useRealTimers();
     }
   });
+
+  it('VOICE-15: resolveEffectiveVoice uses target voice when online', () => {
+    Object.defineProperty(navigator, 'onLine', { value: true, configurable: true });
+    expect(service.resolveEffectiveVoice('elsa')).toBe('elsa');
+    expect(service.resolveEffectiveVoice('giuseppe')).toBe('giuseppe');
+  });
+
+  it('VOICE-16: resolveEffectiveVoice falls back to available voice when offline and target is not downloaded', () => {
+    Object.defineProperty(navigator, 'onLine', { value: false, configurable: true });
+
+    // Mock giuseppe as ready, elsa as not ready
+    vi.spyOn(audioDownloadManager, 'isVoiceReady').mockImplementation(v => v === 'giuseppe');
+    vi.spyOn(audioDownloadManager, 'getAvailableOfflineVoice').mockReturnValue('giuseppe');
+
+    // If user wanted elsa, but elsa is not ready offline and giuseppe is available
+    const resolved = service.resolveEffectiveVoice('elsa');
+    expect(resolved).toBe('giuseppe');
+
+    // If user wanted giuseppe, and giuseppe is ready offline -> stays giuseppe
+    expect(service.resolveEffectiveVoice('giuseppe')).toBe('giuseppe');
+  });
+
+  it('VOICE-17: onFallback notifies registered listeners when voice falls back', () => {
+    Object.defineProperty(navigator, 'onLine', { value: false, configurable: true });
+    vi.spyOn(audioDownloadManager, 'isVoiceReady').mockImplementation(v => v === 'giuseppe');
+    vi.spyOn(audioDownloadManager, 'getAvailableOfflineVoice').mockReturnValue('giuseppe');
+
+    const fallbackListener = vi.fn();
+    service.onFallback(fallbackListener);
+
+    service.resolveEffectiveVoice('elsa');
+
+    expect(fallbackListener).toHaveBeenCalledWith({
+      from: 'elsa',
+      to: 'giuseppe'
+    });
+  });
+
+  it('VOICE-18: playSinglePart uses fallback voice URL when offline', async () => {
+    Object.defineProperty(navigator, 'onLine', { value: false, configurable: true });
+    vi.spyOn(audioDownloadManager, 'isVoiceReady').mockImplementation(v => v === 'giuseppe');
+    vi.spyOn(audioDownloadManager, 'getAvailableOfflineVoice').mockReturnValue('giuseppe');
+
+    service.setVoice('elsa');
+    await service.playSinglePart(1001, 'question');
+
+    // Should play giuseppe audio since elsa is not offline-ready
+    expect(mockAudio.src).toContain('/audio/giuseppe/1001_q.mp3');
+  });
 });
+

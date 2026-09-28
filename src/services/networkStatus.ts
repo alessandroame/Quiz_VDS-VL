@@ -35,6 +35,9 @@ export class NetworkStatus {
     if (!this.online) {
       this.offlineTimestamp = Date.now();
     }
+    if (typeof window !== 'undefined') {
+      this.startListening();
+    }
   }
 
   public getState(): NetworkState {

@@ -2,8 +2,10 @@
 // Manages atomic playback of audio snippets, full question-option sequences, play/pause and restarts
 
 import type { AudioPart, VoicePlaybackState } from '../types/audio';
+import { audioDownloadManager } from './audioDownloadManager';
 
 type StateListener = (state: VoicePlaybackState) => void;
+export type VoiceFallbackListener = (info: { from: 'giuseppe' | 'elsa'; to: 'giuseppe' | 'elsa' }) => void;
 
 export class VoiceService {
   private audio: HTMLAudioElement | null = null;
@@ -13,8 +15,10 @@ export class VoiceService {
   private isPaused: boolean = false;
   private pendingSequencePart: AudioPart | null = null;
   private listeners: Set<StateListener> = new Set();
+  private fallbackListeners: Set<VoiceFallbackListener> = new Set();
   private playbackRate: number = 1.0;
   private voiceName: 'giuseppe' | 'elsa' = 'giuseppe';
+  private effectiveVoice: 'giuseppe' | 'elsa' | null = null;
   private sequenceTimeout: any = null;
 
   constructor() {
@@ -28,6 +32,23 @@ export class VoiceService {
 
       this.audio.addEventListener('error', (e) => {
         console.warn('Audio snippet unavailable or playback error:', e);
+        // Fallback retry if the other voice is available offline
+        const currentActive = this.effectiveVoice || this.voiceName;
+        const otherVoice = currentActive === 'giuseppe' ? 'elsa' : 'giuseppe';
+        if (
+          audioDownloadManager.isVoiceReady(otherVoice) &&
+          this.currentQuestionId &&
+          this.activePart &&
+          this.effectiveVoice !== otherVoice
+        ) {
+          this.effectiveVoice = otherVoice;
+          this.notifyFallback(currentActive, otherVoice);
+          if (this.audio) {
+            this.audio.src = this.getAudioUrl(this.currentQuestionId, this.activePart, otherVoice);
+            this.audio.play().catch(() => this.stop());
+            return;
+          }
+        }
         this.stop();
       });
 
@@ -44,6 +65,33 @@ export class VoiceService {
     this.listeners.add(listener);
     listener(this.getState());
     return () => this.listeners.delete(listener);
+  }
+
+  public onFallback(listener: VoiceFallbackListener): () => void {
+    this.fallbackListeners.add(listener);
+    return () => this.fallbackListeners.delete(listener);
+  }
+
+  private notifyFallback(from: 'giuseppe' | 'elsa', to: 'giuseppe' | 'elsa') {
+    this.fallbackListeners.forEach(fn => fn({ from, to }));
+  }
+
+  public resolveEffectiveVoice(targetVoice: 'giuseppe' | 'elsa'): 'giuseppe' | 'elsa' {
+    if (typeof navigator !== 'undefined' && navigator.onLine) {
+      return targetVoice;
+    }
+
+    if (audioDownloadManager.isVoiceReady(targetVoice)) {
+      return targetVoice;
+    }
+
+    const fallback = audioDownloadManager.getAvailableOfflineVoice();
+    if (fallback && fallback !== targetVoice) {
+      this.notifyFallback(targetVoice, fallback);
+      return fallback;
+    }
+
+    return targetVoice;
   }
 
   private notify() {
@@ -78,6 +126,7 @@ export class VoiceService {
   public setVoice(voice: 'giuseppe' | 'elsa') {
     if (this.voiceName !== voice) {
       this.voiceName = voice;
+      this.effectiveVoice = null;
       // Stop ongoing playback on voice change to prevent voice mismatch
       if (this.getState().isPlaying || this.isPaused) {
         this.stop();
@@ -89,7 +138,11 @@ export class VoiceService {
     return this.voiceName;
   }
 
-  private getAudioUrl(questionId: number, part: AudioPart): string {
+  public getEffectiveVoice(): 'giuseppe' | 'elsa' {
+    return this.effectiveVoice || this.voiceName;
+  }
+
+  public getAudioUrl(questionId: number, part: AudioPart, voiceOverride?: 'giuseppe' | 'elsa'): string {
     const suffixMap: Record<AudioPart, string> = {
       question: 'q',
       opt1: '1',
@@ -97,8 +150,9 @@ export class VoiceService {
       opt3: '3',
       explanation: 'e'
     };
+    const voice = voiceOverride || this.effectiveVoice || this.voiceName;
     const baseUrl = (import.meta.env?.BASE_URL || '/').replace(/\/+$/, '');
-    return `${baseUrl}/audio/${this.voiceName}/${questionId}_${suffixMap[part]}.mp3`;
+    return `${baseUrl}/audio/${voice}/${questionId}_${suffixMap[part]}.mp3`;
   }
 
   private updateMediaSession(questionId: number, titlePart: string) {
@@ -131,6 +185,7 @@ export class VoiceService {
     this.clearSequence();
     this.currentQuestionId = questionId;
     this.activePart = part;
+    this.effectiveVoice = this.resolveEffectiveVoice(this.voiceName);
     this.isSequencePlaying = false;
     this.isPaused = false;
 
@@ -176,6 +231,7 @@ export class VoiceService {
 
     this.currentQuestionId = questionId;
     this.activePart = part;
+    this.effectiveVoice = this.resolveEffectiveVoice(this.voiceName);
     this.isSequencePlaying = wasSequence;
 
     if (!this.audio) return;
@@ -273,6 +329,7 @@ export class VoiceService {
     this.isPaused = false;
     this.pendingSequencePart = null;
     this.currentQuestionId = questionId;
+    this.effectiveVoice = this.resolveEffectiveVoice(this.voiceName);
     this.isSequencePlaying = true;
     await this.stepSequence('question');
   }
@@ -289,6 +346,7 @@ export class VoiceService {
       this.audio.currentTime = 0;
     }
     this.currentQuestionId = questionId;
+    this.effectiveVoice = this.resolveEffectiveVoice(this.voiceName);
     this.isSequencePlaying = true;
     await this.stepSequence('question');
   }
@@ -355,6 +413,7 @@ export class VoiceService {
     }
     this.currentQuestionId = null;
     this.activePart = null;
+    this.effectiveVoice = null;
     this.isSequencePlaying = false;
     this.isPaused = false;
     this.notify();
