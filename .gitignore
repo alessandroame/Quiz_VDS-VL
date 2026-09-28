@@ -24,6 +24,9 @@ Thumbs.db
 *.png
 !public/**/*.png
 
+# Logs
+*.log
+
 
 # Python cache
 __pycache__/
