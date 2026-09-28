@@ -29,7 +29,10 @@ export const ExamScreen: React.FC = () => {
     recordAnswer,
     settings,
     setIsExamRunning,
-    openDriveMode
+    openDriveMode,
+    activeSession,
+    persistActiveSession,
+    dismissActiveSession
   } = useQuiz();
 
   // Stato esame
@@ -57,6 +60,26 @@ export const ExamScreen: React.FC = () => {
     };
   }, [setIsExamRunning]);
 
+  // Auto-resume active exam if present
+  useEffect(() => {
+    if (examState === 'idle' && activeSession?.type === 'exam' && activeSession.questionIds?.length > 0) {
+      const ordered = activeSession.questionIds
+        .map(id => questions.find(q => q.id === id))
+        .filter((q): q is Question => Boolean(q));
+
+      if (ordered.length > 0) {
+        setExamQuestions(ordered);
+        setCurrentIndex(Math.min(activeSession.currentIndex || 0, ordered.length - 1));
+        setAnswers(activeSession.answers || {});
+        setFlags(activeSession.flags || {});
+        setSecondsRemaining(activeSession.secondsRemaining || 45 * 60);
+        setStartTime(activeSession.startTime || Date.now());
+        setIsMarathon(Boolean(activeSession.isMarathon));
+        setExamState('running');
+      }
+    }
+  }, [activeSession, examState, questions]);
+
   const startExam = (marathon = false) => {
     setIsMarathon(marathon);
     const generated = generateExamQuestions(questions, statsMap, marathon);
@@ -65,10 +88,24 @@ export const ExamScreen: React.FC = () => {
     setAnswers({});
     setFlags({});
     const totalMinutes = marathon ? 60 : settings.examTimerMinutes || 45;
-    setSecondsRemaining(totalMinutes * 60);
-    setStartTime(Date.now());
+    const initialSeconds = totalMinutes * 60;
+    setSecondsRemaining(initialSeconds);
+    const now = Date.now();
+    setStartTime(now);
     setCompletedSession(null);
     setExamState('running');
+
+    persistActiveSession({
+      type: 'exam',
+      questionIds: generated.map(q => q.id),
+      currentIndex: 0,
+      answers: {},
+      flags: {},
+      secondsRemaining: initialSeconds,
+      startTime: now,
+      isMarathon: marathon,
+      updatedAt: now
+    });
   };
 
   // Timer countdown
@@ -94,16 +131,59 @@ export const ExamScreen: React.FC = () => {
   const answeredCount = Object.keys(answers).length;
   const flaggedCount = Object.values(flags).filter(Boolean).length;
 
+  const changeIndex = (newIndex: number) => {
+    setCurrentIndex(newIndex);
+    if (examState === 'running') {
+      persistActiveSession({
+        type: 'exam',
+        questionIds: examQuestions.map(q => q.id),
+        currentIndex: newIndex,
+        answers,
+        flags,
+        secondsRemaining,
+        startTime,
+        isMarathon,
+        updatedAt: Date.now()
+      });
+    }
+  };
+
   const handleSelectAnswer = (ans: 1 | 2 | 3, qid?: number) => {
     const targetId = qid ?? currentQuestion?.id;
     if (!targetId) return;
-    setAnswers(prev => ({ ...prev, [targetId]: ans }));
+    const updatedAnswers = { ...answers, [targetId]: ans };
+    setAnswers(updatedAnswers);
+
+    persistActiveSession({
+      type: 'exam',
+      questionIds: examQuestions.map(q => q.id),
+      currentIndex,
+      answers: updatedAnswers,
+      flags,
+      secondsRemaining,
+      startTime,
+      isMarathon,
+      updatedAt: Date.now()
+    });
   };
 
   const handleToggleFlag = (qid?: number) => {
     const targetId = qid ?? currentQuestion?.id;
     if (!targetId) return;
-    setFlags(prev => ({ ...prev, [targetId]: !prev[targetId] }));
+    const updatedFlags = { ...flags, [targetId]: !flags[targetId] };
+    setFlags(updatedFlags);
+
+    persistActiveSession({
+      type: 'exam',
+      questionIds: examQuestions.map(q => q.id),
+      currentIndex,
+      answers,
+      flags: updatedFlags,
+      secondsRemaining,
+      startTime,
+      isMarathon,
+      updatedAt: Date.now()
+    });
   };
 
   // Keyboard navigation
@@ -117,8 +197,8 @@ export const ExamScreen: React.FC = () => {
       else if (e.key === '2') handleSelectAnswer(2);
       else if (e.key === '3') handleSelectAnswer(3);
       else if (e.key.toLowerCase() === 'f') handleToggleFlag();
-      else if (e.key === 'ArrowLeft' && currentIndex > 0) setCurrentIndex(prev => prev - 1);
-      else if (e.key === 'ArrowRight' && currentIndex < totalCount - 1) setCurrentIndex(prev => prev + 1);
+      else if (e.key === 'ArrowLeft' && currentIndex > 0) changeIndex(currentIndex - 1);
+      else if (e.key === 'ArrowRight' && currentIndex < totalCount - 1) changeIndex(currentIndex + 1);
     };
 
     window.addEventListener('keydown', handleKeyDown);
@@ -166,35 +246,35 @@ export const ExamScreen: React.FC = () => {
     return (
       <div className="max-w-2xl mx-auto px-4 py-8 space-y-6">
         <div className="text-center space-y-2">
-          <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-sky-500/10 text-sky-400 mb-2">
+          <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-amber-500/10 text-amber-400 mb-2">
             <Zap className="w-8 h-8" />
           </div>
           <h1 className="text-2xl font-bold tracking-tight">Simulazione Esame</h1>
-          <p className="text-xs text-slate-400 light:text-slate-600 max-w-sm mx-auto">
+          <p className="text-xs text-zinc-400 light:text-slate-600 max-w-sm mx-auto">
             Regolamento Ufficiale AeCI (D.P.R. 133/2010): 30 quesiti proporzionali, max 3 errori, 45 minuti.
           </p>
         </div>
 
         {/* Card Regole Ufficiali */}
-        <div className="bg-slate-900 border border-slate-800 rounded-xl p-5 light:bg-white light:border-slate-200 shadow-sm space-y-3">
+        <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-5 light:bg-white light:border-slate-200 shadow-sm space-y-3">
           <div className="grid grid-cols-3 gap-3 text-center">
-            <div className="p-3 bg-slate-950/60 light:bg-slate-50 rounded-lg border border-slate-800/80 light:border-slate-200">
-              <div className="text-2xl font-black text-sky-400 light:text-sky-600">30</div>
-              <div className="text-[11px] text-slate-400 light:text-slate-500 font-medium">Quesiti</div>
+            <div className="p-3 bg-zinc-950/60 light:bg-slate-50 rounded-lg border border-zinc-800/80 light:border-slate-200">
+              <div className="text-2xl font-black text-amber-400 light:text-amber-600">30</div>
+              <div className="text-[11px] text-zinc-400 light:text-slate-500 font-medium">Quesiti</div>
             </div>
-            <div className="p-3 bg-slate-950/60 light:bg-slate-50 rounded-lg border border-slate-800/80 light:border-slate-200">
+            <div className="p-3 bg-zinc-950/60 light:bg-slate-50 rounded-lg border border-zinc-800/80 light:border-slate-200">
               <div className="text-2xl font-black text-emerald-400 light:text-emerald-600">max 3</div>
-              <div className="text-[11px] text-slate-400 light:text-slate-500 font-medium">Errori Ammessi</div>
+              <div className="text-[11px] text-zinc-400 light:text-slate-500 font-medium">Errori Ammessi</div>
             </div>
-            <div className="p-3 bg-slate-950/60 light:bg-slate-50 rounded-lg border border-slate-800/80 light:border-slate-200">
+            <div className="p-3 bg-zinc-950/60 light:bg-slate-50 rounded-lg border border-zinc-800/80 light:border-slate-200">
               <div className="text-2xl font-black text-amber-400 light:text-amber-600">45'</div>
-              <div className="text-[11px] text-slate-400 light:text-slate-500 font-medium">Tempo Limite</div>
+              <div className="text-[11px] text-zinc-400 light:text-slate-500 font-medium">Tempo Limite</div>
             </div>
           </div>
 
-          <div className="text-xs text-slate-400 light:text-slate-500 pt-2 flex items-center justify-between border-t border-slate-800 light:border-slate-100">
+          <div className="text-xs text-zinc-400 light:text-slate-500 pt-2 flex items-center justify-between border-t border-zinc-800 light:border-slate-100">
             <span>Selezione domande:</span>
-            <span className="text-sky-400 light:text-sky-600 font-medium">Priorità a quelle non ancora viste</span>
+            <span className="text-amber-400 light:text-amber-600 font-medium">Priorità a quelle non ancora viste</span>
           </div>
         </div>
 
@@ -203,7 +283,7 @@ export const ExamScreen: React.FC = () => {
           <button
             id="btn-start-exam"
             onClick={() => startExam(false)}
-            className="w-full py-4 rounded-xl bg-sky-600 hover:bg-sky-500 text-white font-bold text-base shadow-lg shadow-sky-950/40 flex items-center justify-center gap-2 transition-all active:scale-[0.99]"
+            className="w-full py-4 rounded-xl bg-amber-600 hover:bg-amber-500 text-white font-bold text-base shadow-lg shadow-amber-950/40 flex items-center justify-center gap-2 transition-all active:scale-[0.99]"
           >
             <span>Avvia Esame Ufficiale (30 Quiz)</span>
             <ArrowRight className="w-5 h-5" />
@@ -212,7 +292,7 @@ export const ExamScreen: React.FC = () => {
           <button
             id="btn-start-marathon"
             onClick={() => startExam(true)}
-            className="w-full py-3 rounded-xl bg-slate-900 border border-slate-800 hover:border-slate-700 text-slate-300 light:bg-slate-100 light:text-slate-700 light:border-slate-300 text-xs font-semibold flex items-center justify-center gap-1.5 transition-colors"
+            className="w-full py-3 rounded-xl bg-zinc-900 border border-zinc-800 hover:border-zinc-700 text-zinc-300 light:bg-slate-100 light:text-slate-700 light:border-slate-300 text-xs font-semibold flex items-center justify-center gap-1.5 transition-colors"
           >
             <ListFilter className="w-4 h-4" />
             <span>Maratona Intensiva (60 Quiz - 60 min)</span>
@@ -264,8 +344,8 @@ export const ExamScreen: React.FC = () => {
         </div>
 
         {/* Dettaglio Materie con Errori */}
-        <div className="bg-slate-900 border border-slate-800 rounded-xl p-4 light:bg-white light:border-slate-200">
-          <h3 className="text-xs font-bold text-slate-400 light:text-slate-600 uppercase tracking-wider mb-3">
+        <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-4 light:bg-white light:border-slate-200">
+          <h3 className="text-xs font-bold text-zinc-400 light:text-slate-600 uppercase tracking-wider mb-3">
             Ripartizione Materie
           </h3>
           <div className="space-y-2 text-xs">
@@ -276,12 +356,12 @@ export const ExamScreen: React.FC = () => {
               const hasErrors = data.wrong > 0;
 
               return (
-                <div key={subId} className="flex items-center justify-between py-1 border-b border-slate-800/60 light:border-slate-100 last:border-none">
-                  <span className="text-slate-300 light:text-slate-700 font-medium truncate max-w-[200px]">
+                <div key={subId} className="flex items-center justify-between py-1 border-b border-zinc-800/60 light:border-slate-100 last:border-none">
+                  <span className="text-zinc-300 light:text-slate-700 font-medium truncate max-w-[200px]">
                     {subName}
                   </span>
                   <div className="flex items-center gap-2">
-                    <span className="text-slate-400">
+                    <span className="text-zinc-400">
                       {data.correct}/{data.total}
                     </span>
                     {hasErrors ? (
@@ -304,7 +384,7 @@ export const ExamScreen: React.FC = () => {
         <div className="flex gap-3">
           <button
             onClick={() => startExam(false)}
-            className="flex-1 py-3 rounded-xl bg-sky-600 hover:bg-sky-500 text-white font-bold text-sm flex items-center justify-center gap-2"
+            className="flex-1 py-3 rounded-xl bg-amber-600 hover:bg-amber-500 text-white font-bold text-sm flex items-center justify-center gap-2"
           >
             <RotateCcw className="w-4 h-4" />
             <span>Nuovo Esame</span>
@@ -313,7 +393,7 @@ export const ExamScreen: React.FC = () => {
 
         {/* Revisione Domande Sessione */}
         <div className="space-y-4 pt-4">
-          <h3 className="text-sm font-bold text-slate-200 light:text-slate-800">
+          <h3 className="text-sm font-bold text-zinc-200 light:text-slate-800">
             Revisione Quesiti Sessione
           </h3>
           <div className="space-y-4">
@@ -341,20 +421,20 @@ export const ExamScreen: React.FC = () => {
   return (
     <div className="max-w-2xl mx-auto px-4 py-4 space-y-4">
       {/* Top Bar: Timer, Progresso, Consegna */}
-      <div className="flex items-center justify-between gap-2 p-3 bg-slate-900 border border-slate-800 rounded-xl dark:bg-slate-900 light:bg-white light:border-slate-200 shadow-sm sticky top-14 z-30">
+      <div className="flex items-center justify-between gap-2 p-3 bg-zinc-900 border border-zinc-800 rounded-xl dark:bg-zinc-900 light:bg-white light:border-slate-200 shadow-sm sticky top-14 z-30">
         <div className="flex items-center gap-2">
           <div
             className={`flex items-center gap-1.5 font-mono font-bold text-sm px-2.5 py-1 rounded-lg ${
               secondsRemaining < 300
                 ? 'bg-rose-500/20 text-rose-400 animate-pulse'
-                : 'bg-slate-950 text-slate-100 light:bg-slate-100 light:text-slate-800'
+                : 'bg-zinc-950 text-zinc-100 light:bg-slate-100 light:text-slate-800'
             }`}
           >
-            <Timer className="w-4 h-4 text-sky-400" />
+            <Timer className="w-4 h-4 text-amber-400" />
             <span>{formatTime(secondsRemaining)}</span>
           </div>
 
-          <div className="text-xs text-slate-400 light:text-slate-600 font-medium">
+          <div className="text-xs text-zinc-400 light:text-slate-600 font-medium">
             <span>{answeredCount}</span>/{totalCount}
             {flaggedCount > 0 && (
               <span className="ml-1 text-amber-400 font-medium">
@@ -392,7 +472,7 @@ export const ExamScreen: React.FC = () => {
           <button
             id="btn-abandon-exam"
             onClick={() => setShowAbandonModal(true)}
-            className="px-2.5 py-1.5 rounded-lg border border-slate-700/80 hover:border-rose-500/80 text-slate-400 hover:text-rose-400 light:border-slate-300 light:text-slate-600 light:hover:text-rose-600 text-xs font-medium transition-colors flex items-center gap-1"
+            className="px-2.5 py-1.5 rounded-lg border border-zinc-700/80 hover:border-rose-500/80 text-zinc-400 hover:text-rose-400 light:border-slate-300 light:text-slate-600 light:hover:text-rose-600 text-xs font-medium transition-colors flex items-center gap-1"
             title="Abbandona la sessione di esame"
           >
             <LogOut className="w-3.5 h-3.5" />
@@ -409,28 +489,28 @@ export const ExamScreen: React.FC = () => {
       </div>
 
       {/* Griglia Navigatore Domande (30 bolle) */}
-      <div className="p-3 bg-slate-900/60 border border-slate-800 rounded-xl light:bg-white light:border-slate-200">
+      <div className="p-3 bg-zinc-900/60 border border-zinc-800 rounded-xl light:bg-white light:border-slate-200">
         <div className="flex flex-wrap gap-1.5 justify-center">
           {examQuestions.map((q, idx) => {
             const isAnswered = answers[q.id] !== undefined;
             const isFlagged = flags[q.id] === true;
             const isCurrent = currentIndex === idx;
 
-            let bubbleStyle = 'border-slate-800 bg-slate-950 text-slate-400 light:border-slate-200 light:bg-slate-50 light:text-slate-600';
+            let bubbleStyle = 'border-zinc-800 bg-zinc-950 text-zinc-400 light:border-slate-200 light:bg-slate-50 light:text-slate-600';
             if (isAnswered) {
-              bubbleStyle = 'border-sky-500 bg-sky-500 text-white font-bold';
+              bubbleStyle = 'border-amber-500 bg-amber-500 text-zinc-950 font-bold shadow-sm';
             }
             if (isFlagged) {
-              bubbleStyle = 'border-amber-500 bg-amber-500/20 text-amber-300 font-bold';
+              bubbleStyle = 'border-amber-400 bg-amber-400/20 text-amber-300 font-bold ring-1 ring-amber-400';
             }
             if (isCurrent) {
-              bubbleStyle += ' ring-2 ring-sky-400 ring-offset-2 ring-offset-slate-950 light:ring-offset-white';
+              bubbleStyle += ' ring-2 ring-amber-400 ring-offset-2 ring-offset-zinc-950 light:ring-offset-white';
             }
 
             return (
               <button
                 key={q.id}
-                onClick={() => setCurrentIndex(idx)}
+                onClick={() => changeIndex(idx)}
                 className={`w-7 h-7 rounded-lg border text-xs flex items-center justify-center transition-all ${bubbleStyle}`}
                 title={`Quesito #${q.id}`}
               >
@@ -458,18 +538,18 @@ export const ExamScreen: React.FC = () => {
       {/* Controlli Precedente / Successiva */}
       <div className="flex items-center justify-between gap-3 pt-2">
         <button
-          onClick={() => setCurrentIndex(prev => Math.max(0, prev - 1))}
+          onClick={() => changeIndex(Math.max(0, currentIndex - 1))}
           disabled={currentIndex === 0}
-          className="px-4 py-2.5 rounded-xl border border-slate-800 bg-slate-900 text-slate-300 light:bg-white light:border-slate-200 light:text-slate-700 text-xs font-semibold flex items-center gap-1.5 disabled:opacity-30"
+          className="px-4 py-2.5 rounded-xl border border-zinc-800 bg-zinc-900 text-zinc-300 light:bg-white light:border-slate-200 light:text-slate-700 text-xs font-semibold flex items-center gap-1.5 disabled:opacity-30"
         >
           <ArrowLeft className="w-4 h-4" />
           <span>Precedente</span>
         </button>
 
         <button
-          onClick={() => setCurrentIndex(prev => Math.min(totalCount - 1, prev + 1))}
+          onClick={() => changeIndex(Math.min(totalCount - 1, currentIndex + 1))}
           disabled={currentIndex === totalCount - 1}
-          className="px-4 py-2.5 rounded-xl border border-slate-800 bg-slate-900 text-slate-300 light:bg-white light:border-slate-200 light:text-slate-700 text-xs font-semibold flex items-center gap-1.5 disabled:opacity-30"
+          className="px-4 py-2.5 rounded-xl border border-zinc-800 bg-zinc-900 text-zinc-300 light:bg-white light:border-slate-200 light:text-slate-700 text-xs font-semibold flex items-center gap-1.5 disabled:opacity-30"
         >
           <span>Successiva</span>
           <ArrowRight className="w-4 h-4" />
@@ -479,15 +559,15 @@ export const ExamScreen: React.FC = () => {
       {/* Modal di Conferma Consegna */}
       {showSubmitModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4 animate-in fade-in">
-          <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 max-w-sm w-full space-y-4 shadow-2xl light:bg-white light:border-slate-200">
+          <div className="bg-zinc-900 border border-zinc-800 rounded-2xl p-6 max-w-sm w-full space-y-4 shadow-2xl light:bg-white light:border-slate-200">
             <div className="flex items-center gap-2 text-amber-400">
               <AlertCircle className="w-6 h-6" />
-              <h3 className="font-bold text-base text-slate-100 light:text-slate-900">
+              <h3 className="font-bold text-base text-zinc-100 light:text-slate-900">
                 Consegna Esame
               </h3>
             </div>
 
-            <div className="text-xs text-slate-300 light:text-slate-600 space-y-2">
+            <div className="text-xs text-zinc-300 light:text-slate-600 space-y-2">
               <p>
                 Hai risposto a <strong>{answeredCount}</strong> su <strong>{totalCount}</strong> quesiti.
               </p>
@@ -506,7 +586,7 @@ export const ExamScreen: React.FC = () => {
             <div className="flex gap-2 pt-2">
               <button
                 onClick={() => setShowSubmitModal(false)}
-                className="flex-1 py-2.5 rounded-xl border border-slate-800 text-slate-400 hover:text-slate-200 light:border-slate-300 light:text-slate-700 text-xs font-medium"
+                className="flex-1 py-2.5 rounded-xl border border-zinc-800 text-zinc-400 hover:text-zinc-200 light:border-slate-300 light:text-slate-700 text-xs font-medium"
               >
                 Continua
               </button>
@@ -525,15 +605,15 @@ export const ExamScreen: React.FC = () => {
       {/* Modal di Conferma Abbandono Esame */}
       {showAbandonModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/75 p-4 animate-in fade-in">
-          <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 max-w-sm w-full space-y-4 shadow-2xl light:bg-white light:border-slate-200">
+          <div className="bg-zinc-900 border border-zinc-800 rounded-2xl p-6 max-w-sm w-full space-y-4 shadow-2xl light:bg-white light:border-slate-200">
             <div className="flex items-center gap-2 text-rose-400 light:text-rose-600">
               <AlertCircle className="w-6 h-6" />
-              <h3 className="font-bold text-base text-slate-100 light:text-slate-900">
+              <h3 className="font-bold text-base text-zinc-100 light:text-slate-900">
                 Abbandonare l'Esame?
               </h3>
             </div>
 
-            <div className="text-xs text-slate-300 light:text-slate-600 space-y-2">
+            <div className="text-xs text-zinc-300 light:text-slate-600 space-y-2">
               <p>
                 Sei sicuro di voler interrompere la simulazione in corso?
               </p>
@@ -545,7 +625,7 @@ export const ExamScreen: React.FC = () => {
             <div className="flex gap-2 pt-2">
               <button
                 onClick={() => setShowAbandonModal(false)}
-                className="flex-1 py-2.5 rounded-xl bg-sky-600 hover:bg-sky-500 text-white text-xs font-bold shadow-md"
+                className="flex-1 py-2.5 rounded-xl bg-amber-600 hover:bg-amber-500 text-white text-xs font-bold shadow-md"
               >
                 Continua Esame
               </button>
@@ -554,6 +634,7 @@ export const ExamScreen: React.FC = () => {
                   setShowAbandonModal(false);
                   setExamState('idle');
                   setIsExamRunning(false);
+                  dismissActiveSession();
                 }}
                 className="flex-1 py-2.5 rounded-xl border border-rose-500/60 text-rose-400 hover:bg-rose-500/10 light:text-rose-600 light:border-rose-300 text-xs font-medium"
               >

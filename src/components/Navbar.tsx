@@ -9,7 +9,10 @@ import {
   Sun,
   Moon,
   Monitor,
-  Car
+  Car,
+  Cloud,
+  CloudOff,
+  RefreshCw
 } from 'lucide-react';
 import { useTheme } from '../context/ThemeContext';
 import { useQuiz } from '../context/QuizContext';
@@ -25,7 +28,26 @@ interface NavbarProps {
 
 export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab, openSettings }) => {
   const { theme, cycleTheme } = useTheme();
-  const { mistakesCount, readinessScore, isExamRunning, openDriveMode } = useQuiz();
+  const { mistakesCount, readinessScore, isExamRunning, openDriveMode, settings, syncState } = useQuiz();
+
+  const getSyncTooltip = () => {
+    switch (syncState.status) {
+      case 'syncing':
+        return 'Sincronizzazione in corso...';
+      case 'synced':
+        return syncState.lastSyncedAt
+          ? `Sincronizzato: ${new Date(syncState.lastSyncedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`
+          : 'Sincronizzato con Google Drive';
+      case 'offline':
+        return 'Offline: i salvataggi verranno inviati appena torni online';
+      case 'needs_auth':
+        return 'Accesso Google richiesto: tocca per ri-autorizzare';
+      case 'error':
+        return `Errore sincronizzazione: ${syncState.errorDetail || 'controlla le impostazioni'}`;
+      default:
+        return 'Sincronizzazione Google Drive';
+    }
+  };
 
   const navItems = [
     { id: 'exam' as NavTab, label: 'Esame', icon: Compass },
@@ -43,16 +65,14 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab, openSet
   return (
     <>
       {/* Top Header */}
-      <header className="sticky top-0 z-40 w-full border-b backdrop-blur bg-slate-950/80 border-slate-800 dark:bg-slate-950/80 dark:border-slate-800 light:bg-white/80 light:border-slate-200 light:text-slate-900 transition-colors">
+      <header className="sticky top-0 z-40 w-full border-b backdrop-blur bg-zinc-950/80 border-zinc-800 dark:bg-zinc-950/80 dark:border-zinc-800 light:bg-white/80 light:border-slate-200 light:text-slate-900 transition-colors">
         <div className="max-w-4xl mx-auto px-4 h-14 flex items-center justify-between">
-          <div className="flex items-center gap-2 cursor-pointer" onClick={() => setActiveTab('exam')}>
-            <div className="w-8 h-8 rounded-lg bg-sky-600 flex items-center justify-center font-bold text-white shadow-sm">
-              <Compass className="w-5 h-5 text-white" />
-            </div>
+          <div className="flex items-center gap-2.5 cursor-pointer" onClick={() => setActiveTab('exam')}>
+            <img src="/favicon.svg" alt="VDS-VL" className="w-8 h-8 rounded-lg shadow-sm flex-shrink-0" />
             <div>
               <div className="font-bold text-sm tracking-wide flex items-center gap-1.5">
                 <span>VDS-VL</span>
-                <span className="text-[10px] px-1.5 py-0.5 rounded bg-sky-500/20 text-sky-400 font-mono">2017</span>
+                <span className="text-[10px] px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-400 font-mono">2017</span>
                 {isExamRunning && (
                   <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-rose-500/20 text-rose-400 border border-rose-500/40 font-bold flex items-center gap-1 animate-pulse">
                     <span className="w-1.5 h-1.5 rounded-full bg-rose-500" />
@@ -60,8 +80,8 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab, openSet
                   </span>
                 )}
               </div>
-              <div className="text-[11px] text-slate-400 light:text-slate-500">
-                Prontezza: <strong className="text-sky-400 light:text-sky-600">{readinessScore}%</strong>
+              <div className="text-[11px] text-zinc-400 light:text-slate-500">
+                Prontezza: <strong className="text-amber-400 light:text-amber-600">{readinessScore}%</strong>
               </div>
             </div>
           </div>
@@ -81,12 +101,35 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab, openSet
             {/* Quick Voice / Speech Menu */}
             <VoiceQuickMenu />
 
+            {/* Cloud Sync Status Indicator */}
+            {settings.autoSyncDrive && (
+              <button
+                id="btn-cloud-sync"
+                onClick={openSettings}
+                title={getSyncTooltip()}
+                className="p-2 rounded-lg text-zinc-400 hover:text-zinc-200 light:text-slate-600 light:hover:text-slate-900 hover:bg-zinc-800/60 light:hover:bg-slate-100 transition-colors"
+              >
+                {syncState.status === 'syncing' ? (
+                  <RefreshCw className="w-4 h-4 text-amber-400 animate-spin" />
+                ) : syncState.status === 'needs_auth' || syncState.status === 'error' ? (
+                  <div className="relative">
+                    <Cloud className="w-4 h-4 text-amber-400" />
+                    <span className="absolute -top-1 -right-1 w-2 h-2 rounded-full bg-amber-500" />
+                  </div>
+                ) : syncState.status === 'offline' ? (
+                  <CloudOff className="w-4 h-4 text-zinc-500" />
+                ) : (
+                  <Cloud className="w-4 h-4 text-emerald-400" />
+                )}
+              </button>
+            )}
+
             {/* Theme quick toggle */}
             <button
               id="btn-theme-toggle"
               onClick={cycleTheme}
               title={`Tema: ${theme}`}
-              className="p-2 rounded-lg text-slate-400 hover:text-slate-200 light:text-slate-600 light:hover:text-slate-900 hover:bg-slate-800/60 light:hover:bg-slate-100 transition-colors"
+              className="p-2 rounded-lg text-zinc-400 hover:text-zinc-200 light:text-slate-600 light:hover:text-slate-900 hover:bg-zinc-800/60 light:hover:bg-slate-100 transition-colors"
             >
               {theme === 'dark' && <Moon className="w-4 h-4" />}
               {theme === 'light' && <Sun className="w-4 h-4 text-amber-500" />}
@@ -98,7 +141,7 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab, openSet
               id="btn-settings"
               onClick={openSettings}
               title="Impostazioni"
-              className="p-2 rounded-lg text-slate-400 hover:text-slate-200 light:text-slate-600 light:hover:text-slate-900 hover:bg-slate-800/60 light:hover:bg-slate-100 transition-colors"
+              className="p-2 rounded-lg text-zinc-400 hover:text-zinc-200 light:text-slate-600 light:hover:text-slate-900 hover:bg-zinc-800/60 light:hover:bg-slate-100 transition-colors"
             >
               <SettingsIcon className="w-4 h-4" />
             </button>
@@ -107,7 +150,7 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab, openSet
       </header>
 
       {/* Bottom Nav Bar (Mobile & Desktop) */}
-      <nav className="fixed bottom-0 left-0 right-0 z-40 border-t backdrop-blur bg-slate-950/95 border-slate-800 dark:bg-slate-950/95 dark:border-slate-800 light:bg-white/95 light:border-slate-200 transition-colors">
+      <nav className="fixed bottom-0 left-0 right-0 z-40 border-t backdrop-blur bg-zinc-950/95 border-zinc-800 dark:bg-zinc-950/95 dark:border-zinc-800 light:bg-white/95 light:border-slate-200 transition-colors">
         <div className="max-w-md mx-auto grid grid-cols-5 h-16 px-1">
           {navItems.map(item => {
             const Icon = item.icon;
@@ -119,8 +162,8 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab, openSet
                 onClick={() => setActiveTab(item.id)}
                 className={`relative flex flex-col items-center justify-center gap-1 py-1 transition-colors ${
                   isActive
-                    ? 'text-sky-400 light:text-sky-600 font-semibold'
-                    : 'text-slate-400 light:text-slate-500 hover:text-slate-200 light:hover:text-slate-900'
+                    ? 'text-amber-400 light:text-amber-600 font-semibold'
+                    : 'text-zinc-400 light:text-slate-500 hover:text-zinc-200 light:hover:text-slate-900'
                 }`}
               >
                 <div className="relative">
@@ -139,7 +182,7 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab, openSet
                 </div>
                 <span className="text-[11px] tracking-tight">{item.label}</span>
                 {isActive && (
-                  <div className="absolute top-0 w-8 h-0.5 rounded-full bg-sky-500" />
+                  <div className="absolute top-0 w-8 h-0.5 rounded-full bg-amber-500" />
                 )}
               </button>
             );

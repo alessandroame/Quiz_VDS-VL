@@ -51,3 +51,27 @@ export interface AppSettings {
   driveModeAutoAdvanceSeconds: number;
   driveModeVoiceCommands: boolean;
 }
+
+export interface InProgressSession {
+  type: 'exam' | 'topic' | 'mistakes';
+  subjectId?: number;
+  subjectName?: string;
+  mode?: 'all' | 'unseen' | 'wrong';
+  questionIds: number[];
+  currentIndex: number;
+  answers: Record<number, 1 | 2 | 3>;
+  flags?: Record<number, boolean>;
+  secondsRemaining?: number;
+  startTime?: number;
+  isMarathon?: boolean;
+  updatedAt: number;
+}
+
+export interface BackupDataPayload {
+  version: number;
+  exportedAt: number;
+  stats: QuestionStat[];
+  sessions: ExamSession[];
+  settings: Array<{ key: string; value: any }>;
+  activeSession?: InProgressSession | null;
+}

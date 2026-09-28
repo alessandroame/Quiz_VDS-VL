@@ -18,7 +18,64 @@ Questo documento registra in ordine cronologico tutte le lavorazioni svolte nel 
 
 ## Registro Cronologico
 
-### [2026-09-28] - Rilascio: Quick Speech Menu (1-Click) & Impostazioni a Schede Tematiche (Zero-Scroll)
+### [2026-09-28] - Rilascio: Guida Contestuale Comandi Vocali (Hands-Free HUD & Cheat Sheet Modale)
+- **Cosa abbiamo fatto**:
+  - Creato il nuovo componente [src/components/VoiceCommandsModal.tsx](file:///d:/Github/Quiz_VDS-VL/src/components/VoiceCommandsModal.tsx):
+    - Cheat Sheet modale compatto in stile cockpit avionico ad alto contrasto.
+    - Elenco completo e strutturato delle 6 categorie di comandi: Risposte ("Uno", "Due", "Tre"), Navigazione ("Avanti", "Indietro"), Ripasso Audio ("Ripeti"), Segnalibro ("Bandiera"), Pilota Automatico ("Pausa", "Continua"), Richiesta Assistenza ("Aiuto").
+    - Sezione "Consigli Cockpit per la Guida" con indicazioni pratiche per l'uso con vivavoce auto, auricolari e caschi Bluetooth.
+  - Esteso il parser deterministico in [src/utils/voiceCommandParser.ts](file:///d:/Github/Quiz_VDS-VL/src/utils/voiceCommandParser.ts) e la relativa suite di unit test [src/utils/voiceCommandParser.test.ts](file:///d:/Github/Quiz_VDS-VL/src/utils/voiceCommandParser.test.ts):
+    - Introdotto il comando `'help'` attivabile pronunciando *"aiuto"*, *"guida"*, *"comandi"*, *"istruzioni"*, *"cosa posso dire"*, *"help"*.
+  - Integrata la guida contestuale su 3 livelli in [src/components/DriveModeScreen.tsx](file:///d:/Github/Quiz_VDS-VL/src/components/DriveModeScreen.tsx):
+    - **HUD Live Rotativo**: indicatore discreto animato sopra le macro-fasce di risposta che suggerisce i comandi a rotazione periodica ("Microfono ON: Dì 'Uno', 'Avanti' o 'Aiuto'").
+    - **Pulsante Guida '?'**: presente sia nella schermata di lancio che nella barra comandi superiore durante lo svolgimento dei quiz.
+    - **Trigger Vocale "Aiuto"**: pronunciando a voce *"Aiuto"*, l'assistente sospende ordinatamente l'audio e apre istantaneamente la guida su schermo.
+  - Arricchita la scheda "Guida" di [src/components/SettingsModal.tsx](file:///d:/Github/Quiz_VDS-VL/src/components/SettingsModal.tsx) con box riassuntivo e pulsante diretto al Cheat Sheet.
+  - Aggiunto link alla guida comandi vocali anche nel flyout rapido [src/components/VoiceQuickMenu.tsx](file:///d:/Github/Quiz_VDS-VL/src/components/VoiceQuickMenu.tsx).
+  - Corretto l'edge case del mock `Audio` in [src/services/voiceService.test.ts](file:///d:/Github/Quiz_VDS-VL/src/services/voiceService.test.ts) per piena conformità ai costruttori Vitest v5.
+  - Esteso lo script di collaudo headless [scripts/test_all_use_cases.js](file:///d:/Github/Quiz_VDS-VL/scripts/test_all_use_cases.js) verificando l'apertura e chiusura del modale via CDP.
+  - Verificato con successo:
+    - **98/98 unit test Vitest** superati in 559ms.
+    - Bundle PWA di produzione compilato con successo (`npm run build`).
+    - Collaudo multi-contesto a zero errori in console browser.
+  - Aggiornati [DESIDERATA.md](file:///d:/Github/Quiz_VDS-VL/DESIDERATA.md) e [README.md](file:///d:/Github/Quiz_VDS-VL/README.md).
+- **Scelte architetturali & Rationale**:
+  - *Zero Cognitive Load in Guida*: Quando si guida o si usa l'app a mani libere, l'utente non deve mai dover ricordare a memoria una sintassi rigida. L'HUD live rotativo fornisce piccoli suggerimenti visivi senza distrarre, mentre la possibilità di dire *"Aiuto"* o premere `?` rende il sistema immediatamente trasparente e inclusivo.
+  - *Componente Unificato Reutilizzabile*: `VoiceCommandsModal` è incapsulato e condiviso tra `DriveModeScreen`, `SettingsModal` e `VoiceQuickMenu`, garantendo una Single Source of Truth (SSOT) per la documentazione didattica dei comandi vocali.
+- **Impatto sul Desiderata**:
+  - Requisito pienamente implementato e registrato in [DESIDERATA.md](file:///d:/Github/Quiz_VDS-VL/DESIDERATA.md).
+
+### [2026-09-28] - Rilascio: Auto-Sync Google Drive, Smart Merge Deterministico & Ripresa Sessione Cross-Device
+- **Cosa abbiamo fatto**:
+  - Progettato e risolto l'intero albero decisionale tramite sessione interattiva `/grill-me`, formalizzando il piano operativo nell'artifact [auto_sync_smart_merge_plan.md](file:///C:/Users/aless/.gemini/antigravity/brain/2988c1c6-7e5b-4739-9662-fdbaa695c8d8/auto_sync_smart_merge_plan.md).
+  - Implementato il modulo di calcolo puro [src/services/smartMerge.ts](file:///d:/Github/Quiz_VDS-VL/src/services/smartMerge.ts) e la relativa suite di unit test [src/services/smartMerge.test.ts](file:///d:/Github/Quiz_VDS-VL/src/services/smartMerge.test.ts) (12 test):
+    - Fusione deterministica per `QuestionStat` basata sul timestamp `lastAnsweredAt` per lo stato didattico (risultato e sequenza consecutiva corretta) e massimo monotono per i contatori cumulativi (`timesSeen`, `timesCorrect`, `timesWrong`).
+    - Unione senza perdita di dati per `ExamSession` con deduplicazione basata sulla chiave di business (`date + durationSeconds + questionCounts`) e rimozione automatica degli ID auto-incrementali di conflitto.
+    - Gestione e unione delle impostazioni applicative e della sessione attiva in corso con filtro di decadimento (max 48 ore).
+  - Esteso lo store IndexedDB in [src/db/index.ts](file:///d:/Github/Quiz_VDS-VL/src/db/index.ts) e i tipi in [src/types/database.ts](file:///d:/Github/Quiz_VDS-VL/src/types/database.ts):
+    - Introdotta la persistenza di `InProgressSession` (`saveActiveSession`, `getActiveSession`, `clearActiveSession`).
+    - Aggiornato l'export di backup al formato `version: 2` includendo la sessione attiva.
+    - Aggiornato `importDatabaseBackup` per eseguire transazionalmente lo Smart Merge con i dati locali preesistenti, preservando tutti gli esami passati sia per il ripristino cloud che per i file JSON locali.
+    - Aggiunti test di persistenza e ripristino in [src/db/database.test.ts](file:///d:/Github/Quiz_VDS-VL/src/db/database.test.ts) (11 test).
+  - Creato l'engine di sincronizzazione continua [src/services/syncEngine.ts](file:///d:/Github/Quiz_VDS-VL/src/services/syncEngine.ts) con relativa suite [src/services/syncEngine.test.ts](file:///d:/Github/Quiz_VDS-VL/src/services/syncEngine.test.ts) (7 test):
+    - Gestione degli stati: `idle`, `syncing`, `synced`, `offline`, `needs_auth`, `error`.
+    - Salvataggio automatico continuo in background con debounce (15-20s) e push istantaneo al termine delle simulazioni d'esame.
+    - Rilevamento automatico dello stato offline con invio differito e sincronizzazione bidirezionale al rientro della connettività (`online` listener).
+  - Integrata la sincronizzazione e la persistenza della sessione in [src/context/QuizContext.tsx](file:///d:/Github/Quiz_VDS-VL/src/context/QuizContext.tsx) con reattività Dexie (`useLiveQuery`).
+  - Aggiornati i controller di studio [src/components/TopicsScreen.tsx](file:///d:/Github/Quiz_VDS-VL/src/components/TopicsScreen.tsx), [src/components/ExamScreen.tsx](file:///d:/Github/Quiz_VDS-VL/src/components/ExamScreen.tsx) e [src/components/MistakesScreen.tsx](file:///d:/Github/Quiz_VDS-VL/src/components/MistakesScreen.tsx) per salvare continuamente la domanda corrente, le risposte e il timer, e per auto-riprendere la sessione attiva all'ingresso.
+  - Implementato in [src/App.tsx](file:///d:/Github/Quiz_VDS-VL/src/App.tsx) il **Banner Avionico di Ripresa Rapida** per riprendere con un tocco la sessione lasciata su un'altra postazione (PC o telefono).
+  - Inserito in [src/components/Navbar.tsx](file:///d:/Github/Quiz_VDS-VL/src/components/Navbar.tsx) l'indicatore discreto di stato cloud (nuvola verde/sincronizzato, animata/sync in corso, ambra/richiesta accesso, barrata/offline).
+  - Aggiornato [src/components/SettingsModal.tsx](file:///d:/Github/Quiz_VDS-VL/src/components/SettingsModal.tsx) (scheda Cloud) con il toggle Auto-Sync, la barra di stato in tempo reale e il feedback didattico sullo Smart Merge.
+  - Aggiornato [README.md](file:///d:/Github/Quiz_VDS-VL/README.md) documentando la sincronizzazione continua, lo Smart Merge e la ripresa sessione cross-device.
+  - Superati al 100% tutti i test: **98/98 unit test Vitest** (`npm run test:unit`) in 523ms e build di produzione Vite (`npm run build`) verificata con successo (0 errori `tsc`).
+- **Scelte architetturali & Rationale**:
+  - *Smart Merge Deterministico vs Last-Write-Wins*: Sovrascrivere ciecamente il database locale al ripristino avrebbe cancellato esami o risposte fornite offline su un altro dispositivo. Lo Smart Merge adotta un'unione monotona sicura: tutti gli esami sostenuti su qualsiasi dispositivo vengono conservati e le domande adottano lo stato didattico dell'ultimo tentativo cronologico.
+  - *Storage in Dexie Settings per activeSession*: Invece di creare una tabella aggiuntiva che avrebbe richiesto una migrazione di schema Dexie (version bump), `activeSession` risiede come chiave dedicata nella tabella `settings`. Questo garantisce massima compatibilità con i database già esistenti e zero rischio di corruzione.
+  - *Disaccoppiamento SyncEngine & Test Isolati*: I test di `SyncEngine` isolano i timer reali e simulano le chiamate DB per evitare blocchi sulla coda delle transazioni di `fake-indexeddb`.
+- **Impatto sul Desiderata**:
+  - Soddisfatto pienamente il requisito di continuità di studio cross-device senza attrito: l'allievo pilota può iniziare un esame o studiare sul PC a casa e riprendere istantaneamente sullo smartphone al campo di volo senza perdere progressi.
+
+### [2026-09-28] - Interfaccia Vocale Rapida (VoiceQuickMenu) e Refactoring Schede Impostazioni
 - **Cosa abbiamo fatto**:
   - Creato il nuovo componente [src/components/VoiceQuickMenu.tsx](file:///d:/Github/Quiz_VDS-VL/src/components/VoiceQuickMenu.tsx) per il controllo vocale rapido a 1 clic:
     - Master toggle Voce Guida ON/OFF con arresto vocale immediato su disattivazione.

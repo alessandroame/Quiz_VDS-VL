@@ -1,5 +1,12 @@
 import Dexie, { type Table } from 'dexie';
-import type { QuestionStat, ExamSession, AppSettings } from '../types/database';
+import type {
+  QuestionStat,
+  ExamSession,
+  AppSettings,
+  InProgressSession,
+  BackupDataPayload
+} from '../types/database';
+import { smartMergeBackups, type SmartMergeResult } from '../services/smartMerge';
 
 export const DEFAULT_SETTINGS: AppSettings = {
   theme: 'system',
@@ -140,45 +147,109 @@ export async function saveQuestionNote(questionId: number, note: string): Promis
   }
 }
 
-// --- Export & Import Completo per Google Drive ---
+// --- Active In-Progress Study Session Persistence ---
+
+export async function saveActiveSession(session: InProgressSession): Promise<void> {
+  try {
+    await db.settings.put({ key: 'activeSession', value: session });
+  } catch (err) {
+    console.error('Error saving activeSession to db:', err);
+  }
+}
+
+export async function getActiveSession(): Promise<InProgressSession | null> {
+  try {
+    const entry = await db.settings.get('activeSession');
+    return entry ? (entry.value as InProgressSession) : null;
+  } catch (err) {
+    console.error('Error fetching activeSession from db:', err);
+    return null;
+  }
+}
+
+export async function clearActiveSession(): Promise<void> {
+  try {
+    await db.settings.delete('activeSession');
+  } catch (err) {
+    console.error('Error clearing activeSession from db:', err);
+  }
+}
+
+// --- Export & Import with Smart Merge for Cloud & Local Backups ---
 
 export async function exportDatabaseBackup(): Promise<string> {
   const stats = await db.stats.toArray();
   const sessions = await db.sessions.toArray();
   const settings = await db.settings.toArray();
+  const activeSession = await getActiveSession();
 
-  const backupData = {
-    version: 1,
+  const filteredSettings = settings.filter(s => s.key !== 'activeSession');
+
+  const backupData: BackupDataPayload = {
+    version: 2,
     exportedAt: Date.now(),
     stats,
     sessions,
-    settings
+    settings: filteredSettings,
+    activeSession: activeSession || null
   };
 
   return JSON.stringify(backupData, null, 2);
 }
 
-export async function importDatabaseBackup(jsonString: string): Promise<{ success: boolean; message: string }> {
+export async function importDatabaseBackup(
+  jsonString: string
+): Promise<{ success: boolean; message: string; mergeResult?: SmartMergeResult }> {
   try {
-    const data = JSON.parse(jsonString);
+    const data = JSON.parse(jsonString) as BackupDataPayload;
     if (!data || !Array.isArray(data.stats)) {
       return { success: false, message: 'Formato backup non valido' };
     }
 
+    const localStats = await db.stats.toArray();
+    const localSessions = await db.sessions.toArray();
+    const localSettings = await db.settings.toArray();
+    const localActive = await getActiveSession();
+
+    const localPayload: BackupDataPayload = {
+      version: 2,
+      exportedAt: Date.now(),
+      stats: localStats,
+      sessions: localSessions,
+      settings: localSettings.filter(s => s.key !== 'activeSession'),
+      activeSession: localActive
+    };
+
+    const merged = smartMergeBackups(localPayload, data);
+
     await db.transaction('rw', db.stats, db.sessions, db.settings, async () => {
-      if (data.stats && data.stats.length > 0) {
-        await db.stats.bulkPut(data.stats);
+      await db.stats.clear();
+      if (merged.stats.length > 0) {
+        await db.stats.bulkPut(merged.stats);
       }
-      if (data.sessions && data.sessions.length > 0) {
-        await db.sessions.bulkPut(data.sessions);
+
+      await db.sessions.clear();
+      if (merged.sessions.length > 0) {
+        await db.sessions.bulkPut(merged.sessions);
       }
-      if (data.settings && data.settings.length > 0) {
-        await db.settings.bulkPut(data.settings);
+
+      if (merged.settings.length > 0) {
+        await db.settings.bulkPut(merged.settings);
+      }
+
+      if (merged.activeSession) {
+        await db.settings.put({ key: 'activeSession', value: merged.activeSession });
+      } else {
+        await db.settings.delete('activeSession');
       }
     });
 
-    return { success: true, message: 'Dati ripristinati con successo' };
-  } catch (err) {
-    return { success: false, message: `Errore ripristino: ${err}` };
+    return {
+      success: true,
+      message: `Dati sincronizzati con successo (${merged.summary.mergedStatsCount} quiz, ${merged.summary.totalSessionsCount} sessioni)`,
+      mergeResult: merged
+    };
+  } catch (err: any) {
+    return { success: false, message: `Errore ripristino: ${err?.message || err}` };
   }
 }

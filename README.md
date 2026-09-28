@@ -86,9 +86,13 @@
 - **Comandi Vocali Hands-Free in Italiano**: interazione completa a voce tramite Web Speech Recognition con comandi dedicati:
   - `"Uno"`, `"Due"`, `"Tre"` per selezionare la risposta.
   - `"Avanti"`, `"Indietro"` per navigare.
-  - `"Ripeti"` per riascoltare domanda e opzioni.
+  - `"Ripeti"`, `"Ascolta"` per riascoltare domanda e opzioni.
   - `"Bandiera"` per contrassegnare il quesito da rivedere.
   - `"Pausa"`, `"Riprendi"` per controllare la sessione.
+  - `"Aiuto"`, `"Guida"`, `"Comandi"` per aprire la guida a voce in qualsiasi istante.
+- **Guida Contestuale Comandi Vocali (Cheat Sheet)**:
+  - **HUD Live Rotativo**: indicatore visivo discreto durante l'ascolto che suggerisce i comandi disponibili ("Microfono ON: Dì 'Uno', 'Avanti' o 'Aiuto'").
+  - **Cheat Sheet a 1 Tocco**: pulsante `?` sempre accessibile nella schermata di guida, nel Quick Speech Menu e nella scheda Impostazioni (🚗 Guida) con la tabella ordinata dei comandi e i consigli per l'uso in auto e casco/auricolare Bluetooth.
 
 ### 8. Motore Vocale Neurale (TTS Multi-Voce Offline) & Audio Cockpit
 - **Oltre 5.000 Segmenti Audio Neurale Pre-Generati**: catalogo audio completo memorizzato localmente e funzionante al 100% offline.
@@ -120,12 +124,16 @@
 - Algoritmo a bucket ponderati sviluppato per superare il noto problema statistico del *collezionista di figurine* (*Coupon Collector's Problem*).
 - Priorità assoluta ai quesiti mai estratti (`times_seen == 0`), garantendo la copertura equa di tutti i 504 quiz prima di riproporre domande già incontrate.
 
-### 11. Privacy, Offline-First & Sincronizzazione Dati
+### 11. Privacy, Offline-First, Auto-Sync & Smart Merge
 - **100% Client-Side & Zero Profilazione**: nessun database proprietario centrale, nessun cookie pubblicitario o tracciamento.
 - **Persistenza Locale Dexie.js (IndexedDB)**: storage asincrono, strutturato e robusto sul browser dell'utente (Single Source of Truth).
 - **Service Worker PWA**: installazione come applicazione standalone su iOS, Android, macOS e Windows con funzionamento completo anche in assenza di segnale.
-- **Salva o Carica da File**: esportazione e ripristino immediato di una copia dei dati su file con un click (100% offline, per chi preferisce non usare Google).
-- **Salvataggio Cloud Google (1-Click)**: sincronizzazione trasparente e immediata ("Salva su Google" / "Ripristina da Google") sul proprio account Google personale, senza configurazioni complesse.
+- **Sincronizzazione Automatica Continua (Auto-Sync)**: salvataggio automatico in background con debounce (15-20s) e push immediato al completamento delle simulazioni d'esame.
+- **Smart Merge Deterministico**: motore di fusione intelligente per sincronizzare più dispositivi (es. PC a casa e smartphone sul campo) senza sovrascritture cieche: tutti gli esami sostenuti vengono preservati (unione cronologica) e per ciascun quesito viene adottato lo stato di apprendimento più recente.
+- **Ripresa Rapida della Sessione (Cross-Device Resume)**: persistenza continua della sessione attiva (esame, materia o quaderno errori) con cursore esatto, risposte parziali e timer; all'apertura su un nuovo dispositivo, un banner avionico consente di riprendere con un tocco esattamente da dove ci si era fermati.
+- **Resilienza Offline con Invio Differito**: studio fluido anche in decollo o in viaggio senza connettività; al rientro della rete (`online`), l'engine sincronizza silenziosamente le modifiche con Google Drive.
+- **Indicatore di Stato Cockpit in Header**: icona discreta nella barra superiore per visualizzare all'istante lo stato della sincronizzazione (verde = sincronizzato, animato = in corso, ambra = necessita accesso, grigio = offline).
+- **Salva o Carica da File (.json)**: esportazione e importazione con Smart Merge deterministico per il backup offline indipendente dal cloud.
 
 ---
 

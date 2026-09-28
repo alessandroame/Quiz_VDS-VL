@@ -14,13 +14,16 @@ import {
   Car,
   Palette,
   Database,
-  Check
+  Check,
+  Mic,
+  HelpCircle
 } from 'lucide-react';
 import { useTheme } from '../context/ThemeContext';
 import { useQuiz } from '../context/QuizContext';
 import { googleDrive } from '../services/googleDrive';
 import { exportDatabaseBackup, importDatabaseBackup, db } from '../db';
 import type { ThemeMode } from '../types/database';
+import { VoiceCommandsModal } from './VoiceCommandsModal';
 
 export type SettingsTab = 'appearance' | 'voice' | 'drive' | 'cloud' | 'data';
 
@@ -36,7 +39,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
   defaultTab = 'appearance'
 }) => {
   const { theme, setTheme } = useTheme();
-  const { settings, updateSetting } = useQuiz();
+  const { settings, updateSetting, syncState, syncNow } = useQuiz();
   const [activeTab, setActiveTab] = useState<SettingsTab>(defaultTab);
 
   const envClientId = (import.meta.env?.VITE_GOOGLE_CLIENT_ID as string) || '182413802928-q7sphls58ob60s2mu3fspbbkk9kq2am9.apps.googleusercontent.com';
@@ -44,6 +47,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
 
   const [syncStatus, setSyncStatus] = useState<string | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
+  const [isVoiceGuideOpen, setIsVoiceGuideOpen] = useState(false);
 
   if (!isOpen) return null;
 
@@ -68,7 +72,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
   };
 
   const handleRestoreFromDrive = async () => {
-    if (!window.confirm('I dati salvati su Google sostituiranno i progressi attuali su questo dispositivo. Vuoi continuare?')) {
+    if (!window.confirm('I dati salvati su Google verranno uniti ai progressi attuali su questo dispositivo (Smart Merge), senza cancellare i tuoi esami. Vuoi continuare?')) {
       return;
     }
     setIsProcessing(true);
@@ -389,21 +393,49 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                   />
                 </div>
 
-                <div className="flex items-center justify-between p-2.5 rounded-xl border border-slate-800 bg-slate-950/60 light:bg-slate-50 light:border-slate-200">
-                  <div>
-                    <span className="text-slate-300 light:text-slate-700 font-medium block">
-                      Rispondi a Voce
-                    </span>
-                    <span className="text-[11px] text-slate-500">
-                      Pronuncia "Uno", "Due", "Tre" o "Avanti"
-                    </span>
+                <div className="p-2.5 rounded-xl border border-slate-800 bg-slate-950/60 light:bg-slate-50 light:border-slate-200 space-y-2">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <span className="text-slate-300 light:text-slate-700 font-medium block">
+                        Rispondi a Voce (Hands-Free)
+                      </span>
+                      <span className="text-[11px] text-slate-500">
+                        Controlla quiz e navigazione a mani libere
+                      </span>
+                    </div>
+                    <input
+                      type="checkbox"
+                      checked={settings.driveModeVoiceCommands ?? false}
+                      onChange={e => updateSetting('driveModeVoiceCommands', e.target.checked)}
+                      className="w-4 h-4 accent-amber-500 rounded cursor-pointer"
+                    />
                   </div>
-                  <input
-                    type="checkbox"
-                    checked={settings.driveModeVoiceCommands ?? false}
-                    onChange={e => updateSetting('driveModeVoiceCommands', e.target.checked)}
-                    className="w-4 h-4 accent-amber-500 rounded cursor-pointer"
-                  />
+
+                  {/* Cheat Sheet rapido & Bottone Guida */}
+                  <div className="grid grid-cols-2 gap-1.5 text-[11px] text-slate-400 light:text-slate-600">
+                    <div className="p-1.5 rounded-lg bg-slate-900/60 light:bg-slate-100 border border-slate-800/80 light:border-slate-200">
+                      <span className="font-bold text-emerald-400 light:text-emerald-600">Risposte:</span> "Uno", "Due", "Tre"
+                    </div>
+                    <div className="p-1.5 rounded-lg bg-slate-900/60 light:bg-slate-100 border border-slate-800/80 light:border-slate-200">
+                      <span className="font-bold text-sky-400 light:text-sky-600">Scorri:</span> "Avanti", "Indietro"
+                    </div>
+                    <div className="p-1.5 rounded-lg bg-slate-900/60 light:bg-slate-100 border border-slate-800/80 light:border-slate-200">
+                      <span className="font-bold text-amber-400 light:text-amber-600">Audio:</span> "Ripeti", "Pausa"
+                    </div>
+                    <div className="p-1.5 rounded-lg bg-slate-900/60 light:bg-slate-100 border border-slate-800/80 light:border-slate-200">
+                      <span className="font-bold text-indigo-400 light:text-indigo-600">Assistente:</span> "Aiuto", "Bandiera"
+                    </div>
+                  </div>
+
+                  <button
+                    type="button"
+                    onClick={() => setIsVoiceGuideOpen(true)}
+                    className="w-full py-1.5 px-3 rounded-lg bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/30 text-emerald-400 light:text-emerald-700 text-xs font-semibold flex items-center justify-center gap-1.5 transition-colors"
+                  >
+                    <Mic className="w-3.5 h-3.5" />
+                    <span>Apri Guida Completa Comandi Vocali</span>
+                    <HelpCircle className="w-3.5 h-3.5 opacity-70" />
+                  </button>
                 </div>
 
                 <div className="p-2.5 rounded-xl border border-slate-800 bg-slate-950/60 light:bg-slate-50 light:border-slate-200 space-y-1.5">
@@ -438,15 +470,66 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
           {/* TAB 4: BACKUP & CLOUD */}
           {activeTab === 'cloud' && (
             <div className="space-y-3.5 animate-in fade-in duration-150">
-              <div className="space-y-2">
+              <div className="space-y-2.5">
                 <label className="text-xs font-bold text-slate-400 uppercase tracking-wider block">
-                  Salvataggio su Google (Cloud)
+                  Sincronizzazione Cloud Google
                 </label>
-                <p className="text-[11px] text-slate-400 light:text-slate-500 leading-relaxed">
-                  Sincronizza i progressi sul tuo Google Drive privato per ritrovarli su qualsiasi dispositivo.
-                </p>
 
-                <div className="grid grid-cols-2 gap-2 pt-1">
+                {/* Toggle Sincronizzazione Automatica */}
+                <div className="flex items-center justify-between p-3 rounded-xl border border-slate-800 bg-slate-950/60 light:bg-slate-50 light:border-slate-200">
+                  <div className="pr-3">
+                    <span className="text-slate-200 light:text-slate-800 font-semibold block text-xs">
+                      Sincronizzazione Automatica (Auto-Sync)
+                    </span>
+                    <span className="text-[11px] text-slate-400 light:text-slate-500 block leading-tight pt-0.5">
+                      Salva e sincronizza i progressi in background tra i tuoi dispositivi (PC, telefono)
+                    </span>
+                  </div>
+                  <input
+                    type="checkbox"
+                    id="toggle-auto-sync-drive"
+                    checked={settings.autoSyncDrive ?? false}
+                    onChange={async e => {
+                      const val = e.target.checked;
+                      await updateSetting('autoSyncDrive', val);
+                      if (val) {
+                        googleDrive.initTokenClient(effectiveClientId);
+                        setSyncStatus('Avvio sincronizzazione cloud...');
+                        const res = await syncNow();
+                        setSyncStatus(res.message);
+                      }
+                    }}
+                    className="w-4 h-4 accent-sky-500 rounded flex-shrink-0"
+                  />
+                </div>
+
+                {/* Barra di Stato Sincronizzazione */}
+                {settings.autoSyncDrive && (
+                  <div className="p-2.5 rounded-xl border border-slate-800/80 bg-slate-950/40 light:bg-slate-100/60 light:border-slate-200 text-xs flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <div className={`w-2 h-2 rounded-full ${
+                        syncState.status === 'syncing' ? 'bg-sky-400 animate-pulse' :
+                        syncState.status === 'offline' ? 'bg-slate-500' :
+                        syncState.status === 'needs_auth' ? 'bg-amber-400' :
+                        'bg-emerald-400'
+                      }`} />
+                      <span className="text-slate-300 light:text-slate-700 font-medium">
+                        {syncState.status === 'syncing' ? 'Sincronizzazione in corso...' :
+                         syncState.status === 'offline' ? 'Dispositivo offline' :
+                         syncState.status === 'needs_auth' ? 'Accesso scaduto' :
+                         'Connesso a Google Drive'}
+                      </span>
+                    </div>
+
+                    <span className="text-[11px] text-slate-500 font-mono">
+                      {syncState.lastSyncedAt
+                        ? `Ultimo: ${new Date(syncState.lastSyncedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`
+                        : 'Mai salvato'}
+                    </span>
+                  </div>
+                )}
+
+                <div className="grid grid-cols-2 gap-2 pt-0.5">
                   <button
                     id="btn-drive-upload"
                     onClick={handleBackupToDrive}
@@ -454,7 +537,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                     className="py-2.5 px-3 rounded-xl bg-sky-600 hover:bg-sky-500 text-white font-semibold text-xs flex items-center justify-center gap-1.5 shadow-sm transition-all disabled:opacity-50"
                   >
                     <Upload className="w-3.5 h-3.5" />
-                    <span>Salva su Google</span>
+                    <span>Salva adesso</span>
                   </button>
 
                   <button
@@ -464,7 +547,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                     className="py-2.5 px-3 rounded-xl border border-slate-800 bg-slate-950 hover:bg-slate-800 text-slate-300 light:bg-slate-50 light:border-slate-200 light:text-slate-700 font-semibold text-xs flex items-center justify-center gap-1.5 transition-all disabled:opacity-50"
                   >
                     <Download className="w-3.5 h-3.5" />
-                    <span>Ripristina</span>
+                    <span>Unisci dati (Merge)</span>
                   </button>
                 </div>
 
@@ -539,6 +622,12 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
         </div>
 
       </div>
+
+      {/* Modale Guida Comandi Vocali (Cheat Sheet) */}
+      <VoiceCommandsModal
+        isOpen={isVoiceGuideOpen}
+        onClose={() => setIsVoiceGuideOpen(false)}
+      />
     </div>
   );
 };

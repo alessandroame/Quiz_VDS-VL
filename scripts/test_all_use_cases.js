@@ -240,6 +240,27 @@ async function run() {
     `);
     console.log(`  -> Schermata Drive Mode Fullscreen aperta: ${isDriveOpen ? '✅ SÌ' : '❌ NO'}`);
 
+    // Verifica apertura Guida Comandi Vocali dal launcher
+    await evalJS(`
+      const btnGuide = Array.from(document.querySelectorAll('button')).find(b => b.innerText.includes('Guida Rapida') || b.innerText.includes('Comandi Vocali'));
+      if (btnGuide) btnGuide.click();
+    `);
+    await sleep(400);
+
+    const isVoiceModalOpen = await evalJS(`
+      document.body.innerText.includes('Guida Comandi Vocali') &&
+      document.body.innerText.includes('Rispondi al Quiz') &&
+      document.body.innerText.includes('Pilota Automatico')
+    `);
+    console.log(`  -> Cheat Sheet Comandi Vocali aperto dal launcher: ${isVoiceModalOpen ? '✅ SÌ' : '❌ NO'}`);
+
+    // Chiudi modale guida vocale
+    await evalJS(`
+      const closeBtn = Array.from(document.querySelectorAll('button')).find(b => b.innerText.includes('Ho Capito') || b.title?.includes('Chiudi'));
+      if (closeBtn) closeBtn.click();
+    `);
+    await sleep(300);
+
     // Avvia Radio Quiz
     await evalJS(`document.getElementById('btn-drive-start-radio').click()`);
     await sleep(600);

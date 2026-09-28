@@ -10,7 +10,10 @@ import {
   setSetting,
   getAllSettings,
   exportDatabaseBackup,
-  importDatabaseBackup
+  importDatabaseBackup,
+  saveActiveSession,
+  getActiveSession,
+  clearActiveSession
 } from './index';
 
 describe('Suite 4: Persistenza Dexie IndexedDB (src/db/index.ts)', () => {
@@ -163,7 +166,7 @@ describe('Suite 4: Persistenza Dexie IndexedDB (src/db/index.ts)', () => {
     // Assert
     expect(typeof backupJson).toBe('string');
     const parsed = JSON.parse(backupJson);
-    expect(parsed.version).toBe(1);
+    expect(parsed.version).toBe(2);
     expect(typeof parsed.exportedAt).toBe('number');
     expect(Array.isArray(parsed.stats)).toBe(true);
     expect(parsed.stats.length).toBe(1);
@@ -171,13 +174,41 @@ describe('Suite 4: Persistenza Dexie IndexedDB (src/db/index.ts)', () => {
     expect(parsed.settings.length).toBe(1);
   });
 
-  it('DB-09: ripristino atomico del backup transazionale', async () => {
-    // Arrange
+  it('DB-09: persistenza, recupero e pulizia della sessione attiva (activeSession)', async () => {
+    // Act 1: salva sessione in corso
+    await saveActiveSession({
+      type: 'topic',
+      subjectId: 2,
+      subjectName: 'Meteorologia',
+      questionIds: [101, 102, 103],
+      currentIndex: 1,
+      answers: { 101: 2 },
+      updatedAt: 123456789
+    });
+
+    // Assert 1: recupero
+    const active = await getActiveSession();
+    expect(active).toBeDefined();
+    expect(active?.type).toBe('topic');
+    expect(active?.subjectId).toBe(2);
+    expect(active?.currentIndex).toBe(1);
+    expect(active?.answers[101]).toBe(2);
+
+    // Act 2: pulizia
+    await clearActiveSession();
+    const cleared = await getActiveSession();
+    expect(cleared).toBeNull();
+  });
+
+  it('DB-10: ripristino atomico del backup transazionale con Smart Merge', async () => {
+    // Arrange: imposta dati locali pre-esistenti
+    await recordQuestionAnswer(2001, true);
+
     const backupPayload = JSON.stringify({
-      version: 1,
+      version: 2,
       exportedAt: Date.now(),
       stats: [
-        { questionId: 3001, timesSeen: 2, timesCorrect: 2, timesWrong: 0, consecutiveCorrect: 2, isBookmarked: true }
+        { questionId: 3001, timesSeen: 2, timesCorrect: 2, timesWrong: 0, consecutiveCorrect: 2, isBookmarked: true, lastAnsweredAt: 5000 }
       ],
       sessions: [
         { id: 1, date: 99999, durationSeconds: 1200, totalQuestions: 30, correctAnswers: 30, wrongAnswers: 0, isPassed: true, isMarathon: false, subjectBreakdown: {}, snapshots: [] }
@@ -192,9 +223,13 @@ describe('Suite 4: Persistenza Dexie IndexedDB (src/db/index.ts)', () => {
 
     // Assert
     expect(result.success).toBe(true);
-    const stat = await db.stats.get(3001);
-    expect(stat).toBeDefined();
-    expect(stat!.isBookmarked).toBe(true);
+    // Sia il dato locale (2001) che quello del backup (3001) devono essere presenti (Smart Merge!)
+    const localStat = await db.stats.get(2001);
+    expect(localStat).toBeDefined();
+
+    const incomingStat = await db.stats.get(3001);
+    expect(incomingStat).toBeDefined();
+    expect(incomingStat!.isBookmarked).toBe(true);
 
     const sessions = await db.sessions.toArray();
     expect(sessions.length).toBe(1);
@@ -204,7 +239,7 @@ describe('Suite 4: Persistenza Dexie IndexedDB (src/db/index.ts)', () => {
     expect(theme).toBe('dark');
   });
 
-  it('DB-10: gestione sicura di backup corrotti o non validi', async () => {
+  it('DB-11: gestione sicura di backup corrotti o non validi', async () => {
     // Act 1: stringa non JSON
     const res1 = await importDatabaseBackup('INVALID_JSON{{{');
     expect(res1.success).toBe(false);

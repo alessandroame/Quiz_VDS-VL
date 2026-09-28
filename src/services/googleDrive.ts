@@ -38,8 +38,17 @@ export class GoogleDriveService {
     }
   }
 
+  public hasValidToken(): boolean {
+    return Boolean(this.accessToken && Date.now() < this.tokenExpiry - 60000);
+  }
+
+  public clearToken(): void {
+    this.accessToken = null;
+    this.tokenExpiry = 0;
+  }
+
   public async getAccessToken(): Promise<string> {
-    if (this.accessToken && Date.now() < this.tokenExpiry - 60000) {
+    if (this.hasValidToken() && this.accessToken) {
       return this.accessToken;
     }
 

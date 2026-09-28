@@ -13,7 +13,17 @@ import { useQuiz } from '../context/QuizContext';
 import { QuestionCard } from './QuestionCard';
 
 export const MistakesScreen: React.FC = () => {
-  const { questions, statsMap, recordAnswer, mistakesCount, settings, openDriveMode } = useQuiz();
+  const {
+    questions,
+    statsMap,
+    recordAnswer,
+    mistakesCount,
+    settings,
+    openDriveMode,
+    activeSession,
+    persistActiveSession,
+    dismissActiveSession
+  } = useQuiz();
 
   const [isReviewing, setIsReviewing] = useState(false);
   const [reviewQuestions, setReviewQuestions] = useState<Question[]>([]);
@@ -26,12 +36,37 @@ export const MistakesScreen: React.FC = () => {
     return s && s.timesWrong > 0 && s.consecutiveCorrect < 2;
   });
 
+  // Auto-resume mistakes review session if present
+  React.useEffect(() => {
+    if (!isReviewing && activeSession?.type === 'mistakes' && activeSession.questionIds?.length > 0) {
+      const ordered = activeSession.questionIds
+        .map(id => questions.find(q => q.id === id))
+        .filter((q): q is Question => Boolean(q));
+
+      if (ordered.length > 0) {
+        setReviewQuestions(ordered);
+        setCurrentIndex(Math.min(activeSession.currentIndex || 0, ordered.length - 1));
+        setReviewAnswers(activeSession.answers || {});
+        setIsReviewing(true);
+      }
+    }
+  }, [activeSession, isReviewing, questions]);
+
   const startReviewSession = () => {
     if (mistakeQuestions.length === 0) return;
     setReviewQuestions(mistakeQuestions);
     setCurrentIndex(0);
     setReviewAnswers({});
     setIsReviewing(true);
+
+    persistActiveSession({
+      type: 'mistakes',
+      subjectName: 'Quaderno Errori',
+      questionIds: mistakeQuestions.map(q => q.id),
+      currentIndex: 0,
+      answers: {},
+      updatedAt: Date.now()
+    });
   };
 
   const currentQ = reviewQuestions[currentIndex];
@@ -42,9 +77,31 @@ export const MistakesScreen: React.FC = () => {
     const targetQ = reviewQuestions.find(q => q.id === targetQid) || currentQ;
     if (!targetQ) return;
 
-    setReviewAnswers(prev => ({ ...prev, [targetQid]: ans }));
+    const updatedAnswers = { ...reviewAnswers, [targetQid]: ans };
+    setReviewAnswers(updatedAnswers);
     const isCorrect = ans === targetQ.correctAnswer;
     await recordAnswer(targetQid, isCorrect);
+
+    persistActiveSession({
+      type: 'mistakes',
+      subjectName: 'Quaderno Errori',
+      questionIds: reviewQuestions.map(q => q.id),
+      currentIndex,
+      answers: updatedAnswers,
+      updatedAt: Date.now()
+    });
+  };
+
+  const changeIndex = (newIndex: number) => {
+    setCurrentIndex(newIndex);
+    persistActiveSession({
+      type: 'mistakes',
+      subjectName: 'Quaderno Errori',
+      questionIds: reviewQuestions.map(q => q.id),
+      currentIndex: newIndex,
+      answers: reviewAnswers,
+      updatedAt: Date.now()
+    });
   };
 
   // --- Modalità Ripasso in Corso ---
@@ -55,10 +112,13 @@ export const MistakesScreen: React.FC = () => {
     return (
       <div className="max-w-2xl mx-auto px-4 py-4 space-y-4">
         {/* Top bar ripasso */}
-        <div className="flex items-center justify-between p-3 bg-slate-900 border border-slate-800 rounded-xl light:bg-white light:border-slate-200">
+        <div className="flex items-center justify-between p-3 bg-zinc-900 border border-zinc-800 rounded-xl light:bg-white light:border-slate-200">
           <button
-            onClick={() => setIsReviewing(false)}
-            className="text-xs text-slate-400 hover:text-slate-200 light:text-slate-600 flex items-center gap-1 font-medium"
+            onClick={() => {
+              setIsReviewing(false);
+              dismissActiveSession();
+            }}
+            className="text-xs text-zinc-400 hover:text-zinc-200 light:text-slate-600 flex items-center gap-1 font-medium"
           >
             <ArrowLeft className="w-4 h-4" />
             <span>Esci</span>
@@ -79,7 +139,7 @@ export const MistakesScreen: React.FC = () => {
                   flags: {},
                   onAnswer: (qid, ans) => handleAnswer(ans, qid),
                   onToggleFlag: () => {},
-                  onNavigateIndex: (idx) => setCurrentIndex(idx),
+                  onNavigateIndex: (idx) => changeIndex(idx),
                   isExam: false,
                   title: 'Ripasso Errori'
                 });
@@ -91,16 +151,16 @@ export const MistakesScreen: React.FC = () => {
               <span>Alla Guida</span>
             </button>
 
-            <div className="text-xs font-mono text-sky-400 light:text-sky-600 font-semibold">
+            <div className="text-xs font-mono text-amber-400 light:text-amber-600 font-semibold">
               {currentIndex + 1}/{reviewQuestions.length}
             </div>
           </div>
         </div>
 
         {/* Badge Obiettivo 2 risposte corrette */}
-        <div className="px-3 py-1.5 bg-slate-900/60 border border-slate-800 rounded-lg text-xs text-slate-400 flex items-center justify-between">
+        <div className="px-3 py-1.5 bg-zinc-900/60 border border-zinc-800 rounded-lg text-xs text-zinc-400 flex items-center justify-between">
           <span>Obiettivo: 2 risposte esatte di fila per toglierla</span>
-          <span className="font-semibold text-slate-200 light:text-slate-700">
+          <span className="font-semibold text-zinc-200 light:text-slate-700">
             {consecutive}/2 completate
           </span>
         </div>
@@ -118,9 +178,9 @@ export const MistakesScreen: React.FC = () => {
         {/* Navigazione */}
         <div className="flex items-center justify-between gap-3 pt-2">
           <button
-            onClick={() => setCurrentIndex(prev => Math.max(0, prev - 1))}
+            onClick={() => changeIndex(Math.max(0, currentIndex - 1))}
             disabled={currentIndex === 0}
-            className="px-4 py-2.5 rounded-xl border border-slate-800 bg-slate-900 text-slate-300 light:bg-white light:border-slate-200 text-xs font-semibold flex items-center gap-1.5 disabled:opacity-30"
+            className="px-4 py-2.5 rounded-xl border border-zinc-800 bg-zinc-900 text-zinc-300 light:bg-white light:border-slate-200 text-xs font-semibold flex items-center gap-1.5 disabled:opacity-30"
           >
             <ArrowLeft className="w-4 h-4" />
             <span>Precedente</span>
@@ -128,15 +188,18 @@ export const MistakesScreen: React.FC = () => {
 
           {currentIndex < reviewQuestions.length - 1 ? (
             <button
-              onClick={() => setCurrentIndex(prev => prev + 1)}
-              className="px-4 py-2.5 rounded-xl bg-sky-600 hover:bg-sky-500 text-white text-xs font-semibold flex items-center gap-1.5 shadow-sm"
+              onClick={() => changeIndex(currentIndex + 1)}
+              className="px-4 py-2.5 rounded-xl bg-amber-600 hover:bg-amber-500 text-white text-xs font-semibold flex items-center gap-1.5 shadow-sm"
             >
               <span>Successiva</span>
               <ArrowRight className="w-4 h-4" />
             </button>
           ) : (
             <button
-              onClick={() => setIsReviewing(false)}
+              onClick={() => {
+                setIsReviewing(false);
+                dismissActiveSession();
+              }}
               className="px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold flex items-center gap-1.5 shadow-sm"
             >
               <CheckCircle2 className="w-4 h-4" />
@@ -154,7 +217,7 @@ export const MistakesScreen: React.FC = () => {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-xl font-bold tracking-tight">Quaderno Errori</h1>
-          <p className="text-xs text-slate-400 light:text-slate-600">
+          <p className="text-xs text-zinc-400 light:text-slate-600">
             Rispondi esattamente per 2 volte di fila per togliere una domanda dagli errori
           </p>
         </div>
@@ -165,14 +228,14 @@ export const MistakesScreen: React.FC = () => {
       </div>
 
       {mistakesCount === 0 ? (
-        <div className="p-8 rounded-2xl border border-slate-800 bg-slate-900/60 light:bg-white light:border-slate-200 text-center space-y-3">
+        <div className="p-8 rounded-2xl border border-zinc-800 bg-zinc-900/60 light:bg-white light:border-slate-200 text-center space-y-3">
           <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-emerald-500/10 text-emerald-400">
             <CheckCircle2 className="w-6 h-6" />
           </div>
-          <h3 className="text-base font-bold text-slate-200 light:text-slate-800">
+          <h3 className="text-base font-bold text-zinc-200 light:text-slate-800">
             Nessun errore da ripassare
           </h3>
-          <p className="text-xs text-slate-400 light:text-slate-600 max-w-sm mx-auto">
+          <p className="text-xs text-zinc-400 light:text-slate-600 max-w-sm mx-auto">
             Hai risposto correttamente a tutte le domande affrontate per almeno 2 volte consecutive. Ottimo lavoro! Avvia una simulazione d'esame per metterti alla prova.
           </p>
         </div>
@@ -188,7 +251,7 @@ export const MistakesScreen: React.FC = () => {
 
           {/* Elenco dettagliato errori */}
           <div className="space-y-3">
-            <h3 className="text-xs font-bold text-slate-400 light:text-slate-600 uppercase tracking-wider">
+            <h3 className="text-xs font-bold text-zinc-400 light:text-slate-600 uppercase tracking-wider">
               Domande da Ripassare
             </h3>
             <div className="space-y-2">
@@ -197,18 +260,18 @@ export const MistakesScreen: React.FC = () => {
                 return (
                   <div
                     key={q.id}
-                    className="p-3.5 rounded-xl border border-slate-800 bg-slate-900/80 light:bg-white light:border-slate-200 flex items-start justify-between gap-3 text-xs"
+                    className="p-3.5 rounded-xl border border-zinc-800 bg-zinc-900/80 light:bg-white light:border-slate-200 flex items-start justify-between gap-3 text-xs"
                   >
                     <div className="space-y-1">
                       <div className="flex items-center gap-2">
-                        <span className="font-mono font-bold text-sky-400">#{q.id}</span>
-                        <span className="text-slate-400 light:text-slate-500">{q.subjectName}</span>
+                        <span className="font-mono font-bold text-amber-400">#{q.id}</span>
+                        <span className="text-zinc-400 light:text-slate-500">{q.subjectName}</span>
                       </div>
-                      <p className="text-slate-200 light:text-slate-800 line-clamp-2">
+                      <p className="text-zinc-200 light:text-slate-800 line-clamp-2">
                         {q.question}
                       </p>
                       {s?.userNote && (
-                        <div className="flex items-center gap-1.5 mt-1 text-[11px] text-sky-400 light:text-sky-700 bg-sky-950/40 light:bg-sky-50 px-2 py-0.5 rounded border border-sky-800/40 light:border-sky-200 w-fit max-w-full">
+                        <div className="flex items-center gap-1.5 mt-1 text-[11px] text-amber-400 light:text-amber-700 bg-amber-950/40 light:bg-amber-50 px-2 py-0.5 rounded border border-amber-800/40 light:border-amber-200 w-fit max-w-full">
                           <FileText className="w-3 h-3 flex-shrink-0" />
                           <span className="truncate italic">Nota: "{s.userNote}"</span>
                         </div>
@@ -219,7 +282,7 @@ export const MistakesScreen: React.FC = () => {
                       <span className="px-2 py-0.5 rounded bg-rose-500/20 text-rose-400 font-bold text-[10px]">
                         {s?.timesWrong} err
                       </span>
-                      <span className="text-[10px] text-slate-500">
+                      <span className="text-[10px] text-zinc-500">
                         {s?.consecutiveCorrect || 0}/2 ok
                       </span>
                     </div>

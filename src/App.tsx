@@ -9,7 +9,7 @@ import { ArchiveScreen } from './components/ArchiveScreen';
 import { StatsScreen } from './components/StatsScreen';
 import { SettingsModal } from './components/SettingsModal';
 import { DriveModeScreen } from './components/DriveModeScreen';
-import { Download, AlertTriangle } from 'lucide-react';
+import { Download, AlertTriangle, Play, ArrowRight, X } from 'lucide-react';
 import { voiceService } from './services/voiceService';
 
 function AppContent() {
@@ -18,7 +18,9 @@ function AppContent() {
     setIsExamRunning,
     isDriveModeOpen,
     closeDriveMode,
-    driveSessionContext
+    driveSessionContext,
+    activeSession,
+    dismissActiveSession
   } = useQuiz();
   const [activeTab, setActiveTab] = useState<NavTab>('exam');
   const [pendingTab, setPendingTab] = useState<NavTab | null>(null);
@@ -79,6 +81,13 @@ function AppContent() {
     setPendingTab(null);
   };
 
+  const handleResumeActiveSession = () => {
+    if (!activeSession) return;
+    if (activeSession.type === 'exam') handleSelectTab('exam');
+    else if (activeSession.type === 'topic') handleSelectTab('topics');
+    else if (activeSession.type === 'mistakes') handleSelectTab('mistakes');
+  };
+
   const getTabLabel = (tab: NavTab | null) => {
     switch (tab) {
       case 'exam': return 'Esame';
@@ -91,23 +100,62 @@ function AppContent() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 dark:bg-slate-950 dark:text-slate-100 light:bg-slate-50 light:text-slate-900 transition-colors pb-20">
+    <div className="min-h-screen bg-zinc-950 text-zinc-100 dark:bg-zinc-950 dark:text-zinc-100 light:bg-slate-50 light:text-slate-900 transition-colors pb-20">
       <Navbar
         activeTab={activeTab}
         setActiveTab={handleSelectTab}
         openSettings={() => setIsSettingsOpen(true)}
       />
 
+      {/* Banner Ripresa Rapida Sessione Cross-Device */}
+      {activeSession && !isExamRunning && activeTab !== activeSession.type && (
+        <div className="max-w-2xl mx-auto px-4 pt-3">
+          <div className="p-3 bg-amber-950/30 border border-amber-500/40 rounded-xl flex items-center justify-between gap-3 text-xs shadow-lg animate-in fade-in light:bg-amber-50 light:border-amber-300">
+            <div className="flex items-center gap-2.5 min-w-0">
+              <div className="p-2 rounded-lg bg-amber-500/20 text-amber-400 light:bg-amber-100 light:text-amber-600 flex-shrink-0">
+                <Play className="w-4 h-4 fill-current" />
+              </div>
+              <div className="min-w-0">
+                <div className="font-bold text-amber-100 light:text-amber-900 truncate">
+                  Riprendi: {activeSession.subjectName || (activeSession.type === 'exam' ? 'Simulazione Esame' : 'Quaderno Errori')}
+                </div>
+                <div className="text-[11px] text-amber-300/80 light:text-amber-700 truncate">
+                  Domanda {activeSession.currentIndex + 1} di {activeSession.questionIds.length} • {activeSession.answers ? Object.keys(activeSession.answers).length : 0} risposte date
+                </div>
+              </div>
+            </div>
+            <div className="flex items-center gap-1.5 flex-shrink-0">
+              <button
+                id="btn-resume-session"
+                onClick={handleResumeActiveSession}
+                className="px-3 py-1.5 rounded-lg bg-amber-600 hover:bg-amber-500 text-white font-bold flex items-center gap-1 shadow-sm transition-colors"
+              >
+                <span>Riprendi</span>
+                <ArrowRight className="w-3.5 h-3.5" />
+              </button>
+              <button
+                id="btn-dismiss-session"
+                onClick={() => dismissActiveSession()}
+                className="p-1.5 rounded-lg text-zinc-400 hover:text-zinc-200 light:text-slate-500 light:hover:text-slate-800"
+                title="Ignora sessione"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Banner Installa PWA se disponibile */}
       {deferredPrompt && (
         <div className="max-w-2xl mx-auto px-4 pt-3">
-          <div className="p-3 bg-sky-950/60 border border-sky-800 rounded-xl flex items-center justify-between gap-3 text-xs">
-            <div className="text-sky-200">
+          <div className="p-3 bg-zinc-900 border border-zinc-800 rounded-xl flex items-center justify-between gap-3 text-xs">
+            <div className="text-zinc-200">
               Installa l'app per usarla offline sul campo di volo.
             </div>
             <button
               onClick={handleInstallPWA}
-              className="px-3 py-1.5 rounded-lg bg-sky-600 hover:bg-sky-500 text-white font-bold flex items-center gap-1.5 flex-shrink-0"
+              className="px-3 py-1.5 rounded-lg bg-amber-600 hover:bg-amber-500 text-white font-bold flex items-center gap-1.5 flex-shrink-0"
             >
               <Download className="w-3.5 h-3.5" />
               <span>Installa</span>
@@ -141,18 +189,18 @@ function AppContent() {
       {/* Modal di Avviso Cambio Pagina durante Esame Attivo */}
       {pendingTab && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/75 p-4 animate-in fade-in">
-          <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 max-w-sm w-full space-y-4 shadow-2xl dark:bg-slate-900 dark:border-slate-800 light:bg-white light:border-slate-200">
+          <div className="bg-zinc-900 border border-zinc-800 rounded-2xl p-6 max-w-sm w-full space-y-4 shadow-2xl dark:bg-zinc-900 dark:border-zinc-800 light:bg-white light:border-slate-200">
             <div className="flex items-center gap-2.5 text-amber-400 light:text-amber-600">
               <AlertTriangle className="w-6 h-6 flex-shrink-0" />
-              <h3 className="font-bold text-base text-slate-100 dark:text-slate-100 light:text-slate-900">
+              <h3 className="font-bold text-base text-zinc-100 dark:text-zinc-100 light:text-slate-900">
                 Simulazione in Corso
               </h3>
             </div>
 
-            <div className="text-xs text-slate-300 dark:text-slate-300 light:text-slate-600 space-y-2">
+            <div className="text-xs text-zinc-300 dark:text-zinc-300 light:text-slate-600 space-y-2">
               <p>
                 Hai una sessione d'esame attiva. Se ti sposti alla sezione{' '}
-                <strong className="text-sky-400 light:text-sky-700 font-bold">
+                <strong className="text-amber-400 light:text-amber-700 font-bold">
                   "{getTabLabel(pendingTab)}"
                 </strong>
                 , la simulazione in corso verrà interrotta e tutti i progressi andranno persi.
@@ -165,7 +213,7 @@ function AppContent() {
             <div className="flex gap-2 pt-2">
               <button
                 onClick={cancelNavigation}
-                className="flex-1 py-2.5 rounded-xl bg-sky-600 hover:bg-sky-500 text-white text-xs font-bold shadow-md transition-colors"
+                className="flex-1 py-2.5 rounded-xl bg-amber-600 hover:bg-amber-500 text-white text-xs font-bold shadow-md transition-colors"
               >
                 Rimani nell'Esame
               </button>

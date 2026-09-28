@@ -11,12 +11,28 @@ async function runTest() {
   const chromePath = 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe';
   const cdpPort = 9226;
 
+  const preview = spawn('npx', ['vite', 'preview', '--port', '5173'], {
+    shell: true,
+    stdio: 'ignore'
+  });
+
+  // Attendi che il server sia pronto
+  for (let i = 0; i < 40; i++) {
+    try {
+      const res = await fetch('http://localhost:5173/');
+      if (res.ok) break;
+    } catch {
+      await sleep(250);
+    }
+  }
+  await sleep(500);
+
   const chromeProc = spawn(chromePath, [
     `--remote-debugging-port=${cdpPort}`,
     '--headless=new',
     '--disable-gpu',
     '--no-sandbox',
-    'http://localhost:5173'
+    'about:blank'
   ]);
 
   try {
@@ -181,6 +197,7 @@ async function runTest() {
     ws.close();
   } finally {
     chromeProc.kill();
+    preview.kill();
   }
 }
 

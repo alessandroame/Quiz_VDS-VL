@@ -7,6 +7,10 @@ import {
   FileText,
   CheckCircle2,
   Volume2,
+  Play,
+  Pause,
+  RotateCcw,
+  Square,
   Edit3,
   Trash2,
   Plus
@@ -34,10 +38,12 @@ const ArchiveItem: React.FC<ArchiveItemProps> = ({ question: q, isExpanded, onTo
   }, [q.id, stat?.userNote]);
 
   const {
-    isSequencePlaying,
+    isPlaying,
+    isPaused,
     isThisQuestionActive,
     isPartPlaying,
-    playFullSequence,
+    togglePlayPause,
+    restartFullSequence,
     playQuestion,
     playOption,
     playExplanation,
@@ -45,42 +51,42 @@ const ArchiveItem: React.FC<ArchiveItemProps> = ({ question: q, isExpanded, onTo
   } = useAviationVoice(q.id);
 
   return (
-    <div className="border border-slate-800 rounded-xl overflow-hidden bg-slate-900/40 light:bg-white light:border-slate-200">
+    <div className="border border-zinc-800 rounded-xl overflow-hidden bg-zinc-900/40 light:bg-white light:border-slate-200">
       <div
         id={`archive-item-${q.id}`}
         onClick={onToggle}
-        className="p-3.5 flex items-start justify-between gap-3 cursor-pointer hover:bg-slate-800/40 light:hover:bg-slate-50 transition-colors"
+        className="p-3.5 flex items-start justify-between gap-3 cursor-pointer hover:bg-zinc-800/40 light:hover:bg-slate-50 transition-colors"
       >
         <div className="space-y-1 flex-1">
           <div className="flex items-center gap-2">
-            <span className="font-mono font-bold text-sky-400 text-xs">
+            <span className="font-mono font-bold text-amber-400 text-xs">
               #{q.id}
             </span>
-            <span className="text-[11px] text-slate-400 light:text-slate-500">
+            <span className="text-[11px] text-zinc-400 light:text-slate-500">
               {q.subjectName}
             </span>
             {stat?.isBookmarked && (
               <Bookmark className="w-3 h-3 text-amber-400 fill-amber-400" />
             )}
             {stat?.userNote && (
-              <span className="inline-flex items-center gap-1 text-[10px] px-1.5 py-0.2 rounded bg-sky-500/20 text-sky-400 light:bg-sky-100 light:text-sky-800 font-medium">
+              <span className="inline-flex items-center gap-1 text-[10px] px-1.5 py-0.2 rounded bg-amber-500/20 text-amber-400 light:bg-amber-100 light:text-amber-800 font-medium">
                 <FileText className="w-3 h-3" />
                 <span>Nota</span>
               </span>
             )}
           </div>
-          <p className="text-xs text-slate-200 light:text-slate-800 font-medium line-clamp-2">
+          <p className="text-xs text-zinc-200 light:text-slate-800 font-medium line-clamp-2">
             {q.question}
           </p>
           {stat?.userNote && (
-            <div className="flex items-center gap-1.5 mt-1 text-[11px] text-sky-400 light:text-sky-800 bg-sky-950/50 light:bg-sky-50 px-2 py-0.5 rounded border border-sky-800/40 light:border-sky-200 w-fit max-w-full">
-              <FileText className="w-3 h-3 flex-shrink-0 text-sky-400 light:text-sky-600" />
+            <div className="flex items-center gap-1.5 mt-1 text-[11px] text-amber-400 light:text-amber-800 bg-amber-950/50 light:bg-amber-50 px-2 py-0.5 rounded border border-amber-800/40 light:border-amber-200 w-fit max-w-full">
+              <FileText className="w-3 h-3 flex-shrink-0 text-amber-400 light:text-amber-600" />
               <span className="truncate italic font-normal">"{stat.userNote}"</span>
             </div>
           )}
         </div>
 
-        <div className="flex items-center gap-2 text-slate-400 flex-shrink-0 mt-1">
+        <div className="flex items-center gap-2 text-zinc-400 flex-shrink-0 mt-1">
           {stat?.lastResult && (
             <span
               className={`text-[10px] px-1.5 py-0.5 rounded font-bold ${
@@ -98,11 +104,11 @@ const ArchiveItem: React.FC<ArchiveItemProps> = ({ question: q, isExpanded, onTo
 
       {/* Sezione Espansa */}
       {isExpanded && (
-        <div className="p-3.5 border-t border-slate-800/80 light:border-slate-100 bg-slate-950/60 light:bg-slate-50 space-y-3">
+        <div className="p-3.5 border-t border-zinc-800/80 light:border-slate-100 bg-zinc-950/60 light:bg-slate-50 space-y-3">
           {/* Barra comandi vocali rapidi */}
           {settings.ttsEnabled && (
-            <div className="flex items-center justify-between pb-2 border-b border-slate-800/60 light:border-slate-200 text-xs">
-              <span className="text-[11px] text-slate-400 font-medium">
+            <div className="flex items-center justify-between pb-2 border-b border-zinc-800/60 light:border-slate-200 text-xs">
+              <span className="text-[11px] text-zinc-400 font-medium">
                 Ascolto Vocale
               </span>
               <div className="flex items-center gap-1.5">
@@ -110,26 +116,52 @@ const ArchiveItem: React.FC<ArchiveItemProps> = ({ question: q, isExpanded, onTo
                   onClick={() => playQuestion()}
                   className={`px-2 py-0.5 rounded text-[11px] flex items-center gap-1 transition-colors ${
                     isPartPlaying('question')
-                      ? 'bg-sky-500/20 text-sky-400 ring-1 ring-sky-500/40'
-                      : 'text-slate-400 hover:text-slate-200 bg-slate-800/60'
+                      ? 'bg-amber-500/20 text-amber-400 ring-1 ring-amber-500/40'
+                      : 'text-zinc-400 hover:text-zinc-200 bg-zinc-800/60'
                   }`}
                   title="Ascolta solo la domanda"
                 >
                   <Volume2 className="w-3 h-3" />
                   <span>Domanda</span>
                 </button>
-                <button
-                  onClick={() => isSequencePlaying && isThisQuestionActive ? stop() : playFullSequence()}
-                  className={`px-2 py-0.5 rounded text-[11px] flex items-center gap-1 transition-colors ${
-                    isSequencePlaying && isThisQuestionActive
-                      ? 'bg-sky-500/20 text-sky-400 ring-1 ring-sky-500/40 font-semibold'
-                      : 'text-slate-400 hover:text-slate-200 bg-slate-800/60'
-                  }`}
-                  title="Ascolta sequenza completa"
-                >
-                  <Volume2 className={`w-3 h-3 ${isSequencePlaying && isThisQuestionActive ? 'animate-pulse text-sky-400' : ''}`} />
-                  <span>{isSequencePlaying && isThisQuestionActive ? 'Stop' : 'Tutto'}</span>
-                </button>
+                {isThisQuestionActive && (isPlaying || isPaused) ? (
+                  <div className="inline-flex items-center bg-zinc-800/80 light:bg-slate-100 border border-zinc-700/80 light:border-slate-300 rounded p-0.5 gap-0.5 text-[11px] animate-in fade-in duration-150">
+                    <button
+                      onClick={togglePlayPause}
+                      className={`px-1.5 py-0.5 rounded flex items-center gap-1 font-semibold transition-colors ${
+                        isPlaying ? 'bg-amber-500/20 text-amber-400' : 'bg-amber-500/20 text-amber-400'
+                      }`}
+                      title={isPlaying ? 'Metti in pausa (Tasto V)' : 'Riprendi ascolto (Tasto V)'}
+                    >
+                      {isPlaying ? <Pause className="w-2.5 h-2.5 animate-pulse" /> : <Play className="w-2.5 h-2.5" />}
+                      <span>{isPlaying ? 'Pausa' : 'Riprendi'}</span>
+                    </button>
+                    <button
+                      onClick={restartFullSequence}
+                      className="px-1.5 py-0.5 rounded text-zinc-300 light:text-slate-700 hover:text-white light:hover:text-black flex items-center gap-1 transition-colors"
+                      title="Ricomincia da capo dall'inizio"
+                    >
+                      <RotateCcw className="w-2.5 h-2.5" />
+                      <span>Da capo</span>
+                    </button>
+                    <button
+                      onClick={stop}
+                      className="p-1 rounded text-zinc-500 hover:text-rose-400 transition-colors"
+                      title="Interrompi ascolto (Esc)"
+                    >
+                      <Square className="w-2 h-2 fill-current" />
+                    </button>
+                  </div>
+                ) : (
+                  <button
+                    onClick={togglePlayPause}
+                    className={`px-2 py-0.5 rounded text-[11px] flex items-center gap-1 transition-colors text-zinc-400 hover:text-zinc-200 bg-zinc-800/60`}
+                    title="Ascolta sequenza completa"
+                  >
+                    <Volume2 className="w-3 h-3" />
+                    <span>Tutto</span>
+                  </button>
+                )}
               </div>
             </div>
           )}
@@ -147,8 +179,8 @@ const ArchiveItem: React.FC<ArchiveItemProps> = ({ question: q, isExpanded, onTo
                   className={`p-2.5 rounded-lg text-xs flex items-start gap-2 border transition-all ${
                     isCorrect
                       ? 'bg-emerald-950/30 border-emerald-500/50 text-emerald-300 light:bg-emerald-50 light:border-emerald-300 light:text-emerald-900 font-medium'
-                      : 'bg-slate-900/60 border-slate-800/60 text-slate-400 light:bg-white light:border-slate-200 light:text-slate-600'
-                  } ${isOptPlaying ? 'ring-1 ring-sky-400' : ''}`}
+                      : 'bg-zinc-900/60 border-zinc-800/60 text-zinc-400 light:bg-white light:border-slate-200 light:text-slate-600'
+                  } ${isOptPlaying ? 'ring-1 ring-amber-400' : ''}`}
                 >
                   <span className="font-bold">{optNum}.</span>
                   <span className="flex-1">{opt}</span>
@@ -157,7 +189,7 @@ const ArchiveItem: React.FC<ArchiveItemProps> = ({ question: q, isExpanded, onTo
                     <button
                       onClick={() => playOption(optNum)}
                       className={`p-0.5 rounded transition-colors ${
-                        isOptPlaying ? 'text-sky-400' : 'text-slate-600 hover:text-slate-300'
+                        isOptPlaying ? 'text-amber-400' : 'text-zinc-600 hover:text-zinc-300'
                       }`}
                       title={`Ascolta opzione ${optNum}`}
                     >
@@ -174,16 +206,16 @@ const ArchiveItem: React.FC<ArchiveItemProps> = ({ question: q, isExpanded, onTo
           </div>
 
           {/* Spiegazione Sintetica con tasto ascolto */}
-          <div className="p-2.5 rounded-lg bg-slate-900 border border-slate-800 light:bg-white light:border-slate-200 text-xs space-y-1 text-slate-300 light:text-slate-700">
-            <div className="flex items-center justify-between pb-1 border-b border-slate-800/60 light:border-slate-100">
-              <span className="font-bold text-[11px] text-slate-400">Spiegazione Didattica</span>
+          <div className="p-2.5 rounded-lg bg-zinc-900 border border-zinc-800 light:bg-white light:border-slate-200 text-xs space-y-1 text-zinc-300 light:text-slate-700">
+            <div className="flex items-center justify-between pb-1 border-b border-zinc-800/60 light:border-slate-100">
+              <span className="font-bold text-[11px] text-zinc-400">Spiegazione Didattica</span>
               {settings.ttsEnabled && (
                 <button
                   onClick={() => playExplanation()}
                   className={`text-[10px] px-1.5 py-0.5 rounded flex items-center gap-1 ${
                     isPartPlaying('explanation')
-                      ? 'bg-sky-500/20 text-sky-400 ring-1 ring-sky-500/40'
-                      : 'text-slate-400 hover:text-slate-200 bg-slate-800/60'
+                      ? 'bg-amber-500/20 text-amber-400 ring-1 ring-amber-500/40'
+                      : 'text-zinc-400 hover:text-zinc-200 bg-zinc-800/60'
                   }`}
                 >
                   <Volume2 className="w-3 h-3" />
@@ -192,7 +224,7 @@ const ArchiveItem: React.FC<ArchiveItemProps> = ({ question: q, isExpanded, onTo
               )}
             </div>
             <div>
-              <strong className="text-sky-400 light:text-sky-600">Regola: </strong>
+              <strong className="text-emerald-400 light:text-emerald-600">Regola: </strong>
               <span>{q.explanation.rule}</span>
             </div>
             <div>

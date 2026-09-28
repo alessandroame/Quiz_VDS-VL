@@ -2,15 +2,18 @@ import React, { createContext, useContext, useMemo, useEffect, useState } from '
 import { useLiveQuery } from 'dexie-react-hooks';
 import questionsData from '../data/questions.json';
 import type { Question } from '../types/quiz';
-import type { QuestionStat, ExamSession, AppSettings } from '../types/database';
+import type { QuestionStat, ExamSession, AppSettings, InProgressSession } from '../types/database';
 import { voiceService } from '../services/voiceService';
+import { syncEngine, type SyncEngineState } from '../services/syncEngine';
 import {
   db,
   DEFAULT_SETTINGS,
   recordQuestionAnswer,
   toggleQuestionBookmark,
   saveQuestionNote,
-  setSetting
+  setSetting,
+  saveActiveSession,
+  clearActiveSession
 } from '../db';
 import type { DriveModeSessionContext } from '../components/DriveModeScreen';
 import {
@@ -43,6 +46,11 @@ interface QuizContextType {
   mistakesCount: number;
   bookmarksCount: number;
   subjectsAnalytics: SubjectAnalytics[];
+  activeSession: InProgressSession | null;
+  persistActiveSession: (session: InProgressSession) => Promise<void>;
+  dismissActiveSession: () => Promise<void>;
+  syncState: SyncEngineState;
+  syncNow: () => Promise<{ success: boolean; message: string }>;
 }
 
 const QuizContext = createContext<QuizContextType | null>(null);
@@ -67,6 +75,19 @@ export const QuizProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const statsList = useLiveQuery(() => db.stats.toArray(), []) || [];
   const sessions = useLiveQuery(() => db.sessions.orderBy('date').reverse().toArray(), []) || [];
   const settingsList = useLiveQuery(() => db.settings.toArray(), []) || [];
+  const activeSessionEntry = useLiveQuery(() => db.settings.get('activeSession'), []);
+
+  const activeSession = useMemo<InProgressSession | null>(() => {
+    return (activeSessionEntry?.value as InProgressSession) || null;
+  }, [activeSessionEntry]);
+
+  const [syncState, setSyncState] = useState<SyncEngineState>(syncEngine.getState());
+
+  useEffect(() => {
+    const unsub = syncEngine.subscribe(setSyncState);
+    syncEngine.init();
+    return unsub;
+  }, []);
 
   const settings = useMemo(() => {
     const map = settingsList.reduce((acc, curr) => {
@@ -114,22 +135,48 @@ export const QuizProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const updateSetting = async <K extends keyof AppSettings>(key: K, value: AppSettings[K]) => {
     await setSetting(key, value);
+    if (key === 'autoSyncDrive') {
+      syncEngine.setAutoSyncEnabled(Boolean(value));
+    } else {
+      syncEngine.schedulePush();
+    }
   };
 
   const recordAnswer = async (questionId: number, isCorrect: boolean) => {
     await recordQuestionAnswer(questionId, isCorrect);
+    syncEngine.schedulePush();
   };
 
   const toggleBookmark = async (questionId: number) => {
-    return await toggleQuestionBookmark(questionId);
+    const res = await toggleQuestionBookmark(questionId);
+    syncEngine.schedulePush();
+    return res;
   };
 
   const saveNote = async (questionId: number, note: string) => {
     await saveQuestionNote(questionId, note);
+    syncEngine.schedulePush();
   };
 
   const saveExam = async (session: ExamSession): Promise<number> => {
-    return await db.sessions.add(session);
+    const id = await db.sessions.add(session);
+    await clearActiveSession();
+    syncEngine.pushNow().catch(() => {});
+    return id;
+  };
+
+  const persistActiveSession = async (session: InProgressSession) => {
+    await saveActiveSession(session);
+    syncEngine.schedulePush();
+  };
+
+  const dismissActiveSession = async () => {
+    await clearActiveSession();
+    syncEngine.schedulePush();
+  };
+
+  const syncNow = async () => {
+    return await syncEngine.fullSync();
   };
 
   return (
@@ -154,7 +201,12 @@ export const QuizProvider: React.FC<{ children: React.ReactNode }> = ({ children
         readinessScore,
         mistakesCount,
         bookmarksCount,
-        subjectsAnalytics
+        subjectsAnalytics,
+        activeSession,
+        persistActiveSession,
+        dismissActiveSession,
+        syncState,
+        syncNow
       }}
     >
       {children}

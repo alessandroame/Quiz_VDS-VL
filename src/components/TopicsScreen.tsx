@@ -10,12 +10,38 @@ import { useQuiz } from '../context/QuizContext';
 import { QuestionCard } from './QuestionCard';
 
 export const TopicsScreen: React.FC = () => {
-  const { questions, statsMap, recordAnswer, subjectsAnalytics, settings, openDriveMode } = useQuiz();
+  const {
+    questions,
+    statsMap,
+    recordAnswer,
+    subjectsAnalytics,
+    settings,
+    openDriveMode,
+    activeSession,
+    persistActiveSession,
+    dismissActiveSession
+  } = useQuiz();
 
   const [activeSubjectId, setActiveSubjectId] = useState<number | null>(null);
   const [sessionQuestions, setSessionQuestions] = useState<Question[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [sessionAnswers, setSessionAnswers] = useState<Record<number, 1 | 2 | 3>>({});
+
+  // Auto-resume topic session from activeSession if available
+  React.useEffect(() => {
+    if (activeSubjectId === null && activeSession?.type === 'topic' && activeSession.subjectId) {
+      const ordered = activeSession.questionIds
+        .map(id => questions.find(q => q.id === id))
+        .filter((q): q is Question => Boolean(q));
+
+      if (ordered.length > 0) {
+        setActiveSubjectId(activeSession.subjectId);
+        setSessionQuestions(ordered);
+        setCurrentIndex(Math.min(activeSession.currentIndex || 0, ordered.length - 1));
+        setSessionAnswers(activeSession.answers || {});
+      }
+    }
+  }, [activeSession, activeSubjectId, questions]);
 
   const startTopicSession = (subId: number, mode: 'all' | 'unseen' | 'wrong' = 'all') => {
     setActiveSubjectId(subId);
@@ -42,6 +68,18 @@ export const TopicsScreen: React.FC = () => {
     }
 
     setSessionQuestions(list);
+
+    const subMeta = subjectsAnalytics.find(s => s.id === subId);
+    persistActiveSession({
+      type: 'topic',
+      subjectId: subId,
+      subjectName: subMeta?.name || `Materia #${subId}`,
+      mode,
+      questionIds: list.map(q => q.id),
+      currentIndex: 0,
+      answers: {},
+      updatedAt: Date.now()
+    });
   };
 
   const currentQ = sessionQuestions[currentIndex];
@@ -52,9 +90,39 @@ export const TopicsScreen: React.FC = () => {
     const targetQ = sessionQuestions.find(q => q.id === targetQid) || currentQ;
     if (!targetQ) return;
 
-    setSessionAnswers(prev => ({ ...prev, [targetQid]: ans }));
+    const updatedAnswers = { ...sessionAnswers, [targetQid]: ans };
+    setSessionAnswers(updatedAnswers);
     const isCorrect = ans === targetQ.correctAnswer;
     await recordAnswer(targetQid, isCorrect);
+
+    if (activeSubjectId !== null) {
+      const currentSubjectMeta = subjectsAnalytics.find(s => s.id === activeSubjectId);
+      persistActiveSession({
+        type: 'topic',
+        subjectId: activeSubjectId,
+        subjectName: currentSubjectMeta?.name,
+        questionIds: sessionQuestions.map(q => q.id),
+        currentIndex,
+        answers: updatedAnswers,
+        updatedAt: Date.now()
+      });
+    }
+  };
+
+  const changeIndex = (newIndex: number) => {
+    setCurrentIndex(newIndex);
+    if (activeSubjectId !== null) {
+      const currentSubjectMeta = subjectsAnalytics.find(s => s.id === activeSubjectId);
+      persistActiveSession({
+        type: 'topic',
+        subjectId: activeSubjectId,
+        subjectName: currentSubjectMeta?.name,
+        questionIds: sessionQuestions.map(q => q.id),
+        currentIndex: newIndex,
+        answers: sessionAnswers,
+        updatedAt: Date.now()
+      });
+    }
   };
 
   // --- Vista Sessione Quiz per Materia ---
@@ -65,16 +133,19 @@ export const TopicsScreen: React.FC = () => {
     return (
       <div className="max-w-2xl mx-auto px-4 py-4 space-y-4">
         {/* Top bar sessione */}
-        <div className="flex items-center justify-between p-3 bg-slate-900 border border-slate-800 rounded-xl light:bg-white light:border-slate-200">
+        <div className="flex items-center justify-between p-3 bg-zinc-900 border border-zinc-800 rounded-xl light:bg-white light:border-slate-200">
           <button
-            onClick={() => setActiveSubjectId(null)}
-            className="text-xs text-slate-400 hover:text-slate-200 light:text-slate-600 flex items-center gap-1 font-medium"
+            onClick={() => {
+              setActiveSubjectId(null);
+              dismissActiveSession();
+            }}
+            className="text-xs text-zinc-400 hover:text-zinc-200 light:text-slate-600 flex items-center gap-1 font-medium"
           >
             <ArrowLeft className="w-4 h-4" />
             <span>Esci</span>
           </button>
 
-          <div className="text-xs font-bold text-slate-200 light:text-slate-800 truncate max-w-[180px]">
+          <div className="text-xs font-bold text-zinc-200 light:text-slate-800 truncate max-w-[180px]">
             {currentSubjectMeta?.name}
           </div>
 
@@ -88,7 +159,7 @@ export const TopicsScreen: React.FC = () => {
                   flags: {},
                   onAnswer: (qid: number, ans: 1 | 2 | 3) => handleAnswer(ans, qid),
                   onToggleFlag: () => {},
-                  onNavigateIndex: (idx: number) => setCurrentIndex(idx),
+                  onNavigateIndex: (idx: number) => changeIndex(idx),
                   isExam: false,
                   title: currentSubjectMeta?.name || 'Materia'
                 });
@@ -100,7 +171,7 @@ export const TopicsScreen: React.FC = () => {
               <span>Alla Guida</span>
             </button>
 
-            <div className="text-xs font-mono text-sky-400 light:text-sky-600 font-semibold">
+            <div className="text-xs font-mono text-amber-400 light:text-amber-600 font-semibold">
               {currentIndex + 1}/{sessionQuestions.length}
             </div>
           </div>
@@ -119,9 +190,9 @@ export const TopicsScreen: React.FC = () => {
         {/* Navigazione */}
         <div className="flex items-center justify-between gap-3 pt-2">
           <button
-            onClick={() => setCurrentIndex(prev => Math.max(0, prev - 1))}
+            onClick={() => changeIndex(Math.max(0, currentIndex - 1))}
             disabled={currentIndex === 0}
-            className="px-4 py-2.5 rounded-xl border border-slate-800 bg-slate-900 text-slate-300 light:bg-white light:border-slate-200 text-xs font-semibold flex items-center gap-1.5 disabled:opacity-30"
+            className="px-4 py-2.5 rounded-xl border border-zinc-800 bg-zinc-900 text-zinc-300 light:bg-white light:border-slate-200 text-xs font-semibold flex items-center gap-1.5 disabled:opacity-30"
           >
             <ArrowLeft className="w-4 h-4" />
             <span>Precedente</span>
@@ -129,15 +200,18 @@ export const TopicsScreen: React.FC = () => {
 
           {currentIndex < sessionQuestions.length - 1 ? (
             <button
-              onClick={() => setCurrentIndex(prev => prev + 1)}
-              className="px-4 py-2.5 rounded-xl bg-sky-600 hover:bg-sky-500 text-white text-xs font-semibold flex items-center gap-1.5 shadow-sm"
+              onClick={() => changeIndex(currentIndex + 1)}
+              className="px-4 py-2.5 rounded-xl bg-amber-600 hover:bg-amber-500 text-white text-xs font-semibold flex items-center gap-1.5 shadow-sm"
             >
               <span>Successiva</span>
               <ArrowRight className="w-4 h-4" />
             </button>
           ) : (
             <button
-              onClick={() => setActiveSubjectId(null)}
+              onClick={() => {
+                setActiveSubjectId(null);
+                dismissActiveSession();
+              }}
               className="px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold flex items-center gap-1.5 shadow-sm"
             >
               <CheckCircle2 className="w-4 h-4" />
@@ -155,7 +229,7 @@ export const TopicsScreen: React.FC = () => {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-xl font-bold tracking-tight">Materie Ufficiali</h1>
-          <p className="text-xs text-slate-400 light:text-slate-600">
+          <p className="text-xs text-zinc-400 light:text-slate-600">
             9 argomenti codificati AeCI VDS-VL
           </p>
         </div>
@@ -168,17 +242,17 @@ export const TopicsScreen: React.FC = () => {
           return (
             <div
               key={sub.id}
-              className="p-4 rounded-xl border border-slate-800 bg-slate-900/90 light:bg-white light:border-slate-200 shadow-sm space-y-3"
+              className="p-4 rounded-xl border border-zinc-800 bg-zinc-900/90 light:bg-white light:border-slate-200 shadow-sm space-y-3"
             >
               <div className="flex items-start justify-between gap-2">
                 <div>
-                  <div className="text-[11px] font-mono text-sky-400 light:text-sky-600 font-bold">
+                  <div className="text-[11px] font-mono text-amber-400 light:text-amber-600 font-bold">
                     0{sub.id}
                   </div>
-                  <h3 className="font-bold text-sm text-slate-100 light:text-slate-900">
+                  <h3 className="font-bold text-sm text-zinc-100 light:text-slate-900">
                     {sub.name}
                   </h3>
-                  <div className="text-xs text-slate-400 light:text-slate-500 mt-0.5">
+                  <div className="text-xs text-zinc-400 light:text-slate-500 mt-0.5">
                     {sub.seen} viste su {sub.total} quesiti
                   </div>
                 </div>
@@ -190,21 +264,21 @@ export const TopicsScreen: React.FC = () => {
                         ? 'text-emerald-400 light:text-emerald-600'
                         : sub.accuracy >= 70
                         ? 'text-amber-400 light:text-amber-600'
-                        : 'text-slate-400'
+                        : 'text-zinc-400'
                     }`}
                   >
                     {sub.seen > 0 ? `${sub.accuracy}%` : '-'}
                   </div>
-                  <div className="text-[10px] text-slate-500 uppercase tracking-wider">
+                  <div className="text-[10px] text-zinc-500 uppercase tracking-wider">
                     Precisione
                   </div>
                 </div>
               </div>
 
               {/* Progress bar vista */}
-              <div className="w-full bg-slate-950 light:bg-slate-100 rounded-full h-1.5 overflow-hidden">
+              <div className="w-full bg-zinc-950 light:bg-slate-100 rounded-full h-1.5 overflow-hidden">
                 <div
-                  className="bg-sky-500 h-full rounded-full transition-all duration-300"
+                  className="bg-amber-500 h-full rounded-full transition-all duration-300"
                   style={{ width: `${coveragePct}%` }}
                 />
               </div>
@@ -214,7 +288,7 @@ export const TopicsScreen: React.FC = () => {
                 <button
                   id={`btn-topic-all-${sub.id}`}
                   onClick={() => startTopicSession(sub.id, 'all')}
-                  className="flex-1 py-2 rounded-lg bg-sky-600 hover:bg-sky-500 text-white font-semibold flex items-center justify-center gap-1 transition-colors"
+                  className="flex-1 py-2 rounded-lg bg-amber-600 hover:bg-amber-500 text-white font-semibold flex items-center justify-center gap-1 transition-colors"
                 >
                   <span>Tutte ({sub.total})</span>
                   <ArrowRight className="w-3.5 h-3.5" />
@@ -223,7 +297,7 @@ export const TopicsScreen: React.FC = () => {
                 {sub.total - sub.seen > 0 && (
                   <button
                     onClick={() => startTopicSession(sub.id, 'unseen')}
-                    className="py-2 px-3 rounded-lg border border-slate-800 bg-slate-950 hover:bg-slate-800 text-slate-300 light:bg-slate-50 light:border-slate-200 light:text-slate-700 text-xs font-medium"
+                    className="py-2 px-3 rounded-lg border border-zinc-800 bg-zinc-950 hover:bg-zinc-800 text-zinc-300 light:bg-slate-50 light:border-slate-200 light:text-slate-700 text-xs font-medium"
                     title="Solo domande mai viste"
                   >
                     <span>Mai viste ({sub.total - sub.seen})</span>
