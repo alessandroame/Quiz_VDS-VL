@@ -18,6 +18,26 @@ Questo documento registra in ordine cronologico tutte le lavorazioni svolte nel 
 
 ## Registro Cronologico
 
+### [2026-09-28] - Interruzione Simulazione d'Esame con Conferma Guidata (ExamScreen & DriveMode)
+- **Cosa abbiamo fatto**:
+  - Implementato in [src/components/ExamScreen.tsx](file:///d:/Github/Quiz_VDS-VL/src/components/ExamScreen.tsx) un flusso esplicito e accessibile per interrompere la simulazione d'esame in qualsiasi momento:
+    - Sostituito il pulsante secondario con testo nascosto su mobile con un pulsante avionico ad alto contrasto `Interrompi` (`btn-abandon-exam`), dotato di icona `XCircle`, bordo e bagliore rose (`border-rose-500/40 bg-rose-500/10 text-rose-400`), visibile su qualsiasi viewport (mobile e desktop).
+    - Aggiunto un pulsante secondario a fondo pagina (`btn-bottom-abandon-exam`) sotto i controlli Precedente/Successiva per permettere l'interruzione rapida anche dopo aver fatto scorrere le opzioni.
+    - Aggiornata la modale di conferma: titolo chiaro *"Interrompere la Simulazione?"*, riepilogo delle risposte inserite non conteggiate, supporto alla chiusura con tasto `Escape` e backdrop click.
+    - Gestione pulita dell'arresto audio tramite `voiceService.stop()` e cancellazione della sessione attiva persistita su Dexie via `dismissActiveSession()`.
+  - Esteso il comportamento in [src/components/DriveModeScreen.tsx](file:///d:/Github/Quiz_VDS-VL/src/components/DriveModeScreen.tsx):
+    - Il tasto `Esci` della barra HUD commuta automaticamente su `Interrompi` (con stile rose) durante le sessioni d'esame.
+    - Introdotta la modale dedicata di conferma interruzione per la guida: se l'esame proviene da `ExamScreen` (`sessionContext`), l'allievo può scegliere tra *"Continua Esame"*, *"Torna alla Scheda"* (senza perdere i progressi dell'esame) e *"Interrompi Esame"*.
+    - Aggiunto il listener del tasto `Escape` per annullare la modale in modalità guida.
+  - Aggiornato [src/App.tsx](file:///d:/Github/Quiz_VDS-VL/src/App.tsx):
+    - Nella modale di cambio tab durante un esame attivo, il pulsante *"Interrompi ed Esci"* invoca ora tassativamente `dismissActiveSession()` per evitare la ri-comparsa indesiderata del banner di sessione attiva non voluta.
+  - Convalidata la suite con **129/129 test unitari superati** (`npm run test:unit`) e `npm run build` a zero errori.
+- **Scelte architetturali & Rationale**:
+  - *Visibilità Mobile First Rationale*: Gli allievi piloti utilizzano la PWA prevalentemente su smartphone (portrait 390x844). Nascondere il testo "Abbandona" con `hidden sm:inline` rendeva invisibile l'intento dell'azione. L'etichetta "Interrompi" sempre presente con semantica visiva rose garantisce chiarezza e previene clic errati.
+  - *Opzione "Torna alla Scheda" in Drive Mode*: Consente al candidato di passare fluidamente dalla visualizzazione ad alto contrasto da cruscotto alla scheda classica senza interrompere la simulazione ufficiale.
+- **Impatto sul Desiderata**:
+  - Pieno controllo dell'utente sull'esame, prevenzione di perdite accidentali di dati e rispetto rigoroso dei requisiti UX di conferma.
+
 ### [2026-09-28] - Avvio e Persistenza Demone Server Web Locale & Rete (Watchdog Resurrezione Automatica)
 - **Cosa abbiamo fatto**:
   - Creato lo script demone [scripts/start_server_daemon.ps1](file:///d:/Github/Quiz_VDS-VL/scripts/start_server_daemon.ps1) per l'esecuzione continua di Vite (`0.0.0.0:5173`) con ciclo di watchdog infinito e auto-restart in caso di crash o arresto imprevisto.

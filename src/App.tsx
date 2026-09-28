@@ -73,6 +73,7 @@ function AppContent() {
     if (pendingTab) {
       setIsExamRunning(false);
       voiceService.stop();
+      dismissActiveSession();
       setActiveTab(pendingTab);
       setPendingTab(null);
     }
@@ -225,7 +226,7 @@ function AppContent() {
                 onClick={confirmAbandonAndNavigate}
                 className="flex-1 py-2.5 rounded-xl border border-rose-500/60 text-rose-400 hover:bg-rose-500/10 light:text-rose-600 light:border-rose-300 text-xs font-medium transition-colors"
               >
-                Abbandona ed Esci
+                Interrompi ed Esci
               </button>
             </div>
           </div>

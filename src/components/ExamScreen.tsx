@@ -10,7 +10,6 @@ import {
   RotateCcw,
   Zap,
   ListFilter,
-  LogOut,
   Car
 } from 'lucide-react';
 import type { Question } from '../types/quiz';
@@ -20,6 +19,7 @@ import { generateExamQuestions } from '../utils/fairRandomizer';
 import { evaluateExam } from '../services/examEvaluator';
 import { formatTime } from '../utils/timer';
 import { QuestionCard } from './QuestionCard';
+import { voiceService } from '../services/voiceService';
 
 export const ExamScreen: React.FC = () => {
   const {
@@ -59,6 +59,19 @@ export const ExamScreen: React.FC = () => {
       setIsExamRunning(false);
     };
   }, [setIsExamRunning]);
+
+  // Gestione tasto Escape per chiudere le modali di conferma esame
+  useEffect(() => {
+    if (!showAbandonModal && !showSubmitModal) return;
+    const handleModalKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        setShowAbandonModal(false);
+        setShowSubmitModal(false);
+      }
+    };
+    window.addEventListener('keydown', handleModalKey);
+    return () => window.removeEventListener('keydown', handleModalKey);
+  }, [showAbandonModal, showSubmitModal]);
 
   // Auto-resume active exam if present
   useEffect(() => {
@@ -472,11 +485,11 @@ export const ExamScreen: React.FC = () => {
           <button
             id="btn-abandon-exam"
             onClick={() => setShowAbandonModal(true)}
-            className="px-2.5 py-1.5 rounded-lg border border-zinc-700/80 hover:border-rose-500/80 text-zinc-400 hover:text-rose-400 light:border-slate-300 light:text-slate-600 light:hover:text-rose-600 text-xs font-medium transition-colors flex items-center gap-1"
-            title="Abbandona la sessione di esame"
+            className="px-2.5 py-1.5 rounded-lg border border-rose-500/40 hover:border-rose-500 bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 hover:text-rose-300 light:border-rose-200 light:bg-rose-50 light:text-rose-700 light:hover:bg-rose-100 text-xs font-semibold transition-colors flex items-center gap-1"
+            title="Interrompi la simulazione d'esame"
           >
-            <LogOut className="w-3.5 h-3.5" />
-            <span className="hidden sm:inline">Abbandona</span>
+            <XCircle className="w-3.5 h-3.5" />
+            <span>Interrompi</span>
           </button>
 
           <button
@@ -556,6 +569,18 @@ export const ExamScreen: React.FC = () => {
         </button>
       </div>
 
+      {/* Link secondario inferiore per interrompere esame */}
+      <div className="flex justify-center pt-2">
+        <button
+          id="btn-bottom-abandon-exam"
+          onClick={() => setShowAbandonModal(true)}
+          className="text-xs text-zinc-500 hover:text-rose-400 light:text-slate-400 light:hover:text-rose-600 transition-colors flex items-center gap-1.5 py-1.5 px-3 rounded-lg hover:bg-zinc-900/60 light:hover:bg-slate-100"
+        >
+          <XCircle className="w-3.5 h-3.5" />
+          <span>Interrompi simulazione d'esame</span>
+        </button>
+      </div>
+
       {/* Modal di Conferma Consegna */}
       {showSubmitModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4 animate-in fade-in">
@@ -602,43 +627,57 @@ export const ExamScreen: React.FC = () => {
         </div>
       )}
 
-      {/* Modal di Conferma Abbandono Esame */}
+      {/* Modal di Conferma Interruzione Esame */}
       {showAbandonModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/75 p-4 animate-in fade-in">
-          <div className="bg-zinc-900 border border-zinc-800 rounded-2xl p-6 max-w-sm w-full space-y-4 shadow-2xl light:bg-white light:border-slate-200">
-            <div className="flex items-center gap-2 text-rose-400 light:text-rose-600">
-              <AlertCircle className="w-6 h-6" />
-              <h3 className="font-bold text-base text-zinc-100 light:text-slate-900">
-                Abbandonare l'Esame?
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/75 backdrop-blur-sm p-4 animate-in fade-in"
+          onClick={() => setShowAbandonModal(false)}
+        >
+          <div
+            className="bg-zinc-900 border border-zinc-800 rounded-2xl p-6 max-w-sm w-full space-y-4 shadow-2xl dark:bg-zinc-900 dark:border-zinc-800 light:bg-white light:border-slate-200"
+            onClick={e => e.stopPropagation()}
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="abandon-modal-title"
+          >
+            <div className="flex items-center gap-2.5 text-rose-400 light:text-rose-600">
+              <AlertCircle className="w-6 h-6 flex-shrink-0" />
+              <h3 id="abandon-modal-title" className="font-bold text-base text-zinc-100 dark:text-zinc-100 light:text-slate-900">
+                Interrompere la Simulazione?
               </h3>
             </div>
 
-            <div className="text-xs text-zinc-300 light:text-slate-600 space-y-2">
+            <div className="text-xs text-zinc-300 dark:text-zinc-300 light:text-slate-600 space-y-2">
               <p>
-                Sei sicuro di voler interrompere la simulazione in corso?
+                Sei sicuro di voler interrompere la prova d'esame in corso?
               </p>
-              <p className="text-amber-400 light:text-amber-700 font-medium">
-                Tutte le {answeredCount} risposte fornite finora andranno perse e la scheda non verrà conteggiata.
+              <p className="text-amber-400 dark:text-amber-400 light:text-amber-700 font-medium">
+                {answeredCount > 0
+                  ? `Le ${answeredCount} risposte fornite finora andranno perse e la scheda non verrà conteggiata.`
+                  : 'La simulazione verrà annullata senza registrare alcuna risposta.'}
               </p>
             </div>
 
             <div className="flex gap-2 pt-2">
               <button
+                id="btn-cancel-abandon"
                 onClick={() => setShowAbandonModal(false)}
-                className="flex-1 py-2.5 rounded-xl bg-amber-600 hover:bg-amber-500 text-white text-xs font-bold shadow-md"
+                className="flex-1 py-2.5 rounded-xl bg-amber-600 hover:bg-amber-500 text-white text-xs font-bold shadow-md transition-colors"
               >
                 Continua Esame
               </button>
               <button
+                id="btn-confirm-abandon-exam"
                 onClick={() => {
+                  voiceService.stop();
                   setShowAbandonModal(false);
                   setExamState('idle');
                   setIsExamRunning(false);
                   dismissActiveSession();
                 }}
-                className="flex-1 py-2.5 rounded-xl border border-rose-500/60 text-rose-400 hover:bg-rose-500/10 light:text-rose-600 light:border-rose-300 text-xs font-medium"
+                className="flex-1 py-2.5 rounded-xl border border-rose-500/60 text-rose-400 hover:bg-rose-500/10 light:text-rose-600 light:border-rose-300 text-xs font-medium transition-colors"
               >
-                Abbandona
+                Interrompi
               </button>
             </div>
           </div>
