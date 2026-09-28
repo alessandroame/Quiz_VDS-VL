@@ -138,24 +138,24 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/75 p-4 animate-in fade-in">
-      <div className="bg-slate-900 border border-slate-800 rounded-2xl p-4 sm:p-5 max-w-md w-full max-h-[92vh] flex flex-col shadow-2xl dark:bg-slate-900 dark:border-slate-800 light:bg-white light:border-slate-200">
+      <div className="bg-zinc-900 border border-zinc-800 rounded-2xl p-4 sm:p-5 max-w-md w-full max-h-[92vh] flex flex-col shadow-2xl dark:bg-zinc-900 dark:border-zinc-800 light:bg-white light:border-slate-200">
         
         {/* Header */}
-        <div className="flex items-center justify-between pb-3 border-b border-slate-800 light:border-slate-100 flex-shrink-0">
-          <h2 className="text-base font-bold text-slate-100 light:text-slate-900 flex items-center gap-2">
+        <div className="flex items-center justify-between pb-3 border-b border-zinc-800 light:border-slate-100 flex-shrink-0">
+          <h2 className="text-base font-bold text-zinc-100 light:text-slate-900 flex items-center gap-2">
             <span>Impostazioni</span>
           </h2>
           <button
             id="btn-close-settings"
             onClick={onClose}
-            className="p-1.5 rounded-lg text-slate-400 hover:text-slate-200 light:text-slate-600 light:hover:text-slate-900"
+            className="p-1.5 rounded-lg text-zinc-400 hover:text-zinc-200 light:text-slate-600 light:hover:text-slate-900"
           >
             <X className="w-4 h-4" />
           </button>
         </div>
 
         {/* Tab Navigation (Segmented Topic Selector) */}
-        <div className="flex items-center gap-1 py-2.5 border-b border-slate-800/80 light:border-slate-100 overflow-x-auto no-scrollbar flex-shrink-0">
+        <div className="flex items-center gap-1 py-2.5 border-b border-zinc-800/80 light:border-slate-100 overflow-x-auto no-scrollbar flex-shrink-0">
           {tabs.map(tab => {
             const Icon = tab.icon;
             const isActive = activeTab === tab.id;
@@ -166,8 +166,8 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                 onClick={() => setActiveTab(tab.id)}
                 className={`flex-1 py-1.5 px-2 rounded-xl text-xs font-semibold flex items-center justify-center gap-1.5 transition-all whitespace-nowrap ${
                   isActive
-                    ? 'bg-sky-500/20 text-sky-400 border border-sky-500/40 light:bg-sky-50 light:border-sky-500 light:text-sky-700 shadow-sm'
-                    : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/40 light:text-slate-600 light:hover:bg-slate-100'
+                    ? 'bg-amber-500/20 text-amber-400 border border-amber-500/40 light:bg-amber-50 light:border-amber-500 light:text-amber-700 shadow-sm'
+                    : 'text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800/40 light:text-slate-600 light:hover:bg-slate-100'
                 }`}
               >
                 <Icon className="w-3.5 h-3.5" />
@@ -184,7 +184,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
           {activeTab === 'appearance' && (
             <div className="space-y-4 animate-in fade-in duration-150">
               <div className="space-y-2">
-                <label className="text-xs font-bold text-slate-400 uppercase tracking-wider block">
+                <label className="text-xs font-bold text-zinc-400 uppercase tracking-wider block">
                   Tema Visivo Cockpit
                 </label>
                 <div className="grid grid-cols-3 gap-2">
@@ -202,8 +202,8 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                         onClick={() => setTheme(item.id)}
                         className={`py-2 px-3 rounded-xl border text-xs font-semibold flex items-center justify-center gap-1.5 transition-colors ${
                           isSelected
-                            ? 'border-sky-500 bg-sky-500/20 text-sky-400 light:border-sky-600 light:bg-sky-50 light:text-sky-700'
-                            : 'border-slate-800 bg-slate-950/60 text-slate-400 light:border-slate-200 light:bg-slate-50'
+                            ? 'border-amber-500 bg-amber-500/20 text-amber-400 light:border-amber-600 light:bg-amber-50 light:text-amber-700'
+                            : 'border-zinc-800 bg-zinc-950/60 text-zinc-400 light:border-slate-200 light:bg-slate-50'
                         }`}
                       >
                         <Icon className="w-3.5 h-3.5" />
@@ -214,16 +214,16 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                 </div>
               </div>
 
-              <div className="space-y-2 pt-2 border-t border-slate-800/80 light:border-slate-100">
-                <label className="text-xs font-bold text-slate-400 uppercase tracking-wider block">
+              <div className="space-y-2 pt-2 border-t border-zinc-800/80 light:border-slate-100">
+                <label className="text-xs font-bold text-zinc-400 uppercase tracking-wider block">
                   Feedback di Studio
                 </label>
-                <div className="flex items-center justify-between p-3 rounded-xl border border-slate-800 bg-slate-950/60 light:bg-slate-50 light:border-slate-200">
+                <div className="flex items-center justify-between p-3 rounded-xl border border-zinc-800 bg-zinc-950/60 light:bg-slate-50 light:border-slate-200">
                   <div>
-                    <span className="text-slate-300 light:text-slate-700 font-medium block text-xs">
+                    <span className="text-zinc-300 light:text-slate-700 font-medium block text-xs">
                       Verifica Immediata nelle Materie
                     </span>
-                    <span className="text-[11px] text-slate-500 block">
+                    <span className="text-[11px] text-zinc-500 block">
                       Durante lo studio per materie, mostra subito se la risposta è esatta
                     </span>
                   </div>
@@ -231,7 +231,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                     type="checkbox"
                     checked={settings.immediateFeedbackInTopics}
                     onChange={e => updateSetting('immediateFeedbackInTopics', e.target.checked)}
-                    className="w-4 h-4 accent-sky-500 rounded cursor-pointer"
+                    className="w-4 h-4 accent-amber-500 rounded cursor-pointer"
                   />
                 </div>
               </div>
@@ -241,12 +241,12 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
           {/* TAB 2: VOCE & AUDIO */}
           {activeTab === 'voice' && (
             <div className="space-y-3.5 animate-in fade-in duration-150">
-              <div className="flex items-center justify-between p-2.5 rounded-xl border border-slate-800 bg-slate-950/60 light:bg-slate-50 light:border-slate-200">
+              <div className="flex items-center justify-between p-2.5 rounded-xl border border-zinc-800 bg-zinc-950/60 light:bg-slate-50 light:border-slate-200">
                 <div>
-                  <span className="text-slate-300 light:text-slate-700 font-medium block text-xs">
+                  <span className="text-zinc-300 light:text-slate-700 font-medium block text-xs">
                     Attiva Lettura Vocale
                   </span>
-                  <span className="text-[11px] text-slate-500 block">
+                  <span className="text-[11px] text-zinc-500 block">
                     Ascolta domande e opzioni lette a voce alta
                   </span>
                 </div>
@@ -254,15 +254,15 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                   type="checkbox"
                   checked={settings.ttsEnabled}
                   onChange={e => updateSetting('ttsEnabled', e.target.checked)}
-                  className="w-4 h-4 accent-sky-500 rounded cursor-pointer"
+                  className="w-4 h-4 accent-amber-500 rounded cursor-pointer"
                 />
               </div>
 
               {settings.ttsEnabled && (
                 <>
                   {/* Selettore Voce */}
-                  <div className="p-2.5 rounded-xl border border-slate-800 bg-slate-950/60 light:bg-slate-50 light:border-slate-200 space-y-2">
-                    <span className="text-slate-300 light:text-slate-700 font-medium block text-xs">
+                  <div className="p-2.5 rounded-xl border border-zinc-800 bg-zinc-950/60 light:bg-slate-50 light:border-slate-200 space-y-2">
+                    <span className="text-zinc-300 light:text-slate-700 font-medium block text-xs">
                       Voce Istruttore
                     </span>
                     <div className="grid grid-cols-2 gap-2">
@@ -271,12 +271,12 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                         onClick={() => updateSetting('ttsVoice', 'giuseppe')}
                         className={`p-2 rounded-xl border text-left flex items-center justify-between transition-all ${
                           (settings.ttsVoice || 'giuseppe') === 'giuseppe'
-                            ? 'border-sky-500 bg-sky-500/20 text-sky-300 light:border-sky-600 light:bg-sky-50 light:text-sky-800 font-semibold'
-                            : 'border-slate-800 bg-slate-900/60 text-slate-400 light:border-slate-200 light:bg-slate-100'
+                            ? 'border-amber-500 bg-amber-500/20 text-amber-300 light:border-amber-600 light:bg-amber-50 light:text-amber-800 font-semibold'
+                            : 'border-zinc-800 bg-zinc-900/60 text-zinc-400 light:border-slate-200 light:bg-slate-100'
                         }`}
                       >
                         <span className="text-xs">👨‍✈️ Giuseppe</span>
-                        {(settings.ttsVoice || 'giuseppe') === 'giuseppe' && <Check className="w-3.5 h-3.5 text-sky-400" />}
+                        {(settings.ttsVoice || 'giuseppe') === 'giuseppe' && <Check className="w-3.5 h-3.5 text-amber-400" />}
                       </button>
 
                       <button
@@ -284,23 +284,23 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                         onClick={() => updateSetting('ttsVoice', 'elsa')}
                         className={`p-2 rounded-xl border text-left flex items-center justify-between transition-all ${
                           settings.ttsVoice === 'elsa'
-                            ? 'border-sky-500 bg-sky-500/20 text-sky-300 light:border-sky-600 light:bg-sky-50 light:text-sky-800 font-semibold'
-                            : 'border-slate-800 bg-slate-900/60 text-slate-400 light:border-slate-200 light:bg-slate-100'
+                            ? 'border-amber-500 bg-amber-500/20 text-amber-300 light:border-amber-600 light:bg-amber-50 light:text-amber-800 font-semibold'
+                            : 'border-zinc-800 bg-zinc-900/60 text-zinc-400 light:border-slate-200 light:bg-slate-100'
                         }`}
                       >
                         <span className="text-xs">👩‍✈️ Elsa</span>
-                        {settings.ttsVoice === 'elsa' && <Check className="w-3.5 h-3.5 text-sky-400" />}
+                        {settings.ttsVoice === 'elsa' && <Check className="w-3.5 h-3.5 text-amber-400" />}
                       </button>
                     </div>
                   </div>
 
                   {/* Velocità di Lettura */}
-                  <div className="p-2.5 rounded-xl border border-slate-800 bg-slate-950/60 light:bg-slate-50 light:border-slate-200 space-y-1.5">
+                  <div className="p-2.5 rounded-xl border border-zinc-800 bg-zinc-950/60 light:bg-slate-50 light:border-slate-200 space-y-1.5">
                     <div className="flex justify-between items-center text-xs">
-                      <span className="text-slate-300 light:text-slate-700 font-medium">
+                      <span className="text-zinc-300 light:text-slate-700 font-medium">
                         Velocità di Lettura
                       </span>
-                      <span className="font-mono font-bold text-sky-400">
+                      <span className="font-mono font-bold text-amber-400">
                         {settings.ttsPlaybackRate || 1.0}x
                       </span>
                     </div>
@@ -311,8 +311,8 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                           onClick={() => updateSetting('ttsPlaybackRate', rate)}
                           className={`py-1 rounded-lg text-xs font-semibold transition-colors ${
                             (settings.ttsPlaybackRate || 1.0) === rate
-                              ? 'bg-sky-600 text-white'
-                              : 'bg-slate-800 hover:bg-slate-700 text-slate-300 light:bg-slate-200 light:text-slate-700'
+                              ? 'bg-amber-600 text-white'
+                              : 'bg-zinc-800 hover:bg-zinc-700 text-zinc-300 light:bg-slate-200 light:text-slate-700'
                           }`}
                         >
                           {rate}x
@@ -323,23 +323,23 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
 
                   {/* Automazioni vocali */}
                   <div className="space-y-2 text-xs">
-                    <label className="flex items-center justify-between p-2 rounded-xl border border-slate-800 bg-slate-950/60 light:bg-slate-50 light:border-slate-200 cursor-pointer">
-                      <span className="text-slate-300 light:text-slate-700">Lettura automatica domanda</span>
+                    <label className="flex items-center justify-between p-2 rounded-xl border border-zinc-800 bg-zinc-950/60 light:bg-slate-50 light:border-slate-200 cursor-pointer">
+                      <span className="text-zinc-300 light:text-slate-700">Lettura automatica domanda</span>
                       <input
                         type="checkbox"
                         checked={settings.ttsAutoPlayQuestion}
                         onChange={e => updateSetting('ttsAutoPlayQuestion', e.target.checked)}
-                        className="w-4 h-4 accent-sky-500 rounded"
+                        className="w-4 h-4 accent-amber-500 rounded"
                       />
                     </label>
 
-                    <label className="flex items-center justify-between p-2 rounded-xl border border-slate-800 bg-slate-950/60 light:bg-slate-50 light:border-slate-200 cursor-pointer">
-                      <span className="text-slate-300 light:text-slate-700">Spiegazione vocale su errore</span>
+                    <label className="flex items-center justify-between p-2 rounded-xl border border-zinc-800 bg-zinc-950/60 light:bg-slate-50 light:border-slate-200 cursor-pointer">
+                      <span className="text-zinc-300 light:text-slate-700">Spiegazione vocale su errore</span>
                       <input
                         type="checkbox"
                         checked={settings.ttsAutoExplainOnMistake}
                         onChange={e => updateSetting('ttsAutoExplainOnMistake', e.target.checked)}
-                        className="w-4 h-4 accent-sky-500 rounded"
+                        className="w-4 h-4 accent-amber-500 rounded"
                       />
                     </label>
                   </div>
@@ -347,19 +347,19 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
               )}
 
               {/* Effetti Sonori Cockpit */}
-              <div className="flex items-center justify-between p-2.5 rounded-xl border border-slate-800 bg-slate-950/60 light:bg-slate-50 light:border-slate-200">
+              <div className="flex items-center justify-between p-2.5 rounded-xl border border-zinc-800 bg-zinc-950/60 light:bg-slate-50 light:border-slate-200">
                 <div>
-                  <span className="text-slate-300 light:text-slate-700 font-medium block text-xs">
+                  <span className="text-zinc-300 light:text-slate-700 font-medium block text-xs">
                     Effetti Sonori Cockpit
                   </span>
-                  <span className="text-[11px] text-slate-500 block">
+                  <span className="text-[11px] text-zinc-500 block">
                     Suoni avionici di tocco e conferma risposta
                   </span>
                 </div>
                 <button
                   onClick={() => updateSetting('soundEnabled', !settings.soundEnabled)}
                   className={`p-1.5 rounded-lg ${
-                    settings.soundEnabled ? 'text-sky-400' : 'text-slate-500'
+                    settings.soundEnabled ? 'text-amber-400' : 'text-zinc-500'
                   }`}
                 >
                   {settings.soundEnabled ? <Volume2 className="w-4 h-4" /> : <VolumeX className="w-4 h-4" />}
@@ -371,17 +371,17 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
           {/* TAB 3: ALLA GUIDA */}
           {activeTab === 'drive' && (
             <div className="space-y-3 animate-in fade-in duration-150">
-              <p className="text-[11px] text-slate-400 light:text-slate-500 leading-relaxed">
+              <p className="text-[11px] text-zinc-400 light:text-slate-500 leading-relaxed">
                 Pulsanti giganti e audio automatico per ripassare in macchina o con le mani occupate in totale sicurezza.
               </p>
 
               <div className="space-y-2 text-xs">
-                <div className="flex items-center justify-between p-2.5 rounded-xl border border-slate-800 bg-slate-950/60 light:bg-slate-50 light:border-slate-200">
+                <div className="flex items-center justify-between p-2.5 rounded-xl border border-zinc-800 bg-zinc-950/60 light:bg-slate-50 light:border-slate-200">
                   <div>
-                    <span className="text-slate-300 light:text-slate-700 font-medium block">
+                    <span className="text-zinc-300 light:text-slate-700 font-medium block">
                       Radio Quiz Continuo
                     </span>
-                    <span className="text-[11px] text-slate-500">
+                    <span className="text-[11px] text-zinc-500">
                       Legge le domande a catena senza tocco fisico
                     </span>
                   </div>
@@ -393,13 +393,13 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                   />
                 </div>
 
-                <div className="p-2.5 rounded-xl border border-slate-800 bg-slate-950/60 light:bg-slate-50 light:border-slate-200 space-y-2">
+                <div className="p-2.5 rounded-xl border border-zinc-800 bg-zinc-950/60 light:bg-slate-50 light:border-slate-200 space-y-2">
                   <div className="flex items-center justify-between">
                     <div>
-                      <span className="text-slate-300 light:text-slate-700 font-medium block">
+                      <span className="text-zinc-300 light:text-slate-700 font-medium block">
                         Rispondi a Voce (Hands-Free)
                       </span>
-                      <span className="text-[11px] text-slate-500">
+                      <span className="text-[11px] text-zinc-500">
                         Controlla quiz e navigazione a mani libere
                       </span>
                     </div>
@@ -412,17 +412,17 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                   </div>
 
                   {/* Cheat Sheet rapido & Bottone Guida */}
-                  <div className="grid grid-cols-2 gap-1.5 text-[11px] text-slate-400 light:text-slate-600">
-                    <div className="p-1.5 rounded-lg bg-slate-900/60 light:bg-slate-100 border border-slate-800/80 light:border-slate-200">
+                  <div className="grid grid-cols-2 gap-1.5 text-[11px] text-zinc-400 light:text-slate-600">
+                    <div className="p-1.5 rounded-lg bg-zinc-900/60 light:bg-slate-100 border border-zinc-800/80 light:border-slate-200">
                       <span className="font-bold text-emerald-400 light:text-emerald-600">Risposte:</span> "Uno", "Due", "Tre"
                     </div>
-                    <div className="p-1.5 rounded-lg bg-slate-900/60 light:bg-slate-100 border border-slate-800/80 light:border-slate-200">
-                      <span className="font-bold text-sky-400 light:text-sky-600">Scorri:</span> "Avanti", "Indietro"
+                    <div className="p-1.5 rounded-lg bg-zinc-900/60 light:bg-slate-100 border border-zinc-800/80 light:border-slate-200">
+                      <span className="font-bold text-amber-400 light:text-amber-600">Scorri:</span> "Avanti", "Indietro"
                     </div>
-                    <div className="p-1.5 rounded-lg bg-slate-900/60 light:bg-slate-100 border border-slate-800/80 light:border-slate-200">
+                    <div className="p-1.5 rounded-lg bg-zinc-900/60 light:bg-slate-100 border border-zinc-800/80 light:border-slate-200">
                       <span className="font-bold text-amber-400 light:text-amber-600">Audio:</span> "Ripeti", "Pausa"
                     </div>
-                    <div className="p-1.5 rounded-lg bg-slate-900/60 light:bg-slate-100 border border-slate-800/80 light:border-slate-200">
+                    <div className="p-1.5 rounded-lg bg-zinc-900/60 light:bg-slate-100 border border-zinc-800/80 light:border-slate-200">
                       <span className="font-bold text-indigo-400 light:text-indigo-600">Assistente:</span> "Aiuto", "Bandiera"
                     </div>
                   </div>
@@ -438,9 +438,9 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                   </button>
                 </div>
 
-                <div className="p-2.5 rounded-xl border border-slate-800 bg-slate-950/60 light:bg-slate-50 light:border-slate-200 space-y-1.5">
+                <div className="p-2.5 rounded-xl border border-zinc-800 bg-zinc-950/60 light:bg-slate-50 light:border-slate-200 space-y-1.5">
                   <div className="flex justify-between items-center">
-                    <span className="text-slate-300 light:text-slate-700 font-medium">
+                    <span className="text-zinc-300 light:text-slate-700 font-medium">
                       Tempo per Pensare alla Risposta
                     </span>
                     <span className="font-mono font-bold text-amber-400">
@@ -455,7 +455,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                         className={`py-1 rounded-lg text-xs font-semibold transition-colors ${
                           (settings.driveModeAutoAdvanceSeconds || 5) === sec
                             ? 'bg-amber-600 text-white'
-                            : 'bg-slate-800 hover:bg-slate-700 text-slate-300 light:bg-slate-200 light:text-slate-700'
+                            : 'bg-zinc-800 hover:bg-zinc-700 text-zinc-300 light:bg-slate-200 light:text-slate-700'
                         }`}
                       >
                         {sec}s
@@ -471,17 +471,17 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
           {activeTab === 'cloud' && (
             <div className="space-y-3.5 animate-in fade-in duration-150">
               <div className="space-y-2.5">
-                <label className="text-xs font-bold text-slate-400 uppercase tracking-wider block">
+                <label className="text-xs font-bold text-zinc-400 uppercase tracking-wider block">
                   Sincronizzazione Cloud Google
                 </label>
 
                 {/* Toggle Sincronizzazione Automatica */}
-                <div className="flex items-center justify-between p-3 rounded-xl border border-slate-800 bg-slate-950/60 light:bg-slate-50 light:border-slate-200">
+                <div className="flex items-center justify-between p-3 rounded-xl border border-zinc-800 bg-zinc-950/60 light:bg-slate-50 light:border-slate-200">
                   <div className="pr-3">
-                    <span className="text-slate-200 light:text-slate-800 font-semibold block text-xs">
+                    <span className="text-zinc-200 light:text-slate-800 font-semibold block text-xs">
                       Sincronizzazione Automatica (Auto-Sync)
                     </span>
-                    <span className="text-[11px] text-slate-400 light:text-slate-500 block leading-tight pt-0.5">
+                    <span className="text-[11px] text-zinc-400 light:text-slate-500 block leading-tight pt-0.5">
                       Salva e sincronizza i progressi in background tra i tuoi dispositivi (PC, telefono)
                     </span>
                   </div>
@@ -499,21 +499,21 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                         setSyncStatus(res.message);
                       }
                     }}
-                    className="w-4 h-4 accent-sky-500 rounded flex-shrink-0"
+                    className="w-4 h-4 accent-amber-500 rounded flex-shrink-0"
                   />
                 </div>
 
                 {/* Barra di Stato Sincronizzazione */}
                 {settings.autoSyncDrive && (
-                  <div className="p-2.5 rounded-xl border border-slate-800/80 bg-slate-950/40 light:bg-slate-100/60 light:border-slate-200 text-xs flex items-center justify-between">
+                  <div className="p-2.5 rounded-xl border border-zinc-800/80 bg-zinc-950/40 light:bg-slate-100/60 light:border-slate-200 text-xs flex items-center justify-between">
                     <div className="flex items-center gap-2">
                       <div className={`w-2 h-2 rounded-full ${
-                        syncState.status === 'syncing' ? 'bg-sky-400 animate-pulse' :
-                        syncState.status === 'offline' ? 'bg-slate-500' :
+                        syncState.status === 'syncing' ? 'bg-amber-400 animate-pulse' :
+                        syncState.status === 'offline' ? 'bg-zinc-500' :
                         syncState.status === 'needs_auth' ? 'bg-amber-400' :
                         'bg-emerald-400'
                       }`} />
-                      <span className="text-slate-300 light:text-slate-700 font-medium">
+                      <span className="text-zinc-300 light:text-slate-700 font-medium">
                         {syncState.status === 'syncing' ? 'Sincronizzazione in corso...' :
                          syncState.status === 'offline' ? 'Dispositivo offline' :
                          syncState.status === 'needs_auth' ? 'Accesso scaduto' :
@@ -521,7 +521,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                       </span>
                     </div>
 
-                    <span className="text-[11px] text-slate-500 font-mono">
+                    <span className="text-[11px] text-zinc-500 font-mono">
                       {syncState.lastSyncedAt
                         ? `Ultimo: ${new Date(syncState.lastSyncedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`
                         : 'Mai salvato'}
@@ -534,7 +534,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                     id="btn-drive-upload"
                     onClick={handleBackupToDrive}
                     disabled={isProcessing}
-                    className="py-2.5 px-3 rounded-xl bg-sky-600 hover:bg-sky-500 text-white font-semibold text-xs flex items-center justify-center gap-1.5 shadow-sm transition-all disabled:opacity-50"
+                    className="py-2.5 px-3 rounded-xl bg-amber-600 hover:bg-amber-500 text-white font-semibold text-xs flex items-center justify-center gap-1.5 shadow-sm transition-all disabled:opacity-50"
                   >
                     <Upload className="w-3.5 h-3.5" />
                     <span>Salva adesso</span>
@@ -544,7 +544,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                     id="btn-drive-download"
                     onClick={handleRestoreFromDrive}
                     disabled={isProcessing}
-                    className="py-2.5 px-3 rounded-xl border border-slate-800 bg-slate-950 hover:bg-slate-800 text-slate-300 light:bg-slate-50 light:border-slate-200 light:text-slate-700 font-semibold text-xs flex items-center justify-center gap-1.5 transition-all disabled:opacity-50"
+                    className="py-2.5 px-3 rounded-xl border border-zinc-800 bg-zinc-950 hover:bg-zinc-800 text-zinc-300 light:bg-slate-50 light:border-slate-200 light:text-slate-700 font-semibold text-xs flex items-center justify-center gap-1.5 transition-all disabled:opacity-50"
                   >
                     <Download className="w-3.5 h-3.5" />
                     <span>Unisci dati (Merge)</span>
@@ -552,26 +552,26 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                 </div>
 
                 {syncStatus && (
-                  <div className="text-[11px] p-2 rounded-lg bg-slate-950/80 border border-slate-800 text-sky-300 light:bg-sky-50 light:border-sky-200 light:text-sky-800 animate-in fade-in">
+                  <div className="text-[11px] p-2 rounded-lg bg-zinc-950/80 border border-zinc-800 text-amber-300 light:bg-amber-50 light:border-amber-200 light:text-amber-800 animate-in fade-in">
                     {syncStatus}
                   </div>
                 )}
               </div>
 
-              <div className="space-y-2 pt-2 border-t border-slate-800/80 light:border-slate-100">
-                <label className="text-xs font-bold text-slate-400 uppercase tracking-wider block">
+              <div className="space-y-2 pt-2 border-t border-zinc-800/80 light:border-slate-100">
+                <label className="text-xs font-bold text-zinc-400 uppercase tracking-wider block">
                   Copia Locale su File (.json)
                 </label>
                 <div className="grid grid-cols-2 gap-2">
                   <button
                     onClick={handleExportLocalJson}
-                    className="py-2 px-3 rounded-xl border border-slate-800 bg-slate-950 hover:bg-slate-800 text-slate-300 light:bg-slate-50 light:border-slate-200 light:text-slate-700 text-xs font-medium flex items-center justify-center gap-1.5"
+                    className="py-2 px-3 rounded-xl border border-zinc-800 bg-zinc-950 hover:bg-zinc-800 text-zinc-300 light:bg-slate-50 light:border-slate-200 light:text-slate-700 text-xs font-medium flex items-center justify-center gap-1.5"
                   >
                     <Download className="w-3.5 h-3.5" />
                     <span>Scarica copia</span>
                   </button>
 
-                  <label className="py-2 px-3 rounded-xl border border-slate-800 bg-slate-950 hover:bg-slate-800 text-slate-300 light:bg-slate-50 light:border-slate-200 light:text-slate-700 text-xs font-medium flex items-center justify-center gap-1.5 cursor-pointer">
+                  <label className="py-2 px-3 rounded-xl border border-zinc-800 bg-zinc-950 hover:bg-zinc-800 text-zinc-300 light:bg-slate-50 light:border-slate-200 light:text-slate-700 text-xs font-medium flex items-center justify-center gap-1.5 cursor-pointer">
                     <Upload className="w-3.5 h-3.5" />
                     <span>Carica copia</span>
                     <input
@@ -589,23 +589,23 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
           {/* TAB 5: DATI & INFO */}
           {activeTab === 'data' && (
             <div className="space-y-3.5 animate-in fade-in duration-150">
-              <div className="p-3 rounded-xl border border-slate-800 bg-slate-950/60 light:bg-slate-50 light:border-slate-200 space-y-1">
-                <div className="text-xs font-bold text-slate-200 light:text-slate-800">
+              <div className="p-3 rounded-xl border border-zinc-800 bg-zinc-950/60 light:bg-slate-50 light:border-slate-200 space-y-1">
+                <div className="text-xs font-bold text-zinc-200 light:text-slate-800">
                   VDS-VL Quiz Master 🛩️
                 </div>
-                <div className="text-[11px] text-slate-400 light:text-slate-500">
+                <div className="text-[11px] text-zinc-400 light:text-slate-500">
                   Database Ufficiale AeCI 2017: 504 quiz completi.
                 </div>
-                <div className="text-[10px] text-sky-400/80 font-mono">
+                <div className="text-[10px] text-amber-400/80 font-mono">
                   100% Offline-First (IndexedDB + Service Worker)
                 </div>
               </div>
 
-              <div className="pt-2 border-t border-slate-800/80 light:border-slate-100 space-y-2">
-                <label className="text-xs font-bold text-slate-400 uppercase tracking-wider block">
+              <div className="pt-2 border-t border-zinc-800/80 light:border-slate-100 space-y-2">
+                <label className="text-xs font-bold text-zinc-400 uppercase tracking-wider block">
                   Area Reset
                 </label>
-                <p className="text-[11px] text-slate-400 light:text-slate-500">
+                <p className="text-[11px] text-zinc-400 light:text-slate-500">
                   Azzera lo storico delle simulazioni, il quaderno errori e le note per ricominciare la preparazione da zero.
                 </p>
                 <button

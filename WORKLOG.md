@@ -18,6 +18,19 @@ Questo documento registra in ordine cronologico tutte le lavorazioni svolte nel 
 
 ## Registro Cronologico
 
+### [2026-09-28] - Chiarimento Microcopy: Da "Voce Guida" a "Lettura Vocale" e Allineamento Palette Cockpit
+- **Cosa abbiamo fatto**:
+  - Rinominata la voce *"Voce Guida"* in *"Lettura Vocale"* in [src/components/VoiceQuickMenu.tsx](file:///d:/Github/Quiz_VDS-VL/src/components/VoiceQuickMenu.tsx) e in [src/components/SettingsModal.tsx](file:///d:/Github/Quiz_VDS-VL/src/components/SettingsModal.tsx).
+  - Eliminata l'ambiguità tra la "Modalità Alla Guida" (guida dell'automobile a schermo intero con comandi vocali hands-free e Wake Lock) e la semplice sintesi vocale / lettura dei quesiti.
+  - Rifiniti gli stili e le classi del tema avionico scuro in `SettingsModal.tsx` per piena coerenza con la palette Cockpit (`zinc-` e `amber-`).
+  - Eseguiti e superati con successo:
+    - **98/98 test Vitest** (`npm test`) in 555ms.
+    - Build di produzione PWA (`npm run build`) a zero errori TypeScript.
+- **Scelte architetturali & Rationale**:
+  - *Disambiguazione Terminologica*: La polisemia del termine "guida" (guidare un veicolo vs voce che funge da guida/tutor) generava confusione percepita nell'utente. "Lettura Vocale" comunica immediatamente e senza fraintendimenti l'azione di Text-to-Speech dei quesiti.
+- **Impatto sul Desiderata**:
+  - Miglioramento immediato dell'ergonomia cognitiva dell'interfaccia sia su smartphone che su desktop.
+
 ### [2026-09-28] - Controlli Parlato Interattivi: Play, Pausa, Riprendi e Riavvio dall'Inizio (Da Capo)
 - **Cosa abbiamo fatto**:
   - Esteso [src/types/audio.ts](file:///d:/Github/Quiz_VDS-VL/src/types/audio.ts) introducendo il campo `isPaused: boolean` nell'interfaccia `VoicePlaybackState`.
