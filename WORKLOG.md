@@ -18,6 +18,17 @@ Questo documento registra in ordine cronologico tutte le lavorazioni svolte nel 
 
 ## Registro Cronologico
 
+### [2026-09-28] - Verifica Integrità Suite, Build PWA & Avvio Server Anteprima Locale
+- **Cosa abbiamo fatto**:
+  - Ripristinate le dipendenze di progetto tramite installazione deterministica `npm ci`.
+  - Eseguita e validata l'intera suite di unit & integration test Vitest: **65/65 test superati** al 100% (10 test file).
+  - Compilato il bundle PWA di produzione con `npm run build` (typecheck `tsc` superato con zero errori, bundle Vite e manifest PWA generati con successo).
+  - Avviato e verificato il server di anteprima locale (`npm run preview`) su [http://localhost:4173/](http://localhost:4173/) con risposta HTTP 200 OK.
+- **Scelte architetturali & Rationale**:
+  - *Zero Drift & Determinismo*: Esecuzione di `npm ci` con lockfile congelato e verifica preventiva di typecheck e test prima di qualsiasi sessione d'uso o deploy.
+- **Impatto sul Desiderata**:
+  - Piena conformità confermata per tutti i 13 moduli del [DESIDERATA.md](file:///d:/Github/Quiz_VDS-VL/DESIDERATA.md). L'applicazione è pronta e fruibile in locale.
+
 ### [2026-09-27] - Analisi Funzionale Approfondita & Collaudo Multi-Contesto d'Uso
 - **Cosa abbiamo fatto**:
   - Modellati ed esaminati 5 contesti d'uso reali per la PWA:
