@@ -76,8 +76,8 @@ export function parseVoiceCommand(raw: string): VoiceCommand | null {
   }
 
   // 6. Guida e Aiuto Contestuale
-  // Riconosce: "aiuto", "guida", "comandi", "istruzioni", "cosa posso dire", "help"
-  if (/\b(aiuto|guida|comandi|istruzioni|cosa posso dire|help)\b/i.test(t)) {
+  // Riconosce: "aiuto", "guida", "comandi", "istruzioni", "spiegazione", "tutorial", "cosa posso dire", "help"
+  if (/\b(aiuto|guida|comandi|istruzioni|spiegazione|tutorial|cosa posso dire|help)\b/i.test(t)) {
     return 'help';
   }
 
