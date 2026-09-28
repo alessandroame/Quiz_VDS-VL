@@ -17,6 +17,7 @@ import {
 import { useTheme } from '../context/ThemeContext';
 import { useQuiz } from '../context/QuizContext';
 import { VoiceQuickMenu } from './VoiceQuickMenu';
+import { OfflineIndicator } from './OfflineIndicator';
 
 export type NavTab = 'exam' | 'topics' | 'mistakes' | 'archive' | 'stats';
 
@@ -87,6 +88,9 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab, openSet
           </div>
 
           <div className="flex items-center gap-1.5">
+            {/* Indicatore Stato Connessione Offline */}
+            <OfflineIndicator />
+
             {/* Modalità Alla Guida */}
             <button
               id="btn-drive-mode"

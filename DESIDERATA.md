@@ -80,6 +80,10 @@ Questo documento rappresenta la **bussola strategica e funzionale** del progetto
    - Modale impostazioni suddiviso rigorosamente a schede tematiche (Voce, Guida, Aspetto, Cloud/Backup, Dati & Reset).
    - Eliminazione totale dello scrolling verticale continuo su dispositivi mobili e desktop.
 
+9. **Identità Visiva, Iconografia & Tema Carbon Cockpit (Zero-Blue)**:
+   - **Icona Ufficiale Aero Shield**: Logo PWA geometrico che unisce l'arco a cassoni del parapendio con l'ala triangolare a freccia 'V' del deltaplano (trave di chiglia e barra di controllo A-frame). Vettore SVG di precisione e icone PNG 192x192 e 512x512.
+   - **Tema Scuro Carbon Cockpit**: Eliminazione totale di qualsiasi dominante fredda o blu dal dark mode. Superfici carbon/grafite (`zinc-950`, `zinc-900`, `zinc-800`) e caldi accenti strumentali **Aviation Amber** (`amber-500` / `amber-600`) per la massima fedeltà e comfort visivo avionico.
+
 ---
 
 ## 3. Vincoli Architetturali e Tecnologici
@@ -107,8 +111,8 @@ Questo documento rappresenta la **bussola strategica e funzionale** del progetto
 | Quaderno Errori Leitner | 🟢 Completato | Uscita vincolata a 2 risposte esatte consecutive. |
 | Archivio & Ricerca Full-Text | 🟢 Completato | Ricerca istantanea, preferiti e note personali salvate in Dexie. |
 | Dashboard Statistiche | 🟢 Completato | Radar materie, prontezza esame e storico sessioni. |
-| Temi Cockpit Dark & Hangar Light | 🟢 Completato | Gestione contrasto, icone responsive e switch istantaneo. |
-| Suite Vitest (Unit & BVA) | 🟢 Completato | 65 test attivi, soglie limite verificate, simulazione Monte Carlo. |
+| Temi Carbon Cockpit & Hangar Light, Icona Aero Shield | 🟢 Completato | Zero dominante blu (`zinc` + `amber`), icona Aero Shield vettoriale e PNG 192/512. |
+| Suite Vitest (Unit & BVA) | 🟢 Completato | 98 test attivi, soglie limite verificate, isolamento in-memory. |
 | Supporto Audio Avionico | 🟢 Completato | Sintesi vocale, feedback sonoro cockpit Web Audio API e fonetica ICAO integrata. |
 | Google Drive Cloud Sync | 🟢 Completato | Integrazione GIS con `appDataFolder` privata e fallback JSON export/import. |
 | Modalità Alla Guida | 🟢 Completato | Layout zero-scroll, Screen Wake Lock, Pilota Auto Radio Quiz e Speech Recognition. |

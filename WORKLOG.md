@@ -18,6 +18,38 @@ Questo documento registra in ordine cronologico tutte le lavorazioni svolte nel 
 
 ## Registro Cronologico
 
+### [2026-09-28] - Identità Visiva PWA: Icona Ufficiale "Aero Shield" e Tema Dark "Carbon Cockpit" (Zero-Blue)
+- **Cosa abbiamo fatto**:
+  - **Ideazione e Creazione Icona PWA "Aero Shield"**:
+    - Disegnato e realizzato l'asset vettoriale master [public/favicon.svg](file:///d:/Github/Quiz_VDS-VL/public/favicon.svg): squircle in carbonio/titanio `#09090b` con indicatori cardinali bussola avionica, profilo a celle cassonate del parapendio fuso con l'ala triangolare a 'V' del deltaplano (trave di chiglia e barra di controllo A-frame) con bagliore ambra avionico (`#fbbf24`, `#f59e0b`).
+    - Creato lo script CDP [scripts/generate_icons.js](file:///d:/Github/Quiz_VDS-VL/scripts/generate_icons.js) con rendering pixel-perfect Chrome DevTools Protocol per generare [public/icons/icon-192x192.png](file:///d:/Github/Quiz_VDS-VL/public/icons/icon-192x192.png) e [public/icons/icon-512x512.png](file:///d:/Github/Quiz_VDS-VL/public/icons/icon-512x512.png).
+  - **Eliminazione Totale Dominante Blu (Tema "Carbon Cockpit")**:
+    - Aggiornati i token di configurazione in [tailwind.config.js](file:///d:/Github/Quiz_VDS-VL/tailwind.config.js), [index.html](file:///d:/Github/Quiz_VDS-VL/index.html), [vite.config.ts](file:///d:/Github/Quiz_VDS-VL/vite.config.ts), [src/context/ThemeContext.tsx](file:///d:/Github/Quiz_VDS-VL/src/context/ThemeContext.tsx) e [src/index.css](file:///d:/Github/Quiz_VDS-VL/src/index.css) con palette base carbonio neutro: sfondo `#09090b` (`zinc-950`), card `#18181b` (`zinc-900`), bordi `#27272a` (`zinc-800`), testo `#f4f4f5` (`zinc-100`) e accento primario caldo **Aviation Amber** (`amber-500` / `amber-600`).
+    - Migrati integralmente tutti i componenti applicativi rimuovendo qualsiasi classe `slate-` o `sky-` dal tema scuro:
+      - [src/App.tsx](file:///d:/Github/Quiz_VDS-VL/src/App.tsx)
+      - [src/components/Navbar.tsx](file:///d:/Github/Quiz_VDS-VL/src/components/Navbar.tsx)
+      - [src/components/QuestionCard.tsx](file:///d:/Github/Quiz_VDS-VL/src/components/QuestionCard.tsx)
+      - [src/components/ExamScreen.tsx](file:///d:/Github/Quiz_VDS-VL/src/components/ExamScreen.tsx)
+      - [src/components/TopicsScreen.tsx](file:///d:/Github/Quiz_VDS-VL/src/components/TopicsScreen.tsx)
+      - [src/components/MistakesScreen.tsx](file:///d:/Github/Quiz_VDS-VL/src/components/MistakesScreen.tsx)
+      - [src/components/ArchiveScreen.tsx](file:///d:/Github/Quiz_VDS-VL/src/components/ArchiveScreen.tsx)
+      - [src/components/StatsScreen.tsx](file:///d:/Github/Quiz_VDS-VL/src/components/StatsScreen.tsx)
+      - [src/components/SettingsModal.tsx](file:///d:/Github/Quiz_VDS-VL/src/components/SettingsModal.tsx)
+      - [src/components/VoiceQuickMenu.tsx](file:///d:/Github/Quiz_VDS-VL/src/components/VoiceQuickMenu.tsx)
+      - [src/components/VoiceCommandsModal.tsx](file:///d:/Github/Quiz_VDS-VL/src/components/VoiceCommandsModal.tsx)
+      - [src/components/DriveModeScreen.tsx](file:///d:/Github/Quiz_VDS-VL/src/components/DriveModeScreen.tsx)
+    - Preservato al 100% il tema diurno ad altissimo contrasto solare **Hangar Light** tramite le varianti dedicate `light:*`.
+  - **Validazione & Collaudo E2E**:
+    - **98/98 unit test Vitest** superati con successo in <550ms.
+    - Build di produzione PWA (`tsc && vite build`) compilata a 0 errori.
+    - Collaudo headless CDP multi-scenario eseguito con successo al 100% e **zero errori in console JavaScript**.
+    - Aggiornati [MEMORY.md](file:///d:/Github/Quiz_VDS-VL/MEMORY.md), [DESIDERATA.md](file:///d:/Github/Quiz_VDS-VL/DESIDERATA.md) e [README.md](file:///d:/Github/Quiz_VDS-VL/README.md).
+- **Scelte architetturali & Rationale**:
+  - *Zero-Blue Hue Rationale*: La palette standard di Tailwind `slate` presenta una temperatura colore fredda e azzurrata (`#020617`, `#0f172a`), affaticante in ambienti a bassa luminosità (cockpit, tenda, decollo crepuscolare) e incoerente con la richiesta di un tema autenticamente avionico e neutro. L'adozione di `zinc` (grigi perfettamente neutrali a base carbonio puro) combinata con l'ambra avionico (`amber-500` / `amber-600`) ricrea fedelmente la strumentazione notturna dei velivoli e garantisce un riposo visivo ottimale.
+  - *Icona "Aero Shield" Rationale*: Rappresenta contemporaneamente l'ala flessibile del parapendio e l'ala rigida a freccia del deltaplano, racchiuse in un'armoniosa "V" di Volo Libero / VDS con un look moderno, riconoscibile anche su display piccoli (favicon 16x16 / 32x32) o come icona schermata home su smartphone.
+- **Impatto sul Desiderata**:
+  - Consolidamento dell'identità visiva e dell'estetica PWA in accordo con i desiderata di progetto (DESIDERATA.md sez. 2.9 e 4).
+
 ### [2026-09-28] - Chiarimento Microcopy: Da "Voce Guida" a "Lettura Vocale" e Allineamento Palette Cockpit
 - **Cosa abbiamo fatto**:
   - Rinominata la voce *"Voce Guida"* in *"Lettura Vocale"* in [src/components/VoiceQuickMenu.tsx](file:///d:/Github/Quiz_VDS-VL/src/components/VoiceQuickMenu.tsx) e in [src/components/SettingsModal.tsx](file:///d:/Github/Quiz_VDS-VL/src/components/SettingsModal.tsx).

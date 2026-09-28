@@ -110,13 +110,16 @@
 - **MediaSession API**: controllo della riproduzione vocale (Play/Pausa/Stop) dai pulsanti fisici o touch degli auricolari Bluetooth anche a schermo spento.
 - **Feedback Sonori Cockpit (Web Audio API)**: click meccanici, segnali di conferma, buzzer di errore e alert timer generati via oscillatori nativi senza pesanti file esterni.
 
-### 9. Ergonomia Cockpit, Temi & Impostazioni a Schede
+### 9. Ergonomia Cockpit, Iconografia Aero Shield & Temi
+- **Icona Ufficiale PWA (Aero Shield)**:
+  - Icona geometrica originale per il Volo Libero che unisce l'arco a celle cassonate del parapendio e l'ala a freccia triangolare del deltaplano (con trave di chiglia centrale e barra di controllo A-frame) a formare uno scudo alare 'V'.
+  - Disponibile in formato vettoriale ad altissima precisione ([favicon.svg](file:///d:/Github/Quiz_VDS-VL/public/favicon.svg)) e rasterizzata per il manifest PWA a 192x192 e 512x512 px.
 - **Pannello Impostazioni a Schede Tematiche (Zero-Scroll)**:
   - Riorganizzazione modulare suddivisa in 5 argomenti dedicati: **🎨 Aspetto**, **🎙️ Voce**, **🚗 Guida**, **☁️ Backup**, **⚙️ Dati**.
   - Eliminazione totale dello scrolling verticale continuo: ogni scheda presenta controlli compatti e accessibili a colpo d'occhio sia su smartphone che su desktop.
 - **Palette Cockpit Bimodale**:
-  - **Cockpit Dark**: sfondo notturno a nero profondo (#020617 / Slate 950), ideale per stanze buie o cockpit.
-  - **Hangar Light**: sfondo diurno ad alto contrasto per perfetta leggibilità sul campo o sotto la luce diretta del sole.
+  - **Carbon Cockpit (Dark Mode Zero-Blue)**: Sfondo grafite profondo e carbonio neutro (`#09090b` / `zinc-950`, superfici `zinc-900`, bordi `zinc-800`, testo `zinc-100`), **con dominante blu categoricamente rimossa (0% cool hue)**. Accento avionico caldo **Aviation Amber** (`amber-500` / `amber-600`) per indicatori, selezioni e bagliore cockpit, ottimizzato per riposo visivo e cockpit notturni.
+  - **Hangar Light (Outdoor High-Contrast)**: Sfondo diurno ad altissimo contrasto per perfetta leggibilità sul campo di volo o sotto la luce solare diretta in decollo.
 - **Scorciatoie da Tastiera Desktop**:
   - `1`, `2`, `3`: selezione immediata delle opzioni A, B o C.
   - `F`: aggiunta o rimozione bandierina (`⚑ Rivedi`).
@@ -124,8 +127,8 @@
   - `Freccia Sinistra`: domanda precedente.
   - `V`: Play / Pausa riproduzione vocale sequenziale.
   - `R` o `Shift + V`: Ricomincia da capo la lettura del quesito (mentre parla o in pausa).
-  - `Q`: riascolto audio della sola domanda.
-  - `Alt + 1 / 2 / 3`: ascolto audio della rispettiva opzione.
+  - `Q`: riascolto audio della sola domanda (Shift+Q per riavviare da capo).
+  - `Alt + 1 / 2 / 3`: ascolto audio della rispettiva opzione (Shift per riavviare).
   - `Esc`: stop e chiusura controlli audio in corso.
 
 ### 10. Fair Coverage Randomizer

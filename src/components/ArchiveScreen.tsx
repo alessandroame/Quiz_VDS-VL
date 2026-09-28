@@ -42,11 +42,16 @@ const ArchiveItem: React.FC<ArchiveItemProps> = ({ question: q, isExpanded, onTo
     isPaused,
     isThisQuestionActive,
     isPartPlaying,
+    isPartPaused,
+    isPartActive,
     togglePlayPause,
     restartFullSequence,
     playQuestion,
+    restartQuestion,
     playOption,
+    restartOption,
     playExplanation,
+    restartExplanation,
     stop
   } = useAviationVoice(q.id);
 
@@ -112,24 +117,49 @@ const ArchiveItem: React.FC<ArchiveItemProps> = ({ question: q, isExpanded, onTo
                 Ascolto Vocale
               </span>
               <div className="flex items-center gap-1.5">
-                <button
-                  onClick={() => playQuestion()}
-                  className={`px-2 py-0.5 rounded text-[11px] flex items-center gap-1 transition-colors ${
-                    isPartPlaying('question')
-                      ? 'bg-amber-500/20 text-amber-400 ring-1 ring-amber-500/40'
-                      : 'text-zinc-400 hover:text-zinc-200 bg-zinc-800/60'
-                  }`}
-                  title="Ascolta solo la domanda"
-                >
-                  <Volume2 className="w-3 h-3" />
-                  <span>Domanda</span>
-                </button>
+                {isPartActive('question') ? (
+                  <div className="inline-flex items-center bg-zinc-800/80 light:bg-slate-100 border border-zinc-700/80 light:border-slate-300 rounded p-0.5 gap-0.5 text-[11px] animate-in fade-in duration-150">
+                    <button
+                      onClick={() => playQuestion()}
+                      className={`px-1.5 py-0.5 rounded flex items-center gap-1 font-semibold transition-colors ${
+                        isPartPlaying('question')
+                          ? 'bg-amber-500/20 text-amber-400 ring-1 ring-amber-500/50'
+                          : 'bg-zinc-700/50 text-zinc-300 ring-1 ring-zinc-600'
+                      }`}
+                      title={isPartPlaying('question') ? 'Metti in pausa la lettura della domanda' : 'Riprendi lettura della domanda'}
+                    >
+                      {isPartPlaying('question') ? (
+                        <Pause className="w-2.5 h-2.5 animate-pulse text-amber-400" />
+                      ) : (
+                        <Play className="w-2.5 h-2.5 text-amber-400" />
+                      )}
+                      <span>Domanda</span>
+                    </button>
+                    <button
+                      onClick={() => restartQuestion()}
+                      className="p-1 rounded text-zinc-300 light:text-slate-700 hover:text-white light:hover:text-black hover:bg-zinc-700/60 light:hover:bg-slate-200 transition-colors"
+                      title="Ricomincia lettura domanda dall'inizio"
+                    >
+                      <RotateCcw className="w-2.5 h-2.5" />
+                    </button>
+                  </div>
+                ) : (
+                  <button
+                    onClick={() => playQuestion()}
+                    className="px-2 py-0.5 rounded text-[11px] flex items-center gap-1 transition-colors text-zinc-400 hover:text-zinc-200 bg-zinc-800/60"
+                    title="Ascolta solo la domanda"
+                  >
+                    <Volume2 className="w-3 h-3" />
+                    <span>Domanda</span>
+                  </button>
+                )}
+
                 {isThisQuestionActive && (isPlaying || isPaused) ? (
                   <div className="inline-flex items-center bg-zinc-800/80 light:bg-slate-100 border border-zinc-700/80 light:border-slate-300 rounded p-0.5 gap-0.5 text-[11px] animate-in fade-in duration-150">
                     <button
                       onClick={togglePlayPause}
                       className={`px-1.5 py-0.5 rounded flex items-center gap-1 font-semibold transition-colors ${
-                        isPlaying ? 'bg-amber-500/20 text-amber-400' : 'bg-amber-500/20 text-amber-400'
+                        isPlaying ? 'bg-amber-500/20 text-amber-400' : 'bg-zinc-700/50 text-zinc-300'
                       }`}
                       title={isPlaying ? 'Metti in pausa (Tasto V)' : 'Riprendi ascolto (Tasto V)'}
                     >
@@ -172,6 +202,8 @@ const ArchiveItem: React.FC<ArchiveItemProps> = ({ question: q, isExpanded, onTo
               const optNum = (idx + 1) as 1 | 2 | 3;
               const isCorrect = q.correctAnswer === optNum;
               const isOptPlaying = isPartPlaying(`opt${optNum}` as any);
+              const isOptPaused = isPartPaused(`opt${optNum}` as any);
+              const isOptActive = isPartActive(`opt${optNum}` as any);
 
               return (
                 <div
@@ -180,21 +212,46 @@ const ArchiveItem: React.FC<ArchiveItemProps> = ({ question: q, isExpanded, onTo
                     isCorrect
                       ? 'bg-emerald-950/30 border-emerald-500/50 text-emerald-300 light:bg-emerald-50 light:border-emerald-300 light:text-emerald-900 font-medium'
                       : 'bg-zinc-900/60 border-zinc-800/60 text-zinc-400 light:bg-white light:border-slate-200 light:text-slate-600'
-                  } ${isOptPlaying ? 'ring-1 ring-amber-400' : ''}`}
+                  } ${isOptPlaying ? 'ring-1 ring-amber-400' : isOptPaused ? 'ring-1 ring-amber-400/50' : ''}`}
                 >
                   <span className="font-bold">{optNum}.</span>
                   <span className="flex-1">{opt}</span>
 
                   {settings.ttsEnabled && (
-                    <button
-                      onClick={() => playOption(optNum)}
-                      className={`p-0.5 rounded transition-colors ${
-                        isOptPlaying ? 'text-amber-400' : 'text-zinc-600 hover:text-zinc-300'
-                      }`}
-                      title={`Ascolta opzione ${optNum}`}
-                    >
-                      <Volume2 className="w-3.5 h-3.5" />
-                    </button>
+                    isOptActive ? (
+                      <span className="inline-flex items-center bg-zinc-800/90 light:bg-slate-200 border border-zinc-700/90 light:border-slate-300 rounded p-0.5 gap-0.5 flex-shrink-0">
+                        <button
+                          onClick={() => playOption(optNum)}
+                          className={`p-0.5 rounded transition-colors ${
+                            isOptPlaying
+                              ? 'bg-amber-500/20 text-amber-400 ring-1 ring-amber-500/50'
+                              : 'bg-zinc-700/50 text-zinc-300 ring-1 ring-zinc-600'
+                          }`}
+                          title={isOptPlaying ? `Metti in pausa opzione ${optNum}` : `Riprendi ascolto opzione ${optNum}`}
+                        >
+                          {isOptPlaying ? (
+                            <Pause className="w-3 h-3 text-amber-400 animate-pulse" />
+                          ) : (
+                            <Play className="w-3 h-3 text-amber-400" />
+                          )}
+                        </button>
+                        <button
+                          onClick={() => restartOption(optNum)}
+                          className="p-0.5 rounded text-zinc-300 light:text-slate-700 hover:text-white light:hover:text-black hover:bg-zinc-700/60 light:hover:bg-slate-300 transition-colors"
+                          title={`Ricomincia opzione ${optNum} da capo`}
+                        >
+                          <RotateCcw className="w-2.5 h-2.5" />
+                        </button>
+                      </span>
+                    ) : (
+                      <button
+                        onClick={() => playOption(optNum)}
+                        className="p-0.5 rounded transition-colors text-zinc-600 hover:text-zinc-300 light:text-slate-400 light:hover:text-slate-600"
+                        title={`Ascolta opzione ${optNum}`}
+                      >
+                        <Volume2 className="w-3.5 h-3.5" />
+                      </button>
+                    )
                   )}
 
                   {isCorrect && (
@@ -210,17 +267,55 @@ const ArchiveItem: React.FC<ArchiveItemProps> = ({ question: q, isExpanded, onTo
             <div className="flex items-center justify-between pb-1 border-b border-zinc-800/60 light:border-slate-100">
               <span className="font-bold text-[11px] text-zinc-400">Spiegazione Didattica</span>
               {settings.ttsEnabled && (
-                <button
-                  onClick={() => playExplanation()}
-                  className={`text-[10px] px-1.5 py-0.5 rounded flex items-center gap-1 ${
-                    isPartPlaying('explanation')
-                      ? 'bg-amber-500/20 text-amber-400 ring-1 ring-amber-500/40'
-                      : 'text-zinc-400 hover:text-zinc-200 bg-zinc-800/60'
-                  }`}
-                >
-                  <Volume2 className="w-3 h-3" />
-                  <span>Ascolta Spiegazione</span>
-                </button>
+                isPartActive('explanation') ? (
+                  <div className="inline-flex items-center bg-zinc-800/80 light:bg-slate-100 border border-zinc-700/80 light:border-slate-300 rounded p-0.5 gap-0.5 text-[10px] animate-in fade-in duration-150">
+                    <button
+                      onClick={() => playExplanation()}
+                      className={`px-1.5 py-0.5 rounded flex items-center gap-1 font-semibold transition-colors ${
+                        isPartPlaying('explanation')
+                          ? 'bg-amber-500/20 text-amber-400 ring-1 ring-amber-500/50'
+                          : 'bg-zinc-700/50 text-zinc-300 ring-1 ring-zinc-600'
+                      }`}
+                      title={isPartPlaying('explanation') ? 'Metti in pausa la spiegazione' : 'Riprendi spiegazione'}
+                    >
+                      {isPartPlaying('explanation') ? (
+                        <>
+                          <Pause className="w-2.5 h-2.5 animate-pulse text-amber-400" />
+                          <span>Pausa</span>
+                        </>
+                      ) : (
+                        <>
+                          <Play className="w-2.5 h-2.5 text-amber-400" />
+                          <span>Riprendi</span>
+                        </>
+                      )}
+                    </button>
+                    <button
+                      onClick={() => restartExplanation()}
+                      className="px-1 py-0.5 rounded text-zinc-300 light:text-slate-700 hover:text-white light:hover:text-black hover:bg-zinc-700/60 light:hover:bg-slate-200 flex items-center gap-0.5 transition-colors"
+                      title="Ricomincia spiegazione da capo"
+                    >
+                      <RotateCcw className="w-2.5 h-2.5" />
+                      <span>Da capo</span>
+                    </button>
+                    <button
+                      onClick={stop}
+                      className="p-0.5 rounded text-zinc-500 hover:text-rose-400 transition-colors"
+                      title="Interrompi spiegazione (Esc)"
+                    >
+                      <Square className="w-2 h-2 fill-current" />
+                    </button>
+                  </div>
+                ) : (
+                  <button
+                    onClick={() => playExplanation()}
+                    className="text-[10px] px-1.5 py-0.5 rounded flex items-center gap-1 text-zinc-400 hover:text-zinc-200 bg-zinc-800/60"
+                    title="Ascolta spiegazione didattica"
+                  >
+                    <Volume2 className="w-3 h-3" />
+                    <span>Ascolta Spiegazione</span>
+                  </button>
+                )
               )}
             </div>
             <div>

@@ -116,8 +116,6 @@ export class VoiceService {
    * Plays a single atomic fragment (e.g. question text only, or option 2)
    */
   public async playSinglePart(questionId: number, part: AudioPart): Promise<void> {
-    this.clearSequence();
-
     // If currently playing this exact fragment -> pause
     if (this.currentQuestionId === questionId && this.activePart === part && this.getState().isPlaying) {
       this.pause();
@@ -130,6 +128,7 @@ export class VoiceService {
       return;
     }
 
+    this.clearSequence();
     this.currentQuestionId = questionId;
     this.activePart = part;
     this.isSequencePlaying = false;
@@ -145,6 +144,50 @@ export class VoiceService {
       this.notify();
     } catch (err) {
       console.warn(`Could not play fragment ${part} for question #${questionId}:`, err);
+      this.stop();
+    }
+  }
+
+  /**
+   * Restarts a single fragment from the beginning (currentTime = 0).
+   * If this part was part of an ongoing sequence, it restarts this part
+   * and preserves sequence continuity.
+   */
+  public async restartSinglePart(questionId: number, part: AudioPart): Promise<void> {
+    const wasSequence = this.isSequencePlaying && this.currentQuestionId === questionId;
+    this.clearSequence();
+    this.isPaused = false;
+    this.pendingSequencePart = null;
+
+    if (this.currentQuestionId === questionId && this.activePart === part && this.audio) {
+      this.audio.pause();
+      this.audio.currentTime = 0;
+      this.isSequencePlaying = wasSequence;
+      try {
+        await this.audio.play();
+        this.updateMediaSession(questionId, part.toUpperCase());
+        this.notify();
+      } catch (err) {
+        console.warn(`Error restarting fragment ${part} for question #${questionId}:`, err);
+        this.stop();
+      }
+      return;
+    }
+
+    this.currentQuestionId = questionId;
+    this.activePart = part;
+    this.isSequencePlaying = wasSequence;
+
+    if (!this.audio) return;
+    try {
+      this.audio.src = this.getAudioUrl(questionId, part);
+      this.audio.currentTime = 0;
+      this.audio.playbackRate = this.playbackRate;
+      await this.audio.play();
+      this.updateMediaSession(questionId, part.toUpperCase());
+      this.notify();
+    } catch (err) {
+      console.warn(`Could not restart fragment ${part} for question #${questionId}:`, err);
       this.stop();
     }
   }

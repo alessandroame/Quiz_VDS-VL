@@ -553,11 +553,11 @@ export const DriveModeScreen: React.FC<DriveModeScreenProps> = ({
     <div
       onTouchStart={handleTouchStart}
       onTouchEnd={handleTouchEnd}
-      className="fixed inset-0 z-50 bg-black text-slate-100 flex flex-col h-[100dvh] w-full overflow-hidden select-none font-sans"
+      className="fixed inset-0 z-50 bg-black text-zinc-100 flex flex-col h-[100dvh] w-full overflow-hidden select-none font-sans"
     >
       {/* Toast Notifiche Vocali */}
       {voiceToast && (
-        <div className="absolute top-16 left-1/2 -translate-x-1/2 z-50 px-4 py-2 rounded-xl bg-sky-500 text-white font-bold text-sm shadow-2xl animate-in fade-in slide-in-from-top-2">
+        <div className="absolute top-16 left-1/2 -translate-x-1/2 z-50 px-4 py-2 rounded-xl bg-amber-500 text-zinc-950 font-bold text-sm shadow-2xl animate-in fade-in slide-in-from-top-2">
           {voiceToast}
         </div>
       )}
@@ -566,7 +566,7 @@ export const DriveModeScreen: React.FC<DriveModeScreenProps> = ({
       {internalMode === 'launcher' && (
         <div className="flex-1 flex flex-col justify-between p-4 sm:p-6 max-w-lg mx-auto w-full">
           {/* Header Launcher */}
-          <div className="flex items-center justify-between pb-3 border-b border-slate-800">
+          <div className="flex items-center justify-between pb-3 border-b border-zinc-800">
             <div className="flex items-center gap-2.5">
               <div className="w-10 h-10 rounded-xl bg-amber-500/20 text-amber-400 flex items-center justify-center">
                 <Car className="w-6 h-6" />
@@ -575,14 +575,14 @@ export const DriveModeScreen: React.FC<DriveModeScreenProps> = ({
                 <h1 className="text-xl font-black tracking-tight text-white flex items-center gap-2">
                   <span>Modalità Alla Guida</span>
                 </h1>
-                <p className="text-xs text-slate-400 font-medium">
+                <p className="text-xs text-zinc-400 font-medium">
                   Pulsanti giganti • Rispondi a voce • Nessun bisogno di scorrere
                 </p>
               </div>
             </div>
             <button
               onClick={handleClose}
-              className="p-2.5 rounded-xl bg-slate-900 border border-slate-800 text-slate-400 hover:text-white"
+              className="p-2.5 rounded-xl bg-zinc-900 border border-zinc-800 text-zinc-400 hover:text-white"
               title="Esci dalla modalità guida"
             >
               <X className="w-6 h-6" />
@@ -595,13 +595,13 @@ export const DriveModeScreen: React.FC<DriveModeScreenProps> = ({
               onClick={() => setIsAutopilotEnabled(!isAutopilotEnabled)}
               className={`p-3 rounded-xl border flex items-center gap-2 text-xs font-bold transition-all ${
                 isAutopilotEnabled
-                  ? 'bg-sky-950/80 border-sky-500 text-sky-200'
-                  : 'bg-slate-900 border-slate-800 text-slate-400'
+                  ? 'bg-amber-950/80 border-amber-500 text-amber-200'
+                  : 'bg-zinc-900 border-zinc-800 text-zinc-400'
               }`}
             >
               <Radio className="w-4 h-4 flex-shrink-0" />
               <div className="text-left">
-                <div className="text-[10px] text-slate-400 uppercase">Pilota Automatico</div>
+                <div className="text-[10px] text-zinc-400 uppercase">Pilota Automatico</div>
                 <div>{isAutopilotEnabled ? 'ATTIVO (Radio)' : 'Manuale'}</div>
               </div>
             </button>
@@ -612,7 +612,7 @@ export const DriveModeScreen: React.FC<DriveModeScreenProps> = ({
               className={`p-3 rounded-xl border flex items-center gap-2 text-xs font-bold transition-all ${
                 isVoiceCommandsEnabled
                   ? 'bg-emerald-950/80 border-emerald-500 text-emerald-200'
-                  : 'bg-slate-900 border-slate-800 text-slate-400'
+                  : 'bg-zinc-900 border-zinc-800 text-zinc-400'
               }`}
             >
               {isVoiceCommandsEnabled ? (
@@ -621,7 +621,7 @@ export const DriveModeScreen: React.FC<DriveModeScreenProps> = ({
                 <MicOff className="w-4 h-4 flex-shrink-0" />
               )}
               <div className="text-left">
-                <div className="text-[10px] text-slate-400 uppercase">Comandi Vocali</div>
+                <div className="text-[10px] text-zinc-400 uppercase">Comandi Vocali</div>
                 <div>{isVoiceSupported ? (isVoiceCommandsEnabled ? 'ATTIVO' : 'Spento') : 'Non supportato'}</div>
               </div>
             </button>
@@ -632,7 +632,7 @@ export const DriveModeScreen: React.FC<DriveModeScreenProps> = ({
             <button
               type="button"
               onClick={() => setIsVoiceGuideOpen(true)}
-              className="px-3.5 py-1.5 rounded-full bg-slate-900 border border-slate-800 hover:border-emerald-500/50 text-slate-400 hover:text-emerald-300 text-xs font-semibold flex items-center gap-1.5 transition-colors"
+              className="px-3.5 py-1.5 rounded-full bg-zinc-900 border border-zinc-800 hover:border-emerald-500/50 text-zinc-400 hover:text-emerald-300 text-xs font-semibold flex items-center gap-1.5 transition-colors"
             >
               <HelpCircle className="w-3.5 h-3.5 text-emerald-400" />
               <span>Cosa posso dire a voce? Consulta la Guida Rapida</span>
@@ -644,13 +644,13 @@ export const DriveModeScreen: React.FC<DriveModeScreenProps> = ({
             <button
               id="btn-drive-start-exam"
               onClick={() => startDriveExam(false)}
-              className="w-full py-5 px-6 rounded-2xl bg-sky-600 hover:bg-sky-500 active:scale-[0.98] text-white font-black text-lg flex items-center justify-between shadow-xl transition-all"
+              className="w-full py-5 px-6 rounded-2xl bg-amber-600 hover:bg-amber-500 active:scale-[0.98] text-white font-black text-lg flex items-center justify-between shadow-xl transition-all"
             >
               <div className="flex items-center gap-3">
-                <Zap className="w-7 h-7 text-sky-200" />
+                <Zap className="w-7 h-7 text-amber-200" />
                 <div className="text-left">
                   <div>Esame Ufficiale AeCI</div>
-                  <div className="text-xs text-sky-200 font-medium">30 Quiz • 45 Minuti • Max 3 Errori</div>
+                  <div className="text-xs text-amber-200 font-medium">30 Quiz • 45 Minuti • Max 3 Errori</div>
                 </div>
               </div>
               <ArrowRight className="w-6 h-6" />
@@ -674,22 +674,22 @@ export const DriveModeScreen: React.FC<DriveModeScreenProps> = ({
             <button
               id="btn-drive-start-mistakes"
               onClick={startDriveMistakes}
-              className="w-full py-4 px-6 rounded-2xl bg-slate-900 border border-slate-800 hover:border-slate-700 active:scale-[0.98] text-rose-300 font-bold text-base flex items-center justify-between transition-all"
+              className="w-full py-4 px-6 rounded-2xl bg-zinc-900 border border-zinc-800 hover:border-zinc-700 active:scale-[0.98] text-rose-300 font-bold text-base flex items-center justify-between transition-all"
             >
               <div className="flex items-center gap-3">
                 <Flame className="w-6 h-6 text-rose-400" />
                 <div className="text-left">
                   <div>Ripasso Quaderno Errori</div>
-                  <div className="text-xs text-slate-400 font-medium">Solo le domande con errori attivi</div>
+                  <div className="text-xs text-zinc-400 font-medium">Solo le domande con errori attivi</div>
                 </div>
               </div>
-              <ArrowRight className="w-5 h-5 text-slate-400" />
+              <ArrowRight className="w-5 h-5 text-zinc-400" />
             </button>
 
             <button
               id="btn-drive-start-marathon"
               onClick={() => startDriveExam(true)}
-              className="w-full py-3.5 px-6 rounded-2xl bg-slate-900/60 border border-slate-800 text-slate-400 font-semibold text-sm flex items-center justify-between transition-all"
+              className="w-full py-3.5 px-6 rounded-2xl bg-zinc-900/60 border border-zinc-800 text-zinc-400 font-semibold text-sm flex items-center justify-between transition-all"
             >
               <div className="flex items-center gap-2">
                 <ListFilter className="w-4 h-4" />
@@ -700,9 +700,9 @@ export const DriveModeScreen: React.FC<DriveModeScreenProps> = ({
           </div>
 
           {/* Indicatori Sicurezza & Wake Lock */}
-          <div className="pt-3 border-t border-slate-900 flex items-center justify-between text-xs text-slate-500">
+          <div className="pt-3 border-t border-zinc-900 flex items-center justify-between text-xs text-zinc-500">
             <div className="flex items-center gap-1.5">
-              <Lightbulb className={`w-3.5 h-3.5 ${isWakeLockActive ? 'text-emerald-400' : 'text-slate-600'}`} />
+              <Lightbulb className={`w-3.5 h-3.5 ${isWakeLockActive ? 'text-emerald-400' : 'text-zinc-600'}`} />
               <span>{isWakeLockActive ? 'Schermo sempre acceso durante la guida' : 'Standby schermo attivo'}</span>
             </div>
             <span>VDS-VL 2017</span>
@@ -714,18 +714,18 @@ export const DriveModeScreen: React.FC<DriveModeScreenProps> = ({
       {internalMode === 'running' && currentQ && (
         <div className="flex-1 flex flex-col justify-between p-3 sm:p-5 max-w-2xl mx-auto w-full h-full overflow-hidden">
           {/* Top Bar HUD */}
-          <div className="flex items-center justify-between gap-2 pb-2 border-b border-slate-800/90 text-xs">
+          <div className="flex items-center justify-between gap-2 pb-2 border-b border-zinc-800/90 text-xs">
             <button
               id="btn-drive-exit"
               onClick={handleClose}
-              className="px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-800 text-slate-300 font-bold flex items-center gap-1 hover:text-white"
+              className="px-3 py-1.5 rounded-xl bg-zinc-900 border border-zinc-800 text-zinc-300 font-bold flex items-center gap-1 hover:text-white"
             >
               <X className="w-4 h-4" />
               <span>Esci</span>
             </button>
 
             <div className="flex items-center gap-2 font-mono">
-              <span className="font-black text-sm text-sky-400">
+              <span className="font-black text-sm text-amber-400">
                 {currentIndex + 1} / {totalCount}
               </span>
               {isExamSession && (
@@ -749,8 +749,8 @@ export const DriveModeScreen: React.FC<DriveModeScreenProps> = ({
                 }}
                 className={`p-1.5 rounded-lg text-xs font-bold flex items-center gap-1 transition-colors ${
                   isAutopilotEnabled
-                    ? 'bg-sky-500/30 text-sky-300 ring-1 ring-sky-500/50'
-                    : 'bg-slate-900 text-slate-500 border border-slate-800'
+                    ? 'bg-amber-500/30 text-amber-300 ring-1 ring-amber-500/50'
+                    : 'bg-zinc-900 text-zinc-500 border border-zinc-800'
                 }`}
                 title="Pilota Automatico"
               >
@@ -766,7 +766,7 @@ export const DriveModeScreen: React.FC<DriveModeScreenProps> = ({
                     className={`p-1.5 rounded-lg text-xs font-bold transition-colors ${
                       isVoiceCommandsEnabled
                         ? 'bg-emerald-500/30 text-emerald-300 ring-1 ring-emerald-500/50'
-                        : 'bg-slate-900 text-slate-500 border border-slate-800'
+                        : 'bg-zinc-900 text-zinc-500 border border-zinc-800'
                     }`}
                     title={isVoiceCommandsEnabled ? 'Disattiva comandi vocali' : 'Attiva comandi vocali'}
                   >
@@ -776,7 +776,7 @@ export const DriveModeScreen: React.FC<DriveModeScreenProps> = ({
                   <button
                     type="button"
                     onClick={() => setIsVoiceGuideOpen(true)}
-                    className="p-1.5 rounded-lg text-xs font-bold bg-slate-900 hover:bg-slate-800 text-slate-400 hover:text-white border border-slate-800 transition-colors"
+                    className="p-1.5 rounded-lg text-xs font-bold bg-zinc-900 hover:bg-zinc-800 text-zinc-400 hover:text-white border border-zinc-800 transition-colors"
                     title="Guida comandi vocali"
                   >
                     <HelpCircle className="w-3.5 h-3.5" />
@@ -787,19 +787,19 @@ export const DriveModeScreen: React.FC<DriveModeScreenProps> = ({
           </div>
 
           {/* Area Domanda (Zero Scroll) */}
-          <div className="my-2 p-3 sm:p-4 rounded-2xl bg-slate-900/90 border border-slate-800/80 flex items-start gap-3">
+          <div className="my-2 p-3 sm:p-4 rounded-2xl bg-zinc-900/90 border border-zinc-800/80 flex items-start gap-3">
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-2 mb-1">
-                <span className="font-mono text-xs font-bold text-sky-400 bg-sky-950 px-2 py-0.5 rounded border border-sky-800/50">
+                <span className="font-mono text-xs font-bold text-amber-400 bg-amber-950 px-2 py-0.5 rounded border border-amber-800/50">
                   #{currentQ.id}
                 </span>
-                <span className="text-xs text-slate-400 font-semibold truncate">
+                <span className="text-xs text-zinc-400 font-semibold truncate">
                   {currentQ.subjectName}
                 </span>
               </div>
               <h2
                 className={`text-base sm:text-xl font-bold leading-snug tracking-tight transition-colors line-clamp-3 sm:line-clamp-4 ${
-                  isPartPlaying('question') ? 'text-sky-300' : 'text-white'
+                  isPartPlaying('question') ? 'text-amber-300' : 'text-white'
                 }`}
               >
                 {currentQ.question}
@@ -811,10 +811,10 @@ export const DriveModeScreen: React.FC<DriveModeScreenProps> = ({
                 onClick={() => togglePlayPause()}
                 className={`p-3 rounded-xl transition-all ${
                   isPlaying
-                    ? 'bg-sky-500 text-white animate-pulse'
+                    ? 'bg-amber-500 text-zinc-950 animate-pulse'
                     : isPaused
-                    ? 'bg-amber-500 text-white ring-2 ring-amber-400'
-                    : 'bg-slate-800 text-slate-300 hover:text-white'
+                    ? 'bg-amber-500 text-zinc-950 ring-2 ring-amber-400'
+                    : 'bg-zinc-800 text-zinc-300 hover:text-white'
                 }`}
                 title={isPlaying ? 'Pausa (Tasto P)' : isPaused ? 'Riprendi (Tasto P)' : 'Ascolta quesito (Tasto Q)'}
               >
@@ -824,7 +824,7 @@ export const DriveModeScreen: React.FC<DriveModeScreenProps> = ({
               {(isPlaying || isPaused) && (
                 <button
                   onClick={() => restartFullSequence()}
-                  className="p-2 rounded-lg bg-slate-800/80 hover:bg-slate-700 text-slate-400 hover:text-white transition-colors flex items-center justify-center animate-in fade-in"
+                  className="p-2 rounded-lg bg-zinc-800/80 hover:bg-zinc-700 text-zinc-400 hover:text-white transition-colors flex items-center justify-center animate-in fade-in"
                   title="Ricomincia da capo dall'inizio (Tasto R)"
                 >
                   <RotateCcw className="w-4 h-4" />
@@ -873,7 +873,7 @@ export const DriveModeScreen: React.FC<DriveModeScreenProps> = ({
               const isRevealed = revealedQuestionId === currentQ.id;
               const isCurrentOptPlaying = isPartPlaying(`opt${optNum}` as any);
 
-              let style = 'bg-slate-900/80 border-slate-800 text-slate-100 hover:border-slate-700 active:scale-[0.99]';
+              let style = 'bg-zinc-900/80 border-zinc-800 text-zinc-100 hover:border-zinc-700 active:scale-[0.99]';
 
               if (isRevealed || (!isExamSession && answers[currentQ.id] !== undefined)) {
                 if (isCorrectAnswer) {
@@ -881,12 +881,12 @@ export const DriveModeScreen: React.FC<DriveModeScreenProps> = ({
                 } else if (isSelected && !isCorrectAnswer) {
                   style = 'bg-rose-950/80 border-rose-500 text-rose-100 ring-2 ring-rose-500';
                 } else {
-                  style = 'opacity-40 bg-slate-950 border-slate-900 text-slate-400';
+                  style = 'opacity-40 bg-zinc-950 border-zinc-900 text-zinc-400';
                 }
               } else if (isSelected) {
-                style = 'bg-sky-950 border-sky-500 text-sky-100 ring-2 ring-sky-500 font-bold';
+                style = 'bg-amber-950 border-amber-500 text-amber-100 ring-2 ring-amber-500 font-bold';
               } else if (isCurrentOptPlaying) {
-                style = 'bg-sky-950/60 border-sky-400 text-sky-200 ring-1 ring-sky-400';
+                style = 'bg-amber-950/60 border-amber-400 text-amber-200 ring-1 ring-amber-400';
               }
 
               return (
@@ -901,10 +901,10 @@ export const DriveModeScreen: React.FC<DriveModeScreenProps> = ({
                       (isRevealed || (!isExamSession && answers[currentQ.id])) && isCorrectAnswer
                         ? 'bg-emerald-500 text-white'
                         : isSelected
-                        ? 'bg-sky-500 text-white'
+                        ? 'bg-amber-500 text-zinc-950'
                         : isCurrentOptPlaying
-                        ? 'bg-sky-500 text-white animate-pulse'
-                        : 'bg-slate-800 text-slate-300'
+                        ? 'bg-amber-500 text-zinc-950 animate-pulse'
+                        : 'bg-zinc-800 text-zinc-300'
                     }`}
                   >
                     {optNum}
@@ -926,11 +926,11 @@ export const DriveModeScreen: React.FC<DriveModeScreenProps> = ({
           </div>
 
           {/* Barra Azioni Inferiore (Pulsanti Giganti) */}
-          <div className="grid grid-cols-12 gap-2 pt-2 border-t border-slate-800/90">
+          <div className="grid grid-cols-12 gap-2 pt-2 border-t border-zinc-800/90">
             <button
               onClick={handlePrevQuestion}
               disabled={currentIndex === 0}
-              className="col-span-4 py-3.5 rounded-xl bg-slate-900 border border-slate-800 text-slate-200 hover:text-white font-black text-sm flex items-center justify-center gap-1.5 disabled:opacity-30 active:scale-[0.98]"
+              className="col-span-4 py-3.5 rounded-xl bg-zinc-900 border border-zinc-800 text-zinc-200 hover:text-white font-black text-sm flex items-center justify-center gap-1.5 disabled:opacity-30 active:scale-[0.98]"
             >
               <ArrowLeft className="w-5 h-5" />
               <span>Prec</span>
@@ -941,7 +941,7 @@ export const DriveModeScreen: React.FC<DriveModeScreenProps> = ({
               className={`col-span-4 py-3.5 rounded-xl border font-black text-sm flex items-center justify-center gap-1.5 transition-colors active:scale-[0.98] ${
                 flags[currentQ.id]
                   ? 'bg-amber-500 border-amber-400 text-black'
-                  : 'bg-slate-900 border-slate-800 text-amber-400 hover:bg-slate-800'
+                  : 'bg-zinc-900 border-zinc-800 text-amber-400 hover:bg-zinc-800'
               }`}
             >
               <Flag className={`w-5 h-5 ${flags[currentQ.id] ? 'fill-black' : ''}`} />
@@ -960,7 +960,7 @@ export const DriveModeScreen: React.FC<DriveModeScreenProps> = ({
               <button
                 onClick={handleNextQuestion}
                 disabled={currentIndex === totalCount - 1 && !isExamSession}
-                className="col-span-4 py-3.5 rounded-xl bg-sky-600 hover:bg-sky-500 text-white font-black text-sm flex items-center justify-center gap-1.5 disabled:opacity-30 shadow-lg shadow-sky-950 active:scale-[0.98]"
+                className="col-span-4 py-3.5 rounded-xl bg-amber-600 hover:bg-amber-500 text-white font-black text-sm flex items-center justify-center gap-1.5 disabled:opacity-30 shadow-lg shadow-amber-950 active:scale-[0.98]"
               >
                 <span>Succ</span>
                 <ArrowRight className="w-5 h-5" />
@@ -999,17 +999,17 @@ export const DriveModeScreen: React.FC<DriveModeScreenProps> = ({
             </div>
 
             <div className="grid grid-cols-2 gap-3">
-              <div className="p-4 rounded-2xl bg-slate-900 border border-slate-800 text-center">
+              <div className="p-4 rounded-2xl bg-zinc-900 border border-zinc-800 text-center">
                 <div className="text-2xl font-black text-emerald-400">
                   {completedSession.correctAnswers}
                 </div>
-                <div className="text-xs text-slate-400 font-bold uppercase">Esatte</div>
+                <div className="text-xs text-zinc-400 font-bold uppercase">Esatte</div>
               </div>
-              <div className="p-4 rounded-2xl bg-slate-900 border border-slate-800 text-center">
+              <div className="p-4 rounded-2xl bg-zinc-900 border border-zinc-800 text-center">
                 <div className="text-2xl font-black text-rose-400">
                   {completedSession.wrongAnswers}
                 </div>
-                <div className="text-xs text-slate-400 font-bold uppercase">Errate</div>
+                <div className="text-xs text-zinc-400 font-bold uppercase">Errate</div>
               </div>
             </div>
           </div>
@@ -1017,14 +1017,14 @@ export const DriveModeScreen: React.FC<DriveModeScreenProps> = ({
           <div className="space-y-3 pb-4">
             <button
               onClick={() => startDriveExam(isMarathon)}
-              className="w-full py-4 rounded-2xl bg-sky-600 hover:bg-sky-500 text-white font-black text-lg flex items-center justify-center gap-2"
+              className="w-full py-4 rounded-2xl bg-amber-600 hover:bg-amber-500 text-white font-black text-lg flex items-center justify-center gap-2"
             >
               <RotateCcw className="w-5 h-5" />
               <span>Riprova Esame</span>
             </button>
             <button
               onClick={handleClose}
-              className="w-full py-4 rounded-2xl bg-slate-900 border border-slate-800 text-slate-300 font-bold text-base flex items-center justify-center gap-2"
+              className="w-full py-4 rounded-2xl bg-zinc-900 border border-zinc-800 text-zinc-300 font-bold text-base flex items-center justify-center gap-2"
             >
               <span>Chiudi Modalità Guida</span>
             </button>
