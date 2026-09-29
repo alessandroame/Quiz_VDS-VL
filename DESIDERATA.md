@@ -87,9 +87,9 @@ Questo documento rappresenta la **bussola strategica e funzionale** del progetto
    - **Spiegazione Vocale di Benvenuto (Audio Briefing Run-Once)**: All'avvio della modalità alla guida, un audio neurale conciso illustra il funzionamento a mani libere (Wake Lock, lettura automatica quesiti, risposte touch e comandi vocali "Uno", "Due", "Tre", "Ripeti", "Aiuto"). Eseguito una sola volta in automatico (`driveModeIntroPlayed: true`), con possibilità di riascolto on-demand (Launcher, Cheat Sheet) o riattivazione all'avvio dalle Impostazioni.
    - **Modalità Tutor Didattica nella Modalità Guida**: Funzionalità hands-free avanzata per lo studio approfondito a mani libere durante la guida. Invece della sola risposta corretta, il motore vocale neurale pronuncia l'intera spiegazione didattica (**Regola** e **Tranello**), mentre l'HUD visualizza le card didattiche ad alto contrasto rispettando il layout zero-scroll a `100dvh`. Il Pilota Automatico sincronizza la prosecuzione attendendo la fine della voce, e sono disponibili comandi vocali dedicati (*"Spiega"*, *"Regola"*, *"Tutor"*).
 
-8. **Impostazioni Modulari per Argomenti (Evoluzione verso Accordion Compresso a Sezione Singola)**:
+8. **Impostazioni Modulari per Argomenti (Accordion Compresso a Sezione Singola)**:
    - Schermata impostazioni fullscreen nativa articolata su 6 aree tematiche (Aspetto, Voce, Guida, Cloud/Backup, Dati & Reset, About con riferimenti normativi AeCI e D.P.R. 133/2010).
-   - Superamento dell'attuale menu orizzontale a pillole/tabs in favore di un layout ad **accordion verticale compresso**, con apertura esclusiva di **una sola sezione alla volta** (mutua esclusione) per eliminare scorrimenti orizzontali e massimizzare la compattezza su smartphone e desktop.
+   - Layout ad **accordion verticale compresso a mutua esclusione**: apertura di una sola sezione alla volta (`openSection: SettingsTab | null`), chiusura automatica delle altre, anteprime dinamiche dello stato attivo nei badge di testata, pulsante di collasso totale per una panoramica compatta a 1 schermata e zero layout shift.
 
 9. **Identità Visiva, Iconografia & Tema Carbon Cockpit (Zero-Blue)**:
    - **Icona Ufficiale Aero Shield**: Logo PWA geometrico che unisce l'arco a cassoni del parapendio con l'ala triangolare a freccia 'V' del deltaplano (trave di chiglia e barra di controllo A-frame). Vettore SVG di precisione e icone PNG 192x192 e 512x512.
@@ -142,7 +142,7 @@ Questo documento rappresenta la **bussola strategica e funzionale** del progetto
 | Protocollo Collaudo Manuale E2E | 🟢 Completato | Checklist completa a 9 aree operative in TODO.md per verifica pilota. |
 | Filtro Quiz Esclusivi Deltaplano | 📋 Pianificato (TODO) | Audit 504 quiz e tagging disciplina deltaplano/parapendio/comune con preservazione concetti condivisi. |
 | Blocco Menu di Navigazione al Top | 🟢 Completato | Barra di navigazione permanently fixed al top (`fixed top-0 left-0 right-0 z-40`), eliminata la bottom nav fissa e rimosso il preamble fuffa dalla schermata esame. |
-| Impostazioni ad Accordion Compresso Singolo | 📋 Pianificato (TODO) | Sostituzione pills menu con accordion verticale mutuo-esclusivo (1 sola sezione aperta alla volta). |
+| Impostazioni ad Accordion Compresso Singolo | 🟢 Completato | Sostituzione pills menu con accordion verticale mutuo-esclusivo (1 sola sezione aperta alla volta, anteprime badge live, pulsante comprimi tutto ed espansione selettiva). |
 | Visualizzazione Globale Versione App | 🟢 Completato | Badge di versione dinamico (`__APP_VERSION__` e `__APP_BUILD_ID__`) visibile in Navbar e header Impostazioni. |
 | Barra Navigazione Quiz Ancorata in Basso | 🟢 Completato | Componente `QuizBottomBar` ancorato in basso al viewport (`fixed bottom-0 z-30`) con Precedente, Successiva, flag rapido, Prossima Domanda Tutor e Consegna su `ExamScreen`, `TopicsScreen` e `MistakesScreen`. |
 | Modalità Tutor nella Modalità Guida | 📋 Pianificato (TODO) | Lettura vocale Regola+Tranello sincronizzata col Pilota Automatico e toggle dedicato. |

@@ -178,17 +178,18 @@ Questa sezione raccoglie le nuove funzionalità e i miglioramenti di interfaccia
   - [x] Verifica tramite CDP headless a 390x844 (mobile) e 1440x900 (desktop) per garantire stabilità visiva durante lo scorrimento, zero salti di layout e nessuna sovrapposizione con i banner informativi o download audio.
 
 ### 3. Ristrutturazione Impostazioni con Accordion Compresso Singolo (Single-Open Accordion)
-- [ ] **Superamento del Pills/Segmented Menu Orizzontale**:
-  - Riprogettazione del componente `src/components/SettingsModal.tsx` (e alias `SettingsScreen`): sostituzione della barra orizzontale a schede/pillole (`tab-appearance`, `tab-voice`, `tab-drive`, `tab-cloud`, `tab-data`, `tab-about`).
-- [ ] **Implementazione Accordion Compresso a Sezione Singola (Mutually Exclusive)**:
-  - Layout verticale a pannelli ripiegabili compatti ad alta densità (header con icona tematica, titolo, anteprima sintetica dell'impostazione attiva e indicatore di espansione/chiusura).
-  - Regola ferrea di mutua esclusione: l'apertura di un pannello espande la sezione desiderata e chiude automaticamente qualsiasi altra sezione precedentemente aperta, mantenendo l'altezza complessiva contenuta e azzerando la confusione visiva.
-  - Possibilità di collassare completamente tutte le sezioni per una panoramica compatta a colpo d'occhio.
-- [ ] **Transizioni Fluide & Rispetto Palette Cockpit**:
-  - Micro-animazioni di espansione/chiusura ad alte prestazioni (zero layout shift, transizioni CSS fluide e leggere).
-  - Piena conformità sia per il tema Carbon Cockpit Dark (Zero-Blue) che per Hangar Light.
-- [ ] **Verifica Visiva Headless & Regression Test**:
-  - Aggiornamento degli script di test visivo delle impostazioni (`test_settings_fullscreen.js`, `test_settings_about.js`) e verifica di 0 errori in console.
+- [x] **Superamento del Pills/Segmented Menu Orizzontale**:
+  - [x] Riprogettazione del componente `src/components/SettingsModal.tsx` (e alias `SettingsScreen`): sostituzione della barra orizzontale a schede/pillole (`tab-appearance`, `tab-voice`, `tab-drive`, `tab-cloud`, `tab-data`, `tab-about`) con un layout verticale compatto a pannelli ripiegabili.
+- [x] **Implementazione Accordion Compresso a Sezione Singola (Mutually Exclusive)**:
+  - [x] Layout verticale a pannelli compatti ad alta densità (`AccordionCard`) con icona tematica, titolo, anteprima live badge dinamico dello stato (`Auto • Feedback ON`, `Giuseppe • 1x • TTS Web`, `Radio ON • 5s`, `Manuale`, `504 Quiz • Dexie SSOT`, `v1.0.0 • AeCI`) e indicatore a freccia `ChevronDown` animato (180° rotation).
+  - [x] Regola ferrea di mutua esclusione: l'apertura di un pannello espande la sezione desiderata e chiude automaticamente qualsiasi altra sezione precedentemente aperta, azzerando la dispersione visiva (`openSection: SettingsTab | null`).
+  - [x] Possibilità di collassare completamente tutti i pannelli cliccando sulla sezione attiva o tramite pulsante rapido di toolbar (`Comprimi tutto` / `Espandi prima`).
+- [x] **Transizioni Fluide & Rispetto Palette Cockpit**:
+  - [x] Transizioni CSS fluide, zero layout shift e perfetta resa visiva sia in tema Carbon Cockpit Dark (Zero-Blue) che in Hangar Light.
+  - [x] Piena retrocompatibilità per selettori ed eventi di tastiera (`Esc`, switch fullscreen, navigazione accessibile).
+- [x] **Verifica Visiva Headless & Regression Test**:
+  - [x] Creato script dedicato `scripts/test_settings_accordion.cjs` (verifica 6 schede, espansione iniziale, collasso totale, mutua esclusione, contenuti about, responsiveness desktop e 0 errori console).
+  - [x] Aggiornati e verificati con successo gli script di collaudo visivo `scripts/test_settings_fullscreen.js`, `scripts/test_settings_about.js`, `scripts/test_drive_intro.js` e `scripts/test_offline_audio.js`.
 
 ### 4. Visualizzazione Globale del Numero di Versione dell'Applicazione
 - [x] **Integrazione del Numero di Versione nella UI**:

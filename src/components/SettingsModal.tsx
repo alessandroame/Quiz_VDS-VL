@@ -25,7 +25,8 @@ import {
   Settings as SettingsIcon,
   ArrowLeft,
   Maximize2,
-  Minimize2
+  Minimize2,
+  ChevronDown
 } from 'lucide-react';
 import { useTheme } from '../context/ThemeContext';
 import { useQuiz } from '../context/QuizContext';
@@ -37,6 +38,105 @@ import { VoiceCommandsModal } from './VoiceCommandsModal';
 import { audioDownloadManager, VoiceName, VoiceDownloadProgress } from '../services/audioDownloadManager';
 
 export type SettingsTab = 'appearance' | 'voice' | 'drive' | 'cloud' | 'data' | 'about';
+
+interface AccordionCardProps {
+  id: SettingsTab;
+  label: string;
+  description: string;
+  summary: string;
+  icon: React.FC<{ className?: string }>;
+  isExpanded: boolean;
+  onToggle: () => void;
+  cardRef?: (el: HTMLDivElement | null) => void;
+  children: React.ReactNode;
+}
+
+const AccordionCard: React.FC<AccordionCardProps> = ({
+  id,
+  label,
+  description,
+  summary,
+  icon: Icon,
+  isExpanded,
+  onToggle,
+  cardRef,
+  children
+}) => {
+  return (
+    <div
+      ref={cardRef}
+      className={`rounded-2xl border transition-all duration-200 overflow-hidden ${
+        isExpanded
+          ? 'border-amber-500/50 bg-zinc-900/80 shadow-md shadow-amber-500/5 light:border-amber-400 light:bg-white ring-1 ring-amber-500/20 light:ring-amber-400/20'
+          : 'border-zinc-800/80 bg-zinc-900/40 hover:bg-zinc-900/70 hover:border-zinc-700/80 light:border-slate-200 light:bg-white light:hover:bg-slate-50'
+      }`}
+    >
+      <button
+        type="button"
+        id={`tab-${id}`}
+        onClick={onToggle}
+        aria-expanded={isExpanded}
+        className="w-full p-3.5 sm:p-4 flex items-center justify-between text-left transition-colors cursor-pointer select-none group focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 rounded-2xl"
+      >
+        <div className="flex items-center gap-3 min-w-0 pr-2">
+          <div
+            className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 transition-colors ${
+              isExpanded
+                ? 'bg-amber-500/20 text-amber-400 border border-amber-500/40 light:bg-amber-100 light:text-amber-800 light:border-amber-300'
+                : 'bg-zinc-800/80 text-zinc-400 border border-zinc-700/40 group-hover:text-zinc-200 group-hover:border-zinc-600 light:bg-slate-100 light:text-slate-600 light:border-slate-200'
+            }`}
+          >
+            <Icon className="w-4 h-4" />
+          </div>
+
+          <div className="min-w-0 flex-1">
+            <div className="flex items-center gap-2 flex-wrap">
+              <span
+                className={`text-sm font-bold tracking-tight transition-colors ${
+                  isExpanded
+                    ? 'text-amber-400 light:text-amber-800'
+                    : 'text-zinc-200 group-hover:text-zinc-100 light:text-slate-800'
+                }`}
+              >
+                {label}
+              </span>
+              <span
+                className={`text-[10px] sm:text-[11px] font-medium px-2 py-0.5 rounded-full border truncate max-w-[190px] sm:max-w-xs transition-colors ${
+                  isExpanded
+                    ? 'bg-amber-500/10 text-amber-300/90 border-amber-500/30 light:bg-amber-50 light:text-amber-700 light:border-amber-200'
+                    : 'bg-zinc-800/60 text-zinc-400 border-zinc-700/50 light:bg-slate-100 light:text-slate-600 light:border-slate-200'
+                }`}
+              >
+                {summary}
+              </span>
+            </div>
+            <p className="text-[11px] text-zinc-400 light:text-slate-500 line-clamp-1 mt-0.5">
+              {description}
+            </p>
+          </div>
+        </div>
+
+        <div className="flex items-center shrink-0 pl-1">
+          <div
+            className={`w-7 h-7 rounded-lg flex items-center justify-center transition-transform duration-200 ${
+              isExpanded
+                ? 'rotate-180 bg-amber-500/10 text-amber-400 light:bg-amber-100 light:text-amber-800'
+                : 'text-zinc-500 group-hover:text-zinc-300 light:text-slate-400 light:group-hover:text-slate-600'
+            }`}
+          >
+            <ChevronDown className="w-4 h-4" />
+          </div>
+        </div>
+      </button>
+
+      {isExpanded && (
+        <div className="px-3.5 pb-4 pt-1 sm:px-4 sm:pb-5 border-t border-zinc-800/70 light:border-slate-100 animate-in fade-in duration-150">
+          {children}
+        </div>
+      )}
+    </div>
+  );
+};
 
 interface SettingsModalProps {
   isOpen: boolean;
@@ -51,7 +151,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
 }) => {
   const { theme, setTheme } = useTheme();
   const { settings, updateSetting, syncState, syncNow } = useQuiz();
-  const [activeTab, setActiveTab] = useState<SettingsTab>(defaultTab);
+  const [openSection, setOpenSection] = useState<SettingsTab | null>(defaultTab);
 
   const envClientId = (import.meta.env?.VITE_GOOGLE_CLIENT_ID as string) || '182413802928-q7sphls58ob60s2mu3fspbbkk9kq2am9.apps.googleusercontent.com';
   const effectiveClientId = (settings.googleClientId || envClientId).trim();
@@ -62,13 +162,25 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
   const [audioStatuses, setAudioStatuses] = useState<Record<VoiceName, VoiceDownloadProgress>>(
     audioDownloadManager.getAllStatuses()
   );
-  const tabRefs = useRef<Record<string, HTMLButtonElement | null>>({});
+  const sectionRefs = useRef<Record<string, HTMLDivElement | null>>({});
 
   useEffect(() => {
     if (isOpen) {
-      tabRefs.current[activeTab]?.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'nearest' });
+      setOpenSection(defaultTab);
     }
-  }, [activeTab, isOpen]);
+  }, [isOpen, defaultTab]);
+
+  const toggleSection = (tabId: SettingsTab) => {
+    setOpenSection(prev => {
+      const next = prev === tabId ? null : tabId;
+      if (next) {
+        setTimeout(() => {
+          sectionRefs.current[next]?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }, 50);
+      }
+      return next;
+    });
+  };
 
   useEffect(() => {
     const unsub = audioDownloadManager.subscribe(newStatuses => {
@@ -207,14 +319,29 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
     }
   };
 
-  const tabs: { id: SettingsTab; label: string; icon: React.FC<{ className?: string }> }[] = [
-    { id: 'appearance', label: 'Aspetto', icon: Palette },
-    { id: 'voice', label: 'Voce', icon: Headphones },
-    { id: 'drive', label: 'Guida', icon: Car },
-    { id: 'cloud', label: 'Backup', icon: Cloud },
-    { id: 'data', label: 'Dati', icon: Database },
-    { id: 'about', label: 'About', icon: Info }
-  ];
+  const appearanceSummary = `${theme === 'dark' ? 'Scuro' : theme === 'light' ? 'Chiaro' : 'Auto'} • ${
+    settings.immediateFeedbackInTopics ? 'Feedback ON' : 'Feedback OFF'
+  }`;
+
+  const voiceSummary = `${settings.ttsVoice === 'elsa' ? 'Elsa' : 'Giuseppe'} • ${
+    settings.ttsPlaybackRate || 1.0
+  }x • ${audioStatuses.giuseppe.isComplete || audioStatuses.elsa.isComplete ? 'Offline OK' : 'TTS Web'}`;
+
+  const driveSummary = `${
+    settings.driveModeVoiceCommands
+      ? 'Radio + Voce'
+      : settings.driveModeAutopilot ?? true
+      ? 'Radio ON'
+      : 'Manuale'
+  } • ${settings.driveModeAutoAdvanceSeconds || 5}s`;
+
+  const cloudSummary = `${
+    settings.autoSyncDrive ? 'Auto-Sync ON' : syncState.lastSyncedAt ? 'Drive Sincronizzato' : 'Manuale'
+  }`;
+
+  const dataSummary = '504 Quiz • Dexie SSOT';
+
+  const aboutSummary = `v${typeof __APP_VERSION__ !== 'undefined' ? __APP_VERSION__ : '1.0.0'} • AeCI`;
 
   return (
     <div
@@ -263,41 +390,52 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
         </div>
       </header>
 
-      {/* Tab Navigation (Segmented Topic Selector) */}
-      <div className="sticky top-14 z-10 w-full border-b border-zinc-800/80 bg-zinc-950/95 dark:bg-zinc-950/95 light:bg-slate-100/95 light:border-slate-200 backdrop-blur flex-shrink-0">
-        <div className="max-w-2xl mx-auto px-4 py-2 flex items-center gap-1.5 overflow-x-auto no-scrollbar">
-          {tabs.map(tab => {
-            const Icon = tab.icon;
-            const isActive = activeTab === tab.id;
-            return (
-              <button
-                key={tab.id}
-                ref={el => {
-                  tabRefs.current[tab.id] = el;
-                }}
-                id={`tab-${tab.id}`}
-                onClick={() => setActiveTab(tab.id)}
-                className={`py-2 px-3 rounded-xl text-xs font-semibold flex items-center justify-center gap-1.5 transition-all whitespace-nowrap min-w-fit flex-1 sm:flex-initial ${
-                  isActive
-                    ? 'bg-amber-500/20 text-amber-400 border border-amber-500/40 light:bg-amber-50 light:border-amber-500 light:text-amber-700 shadow-sm'
-                    : 'text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800/40 light:text-slate-600 light:hover:bg-slate-200/60'
-                }`}
-              >
-                <Icon className="w-3.5 h-3.5" />
-                <span>{tab.label}</span>
-              </button>
-            );
-          })}
-        </div>
-      </div>
-
-      {/* Tab Body (Full-height Scrollable Area) */}
+      {/* Accordion Body (Full-height Scrollable Area) */}
       <main className="flex-1 overflow-y-auto overscroll-contain">
-        <div className="max-w-2xl mx-auto px-4 py-5 space-y-5 pb-24">
+        <div className="max-w-2xl mx-auto px-4 py-4 space-y-3 pb-24">
           
-          {/* TAB 1: ASPETTO & TEMA */}
-          {activeTab === 'appearance' && (
-            <div className="space-y-4 animate-in fade-in duration-150">
+          {/* Quick Toolbar / Overview */}
+          <div className="flex items-center justify-between px-1 text-xs">
+            <div className="flex items-center gap-1.5 text-zinc-400 light:text-slate-500">
+              <span className="font-semibold text-zinc-300 light:text-slate-700">Pannelli di Controllo</span>
+              <span>•</span>
+              <span>6 sezioni configurabili</span>
+            </div>
+            {openSection !== null ? (
+              <button
+                type="button"
+                id="btn-settings-collapse-all"
+                onClick={() => setOpenSection(null)}
+                className="text-[11px] font-semibold text-zinc-400 hover:text-amber-400 light:text-slate-600 light:hover:text-amber-600 transition-colors py-1 px-2 rounded-lg hover:bg-zinc-800/40 light:hover:bg-slate-100 cursor-pointer"
+              >
+                Comprimi tutto
+              </button>
+            ) : (
+              <button
+                type="button"
+                id="btn-settings-expand-first"
+                onClick={() => setOpenSection('appearance')}
+                className="text-[11px] font-semibold text-amber-400 hover:text-amber-300 light:text-amber-600 light:hover:text-amber-700 transition-colors py-1 px-2 rounded-lg hover:bg-zinc-800/40 light:hover:bg-slate-100 cursor-pointer"
+              >
+                Espandi prima
+              </button>
+            )}
+          </div>
+
+          {/* SEZIONE 1: ASPETTO & TEMA */}
+          <AccordionCard
+            id="appearance"
+            label="Aspetto & Tema"
+            description="Tema scuro/chiaro, schermo intero e feedback immediato nelle materie"
+            summary={appearanceSummary}
+            icon={Palette}
+            isExpanded={openSection === 'appearance'}
+            onToggle={() => toggleSection('appearance')}
+            cardRef={el => {
+              sectionRefs.current['appearance'] = el;
+            }}
+          >
+            <div className="space-y-4">
               <div className="space-y-2">
                 <label className="text-xs font-bold text-zinc-400 uppercase tracking-wider block">
                   Tema dell'applicazione
@@ -392,11 +530,22 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                 </div>
               )}
             </div>
-          )}
+          </AccordionCard>
 
-          {/* TAB 2: VOCE & AUDIO */}
-          {activeTab === 'voice' && (
-            <div className="space-y-3.5 animate-in fade-in duration-150">
+          {/* SEZIONE 2: VOCE & AUDIO */}
+          <AccordionCard
+            id="voice"
+            label="Voce & Audio"
+            description="Sintesi vocale quesiti, velocità di lettura e archivio offline PWA"
+            summary={voiceSummary}
+            icon={Headphones}
+            isExpanded={openSection === 'voice'}
+            onToggle={() => toggleSection('voice')}
+            cardRef={el => {
+              sectionRefs.current['voice'] = el;
+            }}
+          >
+            <div className="space-y-3.5">
               <div className="flex items-center justify-between p-2.5 rounded-xl border border-zinc-800 bg-zinc-950/60 light:bg-slate-50 light:border-slate-200">
                 <div>
                   <span className="text-zinc-300 light:text-slate-700 font-medium block text-xs">
@@ -694,11 +843,22 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                 </button>
               </div>
             </div>
-          )}
+          </AccordionCard>
 
-          {/* TAB 3: ALLA GUIDA */}
-          {activeTab === 'drive' && (
-            <div className="space-y-3 animate-in fade-in duration-150">
+          {/* SEZIONE 3: ALLA GUIDA */}
+          <AccordionCard
+            id="drive"
+            label="Modalità Guida"
+            description="Radio quiz a catena, comandi vocali hands-free e timer risposta"
+            summary={driveSummary}
+            icon={Car}
+            isExpanded={openSection === 'drive'}
+            onToggle={() => toggleSection('drive')}
+            cardRef={el => {
+              sectionRefs.current['drive'] = el;
+            }}
+          >
+            <div className="space-y-3">
               <p className="text-[11px] text-zinc-400 light:text-slate-500 leading-relaxed">
                 Pulsanti giganti e audio automatico per ripassare in macchina o con le mani occupate in totale sicurezza.
               </p>
@@ -843,11 +1003,22 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                 </div>
               </div>
             </div>
-          )}
+          </AccordionCard>
 
-          {/* TAB 4: BACKUP & CLOUD */}
-          {activeTab === 'cloud' && (
-            <div className="space-y-3.5 animate-in fade-in duration-150">
+          {/* SEZIONE 4: BACKUP & CLOUD */}
+          <AccordionCard
+            id="cloud"
+            label="Backup Cloud"
+            description="Google Drive, auto-sync, smart merge e salvataggio file JSON"
+            summary={cloudSummary}
+            icon={Cloud}
+            isExpanded={openSection === 'cloud'}
+            onToggle={() => toggleSection('cloud')}
+            cardRef={el => {
+              sectionRefs.current['cloud'] = el;
+            }}
+          >
+            <div className="space-y-3.5">
               <div className="space-y-2.5">
                 <label className="text-xs font-bold text-zinc-400 uppercase tracking-wider block">
                   Sincronizzazione Cloud Google
@@ -962,11 +1133,22 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                 </div>
               </div>
             </div>
-          )}
+          </AccordionCard>
 
-          {/* TAB 5: ARCHIVIO DATI & RESET */}
-          {activeTab === 'data' && (
-            <div className="space-y-3.5 animate-in fade-in duration-150">
+          {/* SEZIONE 5: ARCHIVIO DATI & RESET */}
+          <AccordionCard
+            id="data"
+            label="Gestione Dati"
+            description="Stato database IndexedDB locale e azzeramento progressi"
+            summary={dataSummary}
+            icon={Database}
+            isExpanded={openSection === 'data'}
+            onToggle={() => toggleSection('data')}
+            cardRef={el => {
+              sectionRefs.current['data'] = el;
+            }}
+          >
+            <div className="space-y-3.5">
               <div className="p-3.5 rounded-xl border border-zinc-800 bg-zinc-950/60 light:bg-slate-50 light:border-slate-200 space-y-1.5">
                 <div className="text-xs font-bold text-zinc-200 light:text-slate-800 flex items-center justify-between">
                   <span>Archivio Locale IndexedDB</span>
@@ -997,11 +1179,22 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                 </button>
               </div>
             </div>
-          )}
+          </AccordionCard>
 
-          {/* TAB 6: ABOUT & REGOLAMENTO */}
-          {activeTab === 'about' && (
-            <div className="space-y-4 animate-in fade-in duration-150">
+          {/* SEZIONE 6: ABOUT & REGOLAMENTO */}
+          <AccordionCard
+            id="about"
+            label="Informazioni & Regolamento"
+            description="Conformità esame AeCI, D.P.R. 133/2010 e quote ufficiali materie"
+            summary={aboutSummary}
+            icon={Info}
+            isExpanded={openSection === 'about'}
+            onToggle={() => toggleSection('about')}
+            cardRef={el => {
+              sectionRefs.current['about'] = el;
+            }}
+          >
+            <div className="space-y-4">
               {/* App Identity Banner */}
               <div className="p-3.5 rounded-2xl border border-amber-500/30 bg-gradient-to-br from-amber-500/10 via-zinc-950 to-zinc-950 light:from-amber-50/80 light:via-white light:to-white light:border-amber-400/40 shadow-sm">
                 <div className="flex items-start gap-3">
@@ -1102,7 +1295,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                 </p>
               </div>
             </div>
-          )}
+          </AccordionCard>
 
         </div>
       </main>

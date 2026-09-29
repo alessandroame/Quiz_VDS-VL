@@ -154,12 +154,17 @@
 - **Barra di Navigazione Quiz Ancorata in Basso (Sticky / Fixed Bottom Action Bar)**:
   - Durante l'esecuzione dei quiz (**Simulazione Didattica Tutor** ed **Esame Ufficiale AeCI** in `ExamScreen`, **Studio per Materie** in `TopicsScreen` e ripasso **Quaderno Errori** in `MistakesScreen`), i comandi di navigazione (`Precedente`, `Successiva`, flag rapido `⚑ Segna/Rivedi`, pulsante prioritario `Prossima Domanda` in modalità tutor e `Consegna/Concludi`) sono **costantemente visibili e ancorati sul fondo del viewport** (`fixed bottom-0 z-30`).
   - Sfondo avionico sfumato con `backdrop-blur-md`, pieno supporto per le safe area inferiori degli smartphone (`pb-[max(0.75rem,env(safe-area-inset-bottom))]`) e calibrazione del padding di clearance (`pb-28 sm:pb-32`) per garantire la consultazione fluida e l'avanzamento con il pollice a una mano senza dover scorrere la pagina verso il basso.
-- **Schermata Impostazioni Fullscreen a Schede Tematiche**:
-  - Esperienza nativa a tutto schermo che sostituisce i vecchi modali popup: layout a schermo intero sia su dispositivi mobili che desktop con header dedicato, pulsante Indietro ed `Esc` da tastiera.
-  - Riorganizzazione modulare suddivisa in 6 argomenti dedicati: **🎨 Aspetto**, **🎙️ Voce**, **🚗 Guida**, **☁️ Backup**, **⚙️ Dati**, **ℹ️ About**.
-  - **Supporto Schermo Intero (Browser Fullscreen)**: opzione dedicata nella scheda Aspetto per massimizzare la PWA nascondendo le barre del browser su desktop e tablet.
+- **Schermata Impostazioni Fullscreen ad Accordion Compresso Singolo (Single-Open Accordion)**:
+  - Esperienza nativa a tutto schermo che sostituisce le vecchie barre orizzontali a pillole/tabs con un **layout verticale compatto ad accordion a mutua esclusione**: l'apertura di un pannello espande la sezione desiderata e chiude automaticamente qualsiasi altra sezione precedentemente aperta (`openSection: SettingsTab | null`), azzerando lo scorrimento e la dispersione visiva su smartphone e desktop.
+  - Suddivisione modulare in 6 argomenti dedicati con icone tematiche e **live preview badge dinamici**:
+    * **🎨 Aspetto**: tema attivo (`Auto` / `Cockpit Dark` / `Hangar Light`) e feedback didattico immediato ON/OFF. Include toggle per massimizzazione a Schermo Intero (Browser Fullscreen).
+    * **🎙️ Voce**: istruttore attivo (Giuseppe / Elsa), velocità di lettura, motore TTS (Web / Cache offline) ed effetti sonori cockpit.
+    * **🚗 Guida**: stato del pilota automatico radio quiz, countdown di risposta (3-8s) e riattivazione del briefing vocale iniziale.
+    * **☁️ Backup**: stato della sincronizzazione Google Drive GIS (`Auto-Sync` / `Manuale`), ultimo backup e gestione token.
+    * **⚙️ Dati**: catalogo 504 quiz Dexie IndexedDB (SSOT), ripristino/esportazione JSON locale e reset totale.
+    * **ℹ️ About**: versione attiva dell'applicazione (`v1.0.0 • AeCI`), riferimenti normativi ufficiali (D.P.R. 9 luglio 2010, n. 133 e regolamenti esame AeCI 30 quiz, 45 min, max 3 errori) e architettura di bordo.
+  - Toolbar rapida di controllo con contatore sezioni e pulsante contestuale per **comprimere tutto** a vista d'occhio o **espandere la prima sezione**.
   - Eliminazione totale dello scrolling della pagina sottostante (body scroll lock) per una navigazione pulita e focalizzata.
-  - **Scheda About Dedicata**: consultazione immediata dei riferimenti normativi ufficiali (D.P.R. 9 luglio 2010, n. 133 e regolamenti AeCI), database dei 504 quiz, regole d'esame (30 quiz, 45 min, max 3 errori), principi architetturali (Offline-First, Fair Coverage, Leitner) e garanzie di privacy.
 - **Palette Cockpit Bimodale**:
   - **Carbon Cockpit (Dark Mode Zero-Blue)**: Sfondo grafite profondo e carbonio neutro (`#09090b` / `zinc-950`, superfici `zinc-900`, bordi `zinc-800`, testo `zinc-100`), **con dominante blu categoricamente rimossa (0% cool hue)**. Accento avionico caldo **Aviation Amber** (`amber-500` / `amber-600`) per indicatori, selezioni e bagliore cockpit, ottimizzato per riposo visivo e cockpit notturni.
   - **Hangar Light (Outdoor High-Contrast)**: Sfondo diurno ad altissimo contrasto per perfetta leggibilità sul campo di volo o sotto la luce solare diretta in decollo.

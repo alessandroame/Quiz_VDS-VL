@@ -17,6 +17,27 @@ const sleep = ms => new Promise(r => setTimeout(r, ms));
 
 async function main() {
   const cdpPort = 9226;
+
+  let previewProc = null;
+  try {
+    const res = await fetch('http://localhost:5173/');
+    if (!res.ok) throw new Error('Not ok');
+  } catch {
+    console.log('Avvio vite preview su porta 5173...');
+    previewProc = spawn('npx', ['vite', 'preview', '--port', '5173'], {
+      shell: true,
+      stdio: 'ignore'
+    });
+    for (let i = 0; i < 30; i++) {
+      try {
+        const res = await fetch('http://localhost:5173/');
+        if (res.ok) break;
+      } catch {
+        await sleep(250);
+      }
+    }
+  }
+
   const chromeProc = spawn(chromePath, [
     `--remote-debugging-port=${cdpPort}`,
     '--headless=new',
@@ -90,6 +111,7 @@ async function main() {
           if (db.objectStoreNames.contains('settings')) {
             const tx = db.transaction('settings', 'readwrite');
             tx.objectStore('settings').put({ key: 'driveModeIntroPlayed', value: false });
+            tx.objectStore('settings').put({ key: 'audioOfflinePromptDismissed', value: true });
           }
         };
       })()`,
@@ -264,6 +286,7 @@ async function main() {
     }
   } finally {
     chromeProc.kill();
+    if (previewProc) previewProc.kill();
   }
 }
 

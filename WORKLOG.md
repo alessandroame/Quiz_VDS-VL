@@ -16,6 +16,49 @@ Questo documento registra in ordine cronologico tutte le lavorazioni svolte nel 
 
 ---
 
+### [2026-09-29] - Ristrutturazione Impostazioni ad Accordion Compresso Singolo (Fase 8.3)
+- **Cosa abbiamo fatto**:
+  - **Refactoring Architetturale di `SettingsModal.tsx` ([src/components/SettingsModal.tsx](file:///c:/github/Quiz_VDS-VL/src/components/SettingsModal.tsx))**:
+    * Sostituita la precedente barra orizzontale di navigazione a pillole/tabs con scorrimento (`sticky top-14`, `overflow-x-auto`) con un **layout compatto ad accordion verticale a pannello singolo aperto**.
+    * Implementato il componente riutilizzabile `AccordionCard`:
+      - Header interattivo con supporto mouse e touch ad alta densità (`p-3.5 sm:p-4`).
+      - Icona tematica colorata per ciascuna sezione (`Palette`, `Volume2`, `Car`, `Cloud`, `Database`, `Info`).
+      - Titolo chiaro della sezione e **badge dinamico di anteprima dello stato attivo** (es. `Auto • Feedback ON`, `Giuseppe • 1x • TTS Web`, `Radio ON • 5s`, `Manuale`, `504 Quiz • Dexie SSOT`, `v1.0.0 • AeCI`).
+      - Indicatore a freccia `ChevronDown` animato (rotazione fluida a 180° in espansione).
+      - Area interna a scomparsa con transizioni pulite, zero salti di layout e preservazione integrale dei controlli esistenti.
+    * Applicata la **regola ferrea di mutua esclusione**: l'apertura di un pannello espande la sezione richiesta e chiude all'istante qualunque altro pannello precedentemente aperto (`openSection: SettingsTab | null`).
+    * Implementata la possibilità di **collasso totale**: cliccando sull'header della sezione già aperta o cliccando sul pulsante contestuale di testata `"Comprimi tutto"`, tutti i 6 pannelli si chiudono consentendo una panoramica ultracompatta a una sola schermata senza scorrimento.
+    * Aggiunta una toolbar di controllo discreta in cima all'elenco dei pannelli: conteggio sezioni attive ("Pannelli di Controllo • 6 sezioni configurabili") e pulsante di commutazione rapida `"Comprimi tutto"` / `"Espandi prima"`.
+    * Garantita la **piena retrocompatibilità**: preservati tutti gli identificatori DOM storici (`#tab-appearance`, `#tab-voice`, `#tab-drive`, `#tab-cloud`, `#tab-data`, `#tab-about`, `#btn-close-settings`, `#btn-toggle-fullscreen`, ecc.) per non rompere alcuno script o test automatizzato.
+  - **Aggiornamento e Creazione Suite di Collaudo Automatizzato**:
+    * Creato lo script dedicato [scripts/test_settings_accordion.cjs](file:///c:/github/Quiz_VDS-VL/scripts/test_settings_accordion.cjs) su Chrome DevTools Protocol (CDP):
+      - Verifica l'inizializzazione con 6 card di impostazioni e la prima scheda (Aspetto) aperta di default.
+      - Verifica il collasso totale tramite il pulsante `"Comprimi tutto"` e l'espansione tramite `"Espandi prima"`.
+      - Verifica la mutua esclusione: cliccando su Voce si espande Voce e si chiude Aspetto; cliccando su Guida si espande Guida e si chiude Voce.
+      - Verifica i contenuti della sezione About (database 504 quiz, regole esame AeCI, D.P.R. 133/2010).
+      - Verifica la reattività desktop a 1440x900 con la sezione Guida aperta.
+      - Asserisce 0 errori in console JavaScript del browser.
+    * Aggiornati gli script di collaudo pre-esistenti:
+      - [scripts/test_settings_fullscreen.js](file:///c:/github/Quiz_VDS-VL/scripts/test_settings_fullscreen.js): integrato auto-start e cleanup del server Vite preview per esecuzione standalone affidabile. Test superato al 100%.
+      - [scripts/test_settings_about.js](file:///c:/github/Quiz_VDS-VL/scripts/test_settings_about.js): integrato auto-start e cleanup del server Vite preview. Test superato al 100%.
+      - [scripts/test_drive_intro.js](file:///c:/github/Quiz_VDS-VL/scripts/test_drive_intro.js): allineato il reset di Dexie con `audioOfflinePromptDismissed: true` per prevenire il mascheramento del banner intro da parte del prompt audio offline. Test superato al 100%.
+    * Acquisiti nuovi screenshot di verifica visiva in `public/`:
+      - [public/test_settings_accordion_mobile_open.png](file:///c:/github/Quiz_VDS-VL/public/test_settings_accordion_mobile_open.png): prima sezione aperta con badge attivo e 5 sezioni compatte.
+      - [public/test_settings_accordion_mobile_all_collapsed.png](file:///c:/github/Quiz_VDS-VL/public/test_settings_accordion_mobile_all_collapsed.png): tutti i 6 pannelli compressi a colpo d'occhio.
+      - [public/test_settings_accordion_desktop.png](file:///c:/github/Quiz_VDS-VL/public/test_settings_accordion_desktop.png): resa fluida ed ergonomica a 1440x900.
+  - **Verifiche di Qualità del Codice**:
+    * Type check rigoroso superato: `npx tsc --noEmit` (0 errori).
+    * Test unitari superati: 15 suite e 131 test passati (`npm run test:unit`).
+    * Build di produzione completata con successo (`npm run build`).
+- **Scelte architetturali & Rationale**:
+  - *Single-Open Mutual Exclusion vs Multi-Open Accordion*: Consentire l'apertura simultanea di più sezioni avrebbe ricreato il problema di lunghe pagine verticali caotiche e disorientanti su schermi piccoli (smartphone). La mutua esclusione rigida (`openSection: SettingsTab | null`) combinata con il collasso totale offre invece la massima densità informativa e immediatezza cognitiva: l'allievo vede sempre dove si trova, vede i valori correnti a colpo d'occhio grazie ai live badges e apre solo la sezione che desidera modificare.
+  - *Live Preview Badges*: L'inserimento di pillole riassuntive dinamiche nell'header di ciascuna sezione chiusa (es. visualizzare l'istruttore corrente o il tema attivo senza dover espandere la card) trasforma l'accordion in una dashboard di sintesi dello stato dell'applicazione.
+  - *Idempotent Backward Compatibility*: Mantenere `id="tab-{id}"` sui bottoni dell'accordion garantisce che qualsiasi test E2E o interazione da codice che selezionava le schede continui a funzionare senza modifiche o regressioni.
+- **Impatto sul Desiderata**:
+  - Soddisfatto al 100% l'Obiettivo 3 di Fase 8 ([DESIDERATA.md](file:///c:/github/Quiz_VDS-VL/DESIDERATA.md) Sezione 2.8 e [TODO.md](file:///c:/github/Quiz_VDS-VL/TODO.md)).
+
+---
+
 ### [2026-09-29] - Barra di Navigazione Quiz Ancorata in Basso (Fase 8.5) & Ergonomia Mobile ad Una Mano
 - **Cosa abbiamo fatto**:
   - **Componente Reattivo e Modulare `QuizBottomBar` ([src/components/QuizBottomBar.tsx](file:///c:/github/Quiz_VDS-VL/src/components/QuizBottomBar.tsx))**:
