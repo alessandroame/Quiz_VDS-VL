@@ -27,8 +27,8 @@ export const DEFAULT_SETTINGS: AppSettings = {
   driveModeIntroPlayed: false,
   audioOfflinePromptDismissed: false,
   driveModeTutor: false,
-  disciplinePreference: 'all',
-  disciplineOnboardingDone: false,
+  disciplinePreference: 'paraglider',
+  disciplineOnboardingDone: true,
   audioAutoUpdateOnline: true,
 };
 

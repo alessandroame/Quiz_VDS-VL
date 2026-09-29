@@ -126,7 +126,7 @@ export const QuizProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, [statsList]);
 
   // Gestione filtro disciplina (All / Parapendio / Deltaplano)
-  const disciplineFilter: Discipline = settings.disciplinePreference || 'all';
+  const disciplineFilter: Discipline = settings.disciplinePreference || 'paraglider';
 
   const setDisciplineFilter = async (discipline: Discipline) => {
     await updateSetting('disciplinePreference', discipline);

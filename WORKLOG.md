@@ -14,6 +14,29 @@ Questo documento registra in ordine cronologico tutte le lavorazioni svolte nel 
 - **Impatto sul Desiderata**: <Come questo intervento contribuisce al desiderata (cfr. DESIDERATA.md) e indicazioni per il prossimo agente>
 ```
 
+### [2026-09-29] - Parapendio Default (474 Quiz) & Pulizia Cockpit Selettori Disciplina
+- **Cosa abbiamo fatto**:
+  - **Parapendio come Default Immediato**:
+    * Aggiornato `DEFAULT_SETTINGS` in `src/db/index.ts` impostando `disciplinePreference: 'paraglider'` (474 quiz: 428 comuni + 46 parapendio) e `disciplineOnboardingDone: true`.
+    * Impostato il fallback in `src/context/QuizContext.tsx` e `src/utils/discipline.ts` su `'paraglider'`.
+  - **Eliminazione Onboarding Popup**:
+    * Rimosso il modale iniziale `DisciplineOnboardingModal` ("Quale corso stai seguendo?") da `src/App.tsx` ed eliminato il file sorgente per azzerare codice morto e bundle size.
+  - **Pulizia Selettori Cockpit Inline**:
+    * Rimosso il box di selezione disciplina `[Tutti] [Parapendio] [Deltaplano]` da `src/components/ExamScreen.tsx` eliminando ingombro orizzontale e distrazioni prima di iniziare l'esame.
+    * Rimossi i selettori d'intestazione da `src/components/TopicsScreen.tsx` e `src/components/ArchiveScreen.tsx`, garantendo un'interfaccia sobria e coerente.
+  - **Gestione Centralizzata nelle Impostazioni**:
+    * Confermato il selettore `DisciplineSelector` in `src/components/SettingsModal.tsx` (scheda Aspetto & Studio) con default su Parapendio e possibilità di switch rapido a Deltaplano o Tutti i Quiz.
+  - **Testing & Collaudo Headless CDP**:
+    * Aggiornato il test unitario DB-13 in `src/db/database.test.ts` e aggiunto test DISC-07 in `src/utils/discipline.test.ts` (153/153 test superati).
+    * Eseguito collaudo visivo CDP con `scripts/test_default_paraglider_ui.cjs` verificando l'assenza del modale, l'assenza dei selettori inline, il sottotitolo corretto a 474 quiz in Archivio, la selezione di default nelle Impostazioni e 0 errori in console.
+    * Verificata la build di produzione (`tsc && vite build`).
+- **Scelte architetturali & Rationale**:
+  - *Cockpit Minimalist Philosophy*: La maggioranza degli allievi utilizza l'app per il parapendio. Rimuovere modali bloccanti e selettori sparsi in ogni schermata restituisce un'esperienza fluida e senza attriti, delegando alle Impostazioni il cambio per chi pilota deltaplani.
+- **Impatto sul Desiderata**:
+  - Piena rispondenza alla visione zero-distrazioni e alle richieste dell'allievo pilota.
+
+---
+
 ### [2026-09-29] - Audit Tecnico Completo del Codice Sorgente e Analisi Architetturale PWA
 - **Cosa abbiamo fatto**:
   - Eseguito un audit tecnico completo a 360 gradi sull'intera codebase di **VDS-VL Quiz Master**:

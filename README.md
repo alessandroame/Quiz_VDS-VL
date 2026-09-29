@@ -46,12 +46,12 @@
   - 🌐 **Tutti i Quiz (504 quesiti)**: catalogo unificato completo per chi desidera una preparazione multidisciplinare a 360°.
 - **Salvaguardia Assoluta dei Quesiti Condivisi (Zero False Exclusion)**:
   - Tutti i 428 quesiti di aerodinamica generale, meteorologia, normativa e spazi aerei (D.P.R. 133/2010), fisiopatologia, primo soccorso, sicurezza comune e strumentazione (variometro, altimetro, anemometro) rimangono tassativamente inclusi in entrambi i profili.
-- **Selettore Cockpit a Pillole & Persistenza**:
-  - Selettore ergonomico con icone e contatori dinamici presente nel launcher di **Simulazione Esame**, nello **Studio per Materie** e nell'**Archivio Completo**.
+- **Configurazione Cockpit Immediata & Zero Distrazioni**:
+  - **Parapendio Predefinito (474 quiz)**: l'applicazione si avvia all'istante configurata per il parapendio (428 comuni + 46 specifici), senza alcun popup di onboarding o interruzione all'apertura.
+  - **Schermate Operative Essenziali**: i selettori rapidi ridondanti sono stati rimossi dalle schermate principali (**Esame**, **Materie** e **Archivio**) per garantire un'esperienza di studio pulita e focalizzata.
   - Badge visivo discreto su ciascun quesito esclusivo (`Deltaplano` o `Parapendio`).
   - Integrazione con il *Fair Coverage Randomizer* per estrarre le 30 domande d'esame rispettando le 9 quote ministeriali AeCI all'interno della disciplina scelta.
-  - **Configurazione Iniziale al Primo Avvio (Onboarding Guidato)**: all'apertura dell'app per la prima volta, una modale avionica sobria ed essenziale chiede all'allievo quale corso stia frequentando (Parapendio, Deltaplano o Tutti i Quiz) per impostare immediatamente l'ambiente di studio ottimale, memorizzando la preferenza su IndexedDB senza più richiederla ai successivi avvii.
-  - Impostazione della disciplina predefinita modificabile in qualsiasi momento su IndexedDB (*Impostazioni -> Aspetto & Studio* o dal selettore rapido).
+  - **Gestione Centralizzata nelle Impostazioni**: è possibile commutare la disciplina attiva in qualsiasi momento da *Impostazioni -> Aspetto & Studio*, passando a **Deltaplano** (458 quiz) o a **Tutti i Quiz** (504 quiz).
 
 ### 3. Simulatore d'Esame & Simulazione Didattica (Tutor)
 - **Due Modalità di Simulazione Dedicate**:

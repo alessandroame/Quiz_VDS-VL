@@ -266,19 +266,16 @@ describe('Suite 4: Persistenza Dexie IndexedDB (src/db/index.ts)', () => {
     expect(reverted).toBe(false);
   });
 
-  it('DB-13: default e aggiornamento delle impostazioni disciplinePreference e disciplineOnboardingDone', async () => {
+  it('DB-13: default and update of disciplinePreference and disciplineOnboardingDone settings', async () => {
     // Act 1: default values
     const all = await getAllSettings();
-    expect(all.disciplinePreference).toBe('all');
-    expect(all.disciplineOnboardingDone).toBe(false);
+    expect(all.disciplinePreference).toBe('paraglider');
+    expect(all.disciplineOnboardingDone).toBe(true);
 
-    // Act 2: save onboarding preference
-    await setSetting('disciplinePreference', 'paraglider');
-    await setSetting('disciplineOnboardingDone', true);
+    // Act 2: switch preference to hang glider
+    await setSetting('disciplinePreference', 'hang_glider');
 
-    const updatedDisc = await getSetting('disciplinePreference', 'all');
-    const updatedDone = await getSetting('disciplineOnboardingDone', false);
-    expect(updatedDisc).toBe('paraglider');
-    expect(updatedDone).toBe(true);
+    const updatedDisc = await getSetting('disciplinePreference', 'paraglider');
+    expect(updatedDisc).toBe('hang_glider');
   });
 });

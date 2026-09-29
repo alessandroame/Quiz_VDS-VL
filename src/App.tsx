@@ -9,7 +9,6 @@ import { ArchiveScreen } from './components/ArchiveScreen';
 import { StatsScreen } from './components/StatsScreen';
 import { SettingsModal } from './components/SettingsModal';
 import { DriveModeScreen } from './components/DriveModeScreen';
-import { DisciplineOnboardingModal } from './components/DisciplineOnboardingModal';
 import { OfflineBanner } from './components/OfflineIndicator';
 import { Download, AlertTriangle, Play, ArrowRight, X } from 'lucide-react';
 import { voiceService } from './services/voiceService';
@@ -218,11 +217,6 @@ function AppContent() {
         isOpen={isDriveModeOpen}
         onClose={closeDriveMode}
         sessionContext={driveSessionContext || undefined}
-      />
-
-      {/* Onboarding Iniziale Selezione Corso (Primo Avvio) */}
-      <DisciplineOnboardingModal
-        isOpen={isSettingsLoaded && !settings.disciplineOnboardingDone}
       />
 
       {/* Modal di Avviso Cambio Pagina durante Esame Attivo */}

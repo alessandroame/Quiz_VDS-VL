@@ -38,7 +38,7 @@ export const DISCIPLINE_OPTIONS: DisciplineOption[] = [
  * Filtra le domande in base alla disciplina selezionata.
  * Le domande con discipline === 'all' (teoria generale condivisa) sono sempre incluse.
  */
-export function filterQuestionsByDiscipline(questions: Question[], discipline: Discipline = 'all'): Question[] {
+export function filterQuestionsByDiscipline(questions: Question[], discipline: Discipline = 'paraglider'): Question[] {
   if (discipline === 'all') {
     return questions;
   }

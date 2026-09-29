@@ -20,14 +20,11 @@ import { formatTime } from '../utils/timer';
 import { QuestionCard } from './QuestionCard';
 import { voiceService } from '../services/voiceService';
 import { QuizBottomBar } from './QuizBottomBar';
-import { DisciplineSelector } from './DisciplineSelector';
 
 export const ExamScreen: React.FC = () => {
   const {
     questions,
     filteredQuestions,
-    disciplineFilter,
-    setDisciplineFilter,
     statsMap,
     saveExam,
     recordAnswer,
@@ -322,26 +319,6 @@ export const ExamScreen: React.FC = () => {
   if (examState === 'idle') {
     return (
       <div className="max-w-2xl mx-auto px-4 py-4 space-y-4">
-        {/* Selettore Disciplina d'Esame */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 p-3 bg-zinc-900 border border-zinc-800 rounded-xl light:bg-white light:border-slate-200">
-          <div className="text-xs">
-            <span className="font-bold text-zinc-200 light:text-slate-800">Disciplina:</span>
-            <span className="text-zinc-400 light:text-slate-500 ml-1.5 hidden sm:inline">
-              {disciplineFilter === 'all'
-                ? 'Tutti i 504 quiz (Deltaplano e Parapendio)'
-                : disciplineFilter === 'paraglider'
-                ? '474 quiz (Parapendio e teoria comune)'
-                : '458 quiz (Deltaplano e teoria comune)'}
-            </span>
-          </div>
-          <DisciplineSelector
-            value={disciplineFilter}
-            onChange={setDisciplineFilter}
-            size="sm"
-            idPrefix="exam-discipline"
-          />
-        </div>
-
         {/* Selezione Modalità */}
         <div className="space-y-4">
           {/* Opzione 1: Simulazione Didattica (Tutor) - In Evidenza per l'apprendimento */}

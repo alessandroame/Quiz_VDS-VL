@@ -18,7 +18,6 @@ import {
 import { useQuiz } from '../context/QuizContext';
 import { useAviationVoice } from '../hooks/useAviationVoice';
 import type { Question } from '../types/quiz';
-import { DisciplineSelector } from './DisciplineSelector';
 import { getDisciplineBadge } from '../utils/discipline';
 
 interface ArchiveItemProps {
@@ -447,7 +446,7 @@ const ArchiveItem: React.FC<ArchiveItemProps> = ({ question: q, isExpanded, onTo
 };
 
 export const ArchiveScreen: React.FC = () => {
-  const { questions, statsMap, disciplineFilter, setDisciplineFilter, subjectsAnalytics } = useQuiz();
+  const { questions, statsMap, disciplineFilter, subjectsAnalytics } = useQuiz();
 
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedSubject, setSelectedSubject] = useState<number | 'all'>('all');
@@ -490,23 +489,15 @@ export const ArchiveScreen: React.FC = () => {
 
   return (
     <div className="max-w-2xl mx-auto px-4 py-6 space-y-4">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-        <div>
-          <h1 className="text-xl font-bold tracking-tight">Archivio Completo</h1>
-          <p className="text-xs text-zinc-400 light:text-slate-600">
-            {disciplineFilter === 'all'
-              ? 'Tutti i 504 quiz ufficiali AeCI: cerca, leggi e ascolta qualsiasi domanda'
-              : disciplineFilter === 'paraglider'
-              ? '474 quiz: Parapendio e teoria comune (esclusi 30 deltaplano)'
-              : '458 quiz: Deltaplano e teoria comune (esclusi 46 parapendio)'}
-          </p>
-        </div>
-        <DisciplineSelector
-          value={disciplineFilter}
-          onChange={setDisciplineFilter}
-          size="sm"
-          idPrefix="archive-discipline"
-        />
+      <div>
+        <h1 className="text-xl font-bold tracking-tight">Archivio Completo</h1>
+        <p className="text-xs text-zinc-400 light:text-slate-600">
+          {disciplineFilter === 'all'
+            ? 'Tutti i 504 quiz ufficiali AeCI: cerca, leggi e ascolta qualsiasi domanda'
+            : disciplineFilter === 'paraglider'
+            ? '474 quiz: Parapendio e teoria comune (esclusi 30 deltaplano)'
+            : '458 quiz: Deltaplano e teoria comune (esclusi 46 parapendio)'}
+        </p>
       </div>
 
       {/* Barra di Ricerca */}

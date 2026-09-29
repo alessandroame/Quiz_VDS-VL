@@ -370,10 +370,11 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
     }
   };
 
+  const currentDiscipline = settings.disciplinePreference || 'paraglider';
   const disciplineLabel =
-    settings.disciplinePreference === 'paraglider'
+    currentDiscipline === 'paraglider'
       ? 'Parapendio'
-      : settings.disciplinePreference === 'hang_glider'
+      : currentDiscipline === 'hang_glider'
       ? 'Deltaplano'
       : 'Tutti';
 
@@ -603,7 +604,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                     </span>
                   </div>
                   <DisciplineSelector
-                    value={settings.disciplinePreference || 'all'}
+                    value={settings.disciplinePreference || 'paraglider'}
                     onChange={val => updateSetting('disciplinePreference', val)}
                     size="sm"
                     idPrefix="setting-discipline"

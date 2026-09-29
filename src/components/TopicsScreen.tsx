@@ -9,14 +9,11 @@ import type { Question } from '../types/quiz';
 import { useQuiz } from '../context/QuizContext';
 import { QuestionCard } from './QuestionCard';
 import { QuizBottomBar } from './QuizBottomBar';
-import { DisciplineSelector } from './DisciplineSelector';
 
 export const TopicsScreen: React.FC = () => {
   const {
     questions,
     filteredQuestions,
-    disciplineFilter,
-    setDisciplineFilter,
     statsMap,
     recordAnswer,
     subjectsAnalytics,
@@ -228,19 +225,11 @@ export const TopicsScreen: React.FC = () => {
   // --- Vista Elenco 9 Materie ---
   return (
     <div className="max-w-2xl mx-auto px-4 py-6 space-y-5">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-        <div>
-          <h1 className="text-xl font-bold tracking-tight">Materie Ufficiali</h1>
-          <p className="text-xs text-zinc-400 light:text-slate-600">
-            9 argomenti codificati AeCI VDS-VL
-          </p>
-        </div>
-        <DisciplineSelector
-          value={disciplineFilter}
-          onChange={setDisciplineFilter}
-          size="sm"
-          idPrefix="topics-discipline"
-        />
+      <div>
+        <h1 className="text-xl font-bold tracking-tight">Materie Ufficiali</h1>
+        <p className="text-xs text-zinc-400 light:text-slate-600">
+          9 argomenti codificati AeCI VDS-VL
+        </p>
       </div>
 
       <div className="grid grid-cols-1 gap-3">

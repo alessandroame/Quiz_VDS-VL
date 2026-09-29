@@ -88,4 +88,10 @@ describe('Suite 16: Discipline Filtering & Tagging Logic', () => {
     expect(pgBadge).not.toBeNull();
     expect(pgBadge?.label).toBe('Parapendio');
   });
+
+  it('DISC-07: filterQuestionsByDiscipline defaults to paraglider (474 questions) when parameter is omitted', () => {
+    const defaultFiltered = filterQuestionsByDiscipline(allQuestions);
+    expect(defaultFiltered.length).toBe(474);
+    expect(defaultFiltered.some(q => q.discipline === 'hang_glider')).toBe(false);
+  });
 });
