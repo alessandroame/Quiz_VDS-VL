@@ -14,6 +14,58 @@ Questo documento registra in ordine cronologico tutte le lavorazioni svolte nel 
 - **Impatto sul Desiderata**: <Come questo intervento contribuisce al desiderata (cfr. DESIDERATA.md) e indicazioni per il prossimo agente>
 ```
 
+# Registro di Bordo: TODO-06 Impostazione Dimensione Font (Font Scaling / Outdoor Comfort)
+
+- **Data**: 2026-09-29
+- **Autore/Agente**: Antigravity Cockpit Specialist
+- **Tipo di Intervento**: `feat(settings)`
+- **Argomento**: 3 scale carattere ergonomiche (Compatto 14px, Normale 16px, Grande/Outdoor 18px), persistenza in Dexie e adattamento proporzionale senza distorsione di layout.
+
+---
+
+### 1. Cosa abbiamo fatto
+- **Tipizzazione e Persistenza Schema Dexie (`src/types/database.ts`, `src/db/index.ts`)**:
+  - Aggiunto il tipo `FontSizePreference = 'compact' | 'normal' | 'large'`.
+  - Integrata la proprietà `fontSizePreference` nell'interfaccia `AppSettings` e in `DEFAULT_SETTINGS` (con default `'normal'`).
+- **Modulo Puro Font Size Scaling (`src/utils/fontSize.ts`)**:
+  - Definite le costanti `FONT_SIZE_OPTIONS`:
+    * `compact`: `Compatto (14px)` - Ideale per smartphone compatti e zero-scroll.
+    * `normal`: `Normale (16px)` - Dimensione standard bilanciata.
+    * `large`: `Grande / Outdoor (18px)` - Alta leggibilità da manubrio bici o con guanti.
+  - Funzioni pure `getFontSizeLabel` e `applyFontSizePreference` (imposta l'attributo `data-font-size` sul nodo root `document.documentElement`).
+- **Suite di Test Vitest (`src/utils/fontSize.test.ts`)**:
+  - Creata Suite 20 con 6 test unitari passanti al 100% (validazione opzioni, fallback e simulazione manipolazione DOM).
+- **Integrazione CSS & HTML (`src/index.css`, `index.html`)**:
+  - Definite regole per `html[data-font-size="compact"]` (14px), `html[data-font-size="normal"]` (16px) e `html[data-font-size="large"]` (18px).
+  - Poiché Tailwind CSS impiega unità `rem` per tipografia e spaziature, il ridimensionamento della radice scala l'intera interfaccia in modo perfettamente armonico e proporzionale.
+  - Aggiunto `data-font-size="normal"` nativo in `index.html` per azzerare qualsiasi Cumulative Layout Shift (CLS) prima dell'idratazione.
+- **Aggancio Reattivo in `App.tsx` & Selettore in `SettingsModal.tsx`**:
+  - In `src/App.tsx`, aggiunto `useEffect` per sincronizzare in tempo reale l'attributo `data-font-size` non appena l'utente modifica l'impostazione.
+  - In `src/components/SettingsModal.tsx`, aggiunta la griglia a 3 opzioni nella scheda "Aspetto & Tema" con indicatore live, badge di riepilogo nell'accordion (`Auto • Normale • Feedback ON`) e pulsanti ad alto contrasto.
+- **Collaudo Visivo CDP Headless**:
+  - Aperto il pannello Impostazioni in headless Chrome (390x844): verificata la visualizzazione corretta della scheda, l'evidenziazione della scelta attiva e 0 errori in console.
+  - Tutti i 182 test unitari Vitest su 20 suite superati con successo.
+
+---
+
+### 2. Scelte Architetturali & Rationale
+- **Root Rem Scaling vs Inline Overrides**: Scalare la dimensione del carattere agendo su `font-size` del tag radice `<html>` permette a Tailwind CSS di scalare tipografia, padding e line-height contemporaneamente e senza override invasivi classe per classe, prevenendo overflow o sovrapposizioni.
+- **Massima Ergonomia Outdoor**: Per allievi che ripassano con il telefono montato sul manubrio della mountain bike o che corrono all'aperto, il livello `Grande (18px)` aumenta nettamente la leggibilità a distanza di braccio teso.
+
+---
+
+### 3. Impatto sul Desiderata
+- Completa con successo **TODO-06** della roadmap Cockpit V2 in [DESIDERATA.md](file:///d:/Github/Quiz_VDS-VL/DESIDERATA.md).
+- **TUTTI I 6 PUNTI DELLA ROADMAP COCKPIT V2 SONO ORA AL 100% COMPLETATI E CERTIFICATI DA TEST E SCREENSHOT**:
+  1. TODO-01: Potatura Radicale del Deltaplano (Focus 100% Parapendio, 474 quiz)
+  2. TODO-02: Architettura "Home Hub + Back Navigation"
+  3. TODO-03: Modalità Audio (Hands-Free) & Macro-Target Bici/Corsa con haptics
+  4. TODO-04: Layout Zero-Scroll e Ottimizzazione Spaziale
+  5. TODO-05: Archivio con Ricerca Rapida Senza Tastiera (#ID Pad, Materie 01-09, Chips)
+  6. TODO-06: Impostazione Dimensione Font (Font Scaling / Outdoor Comfort)
+
+---
+
 # Registro di Bordo: TODO-05 Archivio con Ricerca Rapida Senza Tastiera
 
 - **Data**: 2026-09-29

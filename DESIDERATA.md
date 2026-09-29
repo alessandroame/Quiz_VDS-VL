@@ -154,7 +154,7 @@ Questo documento rappresenta la **bussola strategica e funzionale** del progetto
 | Modalità Audio (Audiolibro Hands-Free) & Switch Universale | 🟢 Completato | Riconcettualizzazione da "Modalità Guida" a "Modalità Audio" con pulsante `AUDIO` accessibile in qualunque quiz (Navbar e header di Tutor, Materie, Esame, Errori) per passare al volo all'ascolto senza perdere lo stato. |
 | Ricerca Rapida No-Keyboard nell'Archivio | 🟢 Completato | Tastierino materie `01`-`09` + `TUTTE`, filtri stato a 1 tocco (`Tutte`, `Non viste`, `Errate`, `Preferiti`, `Note`) con conteggi live, 7 quick chips tematiche e pad numerico rapido `#ID` per salto istantaneo senza invocare la tastiera dello smartphone. |
 | Macro-Target Tattili per Bici/Corsa (Modalità Audio) | 🟢 Completato | 3 macro-fasce a tutta larghezza con altezza minima 78-85px, badge numerici 44-56px, feedback aptico `navigator.vibrate` e zero elementi affiancati per uso con vibrazioni da manubrio o corsa. |
-| Impostazione Dimensione Font (Font Scaling) | 🟡 In Roadmap (TODO) | Selezione rapida 3 scale carattere (`Compatto` 13px per piccoli schermi, `Normale` 15px standard, `Grande/Outdoor` 17-18px per manubrio a braccio teso). |
+| Impostazione Dimensione Font (Font Scaling) | 🟢 Completato | 3 scale carattere ergonomiche (`Compatto` 14px per smartphone compatti e zero-scroll, `Normale` 16px bilanciato, `Grande/Outdoor` 18px per manubrio a braccio teso o guanti), persistenza in Dexie (`fontSizePreference: 'compact' | 'normal' | 'large'`) e applicazione fluida via CSS rem root senza distorsioni di layout. |
 
 ---
 
@@ -183,10 +183,10 @@ Questa roadmap sintetizza il piano di riorganizzazione per massimizzare l'usabil
    - Filtri di stato a tocco singolo (`Tutte`, `Non viste`, `Errate`, `Preferiti`, `Note`) con badge dei conteggi in tempo reale.
    - Quick chips per concetti frequenti (*Vento*, *Stallo*, *Efficienza*, *Precedenze*, *Spazio Aereo*, *Termica*, *Nubi*).
    - Pad numerico rapido `#ID` per salto diretto ed espansione automatica del quiz senza aprire la tastiera virtuale dello smartphone.
-6. **TODO-06: Impostazione Dimensione Font (Font Scaling / Outdoor Comfort)**:
-   - 3 livelli di scala carattere selezionabili (`Compatto`, `Normale`, `Grande/Outdoor`).
+6. **TODO-06: Impostazione Dimensione Font (Font Scaling / Outdoor Comfort)** `[COMPLETATO]`:
+   - 3 livelli di scala carattere selezionabili (`Compatto` 14px, `Normale` 16px, `Grande/Outdoor` 18px).
    - Persistenza in Dexie (`fontSizePreference: 'compact' | 'normal' | 'large'`).
-   - Adattamento fluido dei layout zero-scroll per preservare la visibilità completa dei testi anche a font maggiorato.
+   - Adattamento fluido dei layout zero-scroll via CSS `rem` proporzionale per preservare la visibilità completa dei testi anche a font maggiorato.
 
 ---
 
