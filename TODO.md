@@ -219,27 +219,44 @@ Questa sezione raccoglie le nuove funzionalità e i miglioramenti di interfaccia
   - [x] Verificato con suite automatizzata `scripts/test_quiz_bottom_bar.cjs` su CDP headless a 390x844 (mobile portrait), 844x390 (mobile landscape) e 1440x900 (desktop): bottom bar agganciata con precisione sub-pixel, 0 shift su scroll di 300px, avanzamento tutor fluido e 0 errori in console browser.
 
 ### 6. Modalità Tutor Didattica nella Modalità Alla Guida (Hands-Free Voice Tutor)
-- [ ] **Flusso Didattico Vocale Esteso**:
-  - In modalità standard, il Pilota Automatico legge domanda, opzioni e, dopo la risposta o lo scadere del timer, pronuncia la sola risposta corretta avanzando al quiz successivo.
-  - In **Modalità Guida Tutor**, il motore vocale neurale non si limita alla risposta corretta, ma **legge ad alta voce la spiegazione didattica essenziale completa**:
+- [x] **Flusso Didattico Vocale Esteso**:
+  - [x] In modalità standard, il Pilota Automatico legge domanda, opzioni e, dopo la risposta o lo scadere del timer, pronuncia la sola risposta corretta avanzando al quiz successivo.
+  - [x] In **Modalità Guida Tutor**, il motore vocale neurale non si limita alla risposta corretta, ma **legge ad alta voce la spiegazione didattica essenziale completa**:
     - 📘 **Regola**: principio fisico, aerodinamico o norma di legge alla base del quesito.
     - ⚠️ **Tranello**: bias cognitivo o ambiguità lessicale da evitare.
-- [ ] **Sincronizzazione Intelligente del Pilota Automatico**:
-  - Nel ciclo automatico, il passaggio al quiz successivo attende tassativamente la **conclusione della lettura vocale della spiegazione didattica** (`onEnd`), lasciando una pausa di assimilazione calibrata (es. 3 secondi) prima di procedere.
-  - Nel ciclo manuale con comandi vocali, l'allievo può pronunciare *"Avanti"*, *"Prossima"* o toccare lo schermo per avanzare con i propri ritmi.
-- [ ] **Interfaccia HUD Cockpit a Zero-Scroll (Viewport 100dvh)**:
-  - Visualizzazione delle card didattiche compatte **Regola** e **Tranello** ad altissima leggibilità direttamente nell'area centrale dell'HUD durante la fase di debriefing della domanda, senza generare barre di scorrimento e rispettando il vincolo rigido `100dvh` della Modalità Guida.
-- [ ] **Controlli Dedicati & Comandi Vocali**:
-  - Toggle rapido **[Tutor ON/OFF]** collocato:
-    - Nel Launcher iniziale della Modalità Guida (`src/components/DriveModeScreen.tsx`);
-    - Nell'HUD superiore a 1 tocco durante la guida attiva;
-    - Nel Quick Speech Menu della Navbar e nelle Impostazioni (scheda Guida).
-  - Estensione del parser dei comandi vocali (`src/utils/voiceCommandParser.ts`):
-    - Comando *"Spiega"* o *"Regola"* per ascoltare la spiegazione on-demand anche con modalità tutor disattivata.
-    - Comandi *"Attiva Tutor"* / *"Disattiva Tutor"* per commutare al volo lo stato durante la guida.
-- [ ] **Suite di Test & Collaudo Visivo Headless**:
-  - Unit test in Vitest per il ciclo a stati della guida in modalità tutor e per il parsing dei nuovi comandi vocali.
-  - Collaudo visivo headless CDP su viewport Mobile Portrait (390x844) e Mobile Landscape (844x390) con assenza di overflow e 0 errori in console.
+- [x] **Sincronizzazione Intelligente del Pilota Automatico**:
+  - [x] Nel ciclo automatico, il passaggio al quiz successivo attende tassativamente la **conclusione della lettura vocale della spiegazione didattica** (`onEnd`), lasciando una pausa di assimilazione calibrata (2.5 secondi con countdown live) prima di procedere.
+  - [x] Nel ciclo manuale con comandi vocali, l'allievo può pronunciare *"Avanti"*, *"Prossima"* o toccare lo schermo per avanzare con i propri ritmi.
+- [x] **Interfaccia HUD Cockpit a Zero-Scroll (Viewport 100dvh)**:
+  - [x] Visualizzazione delle card didattiche compatte **Regola** e **Tranello** ad altissima leggibilità direttamente nell'area centrale dell'HUD (`#drive-didactic-card`) durante la fase di debriefing della domanda, senza generare barre di scorrimento e rispettando il vincolo rigido `100dvh` della Modalità Guida (opzioni compattate ergonomicamente a fascia sottile).
+- [x] **Controlli Dedicati & Comandi Vocali**:
+  - [x] Toggle rapido **[Tutor ON/OFF]** collocato:
+    - Nel Launcher iniziale della Modalità Guida (`#btn-drive-toggle-tutor-launcher`);
+    - Nell'HUD superiore a 1 tocco durante la guida attiva (`#btn-drive-tutor-toggle`);
+    - Nel Quick Speech Menu della Navbar (`#quick-menu-toggle-tutor`) e nelle Impostazioni (scheda Guida: `#setting-drive-tutor-toggle`).
+  - [x] Estensione del parser dei comandi vocali (`src/utils/voiceCommandParser.ts`):
+    - Comando *"Spiega"*, *"Regola"*, *"Tranello"*, *"Perché"* per ascoltare la spiegazione on-demand anche con modalità tutor disattivata.
+    - Comandi *"Attiva Tutor"* / *"Disattiva Tutor"* / *"Tutor"* per commutare al volo lo stato durante la guida.
+    - Normalizzazione Unicode NFD per garantire che le vocali accentate italiane (`perché`, `modalità`) siano riconosciute con word boundary regex.
+- [x] **Suite di Test & Collaudo Visivo Headless**:
+  - [x] Unit test in Vitest per comandi vocali didattici e toggle tutor (`src/utils/voiceCommandParser.test.ts`: test cases `VC-08` e `VC-09`).
+  - [x] Collaudo visivo headless CDP con script dedicato `scripts/test_drive_tutor.js` su viewport Mobile Portrait (390x844) che ha certificato: comparsa della scheda didattica `#drive-didactic-card`, pulsante Riascolta, zero-scroll garantito (`scrollHeight: 844, innerHeight: 844`) e 0 errori in console browser.
+
+### 7. Analisi & Risoluzione Interruzione Spiegazione Vocale su Risposta Errata
+- [x] **Indagine Root Cause e Diagnosi Tecnica**:
+  - [x] **Causa Primaria Identificata in Modalità Alla Guida (`src/components/DriveModeScreen.tsx`)**:
+    * Quando l'allievo selezionava una risposta errata o scadeva il countdown di risposta, veniva invocato `playExplanation()` per avviare il file audio `{qid}_e.mp3` che recita: *"Risposta errata. La risposta esatta è [la due: ...]. Regola: [...]. Tranello: [...]"* (durata audio: 12-25 secondi).
+    * Contemporaneamente, il timer rigido cablato a 3.5s (`setTimeout(..., 3500)`) scattava prematuramente troncando la voce proprio all'inizio di Regola e Tranello.
+- [x] **Piano di Risoluzione Architetturale**:
+  - [x] **Avanzamento Event-Driven del Pilota Automatico (`onEnd`)**:
+    * Sostituito il timer rigido: implementato listener reattivo su `isExplanationPlaying` / `isPartPlaying('explanation')` che rileva la conclusione effettiva dell'audio.
+    * Integrata una pausa di assimilazione temporizzata a 2.5 secondi con countdown visivo `Prossima in Xs` nell'HUD, e safety guard a 4.5s in caso di assenza file audio.
+  - [x] **Controllo Interruzione Manuale Utente**:
+    * Preservata la facoltà per l'allievo di saltare la spiegazione anticipatamente con comando vocale (*"Avanti"*) o tocco del pulsante Successiva senza bloccare l'interfaccia.
+- [x] **Suite di Test & Collaudo Visivo**:
+  - [x] Test unitari 15/15 suite passate (133/133 test).
+  - [x] Collaudo E2E headless confermato tramite `npm run test:visual:tutor` con zero errori di console e perfetto debriefing didattico.
+
 
 
 

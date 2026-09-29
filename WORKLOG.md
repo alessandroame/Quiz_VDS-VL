@@ -16,6 +16,58 @@ Questo documento registra in ordine cronologico tutte le lavorazioni svolte nel 
 
 ---
 
+### [2026-09-29] - Implementazione Modalità Tutor Didattica e Risoluzione Interruzione Spiegazione Vocale nella Modalità Alla Guida (Fase 8.6 & 8.7)
+- **Cosa abbiamo fatto**:
+  - **Estensione dello Schema Database & Impostazioni**:
+    * In [src/types/database.ts](file:///c:/github/Quiz_VDS-VL/src/types/database.ts): aggiunto `driveModeTutor?: boolean` a `AppSettings`.
+    * In [src/db/index.ts](file:///c:/github/Quiz_VDS-VL/src/db/index.ts): impostato `driveModeTutor: false` in `DEFAULT_SETTINGS`.
+  - **Potenziamento del Parser Comandi Vocali (`voiceCommandParser.ts`)**:
+    * In [src/utils/voiceCommandParser.ts](file:///c:/github/Quiz_VDS-VL/src/utils/voiceCommandParser.ts): aggiunti i comandi vocali `'explain'`, `'tutor_on'`, `'tutor_off'`, `'toggle_tutor'`.
+    * Normalizzazione Unicode NFD (`.normalize('NFD').replace(/[\u0300-\u036f]/g, '')`) per consentire il funzionamento rigoroso dei word boundaries regex `\b` su parole italiane accentate (*"perché"*, *"modalità"*).
+    * Precedenza dei comandi Tutor rispetto a comandi generici per prevenire collisioni (es. *"avvia tutor"* non viene più confuso con *"avvia"*).
+    * Test unitari estesi in [src/utils/voiceCommandParser.test.ts](file:///c:/github/Quiz_VDS-VL/src/utils/voiceCommandParser.test.ts) (casi `VC-08` e `VC-09`), con 133/133 test Vitest passati.
+  - **Controlli UI & Toggle a 1 Tocco Multicanale**:
+    * In [src/components/VoiceCommandsModal.tsx](file:///c:/github/Quiz_VDS-VL/src/components/VoiceCommandsModal.tsx): aggiunte le schede informative per "Spiegazione Didattica" e "Modalità Tutor".
+    * In [src/components/SettingsModal.tsx](file:///c:/github/Quiz_VDS-VL/src/components/SettingsModal.tsx): aggiunto il toggle `#setting-drive-tutor-toggle` nella sezione Guida con badge dinamico live `Tutor ON`.
+    * In [src/components/VoiceQuickMenu.tsx](file:///c:/github/Quiz_VDS-VL/src/components/VoiceQuickMenu.tsx): aggiunto il toggle rapido `#quick-menu-toggle-tutor`.
+    * In [src/components/DriveModeScreen.tsx](file:///c:/github/Quiz_VDS-VL/src/components/DriveModeScreen.tsx): integrato il toggle a tutta larghezza nel Launcher (`#btn-drive-toggle-tutor-launcher`) e il pulsante con icona `GraduationCap` nella Top Bar HUD a quiz attivo (`#btn-drive-tutor-toggle`).
+  - **Motore Sincronizzato Voice Tutor & Risoluzione Troncamento Audio (Fase 8.7)**:
+    * Eliminato il timer rigido cablato a 3.5s (`setTimeout(..., 3500)`).
+    * Sostituito con listener reattivo su `isExplanationPlaying` (`isPartPlaying('explanation')`): all'evento `ended` naturale, scatta la pausa di assimilazione calibrata a 2.5s con indicatore visivo `Prossima in Xs` nell'HUD, con safety guard a 4.5s in caso di assenza file audio.
+    * In Tutor Mode, la spiegazione (Regola + Tranello) viene riprodotta e attesa integralmente sia dopo una risposta data sia su auto-avanzamento timeout.
+  - **Layout Cockpit Zero-Scroll (`100dvh`)**:
+    * Quando la domanda viene rivelata (`isCurrentRevealed`), le 3 opzioni passano a stile compatto a fascia sottile (`flex-none`), liberando spazio per la scheda didattica `#drive-didactic-card` (`flex-1 min-h-0`) con scroll interno personalizzato, garantendo l'assoluta assenza di barre di scorrimento sulla pagina (`scrollHeight === innerHeight === 844`).
+    * Scheda didattica arricchita con pill `Regola`, pill `Tranello`, badge live dizione vocale e pulsante `Riascolta` (`#btn-drive-replay-explanation`).
+  - **Suite di Test & Collaudo Headless CDP**:
+    * 133/133 test unitari passati su 15 suite (`npm run test:unit`).
+    * Typecheck TypeScript (`npx tsc --noEmit`) e build di produzione (`npm run build`) superati con 0 errori.
+    * Script di collaudo headless dedicato `scripts/test_drive_tutor.js` (`npm run test:visual:tutor`) che ha validato su viewport mobile 390x844 l'attivazione del tutor nel launcher, la presenza del pulsante HUD, la comparsa della scheda didattica al click sull'opzione, il perfetto zero-scroll e ZERO errori in console browser.
+- **Scelte architetturali & Rationale**:
+  - *Audio Event-Driven Synchronization vs Arbitrary Timeouts*: Le spiegazioni didattiche variano tra 10 e 25 secondi. Rimuovere il timeout fisso a 3.5s ed agganciare la transizione allo stato di fine audio reale (`ended`) elimina alla radice il troncamento della voce didattica, garantendo un'esperienza di studio naturale e completa.
+  - *Diacritics Normalization for Italian Speech*: L'analisi vocale italiana include accenti gravi e acuti (`perché`, `modalità`). `\b` in regex ASCII non riconosce i caratteri accentati come caratteri di parola (`\w`). La rimozione dei diacritici prima del matching garantisce affidabilità al 100%.
+  - *Zero-Scroll Adaptive Layout*: Invece di introdurre scorrimento verticale durante la guida (incompatibile con la sicurezza in auto), le opzioni già risposte si contraggono a pillole ergonomiche, lasciando il resto dell'altezza visibile alla scheda didattica senza causare overflow.
+- **Impatto sul Desiderata**:
+  - Pienamente realizzati e convalidati gli Obiettivi 6 e 7 di Fase 8 ([DESIDERATA.md](file:///c:/github/Quiz_VDS-VL/DESIDERATA.md) Sezione 2.7, 4 e [TODO.md](file:///c:/github/Quiz_VDS-VL/TODO.md)).
+
+---
+
+### [2026-09-29] - Integrazione Backlog & Root Cause Analysis: Interruzione Spiegazione Vocale su Risposta Errata
+- **Cosa abbiamo fatto**:
+  - Censito e formalizzato nel backlog operativo [TODO.md](file:///c:/github/Quiz_VDS-VL/TODO.md) (Fase 8, Obiettivo 7) e nel documento strategico [DESIDERATA.md](file:///c:/github/Quiz_VDS-VL/DESIDERATA.md) (Sezione 4) l'indagine e il piano di risoluzione per il troncamento della voce didattica su risposta errata:
+    * **Root Cause Identificata in Modalità Alla Guida ([src/components/DriveModeScreen.tsx](file:///c:/github/Quiz_VDS-VL/src/components/DriveModeScreen.tsx))**:
+      - Quando l'utente seleziona una risposta errata o scade il timer, `playExplanation()` avvia il file `{qid}_e.mp3` contenente la sequenza completa: *"Risposta errata. La risposta esatta è la due: [...]. Regola: [...]. Tranello: [...]"* (durata: 15-25s).
+      - Contemporaneamente, il Pilota Automatico attiva un timeout fisso cablato (`setTimeout(..., 3500)` alle righe 343 e 390).
+      - Dopo 3.5s (il tempo appena sufficiente per dire *"Risposta errata. La risposta esatta è..."*), `handleNextQuestion` viene invocato incondizionatamente, chiamando `stopVoice()` e passando alla domanda successiva, interrompendo la spiegazione didattica (**Regola** e **Tranello**) sul nascere.
+    * **Piano di Intervento Architetturale**:
+      - Sostituire il timer fisso a 3.5s con l'ascolto reattivo dell'evento `ended` dell'elemento audio o callback `onEnded` del singleton [src/services/voiceService.ts](file:///c:/github/Quiz_VDS-VL/src/services/voiceService.ts).
+      - Avanzare al quesito successivo solo dopo la conclusione dell'audio integrale (con 2-3s di pausa di assimilazione), lasciando comunque all'utente la libertà di avanzare manualmente in anticipo con tocco o comando vocale *"Avanti"*.
+- **Scelte architetturali & Rationale**:
+  - *Event-Driven Audio State vs Hardcoded Timeouts*: I file audio delle spiegazioni hanno lunghezze variabili da 10 a 25 secondi a seconda della complessità del quesito ministeriale. Un timeout cablato a 3.5s è concettualmente fallace perché basato su una stima fissa e non sullo stato reale del flusso multimediale. La gestione event-driven garantisce l'ascolto completo a qualsiasi velocità di riproduzione.
+- **Impatto sul Desiderata**:
+  - Obiettivo 7 di Fase 8 pronto per l'implementazione per assicurare la piena integrità pedagogica della voce didattica.
+
+---
+
 ### [2026-09-29] - Ristrutturazione Impostazioni ad Accordion Compresso Singolo (Fase 8.3)
 - **Cosa abbiamo fatto**:
   - **Refactoring Architetturale di `SettingsModal.tsx` ([src/components/SettingsModal.tsx](file:///c:/github/Quiz_VDS-VL/src/components/SettingsModal.tsx))**:

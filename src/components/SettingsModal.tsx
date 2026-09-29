@@ -333,7 +333,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
       : settings.driveModeAutopilot ?? true
       ? 'Radio ON'
       : 'Manuale'
-  } • ${settings.driveModeAutoAdvanceSeconds || 5}s`;
+  } • ${settings.driveModeAutoAdvanceSeconds || 5}s${settings.driveModeTutor ? ' • Tutor ON' : ''}`;
 
   const cloudSummary = `${
     settings.autoSyncDrive ? 'Auto-Sync ON' : syncState.lastSyncedAt ? 'Drive Sincronizzato' : 'Manuale'
@@ -877,6 +877,28 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                     type="checkbox"
                     checked={settings.driveModeAutopilot ?? true}
                     onChange={e => updateSetting('driveModeAutopilot', e.target.checked)}
+                    className="w-4 h-4 accent-amber-500 rounded cursor-pointer"
+                  />
+                </div>
+
+                {/* Modalità Tutor Didattica */}
+                <div className="flex items-center justify-between p-2.5 rounded-xl border border-zinc-800 bg-zinc-950/60 light:bg-slate-50 light:border-slate-200">
+                  <div>
+                    <span className="text-zinc-300 light:text-slate-700 font-medium block flex items-center gap-1.5">
+                      <span>Modalità Tutor Didattica</span>
+                      <span className="text-[10px] font-mono px-1.5 py-0.2 rounded bg-amber-500/20 text-amber-300 font-bold">
+                        REGOLA + TRANELLO
+                      </span>
+                    </span>
+                    <span className="text-[11px] text-zinc-500">
+                      Legge ad alta voce l'intera spiegazione didattica prima di avanzare alla domanda successiva
+                    </span>
+                  </div>
+                  <input
+                    id="setting-drive-tutor-toggle"
+                    type="checkbox"
+                    checked={settings.driveModeTutor ?? false}
+                    onChange={e => updateSetting('driveModeTutor', e.target.checked)}
                     className="w-4 h-4 accent-amber-500 rounded cursor-pointer"
                   />
                 </div>

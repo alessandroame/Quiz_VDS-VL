@@ -119,6 +119,13 @@
   - **Riascolto On-Demand a 1 Tocco**: pulsante dedicato `[🔊 Spiegazione Vocale]` nel Launcher della Guida e pulsante d'ascolto diretto nella scheda Comandi Vocali (`VoiceCommandsModal`).
   - **Gestione e Riattivazione nelle Impostazioni (🚗 Guida)**: card dedicata per riascoltare subito il briefing o riabilitare la riproduzione automatica al prossimo avvio della guida.
   - **Audio Neurale Offline & Fallback**: file MP3 dedicati per entrambe le voci (`giuseppe/drive_intro.mp3` ed `elsa/drive_intro.mp3`) con fallback trasparente su Web Speech API.
+- **Modalità Tutor Didattica Hands-Free (Voice Tutor Synchronized Engine)**:
+  - **Spiegazione Didattica Integrale a Voce**: Invece di limitarsi a indicare la sola risposta esatta, il Tutor pronuncia ad alta voce l'intera scheda didattica (la **Regola** fisica o normativa e il **Tranello** da evitare) dopo ogni risposta selezionata o dopo lo scadere del timer di risposta.
+  - **Sincronizzazione Event-Driven col Pilota Automatico**: L'avanzamento automatico al quiz successivo attende tassativamente la conclusione naturale dell'audio (`ended`), lasciando una pausa di assimilazione temporizzata a 2.5 secondi (con indicatore live `Prossima in Xs` nell'HUD), eliminando qualsiasi interruzione prematura della dizione.
+  - **Interfaccia HUD Cockpit a Zero-Scroll (`100dvh`)**: Quando la domanda viene rivelata, le 3 macro-opzioni si compattano ergonomicamente a fascia sottile per fare spazio alla Scheda Didattica `#drive-didactic-card` con pulsante `Riascolta`, mantenendo il layout rigorosamente bloccato all'altezza dello schermo senza barre di scorrimento né layout shift.
+  - **Accessibilità a 1 Tocco & Comandi Vocali Dedicati**:
+    * Toggle rapido `[Tutor ON/OFF]` nel Launcher iniziale (`#btn-drive-toggle-tutor-launcher`), nella Top Bar HUD a quiz attivo (`#btn-drive-tutor-toggle`), nel Quick Speech Menu della Navbar e nelle Impostazioni (🚗 Guida).
+    * Nuovi comandi vocali in italiano: *"Spiega"*, *"Regola"*, *"Tranello"*, *"Perché"* per ascoltare la spiegazione on-demand; *"Attiva Tutor"*, *"Disattiva Tutor"*, *"Tutor"* per commutare la modalità al volo mentre si guida.
 
 ### 8. Motore Vocale Neurale (TTS Multi-Voce Offline) & Audio Cockpit
 - **Oltre 5.000 Segmenti Audio Neurale Pre-Generati**: catalogo audio completo memorizzato localmente e funzionante al 100% offline.

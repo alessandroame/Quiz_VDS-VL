@@ -9,7 +9,9 @@ import {
   Play,
   HelpCircle,
   Headphones,
-  Volume2
+  Volume2,
+  GraduationCap,
+  Sparkles
 } from 'lucide-react';
 
 interface VoiceCommandsModalProps {
@@ -81,6 +83,20 @@ export const VoiceCommandsModal: React.FC<VoiceCommandsModalProps> = ({
       primaryPhrase: '"Pausa" • "Stop" • "Continua"',
       alternatives: ['"Ferma"', '"Basta"', '"Attendi"', '"Riprendi"', '"Vai"'],
       description: 'Mette in pausa, ferma l\'audio (il riavvio riparte dalla domanda) o riprende la lettura.'
+    },
+    {
+      icon: <GraduationCap className="w-5 h-5 text-sky-400" />,
+      title: 'Spiegazione Didattica',
+      primaryPhrase: '"Spiega" • "Regola"',
+      alternatives: ['"Spiegami"', '"Tranello"', '"Perché"', '"Motivo"'],
+      description: 'Ascolta ad alta voce la spiegazione completa (Regola e Tranello) del quesito corrente.'
+    },
+    {
+      icon: <Sparkles className="w-5 h-5 text-amber-400" />,
+      title: 'Modalità Tutor',
+      primaryPhrase: '"Attiva Tutor" • "Tutor Off"',
+      alternatives: ['"Tutor"', '"Modalità tutor"', '"Disattiva tutor"'],
+      description: 'Abilita la lettura didattica continua sincronizzata prima dell\'avanzamento automatico.'
     },
     {
       icon: <HelpCircle className="w-5 h-5 text-indigo-400" />,

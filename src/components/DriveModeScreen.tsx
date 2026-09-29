@@ -21,7 +21,8 @@ import {
   Check,
   AlertTriangle,
   HelpCircle,
-  Square
+  Square,
+  GraduationCap
 } from 'lucide-react';
 import type { Question } from '../types/quiz';
 import type { ExamSession } from '../types/database';
@@ -64,6 +65,8 @@ interface DriveModeScreenProps {
 
 const VOICE_HINTS = [
   'Dì "Uno", "Due" o "Tre" per scegliere la risposta',
+  'Dì "Spiega" o "Regola" per ascoltare la spiegazione didattica',
+  'Dì "Attiva Tutor" o "Disattiva Tutor" per la modalità didattica',
   'Dì "Ripeti" per riascoltare l\'elemento attivo',
   'Dì "Avanti" o "Indietro" per scorrere i quesiti',
   'Dì "Pausa", "Stop" o "Continua" per il pilota automatico',
@@ -115,6 +118,21 @@ export const DriveModeScreen: React.FC<DriveModeScreenProps> = ({
   const [isVoiceCommandsEnabled, setIsVoiceCommandsEnabled] = useState<boolean>(
     settings.driveModeVoiceCommands ?? false
   );
+  const [isTutorEnabled, setIsTutorEnabled] = useState<boolean>(
+    settings.driveModeTutor ?? false
+  );
+  const [isWaitingForExplanationEnd, setIsWaitingForExplanationEnd] = useState<boolean>(false);
+  const isWaitingForExplanationEndRef = useRef<boolean>(false);
+  const [assimilationCountdown, setAssimilationCountdown] = useState<number | null>(null);
+  const assimilationTimeoutRef = useRef<any>(null);
+
+  // Sincronizza stato Tutor se aggiornato dall'esterno (es. Settings o VoiceQuickMenu)
+  useEffect(() => {
+    if (settings.driveModeTutor !== undefined) {
+      setIsTutorEnabled(settings.driveModeTutor);
+    }
+  }, [settings.driveModeTutor]);
+
   const [voiceToast, setVoiceToast] = useState<string | null>(null);
   const [waitingCountdown, setWaitingCountdown] = useState<number | null>(null);
   const [revealedQuestionId, setRevealedQuestionId] = useState<number | null>(null);
@@ -158,6 +176,8 @@ export const DriveModeScreen: React.FC<DriveModeScreenProps> = ({
   }, [isOpen, internalMode, isVoiceCommandsEnabled]);
 
   const countdownTimerRef = useRef<any>(null);
+  const handleNextQuestionRef = useRef<() => void>(() => {});
+  const handleSubmitExamRef = useRef<() => Promise<void> | void>(() => {});
   const touchStartXRef = useRef<number | null>(null);
   const touchStartYRef = useRef<number | null>(null);
 
@@ -321,6 +341,98 @@ export const DriveModeScreen: React.FC<DriveModeScreenProps> = ({
     }, 1000);
   }, [currentQ, settings.driveModeAutoAdvanceSeconds]);
 
+  // Navigazione tra le domande
+  const handleNextQuestion = useCallback(() => {
+    stopVoice();
+    if (countdownTimerRef.current) {
+      clearInterval(countdownTimerRef.current);
+      countdownTimerRef.current = null;
+    }
+    if (assimilationTimeoutRef.current) {
+      clearTimeout(assimilationTimeoutRef.current);
+      assimilationTimeoutRef.current = null;
+    }
+    setWaitingCountdown(null);
+    setAssimilationCountdown(null);
+    setIsWaitingForExplanationEnd(false);
+    isWaitingForExplanationEndRef.current = false;
+
+    if (currentIndex < totalCount - 1) {
+      const nextIdx = currentIndex + 1;
+      setCurrentIndex(nextIdx);
+      if (sessionContext) sessionContext.onNavigateIndex(nextIdx);
+    } else if (isExamSession) {
+      handleSubmitExamRef.current();
+    }
+  }, [stopVoice, currentIndex, totalCount, sessionContext, isExamSession]);
+
+  handleNextQuestionRef.current = handleNextQuestion;
+
+  const handlePrevQuestion = useCallback(() => {
+    stopVoice();
+    if (countdownTimerRef.current) {
+      clearInterval(countdownTimerRef.current);
+      countdownTimerRef.current = null;
+    }
+    if (assimilationTimeoutRef.current) {
+      clearTimeout(assimilationTimeoutRef.current);
+      assimilationTimeoutRef.current = null;
+    }
+    setWaitingCountdown(null);
+    setAssimilationCountdown(null);
+    setIsWaitingForExplanationEnd(false);
+    isWaitingForExplanationEndRef.current = false;
+
+    if (currentIndex > 0) {
+      const prevIdx = currentIndex - 1;
+      setCurrentIndex(prevIdx);
+      if (sessionContext) sessionContext.onNavigateIndex(prevIdx);
+    }
+  }, [stopVoice, currentIndex, sessionContext]);
+
+  // Gestione audio spiegazione & pausa di assimilazione in Modalità Tutor
+  const isExplanationPlaying = isPartPlaying('explanation');
+  const prevExplanationPlayingRef = useRef<boolean>(false);
+
+  const startAssimilationPause = useCallback((seconds: number = 2.5) => {
+    if (assimilationTimeoutRef.current) clearTimeout(assimilationTimeoutRef.current);
+    setAssimilationCountdown(seconds);
+
+    assimilationTimeoutRef.current = setTimeout(() => {
+      setAssimilationCountdown(null);
+      handleNextQuestionRef.current();
+    }, seconds * 1000);
+  }, []);
+
+  // Rileva quando la spiegazione vocale didattica finisce di parlare
+  useEffect(() => {
+    if (prevExplanationPlayingRef.current && !isExplanationPlaying && isWaitingForExplanationEndRef.current) {
+      isWaitingForExplanationEndRef.current = false;
+      setIsWaitingForExplanationEnd(false);
+
+      if (isAutopilotEnabled) {
+        startAssimilationPause(2.5);
+      }
+    }
+    prevExplanationPlayingRef.current = isExplanationPlaying;
+  }, [isExplanationPlaying, isAutopilotEnabled, startAssimilationPause]);
+
+  // Safety guard se l'audio della spiegazione non parte o fallisce entro 4.5s
+  useEffect(() => {
+    if (isWaitingForExplanationEnd) {
+      const guardTimer = setTimeout(() => {
+        if (isWaitingForExplanationEndRef.current && !isExplanationPlaying) {
+          isWaitingForExplanationEndRef.current = false;
+          setIsWaitingForExplanationEnd(false);
+          if (isAutopilotEnabled) {
+            handleNextQuestionRef.current();
+          }
+        }
+      }, 4500);
+      return () => clearTimeout(guardTimer);
+    }
+  }, [isWaitingForExplanationEnd, isExplanationPlaying, isAutopilotEnabled]);
+
   // Auto-rivelazione in modalità Pilota Automatico passivo (se l'utente non tocca nulla)
   const handleAutoRevealAndAdvance = useCallback(async () => {
     if (!currentQ) return;
@@ -331,26 +443,30 @@ export const DriveModeScreen: React.FC<DriveModeScreenProps> = ({
       soundFX.playClick();
     }
 
-    // Lettura spiegazione
-    playExplanation();
-
     // Registra come vista/non risposta (solo se fuori esame e senza context padre)
     if (!isExamSession && !sessionContext) {
       await recordAnswer(currentQ.id, false);
     }
 
-    // Passa alla prossima domanda dopo 3.5 secondi
-    setTimeout(() => {
-      handleNextQuestion();
-    }, 3500);
-  }, [currentQ, settings.soundEnabled, playExplanation, recordAnswer]);
+    if (isTutorEnabled) {
+      // MODALITÀ TUTOR: avvia lettura integrale e attende il completamento naturale
+      isWaitingForExplanationEndRef.current = true;
+      setIsWaitingForExplanationEnd(true);
+      playExplanation();
+    } else {
+      // MODALITÀ STANDARD: avanza dopo 3.5 secondi
+      setTimeout(() => {
+        handleNextQuestionRef.current();
+      }, 3500);
+    }
+  }, [currentQ, settings.soundEnabled, isTutorEnabled, playExplanation, recordAnswer, isExamSession, sessionContext]);
 
   // Seleziona risposta
   const handleSelectAnswer = async (ans: 1 | 2 | 3) => {
     if (!currentQ) return;
 
     // Se l'esame è già terminato o la domanda è già rivelata
-    if (answers[currentQ.id] !== undefined && !isExamSession) return;
+    if (answers[currentQ.id] !== undefined && (!isExamSession || isTutorEnabled)) return;
 
     stopVoice();
     if (countdownTimerRef.current) {
@@ -372,55 +488,32 @@ export const DriveModeScreen: React.FC<DriveModeScreenProps> = ({
       else soundFX.playWrong();
     }
 
-    if (!isExamSession) {
+    if (!isExamSession || isTutorEnabled) {
       setRevealedQuestionId(currentQ.id);
-      if (!sessionContext) {
+      if (!sessionContext && !isExamSession) {
         await recordAnswer(currentQ.id, isCorrect);
       }
 
-      if (!isCorrect) {
-        playExplanation();
+      if (isTutorEnabled) {
+        // MODALITÀ TUTOR: riproduce la spiegazione didattica (Regola + Tranello) e sincronizza l'autopilota
+        isWaitingForExplanationEndRef.current = true;
+        setIsWaitingForExplanationEnd(true);
+        setTimeout(() => {
+          playExplanation();
+        }, 300);
+        return; // L'avanzamento avverrà al termine della lettura vocale + pausa di assimilazione
+      } else {
+        if (!isCorrect && settings.ttsAutoExplainOnMistake) {
+          playExplanation();
+        }
       }
     }
 
-    // Se il pilota automatico è attivo, avanza dopo 2 secondi
+    // Se il pilota automatico è attivo (fuori da tutor mode), avanza dopo tempo standard
     if (isAutopilotEnabled) {
       setTimeout(() => {
-        handleNextQuestion();
+        handleNextQuestionRef.current();
       }, isCorrect ? 1800 : 3500);
-    }
-  };
-
-  // Navigazione
-  const handleNextQuestion = () => {
-    stopVoice();
-    if (countdownTimerRef.current) {
-      clearInterval(countdownTimerRef.current);
-      countdownTimerRef.current = null;
-    }
-    setWaitingCountdown(null);
-
-    if (currentIndex < totalCount - 1) {
-      const nextIdx = currentIndex + 1;
-      setCurrentIndex(nextIdx);
-      if (sessionContext) sessionContext.onNavigateIndex(nextIdx);
-    } else if (isExamSession) {
-      handleSubmitExam();
-    }
-  };
-
-  const handlePrevQuestion = () => {
-    stopVoice();
-    if (countdownTimerRef.current) {
-      clearInterval(countdownTimerRef.current);
-      countdownTimerRef.current = null;
-    }
-    setWaitingCountdown(null);
-
-    if (currentIndex > 0) {
-      const prevIdx = currentIndex - 1;
-      setCurrentIndex(prevIdx);
-      if (sessionContext) sessionContext.onNavigateIndex(prevIdx);
     }
   };
 
@@ -455,6 +548,10 @@ export const DriveModeScreen: React.FC<DriveModeScreenProps> = ({
       pause: 'Pausa',
       stop: 'Stop',
       resume: 'Riprendi',
+      explain: 'Spiegazione ("Spiega")',
+      tutor_on: 'Attiva Tutor',
+      tutor_off: 'Disattiva Tutor',
+      toggle_tutor: 'Tutor Didattico',
       help: 'Guida Comandi'
     };
 
@@ -510,13 +607,34 @@ export const DriveModeScreen: React.FC<DriveModeScreenProps> = ({
       } else {
         playFullSequence();
       }
+    } else if (cmd === 'explain') {
+      showToast('🗣️ "Spiega" - Regola & Tranello');
+      if (currentQ) {
+        setRevealedQuestionId(currentQ.id);
+      }
+      playExplanation();
+    } else if (cmd === 'tutor_on') {
+      showToast('🗣️ "Tutor Attivo"');
+      setIsTutorEnabled(true);
+      updateSetting('driveModeTutor', true);
+    } else if (cmd === 'tutor_off') {
+      showToast('🗣️ "Tutor Disattivato"');
+      setIsTutorEnabled(false);
+      updateSetting('driveModeTutor', false);
+    } else if (cmd === 'toggle_tutor') {
+      setIsTutorEnabled(prev => {
+        const next = !prev;
+        updateSetting('driveModeTutor', next);
+        showToast(`🗣️ Tutor ${next ? 'Attivo' : 'Disattivato'}`);
+        return next;
+      });
     } else if (cmd === 'help') {
       showToast('🗣️ "Aiuto" - Guida Comandi');
       setIsVoiceGuideOpen(true);
       setIsAutopilotEnabled(false);
       pauseVoice();
     }
-  }, [currentQ, handleSelectAnswer, handleNextQuestion, handlePrevQuestion, playFullSequence, restartCurrentOrSequence, handleToggleFlag, pauseVoice, stopVoice, resumeVoice, isPaused]);
+  }, [currentQ, handleSelectAnswer, handleNextQuestion, handlePrevQuestion, playFullSequence, restartCurrentOrSequence, handleToggleFlag, pauseVoice, stopVoice, resumeVoice, isPaused, playExplanation, updateSetting]);
 
   // Hook Comandi Vocali
   const {
@@ -582,6 +700,8 @@ export const DriveModeScreen: React.FC<DriveModeScreenProps> = ({
     setCompletedSession(session);
     setInternalMode('debriefing');
   };
+
+  handleSubmitExamRef.current = handleSubmitExam;
 
   // Keyboard Navigation per telecomandi Bluetooth da volante o tastierini
   useEffect(() => {
@@ -842,6 +962,32 @@ export const DriveModeScreen: React.FC<DriveModeScreenProps> = ({
                 <div>{isVoiceSupported ? (isVoiceCommandsEnabled ? 'ATTIVO (in sessione)' : 'Spento') : 'Non supportato'}</div>
               </div>
             </button>
+
+            {/* Toggle Modalità Tutor Didattica nel Launcher */}
+            <button
+              id="btn-drive-toggle-tutor-launcher"
+              onClick={() => {
+                const nextVal = !isTutorEnabled;
+                setIsTutorEnabled(nextVal);
+                updateSetting('driveModeTutor', nextVal);
+              }}
+              className={`col-span-2 p-2.5 rounded-xl border flex items-center justify-between text-xs font-bold transition-all ${
+                isTutorEnabled
+                  ? 'bg-amber-950/80 border-amber-500 text-amber-200 ring-1 ring-amber-500/50'
+                  : 'bg-zinc-900 border-zinc-800 text-zinc-400 hover:text-zinc-200'
+              }`}
+            >
+              <div className="flex items-center gap-2">
+                <GraduationCap className={`w-4 h-4 flex-shrink-0 ${isTutorEnabled ? 'text-amber-400' : 'text-zinc-500'}`} />
+                <div className="text-left">
+                  <div className="text-[10px] text-zinc-400 uppercase">Modalità Tutor Didattica</div>
+                  <div className="text-xs font-medium">{isTutorEnabled ? 'ATTIVA (Regola + Tranello a voce)' : 'Disattivata (Avanzamento rapido)'}</div>
+                </div>
+              </div>
+              <span className={`text-[10px] font-mono font-bold px-2 py-0.5 rounded-full ${isTutorEnabled ? 'bg-amber-500 text-zinc-950 font-black' : 'bg-zinc-800 text-zinc-400'}`}>
+                {isTutorEnabled ? 'TUTOR ON' : 'OFF'}
+              </span>
+            </button>
           </div>
 
           {/* Spiegazione Vocale Briefing Banner (se attiva) */}
@@ -1059,6 +1205,26 @@ export const DriveModeScreen: React.FC<DriveModeScreenProps> = ({
               >
                 {isAutopilotEnabled ? <Pause className="w-3.5 h-3.5" /> : <Play className="w-3.5 h-3.5" />}
                 <span className="hidden sm:inline">{isAutopilotEnabled ? 'Pilota ON' : 'Manuale'}</span>
+              </button>
+
+              {/* Toggle Modalità Tutor Didattica */}
+              <button
+                id="btn-drive-tutor-toggle"
+                onClick={() => {
+                  const nextVal = !isTutorEnabled;
+                  setIsTutorEnabled(nextVal);
+                  updateSetting('driveModeTutor', nextVal);
+                  showToast(nextVal ? '🎓 Tutor Didattico ATTIVO' : '🎓 Tutor Disattivato');
+                }}
+                className={`p-1.5 rounded-lg text-xs font-bold flex items-center gap-1 transition-colors ${
+                  isTutorEnabled
+                    ? 'bg-amber-500/30 text-amber-300 ring-1 ring-amber-500/50 shadow-[0_0_10px_rgba(245,158,11,0.2)]'
+                    : 'bg-zinc-900 text-zinc-500 border border-zinc-800 hover:text-zinc-300'
+                }`}
+                title={isTutorEnabled ? 'Modalità Tutor attiva (tocca per disattivare)' : 'Attiva modalità tutor (Regola + Tranello)'}
+              >
+                <GraduationCap className="w-3.5 h-3.5" />
+                <span className="hidden sm:inline">{isTutorEnabled ? 'Tutor ON' : 'Tutor'}</span>
               </button>
 
               {/* Toggle Comandi Vocali & Guida Rapida */}
@@ -1350,65 +1516,154 @@ export const DriveModeScreen: React.FC<DriveModeScreenProps> = ({
             </button>
           )}
 
-          {/* 3 Macro-Fasce di Risposta (Riempiono lo spazio verticale uniformemente) */}
-          <div className="flex-1 flex flex-col gap-2 sm:gap-3 my-1 sm:my-2 min-h-0">
-            {currentQ.options.map((opt, idx) => {
-              const optNum = (idx + 1) as 1 | 2 | 3;
-              const isSelected = answers[currentQ.id] === optNum;
-              const isCorrectAnswer = currentQ.correctAnswer === optNum;
-              const isRevealed = revealedQuestionId === currentQ.id;
-              const isCurrentOptPlaying = isPartPlaying(`opt${optNum}` as any);
-
-              let style = 'bg-zinc-900/80 border-zinc-800 text-zinc-100 hover:border-zinc-700 active:scale-[0.99]';
-
-              if (isRevealed || (!isExamSession && answers[currentQ.id] !== undefined)) {
-                if (isCorrectAnswer) {
-                  style = 'bg-emerald-950/80 border-emerald-500 text-emerald-100 ring-2 ring-emerald-500 font-bold';
-                } else if (isSelected && !isCorrectAnswer) {
-                  style = 'bg-rose-950/80 border-rose-500 text-rose-100 ring-2 ring-rose-500';
-                } else {
-                  style = 'opacity-40 bg-zinc-950 border-zinc-900 text-zinc-400';
-                }
-              } else if (isSelected) {
-                style = 'bg-amber-950 border-amber-500 text-amber-100 ring-2 ring-amber-500 font-bold';
-              } else if (isCurrentOptPlaying) {
-                style = 'bg-amber-950/60 border-amber-400 text-amber-200 ring-1 ring-amber-400';
-              }
+          {/* 3 Macro-Fasce di Risposta & Card Didattica (Regola + Tranello) */}
+          <div className="flex-1 flex flex-col gap-2 my-1 sm:my-2 min-h-0">
+            {(() => {
+              const isCurrentRevealed = revealedQuestionId === currentQ.id || ((!isExamSession || isTutorEnabled) && answers[currentQ.id] !== undefined);
 
               return (
-                <button
-                  key={optNum}
-                  id={`btn-drive-opt-${optNum}`}
-                  onClick={() => handleSelectAnswer(optNum)}
-                  className={`flex-1 w-full rounded-2xl border-2 p-3 sm:p-4 flex items-center gap-3 sm:gap-4 text-left transition-all ${style}`}
-                >
-                  <div
-                    className={`w-10 h-10 sm:w-12 sm:h-12 rounded-xl flex items-center justify-center font-black text-lg sm:text-2xl flex-shrink-0 ${
-                      (isRevealed || (!isExamSession && answers[currentQ.id])) && isCorrectAnswer
-                        ? 'bg-emerald-500 text-white'
-                        : isSelected
-                        ? 'bg-amber-500 text-zinc-950'
-                        : isCurrentOptPlaying
-                        ? 'bg-amber-500 text-zinc-950 animate-pulse'
-                        : 'bg-zinc-800 text-zinc-300'
-                    }`}
-                  >
-                    {optNum}
+                <>
+                  <div className={`flex flex-col gap-2 sm:gap-2.5 ${isCurrentRevealed ? 'flex-none' : 'flex-1'} min-h-0`}>
+                    {currentQ.options.map((opt, idx) => {
+                      const optNum = (idx + 1) as 1 | 2 | 3;
+                      const isSelected = answers[currentQ.id] === optNum;
+                      const isCorrectAnswer = currentQ.correctAnswer === optNum;
+                      const isCurrentOptPlaying = isPartPlaying(`opt${optNum}` as any);
+
+                      let style = 'bg-zinc-900/80 border-zinc-800 text-zinc-100 hover:border-zinc-700 active:scale-[0.99]';
+
+                      if (isCurrentRevealed) {
+                        if (isCorrectAnswer) {
+                          style = 'bg-emerald-950/80 border-emerald-500 text-emerald-100 ring-2 ring-emerald-500 font-bold';
+                        } else if (isSelected && !isCorrectAnswer) {
+                          style = 'bg-rose-950/80 border-rose-500 text-rose-100 ring-2 ring-rose-500';
+                        } else {
+                          style = 'opacity-40 bg-zinc-950 border-zinc-900 text-zinc-400';
+                        }
+                      } else if (isSelected) {
+                        style = 'bg-amber-950 border-amber-500 text-amber-100 ring-2 ring-amber-500 font-bold';
+                      } else if (isCurrentOptPlaying) {
+                        style = 'bg-amber-950/60 border-amber-400 text-amber-200 ring-1 ring-amber-400';
+                      }
+
+                      return (
+                        <button
+                          key={optNum}
+                          id={`btn-drive-opt-${optNum}`}
+                          onClick={() => handleSelectAnswer(optNum)}
+                          className={`${
+                            isCurrentRevealed
+                              ? 'w-full rounded-xl border p-2 sm:p-2.5 flex items-center gap-2.5 sm:gap-3 text-left transition-all'
+                              : 'flex-1 w-full rounded-2xl border-2 p-3 sm:p-4 flex items-center gap-3 sm:gap-4 text-left transition-all'
+                          } ${style}`}
+                        >
+                          <div
+                            className={`${
+                              isCurrentRevealed
+                                ? 'w-7 h-7 sm:w-8 sm:h-8 rounded-lg font-black text-xs sm:text-sm'
+                                : 'w-10 h-10 sm:w-12 sm:h-12 rounded-xl font-black text-lg sm:text-2xl'
+                            } flex items-center justify-center flex-shrink-0 ${
+                              isCurrentRevealed && isCorrectAnswer
+                                ? 'bg-emerald-500 text-white'
+                                : isSelected
+                                ? 'bg-amber-500 text-zinc-950'
+                                : isCurrentOptPlaying
+                                ? 'bg-amber-500 text-zinc-950 animate-pulse'
+                                : 'bg-zinc-800 text-zinc-300'
+                            }`}
+                          >
+                            {optNum}
+                          </div>
+
+                          <div
+                            className={`flex-1 ${
+                              isCurrentRevealed
+                                ? 'text-xs sm:text-sm font-medium leading-tight line-clamp-2'
+                                : 'text-sm sm:text-lg font-semibold leading-snug line-clamp-3'
+                            }`}
+                          >
+                            {opt}
+                          </div>
+
+                          {isCurrentRevealed && isCorrectAnswer && (
+                            <CheckCircle2 className={`${isCurrentRevealed ? 'w-5 h-5' : 'w-7 h-7'} text-emerald-400 flex-shrink-0`} />
+                          )}
+                          {isCurrentRevealed && isSelected && !isCorrectAnswer && (
+                            <XCircle className={`${isCurrentRevealed ? 'w-5 h-5' : 'w-7 h-7'} text-rose-400 flex-shrink-0`} />
+                          )}
+                        </button>
+                      );
+                    })}
                   </div>
 
-                  <div className="flex-1 text-sm sm:text-lg font-semibold leading-snug line-clamp-3">
-                    {opt}
-                  </div>
+                  {/* Scheda Didattica (Regola e Tranello) in Debriefing / Tutor Mode */}
+                  {isCurrentRevealed && currentQ.explanation && (
+                    <div
+                      id="drive-didactic-card"
+                      className="flex-1 min-h-0 mt-1 p-2.5 sm:p-3 rounded-2xl bg-zinc-900/95 border-2 border-amber-500/50 text-zinc-100 shadow-2xl flex flex-col justify-between overflow-hidden animate-in fade-in slide-in-from-bottom-2"
+                    >
+                      <div className="overflow-y-auto custom-scrollbar space-y-2 pr-1">
+                        {/* Header Scheda Didattica */}
+                        <div className="flex items-center justify-between gap-2 pb-1.5 border-b border-zinc-800 text-xs">
+                          <div className="flex items-center gap-1.5 font-bold text-amber-400">
+                            <GraduationCap className="w-4 h-4 text-amber-400 flex-shrink-0" />
+                            <span>Spiegazione Didattica</span>
+                          </div>
 
-                  {(isRevealed || (!isExamSession && answers[currentQ.id])) && isCorrectAnswer && (
-                    <CheckCircle2 className="w-7 h-7 text-emerald-400 flex-shrink-0" />
+                          <div className="flex items-center gap-2">
+                            {isExplanationPlaying ? (
+                              <span className="flex items-center gap-1 text-[11px] font-mono text-emerald-400 font-bold animate-pulse">
+                                <Volume2 className="w-3.5 h-3.5" />
+                                <span>Lettura in corso...</span>
+                              </span>
+                            ) : assimilationCountdown !== null ? (
+                              <span className="text-[11px] font-mono text-amber-400 font-bold animate-pulse">
+                                Prossima in {assimilationCountdown}s
+                              </span>
+                            ) : (
+                              <button
+                                type="button"
+                                id="btn-drive-replay-explanation"
+                                onClick={() => playExplanation()}
+                                className="px-2 py-0.5 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-zinc-300 hover:text-white text-[11px] font-bold flex items-center gap-1 transition-colors"
+                                title="Riascolta spiegazione vocale"
+                              >
+                                <RotateCcw className="w-3 h-3" />
+                                <span>Riascolta</span>
+                              </button>
+                            )}
+                          </div>
+                        </div>
+
+                        {/* Regola */}
+                        {currentQ.explanation.rule && (
+                          <div className="flex items-start gap-2 text-xs sm:text-sm">
+                            <span className="px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-300 font-black text-[10px] uppercase tracking-wider flex-shrink-0 mt-0.5">
+                              Regola
+                            </span>
+                            <p className="text-zinc-200 font-medium leading-relaxed">
+                              {currentQ.explanation.rule}
+                            </p>
+                          </div>
+                        )}
+
+                        {/* Tranello (se presente) */}
+                        {currentQ.explanation.trap && (
+                          <div className="flex items-start gap-2 text-xs sm:text-sm pt-1 border-t border-zinc-800/60">
+                            <span className="px-1.5 py-0.5 rounded bg-rose-500/20 text-rose-300 font-black text-[10px] uppercase tracking-wider flex-shrink-0 mt-0.5">
+                              Tranello
+                            </span>
+                            <p className="text-zinc-300 font-medium leading-relaxed">
+                              {currentQ.explanation.trap}
+                            </p>
+                          </div>
+                        )}
+                      </div>
+                    </div>
                   )}
-                  {(isRevealed || (!isExamSession && answers[currentQ.id])) && isSelected && !isCorrectAnswer && (
-                    <XCircle className="w-7 h-7 text-rose-400 flex-shrink-0" />
-                  )}
-                </button>
+                </>
               );
-            })}
+            })()}
           </div>
 
           {/* Barra Azioni Inferiore (Pulsanti Giganti) */}

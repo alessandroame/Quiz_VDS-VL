@@ -145,7 +145,9 @@ Questo documento rappresenta la **bussola strategica e funzionale** del progetto
 | Impostazioni ad Accordion Compresso Singolo | 🟢 Completato | Sostituzione pills menu con accordion verticale mutuo-esclusivo (1 sola sezione aperta alla volta, anteprime badge live, pulsante comprimi tutto ed espansione selettiva). |
 | Visualizzazione Globale Versione App | 🟢 Completato | Badge di versione dinamico (`__APP_VERSION__` e `__APP_BUILD_ID__`) visibile in Navbar e header Impostazioni. |
 | Barra Navigazione Quiz Ancorata in Basso | 🟢 Completato | Componente `QuizBottomBar` ancorato in basso al viewport (`fixed bottom-0 z-30`) con Precedente, Successiva, flag rapido, Prossima Domanda Tutor e Consegna su `ExamScreen`, `TopicsScreen` e `MistakesScreen`. |
-| Modalità Tutor nella Modalità Guida | 📋 Pianificato (TODO) | Lettura vocale Regola+Tranello sincronizzata col Pilota Automatico e toggle dedicato. |
+| Modalità Tutor nella Modalità Guida | 🟢 Completato | Lettura vocale Regola+Tranello sincronizzata col Pilota Automatico, Scheda Didattica HUD zero-scroll 100dvh, toggle in Launcher/HUD/Settings/QuickMenu e comandi vocali. |
+| Risoluzione Interruzione Spiegazione Vocale | 🟢 Completato | Eliminato timeout prematuro 3.5s, sincronizzazione event-driven con audio ended + pausa di assimilazione (2.5s) e safety guard 4.5s. |
+
 
 
 ---

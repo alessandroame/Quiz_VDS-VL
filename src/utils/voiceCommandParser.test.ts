@@ -85,10 +85,39 @@ describe('Suite: voiceCommandParser (Parser comandi vocali Modalità Guida)', ()
     expect(parseVoiceCommand('guida')).toBe('help');
     expect(parseVoiceCommand('comandi')).toBe('help');
     expect(parseVoiceCommand('istruzioni')).toBe('help');
-    expect(parseVoiceCommand('spiegazione')).toBe('help');
     expect(parseVoiceCommand('tutorial')).toBe('help');
     expect(parseVoiceCommand('cosa posso dire')).toBe('help');
     expect(parseVoiceCommand('help')).toBe('help');
+  });
+
+  it('VC-08: riconosce comandi di spiegazione didattica (Regola e Tranello)', () => {
+    expect(parseVoiceCommand('spiega')).toBe('explain');
+    expect(parseVoiceCommand('spiegami')).toBe('explain');
+    expect(parseVoiceCommand('spiegazione')).toBe('explain');
+    expect(parseVoiceCommand('regola')).toBe('explain');
+    expect(parseVoiceCommand('la regola')).toBe('explain');
+    expect(parseVoiceCommand('tranello')).toBe('explain');
+    expect(parseVoiceCommand('il tranello')).toBe('explain');
+    expect(parseVoiceCommand('perché')).toBe('explain');
+    expect(parseVoiceCommand('perche')).toBe('explain');
+    expect(parseVoiceCommand('motivo')).toBe('explain');
+  });
+
+  it('VC-09: riconosce comandi di attivazione, disattivazione e commutazione tutor', () => {
+    expect(parseVoiceCommand('attiva tutor')).toBe('tutor_on');
+    expect(parseVoiceCommand('abilita tutor')).toBe('tutor_on');
+    expect(parseVoiceCommand('avvia tutor')).toBe('tutor_on');
+    expect(parseVoiceCommand('tutor on')).toBe('tutor_on');
+
+    expect(parseVoiceCommand('disattiva tutor')).toBe('tutor_off');
+    expect(parseVoiceCommand('disabilita tutor')).toBe('tutor_off');
+    expect(parseVoiceCommand('spegni tutor')).toBe('tutor_off');
+    expect(parseVoiceCommand('stop tutor')).toBe('tutor_off');
+    expect(parseVoiceCommand('tutor off')).toBe('tutor_off');
+
+    expect(parseVoiceCommand('tutor')).toBe('toggle_tutor');
+    expect(parseVoiceCommand('modalità tutor')).toBe('toggle_tutor');
+    expect(parseVoiceCommand('modalita tutor')).toBe('toggle_tutor');
   });
 
   it('VC-07: ignora input vuoti o frasi non correlate', () => {

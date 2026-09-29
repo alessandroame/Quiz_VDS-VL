@@ -16,6 +16,7 @@
     "test:visual:landscape": "node .agents/skills/headless-pwa-tester/scripts/visual_check.js mobile-landscape",
     "test:visual:all": "node .agents/skills/headless-pwa-tester/scripts/visual_check.js all",
     "test:visual:drive": "node scripts/test_drive_mode.js",
+    "test:visual:tutor": "node scripts/test_drive_tutor.js",
     "test:visual:mic": "node scripts/test_mic_pulsing.cjs"
   },
   "dependencies": {
