@@ -16,6 +16,51 @@ Questo documento registra in ordine cronologico tutte le lavorazioni svolte nel 
 
 ---
 
+### [2026-09-29] - Meccanismo di Invalidazione & Aggiornamento Differenziale Audio Offline (Opzione A + Opzione 1) e Soppressione Prompt Guida Ridondante
+- **Cosa abbiamo fatto**:
+  - Implementata la soluzione approvata dall'utente (**Opzione A**: aggiornamento differenziale puntuale basato su manifest leggero con hash per singolo file, anziché riscaricare l'intero archivio da 150 MB; **Opzione 1**: sincronizzazione automatica silenziosa all'avvio dell'app in presenza di connettività Internet):
+    * Creato lo script Python [scripts/generate_audio_manifest.py](file:///c:/github/Quiz_VDS-VL/scripts/generate_audio_manifest.py) per generare il file [public/audio/manifest.json](file:///c:/github/Quiz_VDS-VL/public/audio/manifest.json) (~118 KB) che mappa i 5.040 snippet audio MP3 di Giuseppe ed Elsa con hash MD5 di 8 caratteri. Aggiunto lo script `"build:audio:manifest"` a [package.json](file:///c:/github/Quiz_VDS-VL/package.json).
+    * Configurato in [vite.config.ts](file:///c:/github/Quiz_VDS-VL/vite.config.ts) il routing Workbox per `/audio/manifest.json` con strategia `NetworkFirst` (`networkTimeoutSeconds: 3`), assicurando il rilevamento tempestivo di modifiche senza rompere l'offline.
+    * Estesa la tipizzazione in [src/types/audio.ts](file:///c:/github/Quiz_VDS-VL/src/types/audio.ts) con le interfacce `AudioManifest`, `InstalledVoiceMetadata`, `VoiceUpdateDetail`, `AudioUpdateCheckResult`.
+    * Aggiunte le impostazioni `audioAutoUpdateOnline: true` e `lastAudioCheckAt?: number` in [src/types/database.ts](file:///c:/github/Quiz_VDS-VL/src/types/database.ts) e [src/db/index.ts](file:///c:/github/Quiz_VDS-VL/src/db/index.ts).
+    * Esteso [src/services/audioDownloadManager.ts](file:///c:/github/Quiz_VDS-VL/src/services/audioDownloadManager.ts) con `checkAudioUpdates()`, `applyAudioUpdates()` (con cache-busting `?v=${hash}&_t=${Date.now()}` per aggiornare direttamente la voce in `CacheStorage`), `autoCheckAndSyncOnStartup()`, `getInstalledMetadata()` e `saveInstalledMetadata()`.
+    * Integrato in [src/App.tsx](file:///c:/github/Quiz_VDS-VL/src/App.tsx) il trigger non bloccante `audioDownloadManager.autoCheckAndSyncOnStartup()` all'avvio.
+    * Risolto il problema del prompt ridondante in Modalità Guida ([src/components/DriveModeScreen.tsx](file:///c:/github/Quiz_VDS-VL/src/components/DriveModeScreen.tsx)): aggiunta la verifica asincrona reale con `checkAllStatuses()`, sopprimendo `AudioOfflinePromptModal` se la voce attiva o un'altra voce è già presente in `CacheStorage`.
+    * Arricchita la sezione Impostazioni ([src/components/SettingsModal.tsx](file:///c:/github/Quiz_VDS-VL/src/components/SettingsModal.tsx)): badge animati per file modificati, pulsanti di aggiornamento parziale per singola voce con progress bar live, pulsante di verifica manuale con data/ora e switch per l'auto-sync online.
+  - Testing & Quality Assurance:
+    * Estesa la suite [src/services/audioDownloadManager.test.ts](file:///c:/github/Quiz_VDS-VL/src/services/audioDownloadManager.test.ts) con 7 nuovi unit test (`ADM-09` fino a `ADM-15`) per manifest fetch, persistenza Dexie, rilevamento offline, identificazione file obsoleti, scrittura su CacheStorage e sincronizzazione automatica.
+    * Eseguiti con successo tutti i 150 test unitari (`npm run test:unit`) con exit code 0.
+    * Eseguita la build di produzione (`npm run build`) verificando la corretta generazione del bundle, manifest e PWA Service Worker.
+- **Scelte architetturali & Rationale**:
+  - *Manifest Atomico con Hash MD5 a 8 Caratteri*: Mappare ogni file con un digest compatto di 8 caratteri mantiene il file JSON a soli ~118 KB per 5.040 file. Questo consente un download rapidissimo anche su rete mobile 3G/4G e un confronto istantaneo `O(1)` in memoria rispetto ai file salvati in Dexie.
+  - *Bypass CacheFirst via Query Busted Fetch & Cache.put*: Workbox intercetta le richieste audio con `CacheFirst`. Per aggiornare un file modificato sul server, scaricare con URL canonico restituirebbe la vecchia versione dalla cache locale. Utilizzando `${canonicalUrl}?v=${hash}&_t=${Date.now()}` per il fetch di rete e salvando poi la risposta con la chiave canonica via `cache.put(canonicalUrl, resp)`, la cache locale viene aggiornata atomicamente senza toccare il Service Worker.
+  - *Controllo Asincrono Reale in CacheStorage per la Guida*: All'avvio dell'app lo stato in-memory parte con contatori a zero prima che l'interrogazione asincrona a `caches.keys()` termini. Eseguendo un `await checkAllStatuses()` prima di valutare l'apertura del prompt della Modalità Guida, si evitano falsi positivi garantendo che l'utente non riceva mai richieste di scaricamento se i file sono già residenti sul dispositivo.
+- **Impatto sul Desiderata**:
+  - Garantita la manutenibilità e la freschezza didattica degli oltre 5.000 file audio senza costringere l'allievo pilota a riscaricare centinaia di megabyte di dati per correzioni puntuali.
+
+---
+
+### [2026-09-29] - Blindatura Fonetica Italiana Integrale per Sintesi Vocale Web Speech API, DOM HTML e Pipeline Neurale Edge-TTS
+- **Cosa abbiamo fatto**:
+  - **Web Speech API & Sintesi Vocale Browser ([src/services/voiceService.ts](file:///c:/github/Quiz_VDS-VL/src/services/voiceService.ts))**:
+    * Identificata la causa radice dell'accento inglese nella sintesi vocale: impostare solo `utterance.lang = 'it-IT'` viene ignorato dai browser quando il sistema operativo o il browser ha lingua predefinita inglese (es. Windows/macOS/Chrome su EN-US), provocando la lettura del testo italiano tramite la voce di sistema inglese (fonetica anglofona).
+    * Implementato il metodo `getItalianSpeechVoice()` in `VoiceService` che scansiona programmaticamente `window.speechSynthesis.getVoices()` e seleziona prioritariamente una voce nativa `it-IT` / `it_*`.
+    * In `playSpeechSynthesisFallback()`, associata esplicitamente la voce italiana ad `utterance.voice`, garantendo che qualunque fallback vocale del browser pronunci sempre l'italiano corretto.
+    * Aggiunti unit test `VOICE-26` e `VOICE-27` in [src/services/voiceService.test.ts](file:///c:/github/Quiz_VDS-VL/src/services/voiceService.test.ts) (150/150 test unitari passati).
+  - **Blindatura Semantica del DOM HTML ([index.html](file:///c:/github/Quiz_VDS-VL/index.html), [QuestionCard.tsx](file:///c:/github/Quiz_VDS-VL/src/components/QuestionCard.tsx), [DriveModeScreen.tsx](file:///c:/github/Quiz_VDS-VL/src/components/DriveModeScreen.tsx))**:
+    * In `index.html`: aggiunti `lang="it"` e `translate="no"` sia sul tag `<body>` che sul contenitore `#root`.
+    * In `QuestionCard.tsx`: aggiunti `lang="it"` e `translate="no"` al testo della domanda (`<h3>`), a ciascun pulsante opzione di risposta (`#btn-option-X`), al contenitore del testo opzione e alla scheda della spiegazione didattica (Regola + Tranello), impedendo a screen reader o tool "Leggi ad alta voce" di usare motori fonetici stranieri.
+    * In `DriveModeScreen.tsx`: aggiunti `lang="it"` e `translate="no"` al titolo domanda (`<h2>`), ai pulsanti giganti delle opzioni di guida (`#btn-drive-opt-X`), al testo opzione e alla scheda didattica `#drive-didactic-card`.
+  - **Protezione Anti-Bleeding nella Pipeline Audio Neurale Edge-TTS ([scripts/generate_audio_database.py](file:///c:/github/Quiz_VDS-VL/scripts/generate_audio_database.py), [scripts/generate_drive_intro.py](file:///c:/github/Quiz_VDS-VL/scripts/generate_drive_intro.py))**:
+    * Identificata la causa della possibile pronuncia con accento estero nei file generati: la voce `it-IT-GiuseppeMultilingualNeural` è un modello *multilingue* con rilevamento dinamico della lingua (LID), che su frasi brevi, numeri o acronimi tende a commutare sulla fonetica inglese.
+    * Integrata la voce maschile 100% nativa italiana **`it-IT-DiegoNeural`** (monolingue italiana pura, zero rischio di language bleed o commutazione di accento).
+    * Implementata la funzione `build_ssml()` con tag `<speak xml:lang='it-IT'><lang xml:lang='it-IT'>...` per blindare rigorosamente la lingua italiana ad ogni chiamata Edge-TTS.
+- **Scelte architetturali & Rationale**:
+  - *Difesa in Profondità a 3 Livelli (HTML, Web Speech API, Neurale)*: L'esperienza vocale dell'allievo pilota può passare dal lettore del browser, dalla Web Speech API o dai file audio pre-renderizzati. Proteggere contemporaneamente tutti e tre i canali elimina definitivamente qualsiasi possibilità di regressione all'accento inglese.
+  - *Native Monolingual Voice over Multilingual*: Le voci multilingue Azure/Edge-TTS tentano di indovinare la lingua. Per il catalogo d'esame ufficiale VDS-VL, modelli nativi puri come `it-IT-DiegoNeural` ed `it-IT-ElsaNeural` garantiscono assoluta costanza di dizione italiana da istruttore aeronautico.
+- **Impatto sul Desiderata**:
+  - Risolto in modo permanente il difetto di lettura con accento inglese, blindando l'esperienza audio in studio e in Modalità alla Guida.
+
 ### [2026-09-29] - Modale Onboarding Scelta Disciplina al Primo Avvio (Parapendio / Deltaplano / Tutti)
 - **Cosa abbiamo fatto**:
   - Creato il componente [src/components/DisciplineOnboardingModal.tsx](file:///c:/github/Quiz_VDS-VL/src/components/DisciplineOnboardingModal.tsx) per consentire all'allievo pilota di selezionare la propria disciplina di studio al primo avvio dell'app:

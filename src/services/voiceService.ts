@@ -466,6 +466,33 @@ export class VoiceService {
     }
   }
 
+  /**
+   * Resolves the best available Italian voice from window.speechSynthesis.
+   * Strictly prioritizes it-IT voices to prevent English phonetics on systems with non-Italian default voices.
+   */
+  public getItalianSpeechVoice(): SpeechSynthesisVoice | null {
+    if (typeof window === 'undefined' || !('speechSynthesis' in window)) {
+      return null;
+    }
+    const voices = window.speechSynthesis.getVoices();
+    if (!voices || voices.length === 0) {
+      return null;
+    }
+
+    // 1. Exact match for it-IT locale
+    const exactIt = voices.find(v => {
+      const code = (v.lang || '').toLowerCase().replace('_', '-');
+      return code === 'it-it';
+    });
+    if (exactIt) return exactIt;
+
+    // 2. Any Italian dialect or prefix
+    const anyIt = voices.find(v => (v.lang || '').toLowerCase().startsWith('it'));
+    if (anyIt) return anyIt;
+
+    return null;
+  }
+
   private playSpeechSynthesisFallback(): void {
     if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
       try {
@@ -474,6 +501,13 @@ export class VoiceService {
           "Benvenuto nella modalità alla guida. Lo schermo rimarrà sempre acceso sul tuo cruscotto. Le domande e le opzioni verranno lette automaticamente. Puoi rispondere toccando i tre grandi pulsanti sullo schermo, oppure usando i comandi vocali pronunciando Uno, Due o Tre. Puoi dire Ripeti per riascoltare, oppure Aiuto per l'elenco dei comandi. Tocca lo schermo per iniziare.";
         const utterance = new SpeechSynthesisUtterance(text);
         utterance.lang = 'it-IT';
+
+        // Explicitly attach Italian voice to prevent English pronunciation
+        const itVoice = this.getItalianSpeechVoice();
+        if (itVoice) {
+          utterance.voice = itVoice;
+        }
+
         utterance.rate = this.playbackRate;
         utterance.onend = () => {
           this.stop();

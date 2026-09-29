@@ -23,9 +23,9 @@ INTRO_TEXT = (
 
 VOICE_CONFIGS = {
     "giuseppe": {
-        "voice": "it-IT-GiuseppeMultilingualNeural",
-        "rate": "-5%",
-        "pitch": "-5Hz",
+        "voice": "it-IT-DiegoNeural",
+        "rate": "-4%",
+        "pitch": "-4Hz",
         "dest": os.path.join("public", "audio", "giuseppe", "drive_intro.mp3")
     },
     "elsa": {
@@ -36,15 +36,25 @@ VOICE_CONFIGS = {
     }
 }
 
+def build_ssml(text: str, voice: str, rate: str, pitch: str) -> str:
+    escaped = text.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;").replace('"', "&quot;")
+    return (
+        f"<speak version='1.0' xmlns='http://www.w3.org/2001/10/synthesis' "
+        f"xmlns:mstts='https://www.w3.org/2001/mstts' xml:lang='it-IT'>"
+        f"<voice name='{voice}'>"
+        f"<prosody rate='{rate}' pitch='{pitch}'>"
+        f"<lang xml:lang='it-IT'>{escaped}</lang>"
+        f"</prosody></voice></speak>"
+    )
+
 async def generate_voice_intro(name: str, config: dict):
     dest = config["dest"]
     os.makedirs(os.path.dirname(dest), exist_ok=True)
     print(f"Generating drive intro for voice '{name}' ({config['voice']})...")
+    ssml = build_ssml(INTRO_TEXT, config["voice"], config["rate"], config["pitch"])
     comm = edge_tts.Communicate(
-        INTRO_TEXT,
-        config["voice"],
-        rate=config["rate"],
-        pitch=config["pitch"]
+        ssml,
+        config["voice"]
     )
     await comm.save(dest)
     size = os.path.getsize(dest)

@@ -260,6 +260,29 @@ Questa sezione raccoglie le nuove funzionalità e i miglioramenti di interfaccia
   - [x] Test unitari 15/15 suite passate (133/133 test).
   - [x] Collaudo E2E headless confermato tramite `npm run test:visual:tutor` con zero errori di console e perfetto debriefing didattico.
 
+### 8. Meccanismo di Invalidazione & Aggiornamento Differenziale Audio Offline (PWA Cache Invalidation)
+- [x] **Manifest Audio Indicizzato con Hash (Opzione A - Differential Update)**:
+  - [x] Creato lo script Python [scripts/generate_audio_manifest.py](file:///c:/github/Quiz_VDS-VL/scripts/generate_audio_manifest.py) per generare in fase di build [public/audio/manifest.json](file:///c:/github/Quiz_VDS-VL/public/audio/manifest.json) contenente versione semantica, data di compilazione, conteggio frammenti e mappa `filename -> MD5 hash (8 caratteri)` per tutte le 2.520 tracce di Giuseppe ed Elsa (~118 KB complessivi).
+  - [x] Aggiunto lo script di automazione `"build:audio:manifest": "python scripts/generate_audio_manifest.py"` in [package.json](file:///c:/github/Quiz_VDS-VL/package.json).
+- [x] **Configurazione Workbox Service Worker**:
+  - [x] Configurato in [vite.config.ts](file:///c:/github/Quiz_VDS-VL/vite.config.ts) il routing dedicato con strategia `NetworkFirst` (`networkTimeoutSeconds: 3`) per `/audio/manifest.json`, assicurando che la PWA riceva sempre la versione più recente del manifest quando connessa a internet.
+- [x] **Estensione del Modello Dati e Motore Audio (`AudioDownloadManager`)**:
+  - [x] Tipizzazione estesa in [src/types/audio.ts](file:///c:/github/Quiz_VDS-VL/src/types/audio.ts) (`AudioManifest`, `InstalledVoiceMetadata`, `VoiceUpdateDetail`, `AudioUpdateCheckResult`).
+  - [x] Aggiunte le impostazioni `audioAutoUpdateOnline: boolean` e `lastAudioCheckAt?: number` in [src/types/database.ts](file:///c:/github/Quiz_VDS-VL/src/types/database.ts) e [src/db/index.ts](file:///c:/github/Quiz_VDS-VL/src/db/index.ts).
+  - [x] Implementate in [src/services/audioDownloadManager.ts](file:///c:/github/Quiz_VDS-VL/src/services/audioDownloadManager.ts):
+    * `checkAudioUpdates(targetVoice?)`: confronta gli hash del manifest remoto con i metadati memorizzati su Dexie, identificando i soli file obsoleti o modificati (`staleFiles`).
+    * `applyAudioUpdates(voice, onProgress)`: scarica selettivamente i soli frammenti obsoleti con cache-busting `?v=${hash}&_t=${Date.now()}` e li scrive direttamente nella cache locale `vds-audio-${voice}` di `window.caches`, aggiornando i metadati Dexie.
+    * `autoCheckAndSyncOnStartup()`: controllo silenzioso non bloccante all'avvio dell'app (se online e autorizzato dall'impostazione) che sincronizza in background modifiche puntuali (fino a 25 file).
+- [x] **Soppressione Prompt Download Ridondante in Modalità Guida**:
+  - [x] In [src/components/DriveModeScreen.tsx](file:///c:/github/Quiz_VDS-VL/src/components/DriveModeScreen.tsx): verificato asincronamente lo stato reale in `CacheStorage` all'avvio tramite `audioDownloadManager.checkAllStatuses()`. Se la voce attiva o un'altra voce è già scaricata (`downloadedCount > 2000` o `isComplete`), la modale `AudioOfflinePromptModal` non compare e il prompt viene contrassegnato automaticamente come dispensato.
+- [x] **Interfaccia Utente nelle Impostazioni (`SettingsModal.tsx`)**:
+  - [x] Integrati badge ambra animati (`X file modificati`) su Giuseppe ed Elsa in caso di aggiornamenti disponibili.
+  - [x] Pulsante dedicato `[Aggiorna (N)]` per voce con barra di avanzamento e percentuale live.
+  - [x] Pannello di controllo con pulsante `[Verifica ora]` (`#btn-check-audio-updates`), timestamp dell'ultima verifica e switch per attivare/disattivare l'aggiornamento automatico online.
+- [x] **Test Unitari Vitest & Build di Produzione**:
+  - [x] Aggiunti 7 unit test in [src/services/audioDownloadManager.test.ts](file:///c:/github/Quiz_VDS-VL/src/services/audioDownloadManager.test.ts) (`ADM-09` a `ADM-15`), portando la suite totale a 150/150 test superati al 100%.
+  - [x] Build di produzione verificata con successo (`npm run build`).
+
 
 
 

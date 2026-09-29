@@ -132,7 +132,7 @@ export class AudioDownloadManager {
 
     try {
       const cacheName = this.getCacheName(voice);
-      const hasCache = await window.caches.has(cacheName);
+      const hasCache = typeof window.caches.has === 'function' ? await window.caches.has(cacheName) : true;
       if (!hasCache) {
         this.statuses[voice] = {
           voice,

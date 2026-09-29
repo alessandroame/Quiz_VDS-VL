@@ -75,6 +75,7 @@ Questo documento rappresenta la **bussola strategica e funzionale** del progetto
    - Sintesi vocale neurale italiana (voci Giuseppe/Elsa) con fonetica aeronautica ICAO ed estrema concisione (pronuncia del solo testo della domanda, omettendo numero e materia per azzerare i preamboli verbali).
    - **Controlli Parlato Interattivi**: Riproduzione flessibile con Play, Pausa (con preservazione della posizione esatta senza ricominciare da capo), Riprendi, e Riavvio istantaneo dall'inizio ("Da capo" / tasto `R` o `Shift+V`) anche mentre l'audio sta parlando.
    - Quick Speech Menu sempre accessibile nell'header: controllo istantaneo a 1 clic per voce istruttore (Giuseppe/Elsa), velocità di riproduzione, lettura automatica e muting senza interruzioni o modali pesanti.
+   - **Invalidazione & Aggiornamento Differenziale Audio Offline (Opzione A + Opzione 1)**: meccanismo intelligente per mantenere allineati i file audio MP3 salvati in `CacheStorage`. Manifest leggero con hash MD5 a 8 caratteri (`public/audio/manifest.json`), strategia Workbox `NetworkFirst`, download selettivo dei soli frammenti modificati senza riscaricare l'intero archivio da 150 MB, sincronizzazione automatica silenziosa all'avvio dell'app se connessi a Internet e soppressione del prompt di download in Modalità Guida se le voci sono già state salvate localmente.
 
 7. **Modalità Alla Guida (Truck & Cockpit Drive Mode)**:
    - Vista a tutto schermo con viewport bloccato (`100dvh`) e zero-scroll.
@@ -146,6 +147,7 @@ Questo documento rappresenta la **bussola strategica e funzionale** del progetto
 | Barra Navigazione Quiz Ancorata in Basso | 🟢 Completato | Componente `QuizBottomBar` ancorato in basso al viewport (`fixed bottom-0 z-30`) con Precedente, Successiva, flag rapido, Prossima Domanda Tutor e Consegna su `ExamScreen`, `TopicsScreen` e `MistakesScreen`. |
 | Modalità Tutor nella Modalità Guida | 🟢 Completato | Lettura vocale Regola+Tranello sincronizzata col Pilota Automatico, Scheda Didattica HUD zero-scroll 100dvh, toggle in Launcher/HUD/Settings/QuickMenu e comandi vocali. |
 | Risoluzione Interruzione Spiegazione Vocale | 🟢 Completato | Eliminato timeout prematuro 3.5s, sincronizzazione event-driven con audio ended + pausa di assimilazione (2.5s) e safety guard 4.5s. |
+| Invalidazione & Aggiornamento Differenziale Audio Offline | 🟢 Completato | Manifest JSON con hash MD5 (`manifest.json`), strategia Workbox `NetworkFirst`, download differenziale dei soli frammenti obsoleti in `AudioDownloadManager`, auto-check silenzioso su rete e soppressione prompt guida se voci già presenti in cache. |
 
 
 

@@ -395,7 +395,10 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({
 
       {/* Testo Domanda con microfono / speaker dedicato */}
       <div className="flex items-start gap-2 mb-5">
-        <h3 className={`text-base sm:text-lg font-medium leading-snug flex-1 transition-colors ${
+        <h3
+          lang="it"
+          translate="no"
+          className={`text-base sm:text-lg font-medium leading-snug flex-1 transition-colors ${
           isPartPlaying('question')
             ? 'text-amber-300 light:text-amber-700'
             : isPartPaused('question')
@@ -483,6 +486,8 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({
               id={`btn-option-${optNum}`}
               data-testid={`option-${optNum}`}
               data-answer-option={optNum}
+              lang="it"
+              translate="no"
               onClick={() => handleSelect(optNum)}
               disabled={showFeedback && selectedAnswer !== undefined}
               className={`w-full text-left p-3.5 sm:p-4 rounded-xl border transition-all flex items-start gap-3 text-sm leading-relaxed ${btnStyle}`}
@@ -505,7 +510,7 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({
                 {optNum}
               </span>
 
-              <div className="flex-1 pt-0.5">
+              <div className="flex-1 pt-0.5" lang="it">
                 <span>{opt}</span>
               </div>
 
@@ -664,7 +669,11 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({
             )}
           </div>
 
-          <div className="space-y-1.5 text-zinc-300 light:text-slate-700 bg-zinc-950/60 light:bg-slate-50 p-2.5 rounded-lg border border-zinc-800/60 light:border-slate-200">
+          <div
+            lang="it"
+            translate="no"
+            className="space-y-1.5 text-zinc-300 light:text-slate-700 bg-zinc-950/60 light:bg-slate-50 p-2.5 rounded-lg border border-zinc-800/60 light:border-slate-200"
+          >
             <div>
               <strong className="text-emerald-400 light:text-emerald-600">Regola: </strong>
               <span>{question.explanation.rule}</span>

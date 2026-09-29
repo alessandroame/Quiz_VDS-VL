@@ -16,18 +16,39 @@ import edge_tts
 
 VOICE_CONFIGS = {
     "giuseppe": {
-        "voice": "it-IT-GiuseppeMultilingualNeural",
-        "rate": "-5%",
-        "pitch": "-5Hz",
+        # it-IT-DiegoNeural is pure native Italian (no multilingual language bleed)
+        # with calm cockpit instructor tone. Backward compatible directory.
+        "voice": "it-IT-DiegoNeural",
+        "rate": "-4%",
+        "pitch": "-4Hz",
         "dir": os.path.join("public", "audio", "giuseppe")
     },
     "elsa": {
+        # it-IT-ElsaNeural is pure native Italian female neural voice, crisp and clear
         "voice": "it-IT-ElsaNeural",
         "rate": "-2%",
         "pitch": "+0Hz",
         "dir": os.path.join("public", "audio", "elsa")
+    },
+    "diego": {
+        "voice": "it-IT-DiegoNeural",
+        "rate": "-4%",
+        "pitch": "-4Hz",
+        "dir": os.path.join("public", "audio", "diego")
     }
 }
+
+def build_ssml(text: str, voice: str, rate: str, pitch: str) -> str:
+    """Wraps text in SSML with explicit xml:lang='it-IT' to guarantee 100% native Italian phonetics."""
+    escaped = text.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;").replace('"', "&quot;")
+    return (
+        f"<speak version='1.0' xmlns='http://www.w3.org/2001/10/synthesis' "
+        f"xmlns:mstts='https://www.w3.org/2001/mstts' xml:lang='it-IT'>"
+        f"<voice name='{voice}'>"
+        f"<prosody rate='{rate}' pitch='{pitch}'>"
+        f"<lang xml:lang='it-IT'>{escaped}</lang>"
+        f"</prosody></voice></speak>"
+    )
 
 def normalize_phonetics(text: str) -> str:
     if not text:
@@ -113,7 +134,8 @@ async def generate_single(out_dir: str, filename: str, text: str, voice_cfg: dic
     async with semaphore:
         for attempt in range(max_retries):
             try:
-                comm = edge_tts.Communicate(text, voice_cfg["voice"], rate=voice_cfg["rate"], pitch=voice_cfg["pitch"])
+                ssml = build_ssml(text, voice_cfg["voice"], voice_cfg["rate"], voice_cfg["pitch"])
+                comm = edge_tts.Communicate(ssml, voice_cfg["voice"])
                 await comm.save(dest)
                 return True
             except Exception as e:
@@ -152,7 +174,7 @@ async def process_voice(voice_key: str, questions: list, concurrency: int, part_
 
 async def main():
     parser = argparse.ArgumentParser(description="VDS-VL Multi-Voice Neural Audio Generator")
-    parser.add_argument("--voice", choices=["giuseppe", "elsa", "all"], default="all", help="Target voice")
+    parser.add_argument("--voice", choices=["giuseppe", "elsa", "diego", "all"], default="all", help="Target voice")
     parser.add_argument("--part", choices=["all", "q", "options", "explanation"], default="all", help="Part filter to generate")
     parser.add_argument("--force", action="store_true", help="Force overwrite existing audio files")
     parser.add_argument("--start", type=int, default=None, help="Start question ID (e.g. 1001)")

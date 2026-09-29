@@ -521,5 +521,37 @@ describe('VoiceService (src/services/voiceService.ts)', () => {
       vi.useRealTimers();
     }
   });
+
+  it('VOICE-26: getItalianSpeechVoice returns it-IT voice when available', () => {
+    const mockVoices = [
+      { name: 'Microsoft David', lang: 'en-US' },
+      { name: 'Microsoft Elsa Desktop', lang: 'it-IT' },
+      { name: 'Google Italiano', lang: 'it_IT' }
+    ] as any[];
+
+    (globalThis as any).window = (globalThis as any).window || {};
+    (globalThis as any).window.speechSynthesis = {
+      getVoices: vi.fn().mockReturnValue(mockVoices)
+    };
+
+    const voice = service.getItalianSpeechVoice();
+    expect(voice).toBeDefined();
+    expect(voice?.lang).toBe('it-IT');
+  });
+
+  it('VOICE-27: getItalianSpeechVoice returns null when no Italian voice is present', () => {
+    const mockVoices = [
+      { name: 'Microsoft David', lang: 'en-US' },
+      { name: 'Microsoft Zira', lang: 'en-US' }
+    ] as any[];
+
+    (globalThis as any).window = (globalThis as any).window || {};
+    (globalThis as any).window.speechSynthesis = {
+      getVoices: vi.fn().mockReturnValue(mockVoices)
+    };
+
+    const voice = service.getItalianSpeechVoice();
+    expect(voice).toBeNull();
+  });
 });
 

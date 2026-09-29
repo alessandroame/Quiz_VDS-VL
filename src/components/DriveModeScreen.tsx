@@ -1360,6 +1360,8 @@ export const DriveModeScreen: React.FC<DriveModeScreenProps> = ({
                 </span>
               </div>
               <h2
+                lang="it"
+                translate="no"
                 className={`text-base sm:text-xl font-bold leading-snug tracking-tight transition-colors line-clamp-3 sm:line-clamp-4 ${
                   isPartPlaying('question') ? 'text-amber-300' : 'text-white'
                 }`}
@@ -1571,6 +1573,8 @@ export const DriveModeScreen: React.FC<DriveModeScreenProps> = ({
                         <button
                           key={optNum}
                           id={`btn-drive-opt-${optNum}`}
+                          lang="it"
+                          translate="no"
                           onClick={() => handleSelectAnswer(optNum)}
                           className={`${
                             isCurrentRevealed
@@ -1597,6 +1601,7 @@ export const DriveModeScreen: React.FC<DriveModeScreenProps> = ({
                           </div>
 
                           <div
+                            lang="it"
                             className={`flex-1 ${
                               isCurrentRevealed
                                 ? 'text-xs sm:text-sm font-medium leading-tight line-clamp-2'
@@ -1621,6 +1626,8 @@ export const DriveModeScreen: React.FC<DriveModeScreenProps> = ({
                   {isCurrentRevealed && currentQ.explanation && (
                     <div
                       id="drive-didactic-card"
+                      lang="it"
+                      translate="no"
                       className="flex-1 min-h-0 mt-1 p-2.5 sm:p-3 rounded-2xl bg-zinc-900/95 border-2 border-amber-500/50 text-zinc-100 shadow-2xl flex flex-col justify-between overflow-hidden animate-in fade-in slide-in-from-bottom-2"
                     >
                       <div className="overflow-y-auto custom-scrollbar space-y-2 pr-1">

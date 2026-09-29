@@ -749,7 +749,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                     <div className="p-2.5 rounded-xl border border-zinc-800/80 bg-zinc-900/60 light:bg-white light:border-slate-200 flex flex-col gap-2">
                       <div className="flex items-center justify-between">
                         <div>
-                          <div className="flex items-center gap-1.5">
+                          <div className="flex items-center gap-1.5 flex-wrap">
                             <span className="text-xs font-semibold text-zinc-200 light:text-slate-800">
                               👨‍✈️ Giuseppe (Maschile)
                             </span>
@@ -758,10 +758,17 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                                 Scaricato
                               </span>
                             )}
+                            {updateCheckResult?.voiceUpdates.giuseppe.hasUpdates && (
+                              <span className="text-[10px] px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-400 font-bold animate-pulse">
+                                {updateCheckResult.voiceUpdates.giuseppe.staleFiles.length} file modificati
+                              </span>
+                            )}
                           </div>
                           <span className="text-[11px] text-zinc-400 light:text-slate-500 block">
                             {audioStatuses.giuseppe.isDownloading
                               ? `Download in corso: ${audioStatuses.giuseppe.percent}% (${audioStatuses.giuseppe.downloadedCount}/${audioStatuses.giuseppe.totalCount})`
+                              : updatingVoices.giuseppe
+                              ? `Aggiornamento in corso: ${voiceUpdateProgress.giuseppe || 0}%`
                               : audioStatuses.giuseppe.isComplete
                               ? '2.520 quesiti pronti offline (~154 MB)'
                               : audioStatuses.giuseppe.downloadedCount > 0
@@ -770,8 +777,13 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                           </span>
                         </div>
 
-                        <div className="flex items-center gap-1.5">
-                          {audioStatuses.giuseppe.isDownloading ? (
+                        <div className="flex items-center gap-1.5 flex-wrap justify-end">
+                          {updatingVoices.giuseppe ? (
+                            <span className="text-[11px] text-amber-400 font-semibold px-2 py-1 flex items-center gap-1 bg-amber-500/10 border border-amber-500/30 rounded-lg">
+                              <RefreshCw className="w-3 h-3 animate-spin" />
+                              <span>Aggiornamento...</span>
+                            </span>
+                          ) : audioStatuses.giuseppe.isDownloading ? (
                             <button
                               type="button"
                               id="btn-cancel-download-giuseppe"
@@ -780,27 +792,43 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                             >
                               Annulla
                             </button>
-                          ) : audioStatuses.giuseppe.isComplete || audioStatuses.giuseppe.downloadedCount > 0 ? (
-                            <button
-                              type="button"
-                              id="btn-delete-cache-giuseppe"
-                              onClick={() => audioDownloadManager.deleteCache('giuseppe')}
-                              className="px-2.5 py-1 text-[11px] font-bold text-zinc-400 hover:text-rose-400 border border-zinc-800 hover:border-rose-500/40 rounded-lg hover:bg-rose-500/10 transition-colors flex items-center gap-1"
-                              title="Elimina cache audio di Giuseppe"
-                            >
-                              <Trash2 className="w-3 h-3" />
-                              <span>Elimina</span>
-                            </button>
                           ) : (
-                            <button
-                              type="button"
-                              id="btn-download-giuseppe"
-                              onClick={() => audioDownloadManager.startDownload('giuseppe')}
-                              className="px-2.5 py-1 text-[11px] font-bold text-amber-400 bg-amber-500/10 border border-amber-500/30 rounded-lg hover:bg-amber-500/20 transition-colors flex items-center gap-1"
-                            >
-                              <Download className="w-3 h-3" />
-                              <span>Scarica</span>
-                            </button>
+                            <>
+                              {updateCheckResult?.voiceUpdates.giuseppe.hasUpdates && (
+                                <button
+                                  type="button"
+                                  id="btn-update-audio-giuseppe"
+                                  onClick={() => handleApplyAudioUpdates('giuseppe')}
+                                  className="px-2.5 py-1 text-[11px] font-bold text-amber-300 bg-amber-500/20 border border-amber-500/40 rounded-lg hover:bg-amber-500/30 transition-colors flex items-center gap-1"
+                                  title="Scarica solo i file modificati per la voce di Giuseppe"
+                                >
+                                  <RefreshCw className="w-3 h-3" />
+                                  <span>Aggiorna ({updateCheckResult.voiceUpdates.giuseppe.staleFiles.length})</span>
+                                </button>
+                              )}
+                              {audioStatuses.giuseppe.isComplete || audioStatuses.giuseppe.downloadedCount > 0 ? (
+                                <button
+                                  type="button"
+                                  id="btn-delete-cache-giuseppe"
+                                  onClick={() => audioDownloadManager.deleteCache('giuseppe')}
+                                  className="px-2.5 py-1 text-[11px] font-bold text-zinc-400 hover:text-rose-400 border border-zinc-800 hover:border-rose-500/40 rounded-lg hover:bg-rose-500/10 transition-colors flex items-center gap-1"
+                                  title="Elimina cache audio di Giuseppe"
+                                >
+                                  <Trash2 className="w-3 h-3" />
+                                  <span>Elimina</span>
+                                </button>
+                              ) : (
+                                <button
+                                  type="button"
+                                  id="btn-download-giuseppe"
+                                  onClick={() => audioDownloadManager.startDownload('giuseppe')}
+                                  className="px-2.5 py-1 text-[11px] font-bold text-amber-400 bg-amber-500/10 border border-amber-500/30 rounded-lg hover:bg-amber-500/20 transition-colors flex items-center gap-1"
+                                >
+                                  <Download className="w-3 h-3" />
+                                  <span>Scarica</span>
+                                </button>
+                              )}
+                            </>
                           )}
                         </div>
                       </div>
@@ -813,13 +841,21 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                           />
                         </div>
                       )}
+                      {updatingVoices.giuseppe && (
+                        <div className="w-full bg-zinc-800 light:bg-slate-200 h-1.5 rounded-full overflow-hidden">
+                          <div
+                            className="bg-amber-400 h-full transition-all duration-300"
+                            style={{ width: `${voiceUpdateProgress.giuseppe || 0}%` }}
+                          />
+                        </div>
+                      )}
                     </div>
 
                     {/* Elsa Card */}
                     <div className="p-2.5 rounded-xl border border-zinc-800/80 bg-zinc-900/60 light:bg-white light:border-slate-200 flex flex-col gap-2">
                       <div className="flex items-center justify-between">
                         <div>
-                          <div className="flex items-center gap-1.5">
+                          <div className="flex items-center gap-1.5 flex-wrap">
                             <span className="text-xs font-semibold text-zinc-200 light:text-slate-800">
                               👩‍✈️ Elsa (Femminile)
                             </span>
@@ -828,10 +864,17 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                                 Scaricato
                               </span>
                             )}
+                            {updateCheckResult?.voiceUpdates.elsa.hasUpdates && (
+                              <span className="text-[10px] px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-400 font-bold animate-pulse">
+                                {updateCheckResult.voiceUpdates.elsa.staleFiles.length} file modificati
+                              </span>
+                            )}
                           </div>
                           <span className="text-[11px] text-zinc-400 light:text-slate-500 block">
                             {audioStatuses.elsa.isDownloading
                               ? `Download in corso: ${audioStatuses.elsa.percent}% (${audioStatuses.elsa.downloadedCount}/${audioStatuses.elsa.totalCount})`
+                              : updatingVoices.elsa
+                              ? `Aggiornamento in corso: ${voiceUpdateProgress.elsa || 0}%`
                               : audioStatuses.elsa.isComplete
                               ? '2.520 quesiti pronti offline (~148 MB)'
                               : audioStatuses.elsa.downloadedCount > 0
@@ -840,8 +883,13 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                           </span>
                         </div>
 
-                        <div className="flex items-center gap-1.5">
-                          {audioStatuses.elsa.isDownloading ? (
+                        <div className="flex items-center gap-1.5 flex-wrap justify-end">
+                          {updatingVoices.elsa ? (
+                            <span className="text-[11px] text-amber-400 font-semibold px-2 py-1 flex items-center gap-1 bg-amber-500/10 border border-amber-500/30 rounded-lg">
+                              <RefreshCw className="w-3 h-3 animate-spin" />
+                              <span>Aggiornamento...</span>
+                            </span>
+                          ) : audioStatuses.elsa.isDownloading ? (
                             <button
                               type="button"
                               id="btn-cancel-download-elsa"
@@ -850,27 +898,43 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                             >
                               Annulla
                             </button>
-                          ) : audioStatuses.elsa.isComplete || audioStatuses.elsa.downloadedCount > 0 ? (
-                            <button
-                              type="button"
-                              id="btn-delete-cache-elsa"
-                              onClick={() => audioDownloadManager.deleteCache('elsa')}
-                              className="px-2.5 py-1 text-[11px] font-bold text-zinc-400 hover:text-rose-400 border border-zinc-800 hover:border-rose-500/40 rounded-lg hover:bg-rose-500/10 transition-colors flex items-center gap-1"
-                              title="Elimina cache audio di Elsa"
-                            >
-                              <Trash2 className="w-3 h-3" />
-                              <span>Elimina</span>
-                            </button>
                           ) : (
-                            <button
-                              type="button"
-                              id="btn-download-elsa"
-                              onClick={() => audioDownloadManager.startDownload('elsa')}
-                              className="px-2.5 py-1 text-[11px] font-bold text-amber-400 bg-amber-500/10 border border-amber-500/30 rounded-lg hover:bg-amber-500/20 transition-colors flex items-center gap-1"
-                            >
-                              <Download className="w-3 h-3" />
-                              <span>Scarica</span>
-                            </button>
+                            <>
+                              {updateCheckResult?.voiceUpdates.elsa.hasUpdates && (
+                                <button
+                                  type="button"
+                                  id="btn-update-audio-elsa"
+                                  onClick={() => handleApplyAudioUpdates('elsa')}
+                                  className="px-2.5 py-1 text-[11px] font-bold text-amber-300 bg-amber-500/20 border border-amber-500/40 rounded-lg hover:bg-amber-500/30 transition-colors flex items-center gap-1"
+                                  title="Scarica solo i file modificati per la voce di Elsa"
+                                >
+                                  <RefreshCw className="w-3 h-3" />
+                                  <span>Aggiorna ({updateCheckResult.voiceUpdates.elsa.staleFiles.length})</span>
+                                </button>
+                              )}
+                              {audioStatuses.elsa.isComplete || audioStatuses.elsa.downloadedCount > 0 ? (
+                                <button
+                                  type="button"
+                                  id="btn-delete-cache-elsa"
+                                  onClick={() => audioDownloadManager.deleteCache('elsa')}
+                                  className="px-2.5 py-1 text-[11px] font-bold text-zinc-400 hover:text-rose-400 border border-zinc-800 hover:border-rose-500/40 rounded-lg hover:bg-rose-500/10 transition-colors flex items-center gap-1"
+                                  title="Elimina cache audio di Elsa"
+                                >
+                                  <Trash2 className="w-3 h-3" />
+                                  <span>Elimina</span>
+                                </button>
+                              ) : (
+                                <button
+                                  type="button"
+                                  id="btn-download-elsa"
+                                  onClick={() => audioDownloadManager.startDownload('elsa')}
+                                  className="px-2.5 py-1 text-[11px] font-bold text-amber-400 bg-amber-500/10 border border-amber-500/30 rounded-lg hover:bg-amber-500/20 transition-colors flex items-center gap-1"
+                                >
+                                  <Download className="w-3 h-3" />
+                                  <span>Scarica</span>
+                                </button>
+                              )}
+                            </>
                           )}
                         </div>
                       </div>
@@ -883,6 +947,66 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                           />
                         </div>
                       )}
+                      {updatingVoices.elsa && (
+                        <div className="w-full bg-zinc-800 light:bg-slate-200 h-1.5 rounded-full overflow-hidden">
+                          <div
+                            className="bg-amber-400 h-full transition-all duration-300"
+                            style={{ width: `${voiceUpdateProgress.elsa || 0}%` }}
+                          />
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Control Panel: Verifica manuale + Switch Auto-Update */}
+                    <div className="p-2.5 rounded-xl border border-zinc-800/80 bg-zinc-900/60 light:bg-white light:border-slate-200 space-y-2.5">
+                      <div className="flex items-center justify-between gap-2">
+                        <div>
+                          <span className="text-xs font-semibold text-zinc-200 light:text-slate-800 block">
+                            Verifica aggiornamenti audio
+                          </span>
+                          <span className="text-[11px] text-zinc-400 light:text-slate-500 block">
+                            {settings.lastAudioCheckAt
+                              ? `Ultima verifica: ${new Date(settings.lastAudioCheckAt).toLocaleString('it-IT', { dateStyle: 'short', timeStyle: 'short' })}`
+                              : 'Confronta la cache locale con le modifiche su server'}
+                          </span>
+                        </div>
+                        <button
+                          type="button"
+                          id="btn-check-audio-updates"
+                          disabled={isCheckingAudioUpdates}
+                          onClick={handleCheckAudioUpdates}
+                          className="px-2.5 py-1 text-[11px] font-bold text-zinc-300 hover:text-amber-400 border border-zinc-700 hover:border-amber-500/40 rounded-lg hover:bg-amber-500/10 transition-colors flex items-center gap-1.5 disabled:opacity-50 shrink-0"
+                        >
+                          <RefreshCw className={`w-3 h-3 ${isCheckingAudioUpdates ? 'animate-spin text-amber-400' : ''}`} />
+                          <span>{isCheckingAudioUpdates ? 'Verifica...' : 'Verifica ora'}</span>
+                        </button>
+                      </div>
+
+                      {audioUpdateToast && (
+                        <div className="text-[11px] px-2.5 py-1.5 rounded bg-amber-500/15 border border-amber-500/30 text-amber-300 font-medium animate-in fade-in duration-200">
+                          {audioUpdateToast}
+                        </div>
+                      )}
+
+                      <div className="pt-2 border-t border-zinc-800 light:border-slate-100 flex items-center justify-between">
+                        <div>
+                          <span className="text-xs text-zinc-300 light:text-slate-700 font-medium block">
+                            Aggiornamento automatico online
+                          </span>
+                          <span className="text-[10px] text-zinc-500 block">
+                            Sincronizza silenziosamente file audio modificati all'avvio dell'app
+                          </span>
+                        </div>
+                        <label className="relative inline-flex items-center cursor-pointer">
+                          <input
+                            type="checkbox"
+                            className="sr-only peer"
+                            checked={settings.audioAutoUpdateOnline ?? true}
+                            onChange={(e) => updateSetting('audioAutoUpdateOnline', e.target.checked)}
+                          />
+                          <div className="w-8 h-4 bg-zinc-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-zinc-300 after:border after:rounded-full after:h-3 after:w-3 after:transition-all peer-checked:bg-amber-500"></div>
+                        </label>
+                      </div>
                     </div>
 
                     {/* Note fallback & reset */}
