@@ -10,6 +10,7 @@ import { smartMergeBackups, type SmartMergeResult } from '../services/smartMerge
 
 export const DEFAULT_SETTINGS: AppSettings = {
   theme: 'system',
+  fontSizePreference: 'normal',
   examTimerMinutes: 45,
   immediateFeedbackInTopics: true,
   soundEnabled: true,

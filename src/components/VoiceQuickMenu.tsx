@@ -141,7 +141,7 @@ export const VoiceQuickMenu: React.FC<VoiceQuickMenuProps> = ({
           }`}>
             <div className="flex items-center gap-2">
               <div className="w-6 h-6 rounded-lg bg-amber-500/20 text-amber-400 flex items-center justify-center">
-                <Headphones className="w-3.5 h-3.5" />
+                <Volume2 className="w-3.5 h-3.5" />
               </div>
               <span className={`text-xs font-bold tracking-wide uppercase ${
                 forceDark ? 'text-zinc-200' : 'text-zinc-200 light:text-slate-800'

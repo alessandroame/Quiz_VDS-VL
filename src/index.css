@@ -6,6 +6,20 @@
   color-scheme: light dark;
 }
 
+/* Font Scaling (Cockpit V2 ergonomic tiers) */
+html[data-font-size="compact"] {
+  font-size: 14px;
+}
+
+html[data-font-size="normal"],
+html:not([data-font-size]) {
+  font-size: 16px;
+}
+
+html[data-font-size="large"] {
+  font-size: 18px;
+}
+
 html, body {
   margin: 0;
   padding: 0;

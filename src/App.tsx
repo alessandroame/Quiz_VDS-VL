@@ -15,6 +15,7 @@ import { OfflineBanner } from './components/OfflineIndicator';
 import { Download, AlertTriangle, Play, ArrowRight, X } from 'lucide-react';
 import { voiceService } from './services/voiceService';
 import { audioDownloadManager } from './services/audioDownloadManager';
+import { applyFontSizePreference } from './utils/fontSize';
 
 function AppContent() {
   const {
@@ -53,6 +54,13 @@ function AppContent() {
       return () => clearTimeout(timer);
     }
   }, [isSettingsLoaded, settings.audioAutoUpdateOnline]);
+
+  // Applica reattivamente la scala caratteri (Compatto / Normale / Grande)
+  useEffect(() => {
+    if (isSettingsLoaded) {
+      applyFontSizePreference(settings.fontSizePreference || 'normal');
+    }
+  }, [isSettingsLoaded, settings.fontSizePreference]);
 
   // Protezione prima della chiusura/ricaricamento pagina se c'è un esame attivo
   useEffect(() => {

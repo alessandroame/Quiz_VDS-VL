@@ -38,8 +38,11 @@ export interface ExamSession {
 
 export type ThemeMode = 'dark' | 'light' | 'system';
 
+export type FontSizePreference = 'compact' | 'normal' | 'large';
+
 export interface AppSettings {
   theme: ThemeMode;
+  fontSizePreference?: FontSizePreference;
   examTimerMinutes: number; // 45 standard
   immediateFeedbackInTopics: boolean;
   soundEnabled: boolean;

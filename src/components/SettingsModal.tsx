@@ -34,6 +34,7 @@ import { googleDrive } from '../services/googleDrive';
 import { voiceService } from '../services/voiceService';
 import { exportDatabaseBackup, importDatabaseBackup, db } from '../db';
 import type { ThemeMode } from '../types/database';
+import { FONT_SIZE_OPTIONS, getFontSizeLabel } from '../utils/fontSize';
 import { VoiceCommandsModal } from './VoiceCommandsModal';
 import {
   audioDownloadManager,
@@ -368,7 +369,8 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
     }
   };
 
-  const appearanceSummary = `${theme === 'dark' ? 'Scuro' : theme === 'light' ? 'Chiaro' : 'Auto'} • ${
+  const fontLabel = getFontSizeLabel(settings.fontSizePreference || 'normal');
+  const appearanceSummary = `${theme === 'dark' ? 'Scuro' : theme === 'light' ? 'Chiaro' : 'Auto'} • ${fontLabel} • ${
     settings.immediateFeedbackInTopics ? 'Feedback ON' : 'Feedback OFF'
   }`;
 
@@ -510,6 +512,44 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                       >
                         <Icon className="w-3.5 h-3.5" />
                         <span>{item.label}</span>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* Selezione Scala Caratteri (Font Scaling) */}
+              <div className="space-y-2 pt-2 border-t border-zinc-800/80 light:border-slate-100">
+                <div className="flex items-center justify-between">
+                  <label className="text-xs font-bold text-zinc-400 uppercase tracking-wider block">
+                    Dimensione Caratteri
+                  </label>
+                  <span className="text-[11px] font-mono text-amber-400 font-semibold">
+                    {fontLabel}
+                  </span>
+                </div>
+                <div className="grid grid-cols-3 gap-2">
+                  {FONT_SIZE_OPTIONS.map(opt => {
+                    const isSelected = (settings.fontSizePreference || 'normal') === opt.id;
+                    return (
+                      <button
+                        key={opt.id}
+                        id={`font-size-btn-${opt.id}`}
+                        type="button"
+                        onClick={() => updateSetting('fontSizePreference', opt.id)}
+                        className={`py-2 px-2.5 rounded-xl border text-left flex flex-col justify-between transition-all ${
+                          isSelected
+                            ? 'border-amber-500 bg-amber-500/20 text-amber-300 light:border-amber-600 light:bg-amber-50 light:text-amber-800 shadow-sm'
+                            : 'border-zinc-800 bg-zinc-950/60 text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800/40 light:border-slate-200 light:bg-slate-50 light:text-slate-600'
+                        }`}
+                      >
+                        <div className="flex items-center justify-between w-full">
+                          <span className="text-xs font-bold">{opt.label}</span>
+                          <span className="text-[10px] font-mono opacity-70">{opt.sizeLabel}</span>
+                        </div>
+                        <span className="text-[10px] opacity-75 mt-0.5 line-clamp-1">
+                          {opt.id === 'compact' ? 'Zero-scroll' : opt.id === 'large' ? 'Outdoor/Bici' : 'Standard'}
+                        </span>
                       </button>
                     );
                   })}
