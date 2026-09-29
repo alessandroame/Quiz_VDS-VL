@@ -16,6 +16,30 @@ Questo documento registra in ordine cronologico tutte le lavorazioni svolte nel 
 
 ---
 
+### [2026-09-29] - Modale Onboarding Scelta Disciplina al Primo Avvio (Parapendio / Deltaplano / Tutti)
+- **Cosa abbiamo fatto**:
+  - Creato il componente [src/components/DisciplineOnboardingModal.tsx](file:///c:/github/Quiz_VDS-VL/src/components/DisciplineOnboardingModal.tsx) per consentire all'allievo pilota di selezionare la propria disciplina di studio al primo avvio dell'app:
+    * Presenta 3 schede interattive chiare e sobrie: **Parapendio** (474 quiz), **Deltaplano** (458 quiz) e **Tutti i Quiz** (504 quiz AeCI completo).
+    * Su richiesta dell'utente ("togli i pill consigliato xyz"), rimossi tutti i badge pill di raccomandazione/slogan (`[Consigliato Parapendio]`, `[Consigliato Deltaplano]`, `[Volo Libero Unificato]`), lasciando un'intestazione pulita, sobria ed essenziale (titolo del mezzo e contatore quiz).
+    * Box informativo di salvaguardia: ricorda esplicitamente che i 428 quesiti di teoria comune (aerodinamica, meteo, normativa D.P.R. 133/2010, primo soccorso, sicurezza e strumenti) rimangono sempre inclusi in qualsiasi scelta.
+    * Pulsante primario di conferma: *"Conferma e Inizia lo Studio →"* (`#btn-confirm-discipline-onboarding`).
+  - Esteso il modello dati e la persistenza Dexie:
+    * In [src/types/database.ts](file:///c:/github/Quiz_VDS-VL/src/types/database.ts): aggiunto `disciplineOnboardingDone?: boolean` ad `AppSettings`.
+    * In [src/db/index.ts](file:///c:/github/Quiz_VDS-VL/src/db/index.ts): aggiunto `disciplineOnboardingDone: false` a `DEFAULT_SETTINGS`.
+    * In [src/context/QuizContext.tsx](file:///c:/github/Quiz_VDS-VL/src/context/QuizContext.tsx): esposto `isSettingsLoaded: boolean` calcolato reattivamente su Dexie (`rawSettings !== undefined`) per evitare sfarfallii (zero layout flicker) al caricamento dei profili esistenti.
+    * In [src/App.tsx](file:///c:/github/Quiz_VDS-VL/src/App.tsx): renderizzato `<DisciplineOnboardingModal isOpen={isSettingsLoaded && !settings.disciplineOnboardingDone} />`.
+  - Testing & Quality Assurance:
+    * In [src/db/database.test.ts](file:///c:/github/Quiz_VDS-VL/src/db/database.test.ts): aggiunto unit test `DB-13` per la persistenza di `disciplineOnboardingDone` e `disciplinePreference`. Totale test unitari: 141/141 passati su 16 suite.
+    * Creato lo script CDP headless [scripts/test_discipline_onboarding.cjs](file:///c:/github/Quiz_VDS-VL/scripts/test_discipline_onboarding.cjs) (`npm run test:visual:onboarding`): verificata la comparsa al primo avvio, la selezione e salvataggio della disciplina, la chiusura automatica, la mancata ricomparsa al secondo avvio (persistenza garantita) e 0 errori in console browser.
+    * Catturati gli screenshot di verifica su Mobile Portrait 390x844 ([public/test_discipline_onboarding_mobile.png](file:///c:/github/Quiz_VDS-VL/public/test_discipline_onboarding_mobile.png)) e Desktop 1440x900 ([public/test_discipline_onboarding_desktop.png](file:///c:/github/Quiz_VDS-VL/public/test_discipline_onboarding_desktop.png)).
+- **Scelte architetturali & Rationale**:
+  - *Zero-Flicker Onboarding via isSettingsLoaded*: Interrogare `db.settings` in IndexedDB è un'operazione asincrona. Se il modal venisse montato prima che `useLiveQuery` restituisca i dati reali, gli utenti di ritorno che hanno già completato l'onboarding vedrebbero un flash del modal per poche decine di millisecondi. Condizionando l'apertura a `isSettingsLoaded && !settings.disciplineOnboardingDone`, il rendering è solido e deterministico.
+  - *Microcopy Essenziale (No Slogan)*: Rimossi i pill "Consigliato" in pieno accordo con la regola di progetto di eliminare etichette ridondanti e lasciare spazio a dati oggettivi (titolo mezzo, conteggio domande ed elenco concetti inclusi/esclusi).
+- **Impatto sul Desiderata**:
+  - Esperienza di benvenuto e onboarding fluida e immediata per ogni nuovo allievo pilota che accede alla web app per la prima volta.
+
+---
+
 ### [2026-09-29] - Implementazione Filtro Domande Esclusive Deltaplano e Parapendio (Discipline Tagging con Salvaguardia Teoria Comune - Fase 8.1)
 - **Cosa abbiamo fatto**:
   - Audit semantico approfondito dei 504 quiz ministeriali AeCI (edizione 2017) per identificare i quesiti esclusivi del deltaplano (30 quesiti: 18 in Pilotaggio 7062-7079, 6 in Materiali 8011-8016, 6 in Sicurezza 9037-9042), i quesiti esclusivi del parapendio (46 quesiti: 25 in Pilotaggio 7036, 7038-7061, 10 in Materiali 8001-8010, 11 in Sicurezza 9023-9024, 9026-9028, 9031-9036) e la teoria comune condivisa (428 quesiti trasversali, inclusi Q2147 effetto suolo, Q1036 precedenze tra mezzi e Q8017-8020 paracadute di soccorso).

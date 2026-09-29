@@ -18,7 +18,9 @@
     "test:visual:drive": "node scripts/test_drive_mode.js",
     "test:visual:tutor": "node scripts/test_drive_tutor.js",
     "test:visual:mic": "node scripts/test_mic_pulsing.cjs",
-    "test:visual:discipline": "node scripts/test_discipline_filters.cjs"
+    "test:visual:discipline": "node scripts/test_discipline_filters.cjs",
+    "test:visual:onboarding": "node scripts/test_discipline_onboarding.cjs",
+    "build:audio:manifest": "python scripts/generate_audio_manifest.py"
   },
   "dependencies": {
     "canvas-confetti": "^1.9.4",

@@ -146,15 +146,36 @@ export const DriveModeScreen: React.FC<DriveModeScreenProps> = ({
   const recognizedLabelTimerRef = useRef<any>(null);
   const unrecognizedTimerRef = useRef<any>(null);
 
-  // Trigger prompt audio offline al primo avvio della Guida se la voce attiva non è scaricata
+  // Trigger prompt audio offline al primo avvio della Guida solo se NESSUNA voce è già scaricata offline
   useEffect(() => {
+    let isCancelled = false;
     if (isOpen && !settings.audioOfflinePromptDismissed) {
       const activeVoice = settings.ttsVoice || 'giuseppe';
-      if (!audioDownloadManager.isVoiceReady(activeVoice)) {
-        setShowOfflinePrompt(true);
-      }
+
+      // Verifica accurata asincrona dello stato effettivo in CacheStorage
+      audioDownloadManager.checkAllStatuses().then(statuses => {
+        if (isCancelled) return;
+        const activeStatus = statuses[activeVoice];
+        const isActiveDownloaded = activeStatus.isComplete || activeStatus.downloadedCount >= 2000;
+        const isAnyDownloaded = statuses.giuseppe.isComplete || statuses.giuseppe.downloadedCount >= 2000 ||
+                               statuses.elsa.isComplete || statuses.elsa.downloadedCount >= 2000;
+
+        // Se la voce attiva o almeno una voce completa è già presente offline, NON mostrare il prompt
+        if (isActiveDownloaded || isAnyDownloaded) {
+          updateSetting('audioOfflinePromptDismissed', true);
+        } else {
+          setShowOfflinePrompt(true);
+        }
+      }).catch(() => {
+        if (!isCancelled && !audioDownloadManager.isVoiceReady(activeVoice) && !audioDownloadManager.getAvailableOfflineVoice()) {
+          setShowOfflinePrompt(true);
+        }
+      });
     }
-  }, [isOpen, settings.audioOfflinePromptDismissed, settings.ttsVoice]);
+    return () => {
+      isCancelled = true;
+    };
+  }, [isOpen, settings.audioOfflinePromptDismissed, settings.ttsVoice, updateSetting]);
 
   // Listener notifica fallback vocale cockpit
   useEffect(() => {

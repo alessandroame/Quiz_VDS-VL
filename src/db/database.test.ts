@@ -265,4 +265,20 @@ describe('Suite 4: Persistenza Dexie IndexedDB (src/db/index.ts)', () => {
     const reverted = await getSetting('driveModeIntroPlayed', true);
     expect(reverted).toBe(false);
   });
+
+  it('DB-13: default e aggiornamento delle impostazioni disciplinePreference e disciplineOnboardingDone', async () => {
+    // Act 1: default values
+    const all = await getAllSettings();
+    expect(all.disciplinePreference).toBe('all');
+    expect(all.disciplineOnboardingDone).toBe(false);
+
+    // Act 2: save onboarding preference
+    await setSetting('disciplinePreference', 'paraglider');
+    await setSetting('disciplineOnboardingDone', true);
+
+    const updatedDisc = await getSetting('disciplinePreference', 'all');
+    const updatedDone = await getSetting('disciplineOnboardingDone', false);
+    expect(updatedDisc).toBe('paraglider');
+    expect(updatedDone).toBe(true);
+  });
 });

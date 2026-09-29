@@ -9,6 +9,7 @@ import { ArchiveScreen } from './components/ArchiveScreen';
 import { StatsScreen } from './components/StatsScreen';
 import { SettingsModal } from './components/SettingsModal';
 import { DriveModeScreen } from './components/DriveModeScreen';
+import { DisciplineOnboardingModal } from './components/DisciplineOnboardingModal';
 import { OfflineBanner } from './components/OfflineIndicator';
 import { Download, AlertTriangle, Play, ArrowRight, X } from 'lucide-react';
 import { voiceService } from './services/voiceService';
@@ -22,7 +23,9 @@ function AppContent() {
     closeDriveMode,
     driveSessionContext,
     activeSession,
-    dismissActiveSession
+    dismissActiveSession,
+    settings,
+    isSettingsLoaded
   } = useQuiz();
   const [activeTab, setActiveTab] = useState<NavTab>('exam');
   const [pendingTab, setPendingTab] = useState<NavTab | null>(null);
@@ -39,6 +42,16 @@ function AppContent() {
       setIsAudioDownloading(isDownloading);
     });
   }, []);
+
+  // Controllo automatico aggiornamenti audio in background all'avvio (se online e abilitato)
+  useEffect(() => {
+    if (isSettingsLoaded && settings.audioAutoUpdateOnline !== false) {
+      const timer = setTimeout(() => {
+        audioDownloadManager.autoCheckAndSyncOnStartup().catch(() => {});
+      }, 4000);
+      return () => clearTimeout(timer);
+    }
+  }, [isSettingsLoaded, settings.audioAutoUpdateOnline]);
 
   // Protezione prima della chiusura/ricaricamento pagina se c'è un esame attivo
   useEffect(() => {
@@ -205,6 +218,11 @@ function AppContent() {
         isOpen={isDriveModeOpen}
         onClose={closeDriveMode}
         sessionContext={driveSessionContext || undefined}
+      />
+
+      {/* Onboarding Iniziale Selezione Corso (Primo Avvio) */}
+      <DisciplineOnboardingModal
+        isOpen={isSettingsLoaded && !settings.disciplineOnboardingDone}
       />
 
       {/* Modal di Avviso Cambio Pagina durante Esame Attivo */}

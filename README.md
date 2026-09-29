@@ -48,7 +48,8 @@
   - Selettore ergonomico con icone e contatori dinamici presente nel launcher di **Simulazione Esame**, nello **Studio per Materie** e nell'**Archivio Completo**.
   - Badge visivo discreto su ciascun quesito esclusivo (`Deltaplano` o `Parapendio`).
   - Integrazione con il *Fair Coverage Randomizer* per estrarre le 30 domande d'esame rispettando le 9 quote ministeriali AeCI all'interno della disciplina scelta.
-  - Impostazione della disciplina predefinita salvata stabilmente su IndexedDB (*Impostazioni -> Aspetto & Studio*).
+  - **Configurazione Iniziale al Primo Avvio (Onboarding Guidato)**: all'apertura dell'app per la prima volta, una modale avionica sobria ed essenziale chiede all'allievo quale corso stia frequentando (Parapendio, Deltaplano o Tutti i Quiz) per impostare immediatamente l'ambiente di studio ottimale, memorizzando la preferenza su IndexedDB senza più richiederla ai successivi avvii.
+  - Impostazione della disciplina predefinita modificabile in qualsiasi momento su IndexedDB (*Impostazioni -> Aspetto & Studio* o dal selettore rapido).
 
 ### 3. Simulatore d'Esame & Simulazione Didattica (Tutor)
 - **Due Modalità di Simulazione Dedicate**:
@@ -292,6 +293,9 @@ npm run test:visual:drive
 
 # Collaudo visivo del filtro disciplina Deltaplano / Parapendio (CDP Mobile & Desktop)
 npm run test:visual:discipline
+
+# Collaudo visivo del flusso onboarding al primo avvio (CDP Mobile & Desktop)
+npm run test:visual:onboarding
 ```
 
 ---

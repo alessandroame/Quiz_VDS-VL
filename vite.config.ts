@@ -77,6 +77,18 @@ export default defineConfig({
         globPatterns: ['**/*.{js,css,html,ico,png,svg,json}'],
         runtimeCaching: [
           {
+            urlPattern: ({ url }) => url.pathname.includes('/audio/manifest.json'),
+            handler: 'NetworkFirst',
+            options: {
+              cacheName: 'vds-audio-manifest',
+              networkTimeoutSeconds: 3,
+              expiration: {
+                maxEntries: 2,
+                maxAgeSeconds: 60 * 60 * 24 * 7 // 7 giorni
+              }
+            }
+          },
+          {
             urlPattern: ({ url }) => url.pathname.endsWith('.json'),
             handler: 'CacheFirst',
             options: {

@@ -55,6 +55,7 @@ interface QuizContextType {
   disciplineFilter: Discipline;
   setDisciplineFilter: (discipline: Discipline) => Promise<void>;
   filteredQuestions: Question[];
+  isSettingsLoaded: boolean;
 }
 
 const QuizContext = createContext<QuizContextType | null>(null);
@@ -78,7 +79,9 @@ export const QuizProvider: React.FC<{ children: React.ReactNode }> = ({ children
   // Reattività istantanea con Dexie live queries
   const statsList = useLiveQuery(() => db.stats.toArray(), []) || [];
   const sessions = useLiveQuery(() => db.sessions.orderBy('date').reverse().toArray(), []) || [];
-  const settingsList = useLiveQuery(() => db.settings.toArray(), []) || [];
+  const rawSettings = useLiveQuery(() => db.settings.toArray(), []);
+  const settingsList = rawSettings || [];
+  const isSettingsLoaded = rawSettings !== undefined;
   const activeSessionEntry = useLiveQuery(() => db.settings.get('activeSession'), []);
   const [isLocallyDismissed, setIsLocallyDismissed] = useState(false);
 
@@ -242,7 +245,8 @@ export const QuizProvider: React.FC<{ children: React.ReactNode }> = ({ children
         syncNow,
         disciplineFilter,
         setDisciplineFilter,
-        filteredQuestions
+        filteredQuestions,
+        isSettingsLoaded
       }}
     >
       {children}

@@ -59,6 +59,9 @@ export interface AppSettings {
   audioOfflinePromptDismissed?: boolean;
   driveModeTutor?: boolean;
   disciplinePreference?: Discipline;
+  disciplineOnboardingDone?: boolean;
+  audioAutoUpdateOnline?: boolean;
+  lastAudioCheckAt?: number;
 }
 
 export interface InProgressSession {

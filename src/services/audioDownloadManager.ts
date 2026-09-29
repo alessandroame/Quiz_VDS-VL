@@ -2,8 +2,17 @@
 // Manages non-blocking background downloads of neural TTS audio snippets into CacheStorage
 
 import questionsData from '../data/questions.json';
+import type {
+  VoiceName,
+  AudioManifest,
+  VoiceUpdateDetail,
+  AudioUpdateCheckResult,
+  InstalledVoiceMetadata
+} from '../types/audio';
+import { db } from '../db';
 
-export type VoiceName = 'giuseppe' | 'elsa';
+export type { VoiceName, AudioManifest, VoiceUpdateDetail, AudioUpdateCheckResult, InstalledVoiceMetadata };
+
 
 export interface VoiceDownloadProgress {
   voice: VoiceName;
@@ -285,6 +294,20 @@ export class AudioDownloadManager {
         const finalCount = finalKeys.length;
         const isComplete = finalCount >= totalCount;
 
+        if (isComplete) {
+          // Record installed metadata from remote manifest in background
+          this.fetchRemoteManifest().then(manifest => {
+            if (manifest && manifest.voices[voice]) {
+              this.saveInstalledMetadata({
+                voice,
+                version: manifest.voices[voice].version,
+                hashes: { ...manifest.voices[voice].files },
+                lastCheckedAt: Date.now()
+              });
+            }
+          }).catch(() => {});
+        }
+
         this.statuses[voice] = {
           voice,
           downloadedCount: finalCount,
@@ -344,6 +367,12 @@ export class AudioDownloadManager {
       }
     }
 
+    try {
+      await db.settings.delete(`audio_metadata_${voice}`);
+    } catch {
+      // Ignore settings cleanup error
+    }
+
     this.statuses[voice] = {
       voice,
       downloadedCount: 0,
@@ -373,6 +402,218 @@ export class AudioDownloadManager {
     if (this.statuses.giuseppe.downloadedCount > 500) return 'giuseppe';
     if (this.statuses.elsa.downloadedCount > 500) return 'elsa';
     return null;
+  }
+
+  public getManifestUrl(): string {
+    return `${this.getBaseUrl()}/audio/manifest.json`;
+  }
+
+  public async fetchRemoteManifest(): Promise<AudioManifest | null> {
+    if (typeof window === 'undefined' || typeof fetch === 'undefined') return null;
+    try {
+      const resp = await fetch(`${this.getManifestUrl()}?_t=${Date.now()}`, { cache: 'no-cache' });
+      if (!resp.ok) return null;
+      return (await resp.json()) as AudioManifest;
+    } catch (err) {
+      console.warn('Failed to fetch audio manifest:', err);
+      return null;
+    }
+  }
+
+  public async getInstalledMetadata(voice: VoiceName): Promise<InstalledVoiceMetadata | null> {
+    try {
+      const entry = await db.settings.get(`audio_metadata_${voice}`);
+      return entry ? (entry.value as InstalledVoiceMetadata) : null;
+    } catch {
+      return null;
+    }
+  }
+
+  public async saveInstalledMetadata(metadata: InstalledVoiceMetadata): Promise<void> {
+    try {
+      await db.settings.put({
+        key: `audio_metadata_${metadata.voice}`,
+        value: metadata
+      });
+    } catch (err) {
+      console.warn(`Failed to save audio metadata for ${metadata.voice}:`, err);
+    }
+  }
+
+  /**
+   * Checks if any files in CacheStorage need updating compared to the remote manifest.
+   */
+  public async checkAudioUpdates(targetVoice?: VoiceName): Promise<AudioUpdateCheckResult> {
+    const emptyResult: AudioUpdateCheckResult = {
+      hasUpdates: false,
+      manifest: null,
+      voiceUpdates: {
+        giuseppe: { hasUpdates: false, currentVersion: 'unknown', remoteVersion: 'unknown', staleFiles: [], totalStaleBytes: 0 },
+        elsa: { hasUpdates: false, currentVersion: 'unknown', remoteVersion: 'unknown', staleFiles: [], totalStaleBytes: 0 }
+      }
+    };
+
+    if (typeof navigator !== 'undefined' && !navigator.onLine) {
+      emptyResult.isOffline = true;
+      return emptyResult;
+    }
+
+    const manifest = await this.fetchRemoteManifest();
+    if (!manifest) {
+      emptyResult.error = 'Manifest non disponibile';
+      return emptyResult;
+    }
+    emptyResult.manifest = manifest;
+
+    const voicesToCheck: VoiceName[] = targetVoice ? [targetVoice] : ['giuseppe', 'elsa'];
+    let overallHasUpdates = false;
+
+    for (const v of voicesToCheck) {
+      const remoteVoice = manifest.voices[v];
+      if (!remoteVoice) continue;
+
+      await this.checkStatus(v);
+      const isDownloaded = this.isVoiceReady(v);
+      if (!isDownloaded) {
+        emptyResult.voiceUpdates[v] = {
+          hasUpdates: false,
+          currentVersion: 'not_installed',
+          remoteVersion: remoteVoice.version,
+          staleFiles: [],
+          totalStaleBytes: 0
+        };
+        continue;
+      }
+
+      let installed = await this.getInstalledMetadata(v);
+      if (!installed) {
+        installed = {
+          voice: v,
+          version: remoteVoice.version,
+          hashes: { ...remoteVoice.files },
+          lastCheckedAt: Date.now()
+        };
+        await this.saveInstalledMetadata(installed);
+      }
+
+      const staleFiles: string[] = [];
+      let totalStaleBytes = 0;
+
+      for (const [filename, remoteHash] of Object.entries(remoteVoice.files)) {
+        const localHash = installed.hashes[filename];
+        if (localHash !== remoteHash) {
+          staleFiles.push(filename);
+          totalStaleBytes += 60000;
+        }
+      }
+
+      const hasVoiceUpdates = staleFiles.length > 0;
+      if (hasVoiceUpdates) overallHasUpdates = true;
+
+      emptyResult.voiceUpdates[v] = {
+        hasUpdates: hasVoiceUpdates,
+        currentVersion: installed.version,
+        remoteVersion: remoteVoice.version,
+        staleFiles,
+        totalStaleBytes
+      };
+    }
+
+    emptyResult.hasUpdates = overallHasUpdates;
+    return emptyResult;
+  }
+
+  /**
+   * Performs differential updating: downloads ONLY stale/modified snippets into CacheStorage.
+   */
+  public async applyAudioUpdates(
+    voice: VoiceName,
+    onProgress?: (percent: number, current: number, total: number) => void
+  ): Promise<{ updatedCount: number; error: string | null }> {
+    if (typeof window === 'undefined' || !('caches' in window)) {
+      return { updatedCount: 0, error: 'CacheStorage non supportato' };
+    }
+
+    const check = await this.checkAudioUpdates(voice);
+    const detail = check.voiceUpdates[voice];
+    if (!detail || !detail.hasUpdates || detail.staleFiles.length === 0) {
+      return { updatedCount: 0, error: null };
+    }
+
+    const manifest = check.manifest;
+    const remoteVoice = manifest?.voices[voice];
+    if (!remoteVoice) {
+      return { updatedCount: 0, error: 'Manifest vocale mancante' };
+    }
+
+    try {
+      const cacheName = this.getCacheName(voice);
+      const cache = await window.caches.open(cacheName);
+      const baseUrl = this.getBaseUrl();
+      const total = detail.staleFiles.length;
+      let updated = 0;
+
+      const installed = (await this.getInstalledMetadata(voice)) || {
+        voice,
+        version: remoteVoice.version,
+        hashes: {},
+        lastCheckedAt: Date.now()
+      };
+
+      for (const filename of detail.staleFiles) {
+        const canonicalUrl = `${baseUrl}/audio/${voice}/${filename}`;
+        const newHash = remoteVoice.files[filename] || '';
+        const fetchUrl = `${canonicalUrl}?v=${newHash}&_t=${Date.now()}`;
+
+        try {
+          const resp = await fetch(fetchUrl, { cache: 'reload' });
+          if (resp.ok) {
+            await cache.put(canonicalUrl, resp);
+            installed.hashes[filename] = newHash;
+            updated++;
+          }
+        } catch (fetchErr) {
+          console.warn(`Errore aggiornamento file ${filename}:`, fetchErr);
+        }
+
+        if (onProgress) {
+          const pct = Math.round((updated / total) * 100);
+          onProgress(pct, updated, total);
+        }
+      }
+
+      installed.version = remoteVoice.version;
+      installed.lastCheckedAt = Date.now();
+      await this.saveInstalledMetadata(installed);
+
+      await this.checkStatus(voice);
+      return { updatedCount: updated, error: null };
+    } catch (err: any) {
+      return { updatedCount: 0, error: err?.message || 'Errore aggiornamento' };
+    }
+  }
+
+  /**
+   * Automated silent sync on app startup (if online and auto-sync enabled).
+   */
+  public async autoCheckAndSyncOnStartup(): Promise<void> {
+    if (typeof window === 'undefined' || typeof navigator === 'undefined' || !navigator.onLine) {
+      return;
+    }
+
+    try {
+      const check = await this.checkAudioUpdates();
+      if (!check.hasUpdates) return;
+
+      for (const voice of ['giuseppe', 'elsa'] as VoiceName[]) {
+        const detail = check.voiceUpdates[voice];
+        if (detail.hasUpdates && detail.staleFiles.length > 0 && detail.staleFiles.length <= 25) {
+          await this.applyAudioUpdates(voice);
+        }
+      }
+    } catch (err) {
+      console.warn('[AudioDownloadManager] Auto-sync check failed:', err);
+    }
   }
 }
 
