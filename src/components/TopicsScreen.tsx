@@ -159,9 +159,9 @@ export const TopicsScreen: React.FC = () => {
     const answeredCount = Object.keys(sessionAnswers).length;
 
     return (
-      <div className="max-w-2xl mx-auto px-4 py-4 space-y-4 pb-28 sm:pb-32">
+      <div className="max-w-2xl mx-auto px-2.5 sm:px-4 py-2 sm:py-3 space-y-2.5 sm:space-y-3 pb-20 sm:pb-24">
         {/* Top bar sessione */}
-        <div className="flex items-center justify-between p-3 bg-zinc-900 border border-zinc-800 rounded-xl light:bg-white light:border-slate-200">
+        <div className="flex items-center justify-between p-2 sm:p-2.5 bg-zinc-900 border border-zinc-800 rounded-xl light:bg-white light:border-slate-200">
           <button
             onClick={() => {
               setActiveSubjectId(null);

@@ -172,9 +172,9 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({
   };
 
   return (
-    <div className="w-full bg-zinc-900 border border-zinc-800 rounded-xl p-4 sm:p-6 shadow-md dark:bg-zinc-900 dark:border-zinc-800 light:bg-white light:border-slate-200 light:shadow-sm transition-all">
+    <div className="w-full bg-zinc-900 border border-zinc-800 rounded-2xl p-3 sm:p-4 shadow-md dark:bg-zinc-900 dark:border-zinc-800 light:bg-white light:border-slate-200 light:shadow-sm transition-all">
       {/* Top Header Card */}
-      <div className="flex items-center justify-between gap-2 mb-3 pb-2 border-b border-zinc-800/80 light:border-slate-100 text-xs">
+      <div className="flex items-center justify-between gap-2 mb-2 pb-1.5 border-b border-zinc-800/80 light:border-slate-100 text-xs">
         <div className="flex items-center gap-2">
           <span className="font-mono font-bold text-amber-400 light:text-amber-600 bg-amber-500/10 px-2 py-0.5 rounded">
             #{question.id}
@@ -386,11 +386,11 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({
       )}
 
       {/* Testo Domanda con microfono / speaker dedicato */}
-      <div className="flex items-start gap-2 mb-5">
+      <div className="flex items-start gap-2 mb-2.5 sm:mb-3">
         <h3
           lang="it"
           translate="no"
-          className={`text-base sm:text-lg font-medium leading-snug flex-1 transition-colors ${
+          className={`text-sm sm:text-base font-semibold leading-snug flex-1 transition-colors ${
           isPartPlaying('question')
             ? 'text-amber-300 light:text-amber-700'
             : isPartPaused('question')
@@ -444,7 +444,7 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({
       </div>
 
       {/* 3 Opzioni */}
-      <div className="space-y-2.5">
+      <div className="space-y-2">
         {question.options.map((opt, idx) => {
           const optNum = (idx + 1) as 1 | 2 | 3;
           const isSelected = selectedAnswer === optNum;
@@ -482,10 +482,10 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({
               translate="no"
               onClick={() => handleSelect(optNum)}
               disabled={showFeedback && selectedAnswer !== undefined}
-              className={`w-full text-left p-3.5 sm:p-4 rounded-xl border transition-all flex items-start gap-3 text-sm leading-relaxed ${btnStyle}`}
+              className={`w-full text-left p-2.5 sm:p-3 min-h-[44px] sm:min-h-[48px] rounded-xl border transition-all flex items-start gap-2.5 sm:gap-3 text-xs sm:text-sm leading-snug ${btnStyle}`}
             >
               <span
-                className={`w-6 h-6 rounded-full flex-shrink-0 flex items-center justify-center font-bold text-xs mt-0.5 ${
+                className={`w-5 h-5 sm:w-6 sm:h-6 rounded-full flex-shrink-0 flex items-center justify-center font-bold text-[11px] sm:text-xs mt-0.5 ${
                   showFeedback && selectedAnswer
                     ? isCorrectAnswer
                       ? 'bg-emerald-500 text-white'
@@ -502,7 +502,7 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({
                 {optNum}
               </span>
 
-              <div className="flex-1 pt-0.5" lang="it">
+              <div className="flex-1 pt-0.5 leading-snug" lang="it">
                 <span>{opt}</span>
               </div>
 
@@ -585,8 +585,8 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({
 
       {/* Spiegazione Sintetica (visibile se feedback attivo e risposta data) */}
       {showFeedback && selectedAnswer && (
-        <div className="mt-4 pt-3 border-t border-zinc-800 light:border-slate-200 text-xs animate-in fade-in duration-200">
-          <div className="flex items-center justify-between font-bold mb-1.5">
+        <div className="mt-2.5 pt-2 border-t border-zinc-800 light:border-slate-200 text-xs animate-in fade-in duration-150">
+          <div className="flex items-center justify-between font-bold mb-1">
             <div className="flex items-center gap-1.5">
               {selectedAnswer === question.correctAnswer ? (
                 <span className="text-emerald-400 light:text-emerald-600 flex items-center gap-1">
@@ -664,7 +664,7 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({
           <div
             lang="it"
             translate="no"
-            className="space-y-1.5 text-zinc-300 light:text-slate-700 bg-zinc-950/60 light:bg-slate-50 p-2.5 rounded-lg border border-zinc-800/60 light:border-slate-200"
+            className="space-y-1 text-xs text-zinc-300 light:text-slate-700 bg-zinc-950/60 light:bg-slate-50 p-2 sm:p-2.5 rounded-lg border border-zinc-800/60 light:border-slate-200 leading-snug"
           >
             <div>
               <strong className="text-emerald-400 light:text-emerald-600">Regola: </strong>

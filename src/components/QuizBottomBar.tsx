@@ -52,15 +52,15 @@ export const QuizBottomBar: React.FC<QuizBottomBarProps> = ({
     <nav
       id="quiz-bottom-bar"
       aria-label={`Navigazione quiz: quesito ${currentIndex + 1} di ${totalCount}`}
-      className={`fixed bottom-0 left-0 right-0 z-30 bg-zinc-950/95 dark:bg-zinc-950/95 light:bg-white/95 backdrop-blur-md border-t border-zinc-800 light:border-slate-200 shadow-lg px-4 py-2.5 sm:py-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] transition-all ${className}`}
+      className={`fixed bottom-0 left-0 right-0 z-30 bg-zinc-950/95 dark:bg-zinc-950/95 light:bg-white/95 backdrop-blur-md border-t border-zinc-800 light:border-slate-200 shadow-lg px-3 sm:px-4 py-2 sm:py-2.5 pb-[max(0.5rem,env(safe-area-inset-bottom))] transition-all ${className}`}
     >
-      <div className="max-w-2xl mx-auto flex items-center justify-between gap-2.5">
+      <div className="max-w-2xl mx-auto flex items-center justify-between gap-2 sm:gap-2.5">
         {/* Previous button */}
         <button
           id={previousId}
           onClick={onPrevious}
           disabled={isPreviousDisabled}
-          className="px-3.5 sm:px-4 py-2.5 rounded-xl border border-zinc-800 bg-zinc-900 text-zinc-300 light:bg-slate-100 light:border-slate-200 light:text-slate-700 text-xs font-semibold flex items-center gap-1.5 disabled:opacity-30 disabled:cursor-not-allowed hover:bg-zinc-800 light:hover:bg-slate-200 transition-colors shrink-0 active:scale-[0.98]"
+          className="px-3 sm:px-3.5 py-2 min-h-[40px] rounded-xl border border-zinc-800 bg-zinc-900 text-zinc-300 light:bg-slate-100 light:border-slate-200 light:text-slate-700 text-xs font-semibold flex items-center gap-1.5 disabled:opacity-30 disabled:cursor-not-allowed hover:bg-zinc-800 light:hover:bg-slate-200 transition-colors shrink-0 active:scale-[0.98]"
           title="Domanda precedente"
         >
           <ArrowLeft className="w-4 h-4" />
@@ -72,7 +72,7 @@ export const QuizBottomBar: React.FC<QuizBottomBarProps> = ({
           <button
             id={flagAction.id || 'btn-flag-question-bottom'}
             onClick={flagAction.onToggle}
-            className={`px-3 py-2.5 rounded-xl border text-xs font-semibold flex items-center gap-1.5 shrink-0 transition-colors active:scale-[0.98] ${
+            className={`px-3 py-2 min-h-[40px] rounded-xl border text-xs font-semibold flex items-center gap-1.5 shrink-0 transition-colors active:scale-[0.98] ${
               flagAction.isFlagged
                 ? 'border-amber-500/60 bg-amber-500/20 text-amber-300 light:bg-amber-100 light:border-amber-400 light:text-amber-800 shadow-[0_0_8px_rgba(245,158,11,0.25)]'
                 : 'border-zinc-800 bg-zinc-900 text-zinc-400 light:bg-slate-100 light:border-slate-200 light:text-slate-600 hover:text-zinc-200 light:hover:text-slate-800'
@@ -100,7 +100,7 @@ export const QuizBottomBar: React.FC<QuizBottomBarProps> = ({
           <button
             id={primaryAction.id}
             onClick={primaryAction.onClick}
-            className={`py-2.5 px-4 rounded-xl font-bold text-xs sm:text-sm flex items-center justify-center gap-2 shadow-md transition-all active:scale-[0.99] flex-1 max-w-sm ${
+            className={`py-2 px-3.5 sm:px-4 min-h-[40px] rounded-xl font-bold text-xs sm:text-sm flex items-center justify-center gap-2 shadow-md transition-all active:scale-[0.99] flex-1 max-w-sm ${
               primaryAction.variant === 'emerald'
                 ? 'bg-emerald-600 hover:bg-emerald-500 text-white shadow-emerald-950/30'
                 : primaryAction.variant === 'default'
@@ -117,7 +117,7 @@ export const QuizBottomBar: React.FC<QuizBottomBarProps> = ({
               id={nextId}
               onClick={onNext}
               disabled={isNextDisabled}
-              className="px-3.5 sm:px-4 py-2.5 rounded-xl border border-zinc-800 bg-zinc-900 text-zinc-300 light:bg-slate-100 light:border-slate-200 light:text-slate-700 text-xs font-semibold flex items-center gap-1.5 disabled:opacity-30 disabled:cursor-not-allowed hover:bg-zinc-800 light:hover:bg-slate-200 transition-colors shrink-0 active:scale-[0.98]"
+              className="px-3 sm:px-3.5 py-2 min-h-[40px] rounded-xl border border-zinc-800 bg-zinc-900 text-zinc-300 light:bg-slate-100 light:border-slate-200 light:text-slate-700 text-xs font-semibold flex items-center gap-1.5 disabled:opacity-30 disabled:cursor-not-allowed hover:bg-zinc-800 light:hover:bg-slate-200 transition-colors shrink-0 active:scale-[0.98]"
               title="Domanda successiva"
             >
               <span>{nextLabel}</span>

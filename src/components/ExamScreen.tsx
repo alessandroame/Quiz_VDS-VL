@@ -584,9 +584,9 @@ export const ExamScreen: React.FC<ExamScreenProps> = ({ initialMode = 'tutor', o
 
   // --- Schermata RUNNING: Esame o Simulazione in Corso ---
   return (
-    <div className="max-w-2xl mx-auto px-4 py-4 space-y-4 pb-28 sm:pb-32">
+    <div className="max-w-2xl mx-auto px-2.5 sm:px-4 py-2 sm:py-3 space-y-2.5 sm:space-y-3 pb-20 sm:pb-24">
       {/* Top Bar: Timer, Progresso, Consegna */}
-      <div className="flex items-center justify-between gap-2 p-3 bg-zinc-900 border border-zinc-800 rounded-xl dark:bg-zinc-900 light:bg-white light:border-slate-200 shadow-sm sticky top-[52px] z-20">
+      <div className="flex items-center justify-between gap-2 p-2 sm:p-2.5 bg-zinc-900 border border-zinc-800 rounded-xl dark:bg-zinc-900 light:bg-white light:border-slate-200 shadow-sm sticky top-[48px] sm:top-[50px] z-20">
         <div className="flex items-center gap-2">
           {examMode === 'tutor' ? (
             <div className="flex items-center gap-1.5 font-mono font-bold text-sm px-2.5 py-1 rounded-lg bg-zinc-950 text-zinc-100 light:bg-slate-100 light:text-slate-800 border border-emerald-500/30">
