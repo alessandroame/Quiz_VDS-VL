@@ -68,7 +68,7 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab, openSet
     <>
       {/* Top Header */}
       <header className="sticky top-0 z-40 w-full border-b backdrop-blur bg-zinc-950/80 border-zinc-800 dark:bg-zinc-950/80 dark:border-zinc-800 light:bg-white/80 light:border-slate-200 light:text-slate-900 transition-colors">
-        <div className="max-w-4xl mx-auto px-3 sm:px-4 h-14 flex items-center justify-between gap-1 sm:gap-2 overflow-hidden">
+        <div className="max-w-4xl mx-auto px-3 sm:px-4 h-14 flex items-center justify-between gap-1 sm:gap-2">
           <div className="flex items-center gap-2 sm:gap-2.5 cursor-pointer min-w-0 flex-shrink" onClick={() => setActiveTab('exam')}>
             <img src="/favicon.svg" alt="VDS-VL" className="w-8 h-8 rounded-lg shadow-sm flex-shrink-0" />
             <div className="min-w-0">
@@ -158,7 +158,7 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab, openSet
       <AudioDownloadBanner />
 
       {/* Bottom Nav Bar (Mobile & Desktop) */}
-      <nav className="fixed bottom-0 left-0 right-0 z-40 border-t backdrop-blur bg-zinc-950/95 border-zinc-800 dark:bg-zinc-950/95 dark:border-zinc-800 light:bg-white/95 light:border-slate-200 transition-colors">
+      <nav className="fixed bottom-0 left-0 right-0 z-30 border-t backdrop-blur bg-zinc-950/95 border-zinc-800 dark:bg-zinc-950/95 dark:border-zinc-800 light:bg-white/95 light:border-slate-200 transition-colors">
         <div className="max-w-md mx-auto grid grid-cols-5 h-16 px-1">
           {navItems.map(item => {
             const Icon = item.icon;

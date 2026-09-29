@@ -16,6 +16,24 @@ Questo documento registra in ordine cronologico tutte le lavorazioni svolte nel 
 
 ---
 
+### [2026-09-29] - Portato in Primo Piano il Menu Rapido Impostazioni Voce (Fix Z-Index & Overflow)
+- **Cosa abbiamo fatto**:
+  - Risolto il problema per cui il menu rapido delle voci (`VoiceQuickMenu`) si apriva "in background" o veniva tagliato e reso invisibile:
+    * In [src/components/Navbar.tsx](file:///d:/Github/Quiz_VDS-VL/src/components/Navbar.tsx): rimosso `overflow-hidden` dal container interno della barra superiore (`h-14`), che causava il ritaglio completo del popover a 56px di altezza impedendone la visualizzazione al di sotto dell'header.
+    * In [src/components/Navbar.tsx](file:///d:/Github/Quiz_VDS-VL/src/components/Navbar.tsx): impostato `z-30` (anziché `z-40`) sulla barra di navigazione inferiore fissa (`<nav>`). Avendo `<header>` `z-40`, il popover del menu vocale (`z-[60]`) si colloca ora inequivocabilmente al di sopra della barra di navigazione inferiore anche su schermi a risoluzione verticale ridotta o orientamento orizzontale (mobile landscape).
+    * In [src/components/AudioDownloadBanner.tsx](file:///d:/Github/Quiz_VDS-VL/src/components/AudioDownloadBanner.tsx): allineato il livello z-index del banner inferiore di download da `z-40` a `z-30`, prevenendo sovrapposizioni anomale con i flyout e menu a comparsa della barra superiore.
+  - Verificato il comportamento tramite collaudo visivo headless CDP su viewport Desktop (1200x800), Mobile Portrait (390x844) e Mobile Landscape (844x390):
+    * Popover perfettamente in primo piano, pienamente leggibile e interattivo.
+    * 0 errori in console browser JavaScript.
+  - Verificata la suite unitaria Vitest (131 test su 131 superati) e la build di produzione (`tsc && vite build`).
+- **Scelte architetturali & Rationale**:
+  - *Removal of Header overflow-hidden*: I contenitori flex con altezza fissa (`h-14`) non devono mai avere `overflow-hidden` se contengono elementi a posizionamento assoluto come popover e dropdown (`VoiceQuickMenu`). La protezione dall'overflow orizzontale del testo sul logo è già gestita con precisione tramite `min-w-0 flex-shrink` e `truncate`.
+  - *Stacking Context Hierarchy (Header z-40 vs Bottom Nav z-30)*: Quando header superiore e bottom bar condividono lo stesso livello `z-40`, l'elemento che segue nel DOM (la bottom bar) viene renderizzato sopra i popover dell'header che si estendono verso il basso. Assegnando `z-40` all'header e `z-30` alla bottom bar e al banner di download, tutti i flyout discendenti dell'header mantengono la precedenza visiva in primo piano, preservando al contempo `z-50` per le modali a pieno schermo (`SettingsModal`, `DriveModeScreen`).
+- **Impatto sul Desiderata**:
+  - Il pilota può accedere istantaneamente e senza ostacoli visivi a tutte le impostazioni vocali rapide con 1 tocco dalla barra di navigazione.
+
+---
+
 ### [2026-09-29] - Aggiornamento Backlog Operativo: Filtro Deltaplano, Menu al Top, Impostazioni ad Accordion, Numero Versione
 - **Cosa abbiamo fatto**:
   - Aggiunti e dettagliati i nuovi requisiti operativi richiesti dall'utente all'interno di [TODO.md](file:///d:/Github/Quiz_VDS-VL/TODO.md) (Fase 8: Nuove Funzionalità & Backlog Attivo) e [DESIDERATA.md](file:///d:/Github/Quiz_VDS-VL/DESIDERATA.md):

@@ -59,7 +59,7 @@ export const AudioDownloadBanner: React.FC<AudioDownloadBannerProps> = ({ classN
       aria-label={`Progressione scaricamento voci: ${percent}%`}
       className={
         className ||
-        'fixed bottom-16 left-0 right-0 z-40 pointer-events-none px-3 sm:px-4 pb-1.5'
+        'fixed bottom-16 left-0 right-0 z-30 pointer-events-none px-3 sm:px-4 pb-1.5'
       }
     >
       <div className="max-w-md sm:max-w-lg mx-auto pointer-events-auto bg-zinc-900/95 dark:bg-zinc-900/95 light:bg-white/95 border border-amber-500/40 light:border-amber-400/60 rounded-2xl p-2.5 sm:p-3 shadow-2xl backdrop-blur-md text-zinc-100 light:text-slate-900 transition-all animate-in slide-in-from-bottom-2 fade-in">
