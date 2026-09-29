@@ -82,6 +82,7 @@ Questo documento rappresenta la **bussola strategica e funzionale** del progetto
    - Screen Wake Lock API integrato per prevenire lo spegnimento dello schermo su supporto/cruscotto.
    - Pilota Automatico ("Radio Quiz") continuo per studio e ripasso a mani libere senza tocco fisico.
    - Comandi vocali in lingua italiana tramite Web Speech Recognition ("Uno", "Due", "Tre", "Avanti", "Ripeti", "Pausa", "Aiuto").
+   - **Menu Rapido Impostazioni Voce Integrato (Quick Speech Menu)**: Controllo vocale istantaneo a 1 tocco integrato in tutti gli stati della guida (Launcher, HUD superiore durante il quiz attivo e Debriefing), con styling nativo Cockpit Dark (Zero-Blue) antiriflesso.
    - **Guida Contestuale & Feedback Vocale Reattivo**: icona microfono pulsante con onda radar durante la ricezione comandi, trascrizione in tempo reale nel banner HUD, conferme comando, diagnostica trasparente su frasi non riconosciute e Cheat Sheet rapido con pulsante '?'.
    - **Spiegazione Vocale di Benvenuto (Audio Briefing Run-Once)**: All'avvio della modalità alla guida, un audio neurale conciso illustra il funzionamento a mani libere (Wake Lock, lettura automatica quesiti, risposte touch e comandi vocali "Uno", "Due", "Tre", "Ripeti", "Aiuto"). Eseguito una sola volta in automatico (`driveModeIntroPlayed: true`), con possibilità di riascolto on-demand (Launcher, Cheat Sheet) o riattivazione all'avvio dalle Impostazioni.
 
@@ -125,8 +126,8 @@ Questo documento rappresenta la **bussola strategica e funzionale** del progetto
 | Supporto Audio Avionico | 🟢 Completato | Sintesi vocale neurale con controlli Play/Pausa e Da Capo universali su domanda, singole opzioni e spiegazione; feedback cockpit Web Audio API e fonetica ICAO. |
 | Gestione Offline Audio & Fallback | 🟢 Completato | Download in background non bloccante via CacheStorage, prompt non invasivo al primo avvio Guida, gestione granulare Impostazioni, fallback automatico offline su voce scaricata e Range Requests Safari. |
 | Google Drive Cloud Sync | 🟢 Completato | Integrazione GIS con `appDataFolder` privata e fallback JSON export/import. |
-| Modalità Alla Guida | 🟢 Completato | Layout zero-scroll, Screen Wake Lock, Pilota Auto Radio Quiz e Speech Recognition. |
-| Quick Speech Menu (1-Click) | 🟢 Completato | Flyout compatto in Navbar per controllo vocale rapido senza navigazione. |
+| Modalità Alla Guida | 🟢 Completato | Layout zero-scroll, Screen Wake Lock, Pilota Auto Radio Quiz, Speech Recognition e Quick Speech Menu integrato in tutti gli stati (Launcher, HUD quiz attivo, Debriefing). |
+| Quick Speech Menu (1-Click) | 🟢 Completato | Flyout compatto in Navbar e integrato a tutto schermo in Modalità Guida per controllo vocale rapido a 1 tocco. |
 | Schermata Impostazioni Fullscreen & About | 🟢 Completato | Esperienza nativa a tutto schermo (mobile & desktop), segmented tabs per 6 argomenti con scheda About (normativa AeCI e D.P.R. 133/2010) e supporto Schermo Intero. |
 | Guida Contestuale Comandi Vocali | 🟢 Completato | HUD live rotativo, Cheat Sheet modale a 1 tocco, trigger 'Aiuto' e box in Impostazioni. |
 | Indicatore Stato Offline & HUD Rete | 🟢 Completato | Pillola ambra in Navbar e HUD Guida, banner informativo e modale di briefing via createPortal con feedback di riconnessione ONLINE. |

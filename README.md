@@ -100,6 +100,10 @@
   - `"Bandiera"` per contrassegnare il quesito da rivedere.
   - `"Pausa"`, `"Riprendi"` per controllare la sessione.
   - `"Aiuto"`, `"Guida"`, `"Comandi"` per aprire la guida a voce in qualsiasi istante.
+- **Menu Rapido Impostazioni Voce Integrato (Quick Speech Menu)**:
+  - Accesso istantaneo a 1 tocco alle impostazioni vocali sia nella schermata iniziale (Launcher), sia nella Top Bar HUD durante il quiz attivo a schermo intero e nella schermata di Debriefing finale.
+  - Permette di cambiare al volo l'istruttore (👨‍✈️ Giuseppe / 👩‍✈️ Elsa), la velocità di lettura (0.9x, 1.0x, 1.15x, 1.25x), attivare o disattivare la lettura vocale e abilitare/disabilitare la lettura automatica e gli effetti sonori.
+  - Design nativo in stile **Cockpit Dark antiriflesso** (`forceDark`), ottimizzato per zero riverberi durante la guida serale o notturna sul parabrezza.
 - **Guida Contestuale Comandi Vocali & Feedback Visivo Reattivo**:
   - **Icona Microfono Pulsante & Radar Wave**: sia nell'header superiore sia nel banner inferiore, l'icona del microfono pulsa visibilmente (`animate-pulse`) circondata da un'onda radar radiale (`animate-ping`) e da un bagliore avionico verde smeraldo non appena viene rilevata voce o un comando in arrivo.
   - **HUD Live Dinamico con Trascrizione in Tempo Reale**:
@@ -135,7 +139,7 @@
   - **Riprendi in continuità**: Riprende la riproduzione dal secondo esatto di sospensione. Se si mette in pausa una risposta durante l'ascolto della sequenza automatica, la sequenza viene preservata e prosegue fluidamente alle opzioni successive.
   - **Riavvio da capo su ogni parlato**: Pulsante `[↺]` (o scorciatoie da tastiera dedicate) per far ripartire istantaneamente quel frammento (o l'intera domanda) dall'inizio sia mentre la voce sta parlando sia in stato di pausa.
   - **Stop e Chiusura rapida**: Clic su `[⏹]` (o tasto `Esc`) per azzerare l'audio e ripristinare lo stato iniziale.
-- **Quick Speech Menu (1-Clic in Header)**: menu rapido sempre visibile nella barra di navigazione superiore per commutare istantaneamente con un singolo tocco la voce (👨‍✈️ Giuseppe / 👩‍✈️ Elsa), la velocità di riproduzione (0.9x - 1.25x), la lettura automatica e gli effetti sonori, senza aprire pesanti schermate o abbandonare la sessione di quiz.
+- **Quick Speech Menu (1-Clic in Header & Modalità Guida)**: menu rapido sempre visibile nella barra di navigazione superiore e **integrato in tutti gli stati della Modalità Guida** (Launcher di partenza, Top Bar HUD durante il quiz attivo a schermo intero e schermata di Debriefing), per commutare istantaneamente con un singolo tocco la voce (👨‍✈️ Giuseppe / 👩‍✈️ Elsa), la velocità di riproduzione (0.9x - 1.25x), la lettura automatica e gli effetti sonori con stile Cockpit Dark antiriflesso, senza interrompere la guida né abbandonare la sessione di quiz.
 - **MediaSession API**: controllo della riproduzione vocale (Play/Pausa/Stop) dai pulsanti fisici o touch degli auricolari Bluetooth anche a schermo spento.
 - **Feedback Sonori Cockpit (Web Audio API)**: click meccanici, segnali di conferma, buzzer di errore e alert timer generati via oscillatori nativi senza pesanti file esterni.
 

@@ -16,6 +16,50 @@ Questo documento registra in ordine cronologico tutte le lavorazioni svolte nel 
 
 ---
 
+### [2026-09-29] - Impostazione Voce di Default su Elsa (TTS Neurale Femminile)
+- **Cosa abbiamo fatto**:
+  - Impostata la voce **Elsa** (`'elsa'`) come voce di default predefinita dell'applicazione:
+    * In [src/db/index.ts](file:///d:/Github/Quiz_VDS-VL/src/db/index.ts): aggiornato `DEFAULT_SETTINGS.ttsVoice` da `'giuseppe'` a `'elsa'`.
+    * In [src/services/voiceService.ts](file:///d:/Github/Quiz_VDS-VL/src/services/voiceService.ts): aggiornato lo stato iniziale del singleton `VoiceService` (`private voiceName: 'giuseppe' | 'elsa' = 'elsa'`).
+    * In [src/context/QuizContext.tsx](file:///d:/Github/Quiz_VDS-VL/src/context/QuizContext.tsx): aggiornato il fallback della voce in `voiceService.setVoice(settings.ttsVoice || 'elsa')`.
+    * In [src/components/AudioOfflinePromptModal.tsx](file:///d:/Github/Quiz_VDS-VL/src/components/AudioOfflinePromptModal.tsx): impostato il fallback a `'elsa'`.
+    * In [src/components/DriveModeScreen.tsx](file:///d:/Github/Quiz_VDS-VL/src/components/DriveModeScreen.tsx): impostato il fallback `activeVoice` a `'elsa'`.
+    * In [src/components/VoiceQuickMenu.tsx](file:///d:/Github/Quiz_VDS-VL/src/components/VoiceQuickMenu.tsx): impostato il fallback `currentVoice` a `'elsa'`.
+    * In [src/components/SettingsModal.tsx](file:///d:/Github/Quiz_VDS-VL/src/components/SettingsModal.tsx): aggiornata la logica di visualizzazione dello stato attivo (`(settings.ttsVoice || 'elsa') === 'elsa'`).
+    * In [src/services/voiceService.test.ts](file:///d:/Github/Quiz_VDS-VL/src/services/voiceService.test.ts): allineate le asserzioni dei test unitari della suite vocale con la voce predefinita `elsa` (131 test su 131 superati con esito positivo).
+- **Scelte architetturali & Rationale**:
+  - *Dizione Cristallina & Preferenza Utente*: La voce neurale `it-IT-ElsaNeural` offre un'articolazione chiara ed energica particolarmente adatta all'ascolto rapido delle opzioni d'esame. L'utente può comunque commutare su Giuseppe con 1 tocco dal menu rapido vocale o dalle Impostazioni.
+- **Impatto sul Desiderata**:
+  - Tutte le nuove installazioni e i profili senza selezione pregressa avviano immediatamente la sintesi vocale con Elsa.
+
+### [2026-09-29] - Integrazione Menu Rapido Impostazioni Voce in Modalità Guida
+- **Cosa abbiamo fatto**:
+  - Esteso il componente [src/components/VoiceQuickMenu.tsx](file:///d:/Github/Quiz_VDS-VL/src/components/VoiceQuickMenu.tsx):
+    * Aggiunto supporto a proprietà flessibili: `id`, `popoverId`, `align`, `className`, `buttonClassName`, `forceDark`, `onOpenVoiceGuide`, `onReplaySpokenGuide` e `onOpenChange`.
+    * Introdotta la modalità `forceDark`: garantisce che quando il menu viene aperto all'interno della Modalità Guida (sempre ancorata al tema scuro Cockpit Black per evitare riflessi sul parabrezza dell'auto), non vengano applicate le classi chiare di `Hangar Light` anche qualora l'utente abbia il tema chiaro attivo nel resto dell'applicazione.
+    * Implementata la delimitazione reattiva dello spazio del popover (`max-w-[calc(100vw-24px)]` e `max-h-[calc(100dvh-80px)] overflow-y-auto`) con blocco della propagazione degli eventi touch (`stopPropagation`), impedendo che i tocchi o scorrimenti all'interno del popover attivino inavvertitamente i gesti di swipe per il cambio quiz.
+    * Garantita la retrocompatibilità totale (100%) con il `Navbar`: in assenza di proprietà `id`, vengono mantenuti gli ID originali (`btn-voice-quick-menu`, `voice-quick-popover`, `quick-voice-giuseppe`, `quick-voice-elsa`, `quick-toggle-tts`, `quick-speed-${rate}`).
+  - Integrato il menu rapido voce in tutti e 3 gli stati di [src/components/DriveModeScreen.tsx](file:///d:/Github/Quiz_VDS-VL/src/components/DriveModeScreen.tsx):
+    * **Launcher Guida**: posizionato nell'header superiore (`#btn-drive-launcher-voice-menu`) adiacente al pulsante di uscita `X`, per consentire di regolare voce (Giuseppe/Elsa), velocità (0.9x-1.25x), lettura automatica ed effetti sonori prima di avviare l'esercitazione.
+    * **Quiz Attivo (HUD Superiore)**: posizionato nella Top Bar HUD (`#btn-drive-voice-quick-menu`) a fianco dei controlli del Pilota Automatico e del microfono vocale, consentendo il cambio al volo delle preferenze vocali durante la guida.
+    * **Debriefing**: integrato nell'header della schermata di riepilogo (`#btn-drive-debriefing-voice-menu`).
+    * Aggiunto lo stato `isVoiceMenuOpen` per inibire i comandi da tastiera e telecomandi da volante (tasti 1, 2, 3, frecce) mentre il popover è aperto, consentendo la chiusura pulita con `Escape`.
+  - In [src/components/VoiceCommandsModal.tsx](file:///d:/Github/Quiz_VDS-VL/src/components/VoiceCommandsModal.tsx):
+    * Elevato l'overlay a `z-[70]` per garantire che la guida comandi vocali Hands-Free si posizioni sempre al di sopra sia della Modalità Guida (`z-50`) sia del popover rapido (`z-[60]`).
+  - Creata la suite di collaudo visivo CDP [scripts/test_drive_quick_voice_menu.js](file:///d:/Github/Quiz_VDS-VL/scripts/test_drive_quick_voice_menu.js) su viewport mobile (390x844):
+    * Verificata l'apertura e il layout del popover sia dal Launcher ([public/test_drive_launcher_voice_menu_screenshot.png](file:///d:/Github/Quiz_VDS-VL/public/test_drive_launcher_voice_menu_screenshot.png)) sia durante il quiz attivo ([public/test_drive_running_voice_menu_screenshot.png](file:///d:/Github/Quiz_VDS-VL/public/test_drive_running_voice_menu_screenshot.png)).
+    * Verificato il contenimento perfetto del popover (bounds: `left=1.5`, `right=289.5` nei 390px, 0 overflow orizzontale) e 0 errori in console.
+    * Validata la suite multi-contesto [scripts/test_all_use_cases.js](file:///d:/Github/Quiz_VDS-VL/scripts/test_all_use_cases.js) superata al 100% con 0 errori in console.
+  - Aggiornato [README.md](file:///d:/Github/Quiz_VDS-VL/README.md) e [DESIDERATA.md](file:///d:/Github/Quiz_VDS-VL/DESIDERATA.md).
+  - Superati tutti i 131 test unitari Vitest (`npm run test:unit`) e completata con successo la build di produzione (`tsc && vite build`).
+- **Scelte architetturali & Rationale**:
+  - *Cockpit Dark Invariance (forceDark Rationale)*: In Modalità Guida, l'allievo pilota non deve mai essere abbagliato da finestre popup bianche durante la guida serale o in condizioni di bassa luminosità. L'isolamento tramite `forceDark` mantiene il popover ancorato al carbon dark con accenti ambra avionica, indipendentemente dal tema globale dell'app.
+  - *Event Stop Propagation Rationale*: Poiché la Modalità Guida implementa swipe orizzontali a schermo intero per cambiare quesito, arrestare la propagazione degli eventi `touchstart` e `touchend` sul popover è fondamentale per permettere all'utente di interagire con pulsanti e cursori senza provocare cambi quiz imprevisti.
+- **Impatto sul Desiderata**:
+  - Piena parità funzionale per il controllo vocale rapido a 1 clic anche durante l'utilizzo in auto o con telecomandi da volante.
+
+---
+
 ### [2026-09-29] - Schermata Impostazioni Fullscreen & Supporto Schermo Intero
 - **Cosa abbiamo fatto**:
   - Trasformata la modale delle impostazioni in una schermata **fullscreen nativa** ([src/components/SettingsModal.tsx](file:///d:/Github/Quiz_VDS-VL/src/components/SettingsModal.tsx)):
