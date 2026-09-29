@@ -25,7 +25,12 @@
 - Vietato duplicare lo stato dell'esame o delle risposte in variabili globali o attributi DOM `data-*`.
 
 ## 4. Continuità Cognitiva e Passaggio di Consegne Inter-Agente
-- **Aggiornamento Obbligatorio di WORKLOG.md**: Al termine di ogni sessione o lavorazione, l'agente deve registrare in [WORKLOG.md](file:///c:/github/Quiz_VDS-VL/WORKLOG.md) cosa è stato fatto e le scelte tecniche/architetturali prese con le relative motivazioni, allineando lo stato in [DESIDERATA.md](file:///c:/github/Quiz_VDS-VL/DESIDERATA.md).
+- **Aggiornamento Obbligatorio del Registro di Bordo**: Al termine di ogni sessione o lavorazione, l'agente deve registrare cosa è stato fatto e le scelte tecniche/architetturali prese con le relative motivazioni:
+  - In sessioni parallele o su branch tematici: scrivere il frammento in `.agents/worklog.d/YYYY-MM-DD_<topic>.md` e consolidare con `npm run worklog:consolidate` al momento del merge.
+  - In sessione singola su `main`: registrare direttamente in [WORKLOG.md](file:///c:/github/Quiz_VDS-VL/WORKLOG.md).
+  - Allineare sempre lo stato in [DESIDERATA.md](file:///c:/github/Quiz_VDS-VL/DESIDERATA.md).
+- **Staging Chirurgico Obbligatorio & Divieto `git add .`**: È fatto espresso divieto di usare `git add .`, `git add -A` o `git commit -a`. Aggiungere esclusivamente i file correlati al singolo argomento ed eseguire `git diff --cached --stat` prima del commit.
+- **Isolamento Sessioni Parallele**: In caso di task concorrenti, operare sempre in un Git Worktree dedicato (`.worktrees/<topic>`) per azzerare collisioni di file, lock Git e falsi fallimenti nei test.
 - **Allineamento Continuo del README.md**: Ogni volta che vengono introdotte nuove funzionalità o modificate quelle esistenti, aggiornare tempestivamente il [README.md](file:///c:/github/Quiz_VDS-VL/README.md) per mantenere la documentazione utente allineata allo stato del software.
 - **Divieto di Amnesia e Inizio al Buio**: Nessun agente può avviare modifiche senza consultare prima la triade di conoscenza ([DESIDERATA.md](file:///c:/github/Quiz_VDS-VL/DESIDERATA.md), [MEMORY.md](file:///c:/github/Quiz_VDS-VL/MEMORY.md), [WORKLOG.md](file:///c:/github/Quiz_VDS-VL/WORKLOG.md)), né può chiudere un task senza aver documentato il lavoro svolto per chi subentrerà.
 

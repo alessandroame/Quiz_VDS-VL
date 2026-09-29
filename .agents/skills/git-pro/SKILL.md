@@ -1,50 +1,167 @@
 ---
 name: git-pro
 description: >
-  Standard e procedure professionali per il versionamento Git, commit atomici convenzionali, gestione amend pre-push e igiene del repository.
-  Attiva questa skill quando: crei commit, gestisci amend pre-push, controlli lo stato di git o mantieni pulito il working tree.
-version: 1.1.0
+  Standard professionale Git: gestione sessioni parallele con Git Worktree, commit atomici su singolo argomento, staging chirurgico, Conventional Commits (English only), log anti-conflitto worklog.d e integrazione sicura merge --no-ff.
+  Attiva questa skill quando: crei commit, gestisci sessioni parallele, crei/rimuovi worktree, consolidi worklog o integri branch su main.
+version: 2.0.0
 language: it-IT
 ---
 
-# Profilo Operativo: Git Pro Workflow
+# Profilo Operativo: Git Pro Workflow (Multi-Session & Atomic Commits)
 
-Questa skill definisce le regole operative per una gestione di Git rigorosa, pulita e professionale all'interno del progetto.
+Questa skill definisce il protocollo rigoroso per operare con Git su **VDS-VL Quiz Master**, garantendo:
+1. **Commit atomici su singolo argomento** (nessun commit promiscuo o mostro).
+2. **Isolamento totale delle sessioni parallele** degli agenti tramite **Git Worktree**.
+3. **Zero conflitti di merge sul diario di bordo** tramite frammenti in `.agents/worklog.d/`.
+4. **Integrazione protetta e tracciabile su `main`** tramite `merge --no-ff`.
 
-## 1. Regola di Frequenza e Cadenza dei Commit
-- **Commit al termine di ogni argomento/milestone**: Non accumulare modifiche disparate in un unico maxi-commit. Ogni funzionalità coerente, script, correzione o documentazione deve avere il proprio commit atomico.
-- **Messe a punto e rifiniture pre-push (Amend)**:
-  - Se si apportano rifiniture, fix di lint, correzioni di refusi o micro-tuning a modifiche non ancora inviate al remote (`push`), utilizzare:
-    ```bash
-    git add <file-modificati>
-    git commit --amend --no-edit
-    ```
-    oppure aggiornare il messaggio se l'intervento modifica il perimetro:
-    ```bash
-    git commit --amend -m "tipo: messaggio aggiornato"
-    ```
-  - **Regola di sicurezza**: mai effettuare amend o riscrivere la storia su commit già pubblicati (`pushed`) su branch condivisi.
+---
+
+## 1. Regola dei Commit Atomici su Singolo Argomento (Single-Topic Only)
+
+Ogni commit deve rappresentare **un'unica unità logica autosufficiente**:
+- **Codice + Unit Test Insieme**: Il codice di una feature o correzione e i relativi test unitari (es. `src/components/TopicsScreen.tsx` e `src/components/TopicsScreen.test.ts`) DEVONO trovarsi nello **stesso commit**. Un commit atomico nasce compilabile e passante (`green build`).
+- **Refactoring Propedeutico Separato**: Se l'implementazione richiede una riorganizzazione o un'astrazione preliminare, committarla prima in un commit distinto `refactor(...)`.
+- **Documentazione Generale Separata**: Modifiche a `README.md`, guide o roadmap vanno in un commit `docs(...)` separato.
+
+### 🚫 Divieto Categorico di Staging Indiscriminato
+È severamente **VIETATO** utilizzare comandi che catturano l'intero working tree:
+- ❌ `git add .`
+- ❌ `git add -A`
+- ❌ `git commit -a`
+- ❌ `git commit -am "..."`
+
+### ✅ Staging Chirurgico Obbligatorio
+Aggiungere solo ed esclusivamente i singoli file che appartengono all'argomento del commit:
+```bash
+git add src/path/to/feature.ts src/path/to/feature.test.ts
+```
+
+### 🔍 Pre-Commit Audit (Verifica Obbligatoria Prima del Commit)
+Prima di eseguire `git commit`, l'agente DEVE eseguire:
+```bash
+git diff --cached --stat
+```
+Verificare che:
+1. Siano presenti **esclusivamente** i file pertinenti al singolo argomento.
+2. Non siano presenti file temporanei, test screenshot imprevisti o modifiche lasciate da altre lavorazioni.
+
+---
 
 ## 2. Standard dei Messaggi: Conventional Commits (English Only)
-I messaggi di commit DEVONO essere redatti **esclusivamente in lingua inglese** in modalità imperativa e seguire la specifica Conventional Commits:
+
+Tutti i commit DEVONO essere redatti **esclusivamente in lingua inglese** in modalità imperativa:
 `<type>(<optional scope>): <imperative summary in English>`
 
-**Regola Vincolante**: È fatto espresso divieto di scrivere commit message in lingua italiana. Tutto il testo del commit (tipo, scope, subject ed eventuale body/footer) deve essere redatto in inglese.
+**Divieto Assoluto**: Vietato scrivere messaggi di commit in italiano.
 
 ### Tipi Ammessi ed Esempi:
-- `feat`: Nuova funzionalità (es. `feat(quiz): implement fair coverage randomizer algorithm`)
-- `fix`: Risoluzione di un bug o correzione dati (es. `fix(extractor): handle question 7037 parsing edge case`)
-- `docs`: Documentazione o aggiornamento roadmap (es. `docs(readme): update feature list and test commands`)
-- `style`: Formattazione, spazi, linting senza alterazione logica (es. `style(theme): adjust cockpit dark contrast utility classes`)
-- `refactor`: Riorganizzazione codice senza alterare il comportamento esterno (es. `refactor(audio): decouple TTS speech synthesis player`)
-- `chore`: Modifiche a build, tooling, dipendenze o configurazioni (es. `chore(deps): update vite and dexie dependencies`)
-- `test`: Aggiunta o modifica di test di validazione (es. `test(evaluator): add boundary value analysis tests for exam thresholds`)
+- `feat`: Nuova funzionalità (es. `feat(topics): add keyboard shortcuts 1, 2, 3`)
+- `fix`: Risoluzione bug o correzione dati (es. `fix(audio): handle edge case in pronunciation fallback`)
+- `docs`: Documentazione o aggiornamento roadmap (es. `docs(readme): update test commands and offline audio guide`)
+- `style`: Formattazione, spazi o linting senza impatto logico (es. `style(cockpit): align hud status indicator padding`)
+- `refactor`: Riorganizzazione codice senza alterare il comportamento esterno (es. `refactor(db): extract helper method for settings cache`)
+- `chore`: Modifiche a tooling, build o dipendenze (es. `chore(git): add worktree ignore and consolidation script`)
+- `test`: Aggiunta o modifica di test di validazione (es. `test(worklog): add unit test for fragment consolidator`)
+- `merge`: Commit esplicito di integrazione branch (es. `merge: feat(topics-shortcuts) into main`)
 
-## 3. Igiene Pre-Commit e Repository
-1. **Verifica dello Stato**:
-   - Eseguire sempre `git status` prima di aggiungere file.
-   - Usare `git diff` o `git diff --cached` per verificare con esattezza le righe modificate.
-2. **Nessun File Improprio**:
-   - File temporanei, cache Python (`__pycache__`, `.pytest_cache`), cartelle build (`dist/`, `build/`) e `node_modules/` devono essere rigorosamente inclusi nel `.gitignore`.
-3. **Stato della Working Tree**:
-   - Al termine di ogni sessione, verificare che il working tree sia pulito (`nothing to commit, working tree clean`).
+---
+
+## 3. Protocollo per Sessioni Parallele Multi-Agente (Git Worktrees)
+
+Quando due o più agenti lavorano in parallelo o su task indipendenti, **NON devono operare nella stessa cartella di lavoro**. Operare nella stessa cartella genera collisioni su `.git/index.lock`, sovrascritture di file e falsi fallimenti nei test Vitest.
+
+### A. Creazione del Worktree Isolato
+Per ogni task o sessione parallela, creare un worktree dedicato agganciato a un branch di feature:
+```bash
+# Esempio per il task "topics-shortcuts"
+git worktree add -b feat/topics-shortcuts .worktrees/topics-shortcuts main
+```
+*Vantaggi*:
+- Cartella di lavoro e file system completamente isolati.
+- Nessun blocco `.git/index.lock`.
+- Suite Vitest (`npm run test:unit`) e build (`npm run build`) eseguite in autonomia senza inquinamento incrociato.
+
+### B. Esecuzione nel Worktree
+L'agente esegue tutti i suoi comandi impostando come directory corrente (`Cwd`):
+`d:\Github\Quiz_VDS-VL\.worktrees\topics-shortcuts`
+
+Nel worktree l'agente:
+1. Sviluppa la modifica e i relativi test.
+2. Esegue i test mirati: `npx vitest run src/components/TopicsScreen.test.ts`.
+3. Esegue lo staging chirurgico dei soli file toccati (`git add <file1> <file2>`).
+4. Crea i commit atomici con messaggi in inglese.
+
+---
+
+## 4. Registro Lavorazioni Anti-Conflitto (Pattern `.agents/worklog.d/`)
+
+La Regola 5 impone di documentare ogni lavorazione. Se più agenti paralleli modificassero la riga 17 di [WORKLOG.md](file:///d:/Github/Quiz_VDS-VL/WORKLOG.md), il merge genererebbe inevitabilmente un conflitto.
+
+### Regola Operativa per le Sessioni Parallele:
+1. **Scrivere un Frammento Isolato**: Invece di modificare [WORKLOG.md](file:///d:/Github/Quiz_VDS-VL/WORKLOG.md), creare un file:
+   `.agents/worklog.d/YYYY-MM-DD_<topic>.md`
+   con la struttura ufficiale:
+   ```markdown
+   ### [YYYY-MM-DD] - <Titolo della Lavorazione>
+   - **Cosa abbiamo fatto**: <Sintesi oggettiva degli interventi effettuati e file toccati>
+   - **Scelte architetturali & Rationale**: <Decisioni tecniche adottate, motivazioni e trade-off>
+   - **Impatto sul Desiderata**: <Allineamento con DESIDERATA.md e istruzioni per il prossimo agente>
+   ```
+2. **Commit del Frammento**: Committare il frammento nel proprio branch tematico (`git add .agents/worklog.d/YYYY-MM-DD_<topic>.md`).
+3. **Consolidamento al Merge**: Al momento dell'unione su `main`, il comando automatico:
+   ```bash
+   npm run worklog:consolidate
+   ```
+   concatena tutti i frammenti in cima a [WORKLOG.md](file:///d:/Github/Quiz_VDS-VL/WORKLOG.md) e ripulisce i file sorgente, con **zero conflitti di merge**.
+
+---
+
+## 5. Integrazione Protetta su `main` (Merge `--no-ff`)
+
+Per preservare l'integrità della storia senza rischiare problemi con `ff-only` o rebase distruttivi, l'integrazione di un branch di feature su `main` si esegue con **Merge Commit Esplicito (`--no-ff`)**:
+
+### Sequenza di Integrazione Passo-Passo:
+1. **Aggiornare `main` e posizionarsi sulla radice**:
+   ```bash
+   git checkout main
+   git pull origin main
+   ```
+2. **Eseguire il Merge Non Fast-Forward**:
+   ```bash
+   git merge --no-ff feat/<topic> -m "merge: feat(<topic>) into main"
+   ```
+3. **Consolidare il Diario di Bordo**:
+   ```bash
+   npm run worklog:consolidate
+   git add WORKLOG.md
+   git commit -m "docs(worklog): consolidate worklog entries"
+   ```
+4. **Verifica Finale di Salute**:
+   ```bash
+   npm run test:unit
+   npm run build
+   ```
+5. **Pulizia Worktree e Branch**:
+   ```bash
+   git worktree remove .worktrees/<topic>
+   git branch -d feat/<topic>
+   ```
+
+### 🛡️ Rollback Rapido di Emergenza
+Se un branch parallelo integrato introduce regressioni in produzione, con `--no-ff` è possibile annullare l'intera sessione con un unico comando pulito:
+```bash
+git revert -m 1 <merge-commit-hash>
+```
+senza alterare o corrompere i singoli commit storici.
+
+---
+
+## 6. Rifiniture Locali Pre-Push (Amend)
+
+Se su un commit locale **non ancora pushato né mergiato** si devono applicare micro-fix di sintassi o linting:
+```bash
+git add <file-modificato>
+git commit --amend --no-edit
+```
+**Regola di Sicurezza**: Mai fare amend o riscrivere la storia su commit già pubblicati (`pushed`) o su rami condivisi (`main`).

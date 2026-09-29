@@ -26,6 +26,7 @@ L'alberatura delle configurazioni dell'agente è standardizzata, modulare e ordi
 │   ├── vds-exam-examiner/      # Regolamento esame ufficiale AeCI (30 quiz, 45 min, max 3 errori)
 │   ├── vds-quiz-extractor/     # Pipeline estrazione e normalizzazione dei 504 quiz dal PDF ufficiale
 │   └── git-pro/                # Standard Conventional Commits e igiene del repository
+├── worklog.d/                  # Frammenti di diario per sessioni parallele (anti-merge conflict)
 └── workflows/                  # Flussi procedurali standardizzati
     ├── task_lifecycle.md       # Pre-flight, gestione processi sincroni e pulizia task
     └── browser_testing.md      # Collaudo visivo PWA e verifica console browser
@@ -55,10 +56,13 @@ L'alberatura delle configurazioni dell'agente è standardizzata, modulare e ordi
      * [DESIDERATA.md](file:///c:/github/Quiz_VDS-VL/DESIDERATA.md) per comprendere la visione del prodotto, i requisiti core e la matrice di stato.
      * [MEMORY.md](file:///c:/github/Quiz_VDS-VL/MEMORY.md) per i vincoli tecnici stabili, le regole AeCI e i criteri di testing.
      * [WORKLOG.md](file:///c:/github/Quiz_VDS-VL/WORKLOG.md) per conoscere le ultime decisioni architetturali (ADR) e lo storico recente.
-   - **Post-Task Obbligatorio**: A fronte di **OGNI lavorazione**, aggiornare obbligatoriamente [WORKLOG.md](file:///c:/github/Quiz_VDS-VL/WORKLOG.md) riportando:
-     * **Cosa abbiamo fatto**: sintesi puntuale e verificabile degli interventi effettuati e dei file toccati.
-     * **Scelte architetturali & Rationale**: decisioni tecniche adottate, motivazioni e alternative scartate.
-     * **Impatto sul Desiderata**: allineamento con [DESIDERATA.md](file:///c:/github/Quiz_VDS-VL/DESIDERATA.md) e istruzioni per il prossimo agente.
+   - **Post-Task Obbligatorio**: A fronte di **OGNI lavorazione**, aggiornare obbligatoriamente il registro di bordo:
+     * **In sessioni parallele o su branch tematici**: scrivere il frammento isolato in `.agents/worklog.d/YYYY-MM-DD_<topic>.md` per azzerare i conflitti di merge, e consolidarlo con `npm run worklog:consolidate` al momento dell'integrazione su `main`.
+     * **In sessione singola su `main`**: aggiornare direttamente [WORKLOG.md](file:///c:/github/Quiz_VDS-VL/WORKLOG.md) oppure creare il frammento ed eseguire `npm run worklog:consolidate`.
+     * Riportare sempre:
+       - **Cosa abbiamo fatto**: sintesi puntuale e verificabile degli interventi effettuati e dei file toccati.
+       - **Scelte architetturali & Rationale**: decisioni tecniche adottate, motivazioni e alternative scartate.
+       - **Impatto sul Desiderata**: allineamento con [DESIDERATA.md](file:///c:/github/Quiz_VDS-VL/DESIDERATA.md) e istruzioni per il prossimo agente.
    - Nessun task può considerarsi concluso senza questo aggiornamento di bordo.
 
 6. **Mantenimento Continuo della Documentazione Funzionale (README.md)**:
@@ -69,5 +73,6 @@ L'alberatura delle configurazioni dell'agente è standardizzata, modulare e ordi
    - **Messaggi di Commit**: Tutti i messaggi di commit Git DEVONO seguire la specifica Conventional Commits rigorosamente in lingua inglese (es. `feat(exam): add countdown timer warning`, `fix(randomizer): handle empty pool edge case`).
    - **Eccezione Circoscritta**: L'italiano è riservato tassativamente solo ai testi mostrati all'utente finale (microcopy UI dell'app per gli allievi piloti italiani), ai dati ufficiali dei 504 quiz AeCI (`questions.json`: domande, opzioni, spiegazioni didattiche Regola/Tranello) e alla documentazione di progetto / conversazione con l'utente.
 
-
-
+8. **Staging Chirurgico e Sessioni Parallele via Git Worktree**:
+   - **Staging Chirurgico Obbligatorio**: È fatto espresso divieto di usare `git add .`, `git add -A` o `git commit -a`. Aggiungere esclusivamente i singoli file pertinenti all'argomento del commit ed eseguire `git diff --cached --stat` prima di confermare.
+   - **Isolamento Fisico con Git Worktree**: Per ogni lavorazione concorrente, operare sempre in un worktree dedicato (`.worktrees/<topic>`) agganciato al proprio branch tematico (`feat/...`), integrando su `main` tramite `git merge --no-ff` (cfr. `git-pro`).
