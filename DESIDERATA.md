@@ -97,6 +97,7 @@ Questo documento rappresenta la **bussola strategica e funzionale** del progetto
 10. **Ergonomia di Navigazione & Filtro Disciplina (Deltaplano / Parapendio)**:
    - **Barra di Navigazione Bloccata al Top**: Fissaggio permanente del menu di navigazione in alto (top sticky/fixed bar) per liberare la parte inferiore del viewport da barre fisse, ottimizzando l'area utile di lettura dei quiz e delle opzioni di risposta.
    - **Filtro Quiz Deltaplano con Salvaguardia Condivisi**: Possibilità di filtrare i quesiti specifici per il Deltaplano (barra di controllo/trapezio/A-frame, spostamento del baricentro, trave di chiglia, cavi e tubi strutturali) o per il Parapendio (freni, fascio funicolare, cassoni, centine). **Vincolo tassativo di progetto**: massima cautela nell'audit semantico per NON escludere mai dai piani di studio le nozioni trasversali condivise da entrambi i mezzi (aerodinamica generale, meteo, normativa D.P.R. 133/2010, primo soccorso, fisiopatologia, sicurezza comune e strumentazione).
+   - **Visualizzazione Globale del Numero di Versione**: Integrazione chiara e discreta del badge di versione (es. `v1.0.0` dinamico tramite `__APP_VERSION__` da `vite.config.ts`) nella Navbar, nell'header delle Impostazioni o nel footer, rendendolo immediatamente individuabile dall'allievo per verifiche di aggiornamento PWA e reportistica.
 
 ---
 
@@ -140,6 +141,7 @@ Questo documento rappresenta la **bussola strategica e funzionale** del progetto
 | Filtro Quiz Esclusivi Deltaplano | 📋 Pianificato (TODO) | Audit 504 quiz e tagging disciplina deltaplano/parapendio/comune con preservazione concetti condivisi. |
 | Blocco Menu di Navigazione al Top | 📋 Pianificato (TODO) | Barra di navigazione sticky/fixed al top, eliminando o alleggerendo la bottom nav su mobile. |
 | Impostazioni ad Accordion Compresso Singolo | 📋 Pianificato (TODO) | Sostituzione pills menu con accordion verticale mutuo-esclusivo (1 sola sezione aperta alla volta). |
+| Visualizzazione Globale Versione App | 📋 Pianificato (TODO) | Badge di versione dinamico (__APP_VERSION__) visibile in Navbar/Impostazioni. |
 
 
 ---

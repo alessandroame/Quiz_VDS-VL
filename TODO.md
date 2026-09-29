@@ -189,4 +189,15 @@ Questa sezione raccoglie le nuove funzionalità e i miglioramenti di interfaccia
 - [ ] **Verifica Visiva Headless & Regression Test**:
   - Aggiornamento degli script di test visivo delle impostazioni (`test_settings_fullscreen.js`, `test_settings_about.js`) e verifica di 0 errori in console.
 
+### 4. Visualizzazione Globale del Numero di Versione dell'Applicazione
+- [ ] **Integrazione del Numero di Versione nella UI**:
+  - Rendere il numero di versione dell'applicazione (es. `v1.0.0` o `v1.0.0 (build #...)`) visibile in modo discreto ma immediatamente accessibile all'utente.
+  - Collocazioni candidate per massima ergonomia visiva:
+    - Nell'header della **Navbar** accanto al badge "2017" o al logo (es. pillola sottile o tooltip con build hash).
+    - Nell'header fisso superiore della schermata **Impostazioni** (`SettingsModal`), visibile in cima a colpo d'occhio senza dover cercare nella sezione About.
+    - Nel footer o nelle informazioni di sistema per facilitare la diagnostica, il debug offline e le segnalazioni dell'allievo pilota.
+- [ ] **Utilizzo della Costante di Build Globale (`__APP_VERSION__`)**:
+  - Collegare la visualizzazione direttamente alla costante `__APP_VERSION__` definita in `vite.config.ts` (derivata dinamicamente da `package.json`) ed eventualmente arricchita con `__APP_BUILD_ID__` / commit hash, azzerando le stringhe di versione cablate manualmente (hardcoded).
+
+
 
