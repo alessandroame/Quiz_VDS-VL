@@ -16,7 +16,125 @@ Questo documento registra in ordine cronologico tutte le lavorazioni svolte nel 
 
 ---
 
-## Registro Cronologico
+### [2026-09-29] - Schermata Impostazioni Fullscreen & Supporto Schermo Intero
+- **Cosa abbiamo fatto**:
+  - Trasformata la modale delle impostazioni in una schermata **fullscreen nativa** ([src/components/SettingsModal.tsx](file:///d:/Github/Quiz_VDS-VL/src/components/SettingsModal.tsx)):
+    * Rimosso il vecchio layout a card popup limitata (`max-w-md max-h-[92vh]` con oscuramento di sfondo `bg-black/75`).
+    * Implementato il layout fullscreen viewport-filling (`fixed inset-0 z-50 h-[100dvh] w-screen overflow-hidden`) sia in Carbon Cockpit (`bg-zinc-950`) che in Hangar Light (`light:bg-slate-50`).
+    * Aggiunto l'header fisso superiore (`sticky top-0 z-20 h-14 border-b`) con pulsante Indietro ergonomico (`#btn-close-settings`, con freccia sinistra ed etichetta), titolo con icona ingranaggio ambra, e pulsante di chiusura rapida `X` (`#btn-close-settings-x`).
+    * Aggiunto il blocco dello scorrimento del documento sottostante (`document.body.style.overflow = 'hidden'`) all'apertura per prevenire doppio scroll, con ripristino trasparente alla chiusura.
+    * Aggiunta la scorciatoia da tastiera avionica `Escape` per uscire istantaneamente dalle impostazioni.
+    * Subheader con selettore schede a segmenti (`sticky top-14 z-10`) con auto-scorrimento orizzontale e allineamento reattivo centrato fino a `max-w-2xl` su desktop.
+    * Corpo centrale a scorrimento verticale fluido a tutto schermo (`flex-1 overflow-y-auto overscroll-contain pb-24`) con contenitore centrato ergonomico `max-w-2xl mx-auto`.
+    * Aggiunta l'opzione **"Schermo Intero (Fullscreen)"** nella scheda *Aspetto* con toggle interattivo (`#btn-toggle-fullscreen`) per browser che supportano la Fullscreen API (`requestFullscreen` / `exitFullscreen`).
+    * Esportato anche l'alias `export const SettingsScreen = SettingsModal`.
+    * Aggiunto `aria-label="Impostazioni"` al pulsante `#btn-settings` in [src/components/Navbar.tsx](file:///d:/Github/Quiz_VDS-VL/src/components/Navbar.tsx) per maggiore accessibilità.
+  - Creato lo script di collaudo headless [scripts/test_settings_fullscreen.js](file:///d:/Github/Quiz_VDS-VL/scripts/test_settings_fullscreen.js) ed eseguiti collaudi visivi CDP:
+    * Verificate le dimensioni esatte a tutto schermo su Mobile Portrait 390x844 ([public/test_settings_fullscreen_mobile.png](file:///d:/Github/Quiz_VDS-VL/public/test_settings_fullscreen_mobile.png)).
+    * Verificate le dimensioni esatte a tutto schermo su Desktop 1440x900 ([public/test_settings_fullscreen_desktop.png](file:///d:/Github/Quiz_VDS-VL/public/test_settings_fullscreen_desktop.png)).
+    * Verificata la chiusura con pulsante Indietro e confermata l'assenza assoluta di errori in console JavaScript (0 console errors).
+    * Rieseguito con successo anche il test storico [scripts/test_settings_about.js](file:///d:/Github/Quiz_VDS-VL/scripts/test_settings_about.js).
+  - Superati tutti i 131 test unitari Vitest (`npm run test:unit`) e completata con successo la build di produzione (`npm run build`).
+- **Scelte architetturali & Rationale**:
+  - *Fullscreen Screen Layout vs Small Modal Popup*: Con 6 ricche sezioni tematiche (Aspetto, Voce e gestione cache offline per due voci, Guida con parametri radio/hands-free, Backup Google Drive con sync e token, Dati con export/import, About con regole ufficiali), la visualizzazione a modale popup ristretta risultava angusta, specialmente su smartphone. La transizione a schermata fullscreen offre uno spazio di consultazione arioso, leggibile e privo di barre di scorrimento annidate.
+  - *Body Scroll Lock Rationale*: Il lock dell'overflow sul `body` garantisce che il touch o la rotellina del mouse agiscano esclusivamente sui controlli di configurazione, evitando scorrimenti accidentali della schermata sottostante.
+  - *Dual Close Controls & Escape Rationale*: Fornire sia il pulsante a freccia "Indietro" a sinistra che la "X" a destra, combinati con il supporto tastiera `Escape`, asseconda indistintamente le abitudini d'uso mobile (back navigation) e desktop (window closing).
+- **Impatto sul Desiderata**:
+  - Soddisfatta puntualmente la richiesta dell'utente ("la pagina impostazioni deve essere fullscreen"), elevando l'ergonomia complessiva dell'interfaccia.
+
+### [2026-09-29] - Modalità Simulazione Didattica (Tutor) & Risoluzione Cache Service Worker PWA
+- **Cosa abbiamo fatto**:
+  - Implementata la nuova **Simulazione Didattica (Tutor)** richiesta dall'utente, integrata organicamente nella scheda Esame ([src/components/ExamScreen.tsx](file:///d:/Github/Quiz_VDS-VL/src/components/ExamScreen.tsx)):
+    * **Launcher Rinnovato**: Scheda primaria in evidenza per *Simulazione Didattica (Tutor)* con badge *"Consigliata per imparare"*, spiegazione chiara e pulsante d'avvio prioritario `btn-start-tutor-exam`, affiancata da *Esame Ufficiale AeCI* (45 min) e *Maratona Intensiva* (60 min).
+    * **Assenza di Limiti di Tempo**: Sostituito il countdown timer con un cronometro conteggio progressivo (`elapsedSeconds`) discreto, etichettato con badge verde `Senza limiti` e contatore live delle risposte `X ✓ / Y ✗`.
+    * **Feedback Didattico Istantaneo**: Validazione cromatica immediata per ogni risposta con blocco anti-manomissione della domanda e visualizzazione contestuale della soluzione ufficiale, **Regola** e **Tranello**.
+    * **Avanzamento a 1 Tocco**: Pulsante ad alta visibilità `"Prossima Domanda (N/30) →"` posizionato subito sotto la spiegazione per un flusso di studio rapido ed ergonomico.
+    * **Griglia Reattiva 30 Bolle**: Aggiornamento in tempo reale dello stato visivo di ogni quesito (verde per risposta corretta, rosso per errore) con possibilità di rivedere in qualsiasi momento le domande già affrontate.
+    * **Telemetria e Quaderno Errori**: Registrazione immediata in Dexie (`recordAnswer`) senza duplicazione alla consegna finale.
+  - Aggiornato il modello dati in [src/types/database.ts](file:///d:/Github/Quiz_VDS-VL/src/types/database.ts) con `ExamModeType = 'official' | 'tutor' | 'marathon'`, estendendo `ExamSession` e `InProgressSession`.
+  - Aggiornato il motore di valutazione [src/services/examEvaluator.ts](file:///d:/Github/Quiz_VDS-VL/src/services/examEvaluator.ts) e il relativo test [src/services/examEvaluator.test.ts](file:///d:/Github/Quiz_VDS-VL/src/services/examEvaluator.test.ts) (`EVAL-11`).
+  - **Risoluzione Anomalie di Visualizzazione & Cache Browser**:
+    * Identificato e terminato il processo orfano `vite preview` (PID 41968) in ascolto su `::1:5173` (IPv6), che intercettava le connessioni browser servendo una build precedente a quella aggiornata.
+    * Aggiunto in [src/main.tsx](file:///d:/Github/Quiz_VDS-VL/src/main.tsx) il meccanismo automatico di invalidazione/unregistration dei Service Worker obsoleti in modalità sviluppo (`import.meta.env.DEV`), prevenendo l'intercettazione aggressiva della cache locale.
+    * Ricompilata la build di produzione (`npm run build`) in [dist/](file:///d:/Github/Quiz_VDS-VL/dist/) con zero errori e verificata l'intera suite Vitest (131/131 superati).
+- **Scelte architetturali & Rationale**:
+  - *Tutor Mode Embedded Rationale*: Invece di creare una schermata isolata, l'integrazione diretta all'interno del flusso d'esame (`ExamScreen`) riutilizza l'algoritmo *Fair Coverage Randomizer* e la distribuzione per le 9 materie AeCI, permettendo all'allievo di prepararsi esattamente sul formato del test ufficiale ma con supporto didattico immediato.
+  - *Dev Service Worker Auto-Unregister Rationale*: Nei progetti PWA Vite, un Service Worker registrato in una sessione di preview può rimanere attivo sul dominio locale `localhost:5173`, servendo bundle statici vecchi e bloccando l'aggiornamento dell'interfaccia. La deregistrazione automatica in ambiente di sviluppo garantisce che il browser riceva sempre il codice più recente.
+- **Impatto sul Desiderata**:
+  - Piena realizzazione del requisito di studio guidato con feedback per domanda, consolidando l'esperienza didattica per gli allievi piloti VDS-VL.
+
+
+### [2026-09-29] - Feedback Visivo Reattivo e Pulsazione Microfono durante la Ricezione Comandi Vocali (Modalità Alla Guida)
+- **Cosa abbiamo fatto**:
+  - Risolta l'assenza di feedback percettivo sul funzionamento del riconoscimento vocale lamentata dall'utente:
+    * In [src/hooks/useDriveVoiceCommands.ts](file:///d:/Github/Quiz_VDS-VL/src/hooks/useDriveVoiceCommands.ts):
+      - Esposti i nuovi stati reattivi `isReceiving` (indica ricezione attiva di suoni/parlato/comandi), `interimTranscript` (trascrizione in tempo reale durante la dizione) ed `error` tipizzato (`not-allowed`, `network`, `audio-capture`).
+      - Agganciati gli eventi nativi Web Speech API (`onaudiostart`, `onsoundstart`, `onspeechstart`, `onspeechend`, `onsoundend`, `onaudioend`) e impostato `rec.interimResults = true` per garantire reattività istantanea al parlato.
+      - Implementato meccanismo di debounce/cooldown (1.5s - 1.8s) su `isReceiving` per rendere la pulsazione visibile, fluida e chiara anche per parole brevissime ("Uno", "Due", "Tre").
+      - Prevenuta la doppia esecuzione dei comandi tra trascrizioni parziali e definitive tramite tracciamento progressivo dell'indice `lastHandledIndexRef`.
+      - Irrobustito il ciclo di vita `onend`: gestione differenziata degli errori fatali (blocco riavvii a vuoto in caso di permessi negati `not-allowed`) e riavvio asincrono protetto con timeout da 150ms per prevenire `InvalidStateError` su Chrome/WebKit.
+    * In [src/utils/voiceCommandParser.ts](file:///d:/Github/Quiz_VDS-VL/src/utils/voiceCommandParser.ts) e test [src/utils/voiceCommandParser.test.ts](file:///d:/Github/Quiz_VDS-VL/src/utils/voiceCommandParser.test.ts):
+      - Normalizzazione e pulizia automatica di tutta la punteggiatura (`.`, `,`, `!`, `?`) inserita dai motori STT.
+      - Estesa la grammatica vocale a forme naturali colloquiali italiane: *"la prima"*, *"la seconda"*, *"la terza"*, *"la uno"*, *"la due"*, *"la tre"*, *"scelgo la prima"*, *"scelgo la seconda"*, *"scelgo la terza"*.
+    * In [src/components/DriveModeScreen.tsx](file:///d:/Github/Quiz_VDS-VL/src/components/DriveModeScreen.tsx):
+      - **Pulsazione Icona Microfono Header**: Quando i comandi vocali sono attivi e `isReceiving` è `true`, l'icona `<Mic />` pulsa vistosamente (`animate-pulse text-emerald-200 scale-125`), circondata da un'onda radar espansa (`animate-ping`) e da un bagliore avionico (`ring-2 ring-emerald-400 shadow-[0_0_12px_rgba(52,211,153,0.6)]`). In caso di errore (es. microfono negato), commuta su `MicOff` con bordo rosso/ambra e tooltip diagnostico esplicativo.
+      - **Pulsazione e Feedback HUD Inferiore**: Sostituito il testo statico con un banner dinamico reattivo: icona microfono pulsante con onda radar; feedback in tempo reale *"In ricezione: '[testo]' "* durante il parlato; conferma immediata *"Comando: '[Azione]' ✓"* per 2.5s; notifica trasparente *"Sentito: '[testo]' (non riconosciuto)"* in caso di parole diverse dai comandi; e avviso diagnostico chiaro in caso di permessi negati nel browser.
+      - **Banner Attesa Pilota Automatico**: Durante il conto alla rovescia di 5s, se l'utente parla il microfono pulsa e mostra la dizione live invece del testo generico.
+      - **Launcher Guida**: Persistenza automatica della preferenza comandi vocali nelle impostazioni (`driveModeVoiceCommands`).
+    * Creato lo script di collaudo headless [scripts/test_mic_pulsing.cjs](file:///d:/Github/Quiz_VDS-VL/scripts/test_mic_pulsing.cjs) registrato in `package.json` come `npm run test:visual:mic`.
+    * Acquisito e verificato lo screenshot pixel-perfect [public/drive_mode_mic_active.png](file:///d:/Github/Quiz_VDS-VL/public/drive_mode_mic_active.png) confermando ZERO errori in console.
+    * Superati tutti i 131 test unitari (`npm run test:unit`) e completata la compilazione del bundle di produzione (`npm run build`).
+- **Scelte architetturali & Rationale**:
+  - *Interim Results + Speech Start Pattern Rationale*: Nei test di guida a mani libere, l'attesa del risultato finale (`isFinal`) del motore STT introduceva un ritardo percettivo di 400-800ms durante il quale l'interfaccia appariva completamente inerte. Attivando `onsoundstart`/`onspeechstart` e `interimResults: true`, l'utente riceve un feedback visivo immediato (pulsazione e trascrizione in tempo reale) appena apre bocca.
+  - *Diagnostica "Sentito (non riconosciuto)" Rationale*: Il motivo principale per cui un utente non comprende se il riconoscimento funzioni o meno risiede nei falsi negativi silenziosi (frasi pronunciate ma non riconosciute dal parser). Mostrando esplicitamente cosa il microfono ha captato, l'utente ha la certezza matematica che il microfono funziona e comprende subito se deve aggiustare la pronuncia (es. dire "Due" invece di parole discorsive).
+- **Impatto sul Desiderata**:
+  - Elevata l'esperienza d'uso della Modalità alla Guida hands-free a livello professionale, eliminando qualsiasi ambiguità sullo stato del microfono e del motore vocale.
+
+### [2026-09-28] - Spostamento Progressione Download Voci in Banner Inferiore (Fix Overflow UI)
+- **Cosa abbiamo fatto**:
+  - Risolto il problema di overflow orizzontale su schermi smartphone provocato dall'accumulo di controlli nell'header superiore durante lo scaricamento delle voci audio:
+    * Creato il nuovo componente [src/components/AudioDownloadBanner.tsx](file:///d:/Github/Quiz_VDS-VL/src/components/AudioDownloadBanner.tsx) posizionato in basso (`fixed bottom-16 left-0 right-0 z-40`) immediatamente sopra la barra di navigazione inferiore. Il banner visualizza la voce in download (`Giuseppe` / `Elsa` o combinata), la percentuale, il conteggio file progressivo (`X / 2.520 file`), la barra di avanzamento e il pulsante per annullare il download.
+    * In [src/components/AudioDownloadProgressHUD.tsx](file:///d:/Github/Quiz_VDS-VL/src/components/AudioDownloadProgressHUD.tsx): convertito il modulo in un re-export trasparente di `AudioDownloadBanner` per garantire la retrocompatibilità del 100%.
+    * In [src/components/Navbar.tsx](file:///d:/Github/Quiz_VDS-VL/src/components/Navbar.tsx): rimosso l'indicatore di download dall'header superiore (che provocava l'allargamento forzato oltre i 390px di viewport e il conseguente troncamento del lato sinistro dello schermo) e agganciato `AudioDownloadBanner` sopra la navbar inferiore. Rafforzata la resilienza flex (`min-w-0 flex-shrink` e `gap-1 sm:gap-2`) per impedire sforamenti su qualsiasi viewport.
+    * In [src/components/DriveModeScreen.tsx](file:///d:/Github/Quiz_VDS-VL/src/components/DriveModeScreen.tsx): rimossi i riferimenti all'HUD dai titoli `<h1>` e dall'header quesito, integrandolo in modo ordinato e non invasivo all'interno del corpo del Launcher prima dei pulsanti di avvio rapido.
+    * In [src/App.tsx](file:///d:/Github/Quiz_VDS-VL/src/App.tsx): implementato l'adattamento dinamico del padding inferiore (`pb-36` quando un download è attivo, `pb-20` standard), garantendo che i controlli a fondo pagina non vengano mai oscurati dal banner.
+    * In [src/index.css](file:///d:/Github/Quiz_VDS-VL/src/index.css): applicato `overflow-x: hidden` e `max-width: 100vw` a `html, body` come misura di sicurezza sistemica anti-scroll orizzontale.
+    * In [src/services/audioDownloadManager.ts](file:///d:/Github/Quiz_VDS-VL/src/services/audioDownloadManager.ts) e test [src/services/audioDownloadManager.test.ts](file:///d:/Github/Quiz_VDS-VL/src/services/audioDownloadManager.test.ts): aggiunto il metodo di utilità reattivo `isAnyDownloading()` (suite test passata al 100% con 131 test totali).
+  - Validata l'interfaccia via CDP headless su viewport mobile 390x844 simulando un esame attivo con download vocale al 40%:
+    * Screenshot generato e verificato: [public/audio_download_banner_screenshot.png](file:///d:/Github/Quiz_VDS-VL/public/audio_download_banner_screenshot.png) (zero overflow, testo del quiz e pulsanti perfettamente leggibili e allineati).
+    * Build di produzione verificata con successo (`tsc && vite build`).
+- **Scelte architetturali & Rationale**:
+  - *Bottom Banner Pattern sopra la Nav Bar*: Sulle PWA mobile l'header superiore deve rimanere sobrio e riservato a elementi essenziali (logo, stato sessione/esame, modalità guida e impostazioni). I processi in background prolungati (come il download di 150-300 MB di audio) appartengono naturalmente all'area inferiore, dove non competono per la larghezza orizzontale con i comandi del cockpit e permettono di esporre informazioni dettagliate (nome voce, contatore file, barra grafica e cancel button).
+  - *Zero Horizontal Overflow Guarantee*: L'impiego coordinato di `pointer-events-none` sul wrapper esterno, `pointer-events-auto` sulla scheda centrata (`max-w-md`) e `overflow-x: hidden` a livello di `html, body` elimina alla radice qualsiasi anomalia di trascinamento laterale o taglio del testo sui dispositivi mobili.
+- **Impatto sul Desiderata**:
+  - Esperienza utente impeccabile e priva di troncamenti visivi su smartphone durante sessioni d'esame con download audio in background.
+
+### [2026-09-28] - Implementazione Modalità Simulazione Didattica (Tutor)
+- **Cosa abbiamo fatto**:
+  - Introdotta la nuova modalità **Simulazione Didattica (Tutor)** nella PWA:
+    * In [src/types/database.ts](file:///d:/Github/Quiz_VDS-VL/src/types/database.ts): definito il tipo `ExamModeType = 'official' | 'tutor' | 'marathon'` ed estese le interfacce `ExamSession` e `InProgressSession` con il campo opzionale `examMode`.
+    * In [src/services/examEvaluator.ts](file:///d:/Github/Quiz_VDS-VL/src/services/examEvaluator.ts): esteso `EvaluateExamParams` e propagato `examMode` all'interno dell'oggetto sessione d'esame generato. Aggiunto test unitario dedicato in [src/services/examEvaluator.test.ts](file:///d:/Github/Quiz_VDS-VL/src/services/examEvaluator.test.ts).
+    * In [src/components/ExamScreen.tsx](file:///d:/Github/Quiz_VDS-VL/src/components/ExamScreen.tsx):
+      - Riorganizzata la schermata iniziale (`idle`) con una card principale in evidenza **Simulazione Didattica (Tutor)** (*Consigliata per imparare* · 30 quiz AeCI · Senza limiti di tempo · Feedback istantaneo e spiegazioni), mantenendo al contempo l'avvio dell'**Esame Ufficiale AeCI** (45 min) e della **Maratona Intensiva** (60 quiz).
+      - Implementato il cronometro progressivo per la modalità didattica (tempo trascorso invece del countdown con allarmi).
+      - Integrata la correzione cromatico-sonora immediata al tocco di ciascuna opzione (`showFeedback = true`), con blocco anti-modifica accidentale, visualizzazione immediata della spiegazione **Regola** e **Tranello**, e riproduzione vocale on-demand.
+      - Implementata la colorazione dinamica in tempo reale nella griglia a 30 bolle (verde smeraldo per risposte corrette, rosso per gli errori) per consultazione rapida del bilancio d'esame.
+      - Aggiunto il pulsante ergonomico *"Prossima Domanda"* visualizzato sotto al box spiegazione per avanzare comodamente ad una mano su dispositivi mobili.
+      - Registrazione istantanea delle statistiche e telemetria in IndexedDB tramite `recordAnswer` senza attendere la fine della scheda, alimentando subito il Quaderno Errori.
+      - Adattata la schermata di debriefing e le modali di consegna/abbandono per riflettere la natura della sessione didattica.
+    * In [README.md](file:///d:/Github/Quiz_VDS-VL/README.md) e [DESIDERATA.md](file:///d:/Github/Quiz_VDS-VL/DESIDERATA.md): documentata la nuova modalità sia nelle specifiche funzionali che nella matrice di stato.
+  - Creato lo script di collaudo headless [scripts/test_tutor_mode.js](file:///d:/Github/Quiz_VDS-VL/scripts/test_tutor_mode.js) ed eseguiti test CDP:
+    * Catturato screenshot launcher [public/test_tutor_idle_screenshot.png](file:///d:/Github/Quiz_VDS-VL/public/test_tutor_idle_screenshot.png).
+    * Catturato screenshot feedback positivo [public/test_tutor_feedback_screenshot.png](file:///d:/Github/Quiz_VDS-VL/public/test_tutor_feedback_screenshot.png).
+    * Catturato screenshot feedback errato con Regola/Tranello e quaderno errori incrementato [public/test_tutor_wrong_feedback_screenshot.png](file:///d:/Github/Quiz_VDS-VL/public/test_tutor_wrong_feedback_screenshot.png).
+    * Verificata l'assenza assoluta di errori in console browser (0 console errors).
+  - Superati tutti i 130 test unitari Vitest (`npm run test:unit`) e completata con successo la build di produzione (`npm run build`).
+- **Scelte architetturali & Rationale**:
+  - *Dual-Path Architecture Rationale*: Invece di creare un quarto schermo o affollare la barra di navigazione inferiore a 5 slot (ottimale per i 390px dei dispositivi mobili), integrare la Simulazione Didattica all'interno della scheda Esame fornisce una gerarchia naturale tra prova formativa (Tutor senza tempo) e prova formale (Esame AeCI a tempo).
+  - *Real-Time Telemetry Writing in Tutor Mode Rationale*: Scrivere subito in IndexedDB la risposta fornita assicura che qualsiasi errore commesso durante lo studio entri immediatamente nel Quaderno Errori (algoritmo Leitner), anche se lo studente interrompe l'esercitazione prima di completare tutti i 30 quiz.
+  - *30-Slot Grid Live Balance Rationale*: La visualizzazione in tempo reale di verde/rosso sulle 30 caselle offre all'allievo un colpo d'occhio immediato sul rispetto della soglia dei 3 errori massimi durante l'apprendimento.
+- **Impatto sul Desiderata**:
+  - Soddisfatto pienamente il requisito dell'utente per una modalità identica all'esame ma concepita per imparare senza ansia temporale e con correzione guidata quesito per quesito.
 
 ### [2026-09-28] - Normalizzazione Microcopy: da "Prontezza" a "Preparazione"
 - **Cosa abbiamo fatto**:

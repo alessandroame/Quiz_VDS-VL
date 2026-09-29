@@ -12,77 +12,85 @@ export type VoiceCommand =
   | 'help';
 
 /**
- * Parser deterministico per i comandi vocali in italiano della Modalità Alla Guida.
- * Riceve la trascrizione grezza da SpeechRecognition e restituisce l'azione corrispondente.
+ * Deterministic parser for Italian voice commands in Drive Mode.
+ * Takes the raw transcription from SpeechRecognition and returns the corresponding VoiceCommand.
  */
 export function parseVoiceCommand(raw: string): VoiceCommand | null {
   if (!raw || typeof raw !== 'string') return null;
-  const t = raw.toLowerCase().trim();
 
-  // 1. Opzioni di Risposta (Massima priorità)
-  // Riconosce: "uno", "prima", "opzione uno", "opzione 1", "risposta uno", "1", "scelgo la prima", ecc.
+  // Clean punctuation and normalize whitespace
+  const clean = raw
+    .toLowerCase()
+    .replace(/[.,/#!$%^&*;:{}=\-_`~()?"']/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+
+  if (!clean) return null;
+
+  // 1. Answer Options (Highest priority)
+  // Matches: "uno", "1", "prima", "primo", "opzione uno", "scelgo la 1", "scelgo la prima", "la prima", "la uno", etc.
   if (
-    /^(1|uno|prima|primo)\b/i.test(t) ||
-    /\b(opzione 1|opzione uno|risposta 1|risposta uno|scelgo 1|scelgo la 1|numero 1|la 1)\b/i.test(t)
+    /^(1|uno|prima|primo)\b/i.test(clean) ||
+    /\b(opzione 1|opzione uno|risposta 1|risposta uno|scelgo 1|scelgo la 1|scelgo uno|scelgo la uno|scelgo la prima|scelgo il primo|numero 1|numero uno|la 1|la uno|la prima|il primo)\b/i.test(clean)
   ) {
     return 'opt1';
   }
 
-  // Riconosce: "due", "seconda", "opzione due", "opzione 2", "risposta due", "2", "scelgo la due", ecc.
+  // Matches: "due", "2", "seconda", "secondo", "opzione due", "scelgo la 2", "scelgo la seconda", "la seconda", "la due", etc.
   if (
-    /^(2|due|seconda|secondo)\b/i.test(t) ||
-    /\b(opzione 2|opzione due|risposta 2|risposta due|scelgo 2|scelgo la 2|numero 2|la 2)\b/i.test(t)
+    /^(2|due|seconda|secondo)\b/i.test(clean) ||
+    /\b(opzione 2|opzione due|risposta 2|risposta due|scelgo 2|scelgo la 2|scelgo due|scelgo la due|scelgo la seconda|scelgo il secondo|numero 2|numero due|la 2|la due|la seconda|il secondo)\b/i.test(clean)
   ) {
     return 'opt2';
   }
 
-  // Riconosce: "tre", "terza", "opzione tre", "opzione 3", "risposta tre", "3", "scelgo la tre", ecc.
+  // Matches: "tre", "3", "terza", "terzo", "opzione tre", "scelgo la 3", "scelgo la terza", "la terza", "la tre", etc.
   if (
-    /^(3|tre|terza|terzo)\b/i.test(t) ||
-    /\b(opzione 3|opzione tre|risposta 3|risposta tre|scelgo 3|scelgo la 3|numero 3|la 3)\b/i.test(t)
+    /^(3|tre|terza|terzo)\b/i.test(clean) ||
+    /\b(opzione 3|opzione tre|risposta 3|risposta tre|scelgo 3|scelgo la 3|scelgo tre|scelgo la tre|scelgo la terza|scelgo il terzo|numero 3|numero tre|la 3|la tre|la terza|il terzo)\b/i.test(clean)
   ) {
     return 'opt3';
   }
 
-  // 2. Navigazione tra le domande
-  // Riconosce: "avanti", "successiva", "prossima", "salta", "dopo", "next"
-  if (/\b(avanti|successiva|prossima|prossimo|salta|passa|next)\b/i.test(t)) {
+  // 2. Navigation between questions
+  // Matches: "avanti", "successiva", "prossima", "salta", "dopo", "next", "passa"
+  if (/\b(avanti|successiva|prossima|prossimo|salta|passa|next)\b/i.test(clean)) {
     return 'next';
   }
 
-  // Riconosce: "indietro", "precedente", "torna indietro", "prima domanda", "back"
-  if (/\b(indietro|precedente|torna indietro|back)\b/i.test(t)) {
+  // Matches: "indietro", "precedente", "torna indietro", "prima domanda", "back"
+  if (/\b(indietro|precedente|torna indietro|back)\b/i.test(clean)) {
     return 'prev';
   }
 
-  // 3. Controllo Audio e Ripasso
-  // Riconosce: "ripeti", "ascolta", "rileggi", "riparti", "repeat"
-  if (/\b(ripeti|ascolta|rileggi|riparti|ancora|repeat)\b/i.test(t)) {
+  // 3. Audio Control and Replay
+  // Matches: "ripeti", "ascolta", "rileggi", "riparti", "repeat"
+  if (/\b(ripeti|ascolta|rileggi|riparti|ancora|repeat)\b/i.test(clean)) {
     return 'repeat';
   }
 
-  // 4. Bandierina / Rivedi
-  // Riconosce: "bandiera", "flag", "rivedere", "segna", "da rivedere"
-  if (/\b(bandiera|flag|segna|rivedere|da rivedere)\b/i.test(t)) {
+  // 4. Bookmark / Review Flag
+  // Matches: "bandiera", "flag", "rivedere", "segna", "da rivedere"
+  if (/\b(bandiera|flag|segna|rivedere|da rivedere)\b/i.test(clean)) {
     return 'flag';
   }
 
-  // 5. Controllo Pilota Automatico (Pausa / Stop / Play)
-  if (/\b(stop|ferma|basta|azzera|interrompi)\b/i.test(t)) {
+  // 5. Autopilot Control (Pause / Stop / Play)
+  if (/\b(stop|ferma|basta|azzera|interrompi)\b/i.test(clean)) {
     return 'stop';
   }
 
-  if (/\b(pausa|alt|aspett|attendi|sospendi)\b/i.test(t)) {
+  if (/\b(pausa|alt|aspett|attendi|sospendi)\b/i.test(clean)) {
     return 'pause';
   }
 
-  if (/\b(continua|riprendi|vai|play|riavvia|avvia)\b/i.test(t)) {
+  if (/\b(continua|riprendi|vai|play|riavvia|avvia)\b/i.test(clean)) {
     return 'resume';
   }
 
-  // 6. Guida e Aiuto Contestuale
-  // Riconosce: "aiuto", "guida", "comandi", "istruzioni", "spiegazione", "tutorial", "cosa posso dire", "help"
-  if (/\b(aiuto|guida|comandi|istruzioni|spiegazione|tutorial|cosa posso dire|help)\b/i.test(t)) {
+  // 6. Help and Contextual Guide
+  // Matches: "aiuto", "guida", "comandi", "istruzioni", "spiegazione", "tutorial", "cosa posso dire", "help"
+  if (/\b(aiuto|guida|comandi|istruzioni|spiegazione|tutorial|cosa posso dire|help)\b/i.test(clean)) {
     return 'help';
   }
 

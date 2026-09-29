@@ -36,7 +36,18 @@
   - **Regola**: il principio fisico, aerodinamico o la norma di legge alla base della risposta corretta.
   - **Tranello**: il bias cognitivo o l'ambiguità terminologica tipica della domanda.
 
-### 2. Simulatore d'Esame Ufficiale AeCI
+### 2. Simulatore d'Esame & Simulazione Didattica (Tutor)
+- **Due Modalità di Simulazione Dedicate**:
+  - 🎯 **Simulazione Didattica (Tutor - Consigliata per imparare)**:
+    - 30 quesiti estratti con le quote ministeriali AeCI tramite il *Fair Coverage Randomizer*.
+    - **Nessun limite di tempo**: studio rilassato senza countdown, con cronometro discreto del tempo trascorso.
+    - **Verifica e Feedback Immediato**: alla selezione di una risposta, l'opzione viene validata all'istante (verde/rosso), con visualizzazione esplicita della soluzione esatta e della spiegazione contestuale didattica (**Regola** e **Tranello**).
+    - **Mappa Interattiva a 30 Bolle**: la griglia dei quesiti colora ciascuno slot in tempo reale (verde smeraldo per le risposte esatte, rosso per gli errori) consentendo un'analisi immediata del proprio rendimento.
+    - **Avanzamento Fluido a 1 Tocco**: pulsante dedicato *"Prossima Domanda"* visualizzato sotto al feedback per studiare comodamente con una mano su smartphone.
+    - **Registrazione Istantanea**: statistiche e telemetria salvate in tempo reale in IndexedDB, alimentando subito il Quaderno Errori senza attendere la fine della scheda.
+  - ⏱️ **Simulazione Esame Ufficiale AeCI (Prova Formale)**:
+    - 30 quesiti AeCI, timer countdown di 45 minuti con indicatori di stato visivi e allarmi negli ultimi minuti.
+    - Esito, conteggio errori e debriefing completo svelati esclusivamente alla consegna finale.
 - **Ripartizione Ministeriale Esatta**: estrazione di 30 quesiti secondo le quote di legge:
   - *Aerodinamica*: 9 quiz
   - *Meteorologia*: 8 quiz
@@ -47,12 +58,11 @@
   - *Fisiopatologia del Volo*: 1 quiz
   - *Strumenti di Volo*: 1 quiz
   - *Materiali e Manutenzione*: 1 quiz
-- **Timer d'Esame Reale**: countdown di 45 minuti con indicatori di stato visivi e allarmi sonori negli ultimi minuti.
 - **Valutazione Ufficiale AeCI**:
   - **IDONEO**: massimo **3 errori** ammessi (minimo 27/30).
   - **NON IDONEO**: 4 o più errori.
 - **Griglia di Navigazione a 30 Slot**: panoramica a colpo d'occhio delle domande risposte, da completare e contrassegnate con bandierina (`⚑ Rivedi`).
-- **Debriefing Finale**: esito immediato, cronometro di esecuzione, riepilogo grafico ed elenco analitico delle risposte errate con accesso diretto alle spiegazioni.
+- **Debriefing Finale**: esito immediato, tempo di esecuzione, riepilogo grafico ed elenco analitico delle risposte errate con accesso diretto alle spiegazioni.
 - **Navigation Guard (Protezione Sessione)**: avviso di sicurezza e blocco in caso di tentata navigazione verso altre schede o ricaricamento pagina (`beforeunload`), evitando la perdita accidentale della simulazione in corso.
 
 ### 3. Studio Guidato per Materie
@@ -90,8 +100,13 @@
   - `"Bandiera"` per contrassegnare il quesito da rivedere.
   - `"Pausa"`, `"Riprendi"` per controllare la sessione.
   - `"Aiuto"`, `"Guida"`, `"Comandi"` per aprire la guida a voce in qualsiasi istante.
-- **Guida Contestuale Comandi Vocali (Cheat Sheet)**:
-  - **HUD Live Rotativo**: indicatore visivo discreto durante l'ascolto che suggerisce i comandi disponibili ("Microfono ON: Dì 'Uno', 'Avanti' o 'Aiuto'").
+- **Guida Contestuale Comandi Vocali & Feedback Visivo Reattivo**:
+  - **Icona Microfono Pulsante & Radar Wave**: sia nell'header superiore sia nel banner inferiore, l'icona del microfono pulsa visibilmente (`animate-pulse`) circondata da un'onda radar radiale (`animate-ping`) e da un bagliore avionico verde smeraldo non appena viene rilevata voce o un comando in arrivo.
+  - **HUD Live Dinamico con Trascrizione in Tempo Reale**:
+    * Durante la dizione: visualizza istantaneamente *"In ricezione: '[parole pronunciate]' "* grazie all'analisi `interimResults`.
+    * A comando riconosciuto: conferma *"Comando: '[Azione]' ✓"* per 2.5 secondi.
+    * In caso di frase non abbinata: notifica trasparente *"Sentito: '[testo]' (non riconosciuto)"*, eliminando qualsiasi dubbio sull'effettivo funzionamento del microfono.
+    * In caso di permessi negati: visualizza l'avviso diagnostico chiaro per abilitare il microfono nelle impostazioni del browser.
   - **Cheat Sheet a 1 Tocco**: pulsante `?` sempre accessibile nella schermata di guida, nel Quick Speech Menu e nella scheda Impostazioni (🚗 Guida) con la tabella ordinata dei comandi e i consigli per l'uso in auto e casco/auricolare Bluetooth.
 - **Spiegazione Vocale di Benvenuto (Spoken Audio Briefing & Run-Once Guard)**:
   - **Briefing Vocale Cockpit**: spiegazione parlata chiara e sintetica all'apertura della Modalità Alla Guida che illustra lo schermo sempre attivo (Wake Lock), l'ascolto hands-free, le 3 macro-zone di tocco e i comandi vocali essenziali.
@@ -109,7 +124,7 @@
 - **Gestione Offline del Parlato & Download in Background (`audioDownloadManager`)**:
   - **Prompt Non Invasivo al Primo Avvio della Guida**: dialog dedicato quando si accede per la prima volta alla Modalità Guida, con scelta a 1 tocco: *Scarica Voce Attiva* (consigliato, ~150 MB per 2.520 quesiti), *Scarica Entrambe* (~300 MB) o *Non ora*.
   - **Download Non Bloccante**: il download dei file audio avviene in background via CacheStorage (`vds-audio-giuseppe` e `vds-audio-elsa`) con un pool concorrente a 8 connessioni senza freeze della UI o blocchi della navigazione.
-  - **Mini-HUD di Avanzamento**: indicatore discreto (`⤓ 42%`) nella Navbar e nella barra Guida con popover per annullare o visualizzare i file rimanenti.
+  - **Banner di Avanzamento in Basso**: barra di progressione dedicata agganciata in basso sopra la barra di navigazione (`AudioDownloadBanner`), con percentuale, conteggio file, barra di progresso in tempo reale e pulsante Annulla, che preserva la pulizia e l'allineamento dell'header su qualsiasi dimensione di schermo ed evita ogni tipo di overflow orizzontale su smartphone.
   - **Gestione Granulare nelle Impostazioni (🎙️ Voce)**: due card indipendenti per Giuseppe ed Elsa con monitoraggio dello spazio occupato, barra di progresso, pulsante Scarica/Elimina cache e opzione di ripristino del prompt iniziale.
   - **Fallback Intelligente Offline**: se la voce selezionata non è stata scaricata e ci si trova offline, l'app usa automaticamente la voce scaricata disponibile con notifica informativa cockpit, senza interruzioni.
   - **PWA Service Worker & iOS Safari**: regole Workbox con `rangeRequests: true` per garantire compatibilità con lo streaming audio parziale di Safari su iOS.
@@ -128,9 +143,11 @@
 - **Icona Ufficiale PWA (Aero Shield)**:
   - Icona geometrica originale per il Volo Libero che unisce l'arco a celle cassonate del parapendio e l'ala a freccia triangolare del deltaplano (con trave di chiglia centrale e barra di controllo A-frame) a formare uno scudo alare 'V'.
   - Disponibile in formato vettoriale ad altissima precisione ([favicon.svg](file:///d:/Github/Quiz_VDS-VL/public/favicon.svg)) e rasterizzata per il manifest PWA a 192x192 e 512x512 px.
-- **Pannello Impostazioni a Schede Tematiche (Zero-Scroll)**:
+- **Schermata Impostazioni Fullscreen a Schede Tematiche**:
+  - Esperienza nativa a tutto schermo che sostituisce i vecchi modali popup: layout a schermo intero sia su dispositivi mobili che desktop con header dedicato, pulsante Indietro ed `Esc` da tastiera.
   - Riorganizzazione modulare suddivisa in 6 argomenti dedicati: **🎨 Aspetto**, **🎙️ Voce**, **🚗 Guida**, **☁️ Backup**, **⚙️ Dati**, **ℹ️ About**.
-  - Eliminazione totale dello scrolling verticale continuo: ogni scheda presenta controlli compatti e accessibili a colpo d'occhio sia su smartphone che su desktop.
+  - **Supporto Schermo Intero (Browser Fullscreen)**: opzione dedicata nella scheda Aspetto per massimizzare la PWA nascondendo le barre del browser su desktop e tablet.
+  - Eliminazione totale dello scrolling della pagina sottostante (body scroll lock) per una navigazione pulita e focalizzata.
   - **Scheda About Dedicata**: consultazione immediata dei riferimenti normativi ufficiali (D.P.R. 9 luglio 2010, n. 133 e regolamenti AeCI), database dei 504 quiz, regole d'esame (30 quiz, 45 min, max 3 errori), principi architetturali (Offline-First, Fair Coverage, Leitner) e garanzie di privacy.
 - **Palette Cockpit Bimodale**:
   - **Carbon Cockpit (Dark Mode Zero-Blue)**: Sfondo grafite profondo e carbonio neutro (`#09090b` / `zinc-950`, superfici `zinc-900`, bordi `zinc-800`, testo `zinc-100`), **con dominante blu categoricamente rimossa (0% cool hue)**. Accento avionico caldo **Aviation Amber** (`amber-500` / `amber-600`) per indicatori, selezioni e bagliore cockpit, ottimizzato per riposo visivo e cockpit notturni.

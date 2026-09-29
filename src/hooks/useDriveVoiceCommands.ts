@@ -8,28 +8,36 @@ export interface UseDriveVoiceCommandsProps {
 
 export interface UseDriveVoiceCommandsResult {
   isListening: boolean;
+  isReceiving: boolean;
   isSupported: boolean;
   lastTranscript: string;
+  interimTranscript: string;
   error: string | null;
   start: () => void;
   stop: () => void;
 }
 
 /**
- * Hook per il riconoscimento vocale continuo delle parole chiave in Modalità Alla Guida.
- * Utilizza la Web Speech Recognition API con lingua 'it-IT'.
+ * Hook for continuous Italian speech recognition and keyword detection in Drive Mode.
+ * Leverages the Web Speech Recognition API with real-time receiving detection and command parsing.
  */
 export function useDriveVoiceCommands({
   enabled,
   onCommand
 }: UseDriveVoiceCommandsProps): UseDriveVoiceCommandsResult {
   const [isListening, setIsListening] = useState(false);
+  const [isReceiving, setIsReceiving] = useState(false);
   const [lastTranscript, setLastTranscript] = useState('');
+  const [interimTranscript, setInterimTranscript] = useState('');
   const [error, setError] = useState<string | null>(null);
 
   const recognitionRef = useRef<any>(null);
   const shouldBeListeningRef = useRef(enabled);
   const onCommandRef = useRef(onCommand);
+  const fatalErrorRef = useRef(false);
+  const restartTimeoutRef = useRef<any>(null);
+  const receivingTimeoutRef = useRef<any>(null);
+  const lastHandledIndexRef = useRef<number>(-1);
 
   onCommandRef.current = onCommand;
   shouldBeListeningRef.current = enabled;
@@ -38,8 +46,53 @@ export function useDriveVoiceCommands({
     typeof window !== 'undefined' &&
     Boolean((window as any).SpeechRecognition || (window as any).webkitSpeechRecognition);
 
+  const markReceiving = useCallback((active: boolean, persistMs = 1500) => {
+    if (receivingTimeoutRef.current) {
+      clearTimeout(receivingTimeoutRef.current);
+      receivingTimeoutRef.current = null;
+    }
+    if (active) {
+      setIsReceiving(true);
+    } else {
+      receivingTimeoutRef.current = setTimeout(() => {
+        setIsReceiving(false);
+      }, persistMs);
+    }
+  }, []);
+
+  const stop = useCallback(() => {
+    shouldBeListeningRef.current = false;
+    fatalErrorRef.current = false;
+
+    if (restartTimeoutRef.current) {
+      clearTimeout(restartTimeoutRef.current);
+      restartTimeoutRef.current = null;
+    }
+    if (receivingTimeoutRef.current) {
+      clearTimeout(receivingTimeoutRef.current);
+      receivingTimeoutRef.current = null;
+    }
+
+    if (recognitionRef.current) {
+      try {
+        recognitionRef.current.stop();
+      } catch {
+        // Ignore errors on stopping an already stopped instance
+      }
+      recognitionRef.current = null;
+    }
+
+    setIsListening(false);
+    setIsReceiving(false);
+    setInterimTranscript('');
+  }, []);
+
   const start = useCallback(() => {
     if (!isSupported || recognitionRef.current) return;
+
+    fatalErrorRef.current = false;
+    setError(null);
+
     try {
       const SpeechRecognitionClass =
         (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
@@ -47,7 +100,7 @@ export function useDriveVoiceCommands({
 
       rec.lang = 'it-IT';
       rec.continuous = true;
-      rec.interimResults = false;
+      rec.interimResults = true;
       rec.maxAlternatives = 1;
 
       rec.onstart = () => {
@@ -55,35 +108,112 @@ export function useDriveVoiceCommands({
         setError(null);
       };
 
+      // Sound and speech detection events for instant visual responsiveness
+      rec.onaudiostart = () => {
+        markReceiving(true);
+      };
+
+      rec.onsoundstart = () => {
+        markReceiving(true);
+      };
+
+      rec.onspeechstart = () => {
+        markReceiving(true);
+      };
+
+      rec.onspeechend = () => {
+        // Keep pulsing briefly so the user sees confirmation
+        markReceiving(false, 1500);
+      };
+
+      rec.onsoundend = () => {
+        markReceiving(false, 1500);
+      };
+
+      rec.onaudioend = () => {
+        markReceiving(false, 1500);
+      };
+
       rec.onresult = (event: any) => {
+        markReceiving(true);
+
         const lastIdx = event.results.length - 1;
         const result = event.results[lastIdx];
-        if (result && result[0]) {
-          const text = result[0].transcript;
-          setLastTranscript(text);
+        if (!result || !result[0]) return;
+
+        const text = result[0].transcript || '';
+
+        if (!result.isFinal) {
+          setInterimTranscript(text);
+          // Try early command match on interim results for snappy feedback
           const cmd = parseVoiceCommand(text);
-          if (cmd) {
+          if (cmd && lastHandledIndexRef.current < lastIdx) {
+            lastHandledIndexRef.current = lastIdx;
+            setLastTranscript(text);
+            setInterimTranscript('');
+            markReceiving(false, 1800);
             onCommandRef.current(cmd);
+          }
+        } else {
+          // Final transcript for this speech chunk
+          setLastTranscript(text);
+          setInterimTranscript('');
+          markReceiving(false, 1800);
+
+          if (lastHandledIndexRef.current < lastIdx) {
+            const cmd = parseVoiceCommand(text);
+            if (cmd) {
+              lastHandledIndexRef.current = lastIdx;
+              onCommandRef.current(cmd);
+            }
           }
         }
       };
 
       rec.onerror = (e: any) => {
-        // 'no-speech' è normale nei periodi di silenzio, non è un errore fatale
-        if (e.error !== 'no-speech') {
-          setError(e.error);
+        // 'no-speech' is normal during silence periods; not a fatal error
+        if (e.error === 'no-speech') {
+          return;
         }
+
+        if (e.error === 'not-allowed' || e.error === 'service-not-allowed') {
+          fatalErrorRef.current = true;
+          shouldBeListeningRef.current = false;
+          setError('not-allowed');
+          setIsListening(false);
+          setIsReceiving(false);
+          return;
+        }
+
+        if (e.error === 'audio-capture') {
+          fatalErrorRef.current = true;
+          shouldBeListeningRef.current = false;
+          setError('audio-capture');
+          setIsListening(false);
+          setIsReceiving(false);
+          return;
+        }
+
+        if (e.error === 'network') {
+          setError('network');
+          return;
+        }
+
+        setError(e.error || 'Errore microfono');
       };
 
       rec.onend = () => {
         setIsListening(false);
-        // Se il listener deve rimanere attivo, riavvia la sessione
-        if (shouldBeListeningRef.current) {
-          try {
-            rec.start();
-          } catch {
-            // Ignora se già in avvio
-          }
+        recognitionRef.current = null;
+
+        // Restart cleanly after silence if still enabled and no fatal error occurred
+        if (shouldBeListeningRef.current && !fatalErrorRef.current) {
+          if (restartTimeoutRef.current) clearTimeout(restartTimeoutRef.current);
+          restartTimeoutRef.current = setTimeout(() => {
+            if (shouldBeListeningRef.current && !recognitionRef.current) {
+              start();
+            }
+          }, 150);
         }
       };
 
@@ -92,21 +222,10 @@ export function useDriveVoiceCommands({
     } catch (err: any) {
       setError(err?.message || 'Errore microfono');
       setIsListening(false);
-    }
-  }, [isSupported]);
-
-  const stop = useCallback(() => {
-    shouldBeListeningRef.current = false;
-    if (recognitionRef.current) {
-      try {
-        recognitionRef.current.stop();
-      } catch {
-        // Ignora
-      }
+      setIsReceiving(false);
       recognitionRef.current = null;
     }
-    setIsListening(false);
-  }, []);
+  }, [isSupported, markReceiving]);
 
   useEffect(() => {
     if (enabled && isSupported) {
@@ -123,8 +242,10 @@ export function useDriveVoiceCommands({
 
   return {
     isListening,
+    isReceiving,
     isSupported,
     lastTranscript,
+    interimTranscript,
     error,
     start,
     stop

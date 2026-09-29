@@ -7,24 +7,36 @@ describe('Suite: voiceCommandParser (Parser comandi vocali Modalità Guida)', ()
     expect(parseVoiceCommand('uno')).toBe('opt1');
     expect(parseVoiceCommand('1')).toBe('opt1');
     expect(parseVoiceCommand('prima')).toBe('opt1');
+    expect(parseVoiceCommand('la prima')).toBe('opt1');
+    expect(parseVoiceCommand('la 1')).toBe('opt1');
+    expect(parseVoiceCommand('la uno')).toBe('opt1');
     expect(parseVoiceCommand('opzione uno')).toBe('opt1');
     expect(parseVoiceCommand('opzione 1')).toBe('opt1');
     expect(parseVoiceCommand('scelgo la 1')).toBe('opt1');
+    expect(parseVoiceCommand('scelgo la prima')).toBe('opt1');
+    expect(parseVoiceCommand('uno.')).toBe('opt1');
 
     // Opzione 2
     expect(parseVoiceCommand('due')).toBe('opt2');
     expect(parseVoiceCommand('2')).toBe('opt2');
     expect(parseVoiceCommand('seconda')).toBe('opt2');
+    expect(parseVoiceCommand('la seconda')).toBe('opt2');
+    expect(parseVoiceCommand('la due')).toBe('opt2');
     expect(parseVoiceCommand('opzione due')).toBe('opt2');
     expect(parseVoiceCommand('risposta 2')).toBe('opt2');
     expect(parseVoiceCommand('la 2')).toBe('opt2');
+    expect(parseVoiceCommand('scelgo la seconda')).toBe('opt2');
+    expect(parseVoiceCommand('due!')).toBe('opt2');
 
     // Opzione 3
     expect(parseVoiceCommand('tre')).toBe('opt3');
     expect(parseVoiceCommand('3')).toBe('opt3');
     expect(parseVoiceCommand('terza')).toBe('opt3');
+    expect(parseVoiceCommand('la terza')).toBe('opt3');
+    expect(parseVoiceCommand('la tre')).toBe('opt3');
     expect(parseVoiceCommand('opzione tre')).toBe('opt3');
     expect(parseVoiceCommand('scelgo 3')).toBe('opt3');
+    expect(parseVoiceCommand('scelgo la terza')).toBe('opt3');
   });
 
   it('VC-02: riconosce i comandi di navigazione', () => {
