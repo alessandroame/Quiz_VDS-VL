@@ -333,8 +333,22 @@ function AppContent() {
       {/* Schermata Attiva */}
       <main>
         {activeTab === 'home' && <HomeScreen onSelectTab={handleSelectTab} />}
-        {activeTab === 'tutor' && <ExamScreen initialMode="tutor" onNavigateHome={() => handleSelectTab('home')} />}
-        {activeTab === 'exam' && <ExamScreen initialMode="official" onNavigateHome={() => handleSelectTab('home')} />}
+        {activeTab === 'tutor' && (
+          <ExamScreen
+            key="tutor"
+            initialMode="tutor"
+            onNavigateHome={() => handleSelectTab('home')}
+            onSwitchMode={(mode) => handleSelectTab(mode === 'tutor' ? 'tutor' : 'exam')}
+          />
+        )}
+        {activeTab === 'exam' && (
+          <ExamScreen
+            key="exam"
+            initialMode="official"
+            onNavigateHome={() => handleSelectTab('home')}
+            onSwitchMode={(mode) => handleSelectTab(mode === 'tutor' ? 'tutor' : 'exam')}
+          />
+        )}
         {activeTab === 'topics' && <TopicsScreen />}
         {activeTab === 'mistakes' && <MistakesScreen />}
         {activeTab === 'archive' && <ArchiveScreen />}

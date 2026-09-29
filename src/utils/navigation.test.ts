@@ -53,4 +53,15 @@ describe('Suite 17: Cockpit V2 Navigation & Home Hub Logic', () => {
     expect(getTabLabel('archive')).toBe('Archivio');
     expect(getTabLabel('stats')).toBe('Stats');
   });
+
+  it('NAV-06: tutor ed exam sono scenari distinti con differenti titoli e descrizioni', () => {
+    const tutorScenario = SCENARIO_DEFINITIONS.find(s => s.id === 'tutor');
+    const examScenario = SCENARIO_DEFINITIONS.find(s => s.id === 'exam');
+    expect(tutorScenario).toBeDefined();
+    expect(examScenario).toBeDefined();
+    expect(tutorScenario?.headerTitle).not.toBe(examScenario?.headerTitle);
+    expect(tutorScenario?.description).not.toBe(examScenario?.description);
+    expect(tutorScenario?.shortcut).toBe('1');
+    expect(examScenario?.shortcut).toBe('3');
+  });
 });

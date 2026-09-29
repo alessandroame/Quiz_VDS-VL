@@ -14,6 +14,45 @@ Questo documento registra in ordine cronologico tutte le lavorazioni svolte nel 
 - **Impatto sul Desiderata**: <Come questo intervento contribuisce al desiderata (cfr. DESIDERATA.md) e indicazioni per il prossimo agente>
 ```
 
+# Registro di Bordo: Schermate Dedicate per Tutor Didattico ed Esame Ufficiale AeCI
+
+- **Data**: 2026-09-29
+- **Autore/Agente**: Antigravity Cockpit Specialist
+- **Tipo di Intervento**: `feat(exam)`
+- **Argomento**: Separazione visiva e logica tra le schermate di atterraggio di Tutor Didattico ed Esame Ufficiale AeCI (eliminazione duplicazione menu unico).
+
+---
+
+### 1. Cosa abbiamo fatto
+- **Separazione Dedicata in `src/components/ExamScreen.tsx`**:
+  - Risolta la ridondanza di UX in cui sia il clic su *Tutor Didattico* (card [1] in Home) sia su *Esame Ufficiale* (card [3] in Home) mostravano la medesima schermata generica con tutte le modalità duplicate.
+  - Differenziato lo stato `idle` in base a `examMode` (sincronizzato dinamicamente con `initialMode`):
+    - **Tutor Didattico (`tutor`)**: Briefing focalizzato sull'apprendimento senza stress temporale, con regole didattiche in evidenza (30 quiz con Fair Coverage, nessun timer, spiegazione immediata Regola e Tranello), pulsante primario `btn-start-tutor-exam` e switch rapido discreto verso l'Esame Ufficiale.
+    - **Esame Ufficiale AeCI (`official`)**: Briefing formale fedele alla prova ministeriale (D.P.R. 133/2010: 30 quiz, countdown 45 min, max 3 errori, nessun feedback intermedio, debriefing alla consegna), pulsante primario `btn-start-exam`, box secondario per la Maratona Intensiva (60 quiz / 60 min) e switch rapido verso il Tutor Didattico.
+  - Aggiunta prop facoltativa `onSwitchMode?: (mode: ExamModeType) => void` per navigazione reattiva e dichiarativa.
+  - Aggiornati i pulsanti di riavvio nella schermata di review finale per contestualizzare la ripartenza in base alla modalità appena conclusa.
+- **Integrazione in `src/App.tsx`**:
+  - Applicate le chiavi `key="tutor"` e `key="exam"` per garantire un ciclo di vita e una reinizializzazione di stato pulita e immediata al cambio di scenario.
+  - Passata la callback `onSwitchMode` collegata a `handleSelectTab`.
+- **Aggiornamento Suite di Test Vitest**:
+  - Aggiunto test `NAV-06` in `src/utils/navigation.test.ts` per certificare l'unicità e la divergenza funzionale tra lo scenario `tutor` e lo scenario `exam`.
+  - Aggiornato `src/components/QuestionNavigator.test.ts` per compatibilità con l'interpolazione SSR di React 19.
+
+---
+
+### 2. Scelte Architetturali & Rationale
+- **Purezza dei 6 Macro-Scenari del Cruscotto Home**: Ciascuno dei 6 pulsanti tattili della Home Hub (`TUTOR`, `MATERIE`, `ESAME`, `ERRORI`, `ARCHIVIO`, `STATS`) corrisponde ora a un'esperienza autonoma, chiara e priva di passaggi ridondanti.
+- **Zero Dangling Clicks**: L'allievo pilota non viene più disorientato atterrando su una lista generica dove deve ricliccare una seconda volta la stessa modalità scelta un secondo prima.
+- **Cross-Link Ergonomici**: Entrambe le schermate mantengono un link rapido in fondo che permette all'allievo di passare dall'una all'altra senza dover forzatamente tornare alla Home.
+
+---
+
+### 3. Impatto sul Desiderata
+- Allinea perfettamente l'interfaccia alle specifiche del cockpit avionico definite in `DESIDERATA.md`.
+- Risolve l'attrito cognitivo e la ridondanza segnalati dall'utente durante l'interazione con la PWA.
+
+---
+
 # Registro di Bordo: Sincronizzazione Tasto Indietro Hardware/Gestures (Back Navigation Coordinator)
 
 - **Data**: 2026-09-29

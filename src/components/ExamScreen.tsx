@@ -25,9 +25,14 @@ import { backNavigation } from '../utils/backNavigation';
 interface ExamScreenProps {
   initialMode?: ExamModeType;
   onNavigateHome?: () => void;
+  onSwitchMode?: (mode: ExamModeType) => void;
 }
 
-export const ExamScreen: React.FC<ExamScreenProps> = ({ initialMode = 'tutor', onNavigateHome }) => {
+export const ExamScreen: React.FC<ExamScreenProps> = ({
+  initialMode = 'tutor',
+  onNavigateHome,
+  onSwitchMode
+}) => {
   const {
     questions,
     filteredQuestions,
@@ -57,6 +62,13 @@ export const ExamScreen: React.FC<ExamScreenProps> = ({ initialMode = 'tutor', o
   const [showSubmitModal, setShowSubmitModal] = useState(false);
   const [showAbandonModal, setShowAbandonModal] = useState(false);
   const [completedSession, setCompletedSession] = useState<ExamSession | null>(null);
+
+  // Sync examMode with initialMode prop when in idle state
+  useEffect(() => {
+    if (examState === 'idle') {
+      setExamMode(initialMode);
+    }
+  }, [initialMode, examState]);
 
   // Track question IDs whose answers have already been recorded to prevent duplicate writes
   const recordedQuestionIds = useRef<Set<number>>(new Set());
@@ -376,68 +388,68 @@ export const ExamScreen: React.FC<ExamScreenProps> = ({ initialMode = 'tutor', o
     return q && q.correctAnswer !== ans;
   }).length;
 
-  // --- Schermata IDLE: Avvio Esame ---
+  // --- Schermata IDLE: Avvio Esame / Tutor Dedicato ---
   if (examState === 'idle') {
-    return (
-      <div className="max-w-2xl mx-auto px-4 py-4 space-y-4">
-        {/* Selezione Modalità */}
-        <div className="space-y-4">
-          {/* Opzione 1: Simulazione Didattica (Tutor) - In Evidenza per l'apprendimento */}
-          <div className="p-5 bg-zinc-900 border-2 border-amber-500/50 hover:border-amber-500 rounded-2xl transition-all shadow-md light:bg-white light:border-amber-500/60 space-y-3">
-            <div className="space-y-1">
-              <div className="flex items-center gap-2">
-                <span className="px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-400 light:bg-emerald-100 light:text-emerald-800 text-[10px] font-bold uppercase tracking-wider">
+    if (examMode === 'tutor') {
+      return (
+        <div className="max-w-2xl mx-auto px-4 py-4 space-y-4">
+          {/* Card Principale: Simulazione Didattica (Tutor) */}
+          <div className="p-5 sm:p-6 bg-zinc-900 border-2 border-emerald-500/50 hover:border-emerald-500 rounded-2xl transition-all shadow-md light:bg-white light:border-emerald-500/60 space-y-4">
+            <div className="space-y-2">
+              <div className="flex items-center justify-between gap-2">
+                <span className="px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 light:bg-emerald-100 light:text-emerald-800 text-[10px] font-bold uppercase tracking-wider font-mono">
                   Consigliata per imparare
                 </span>
+                <span className="text-[11px] font-mono text-zinc-400 light:text-slate-500">
+                  30 Quiz • Senza limiti di tempo
+                </span>
               </div>
-              <h3 className="font-bold text-base text-zinc-100 light:text-slate-900 flex items-center gap-2">
-                <BookOpen className="w-5 h-5 text-amber-400" />
+              <h2 className="font-bold text-lg sm:text-xl text-zinc-100 light:text-slate-900 flex items-center gap-2.5">
+                <BookOpen className="w-6 h-6 text-emerald-400" />
                 <span>Simulazione Didattica (Tutor)</span>
-              </h3>
-              <p className="text-xs text-zinc-400 light:text-slate-600 leading-relaxed">
-                30 quesiti bilanciati AeCI <strong>senza limiti di tempo</strong>. Feedback cromatico immediato ad ogni risposta con spiegazione dettagliata <strong>Regola</strong> e <strong>Tranello</strong>.
+              </h2>
+              <p className="text-xs sm:text-sm text-zinc-400 light:text-slate-600 leading-relaxed">
+                Esercitazione guidata sui 30 quesiti ufficiali AeCI ripartiti per materia. Correzione cromatico-didattica istantanea ad ogni risposta con spiegazione dettagliata <strong>Regola</strong> e <strong>Tranello</strong>.
               </p>
             </div>
+
+            <div className="p-3.5 bg-zinc-950/60 light:bg-slate-50 border border-zinc-800 light:border-slate-200 rounded-xl space-y-2 text-xs text-zinc-300 light:text-slate-700">
+              <div className="font-semibold text-zinc-200 light:text-slate-800 flex items-center gap-1.5">
+                <CheckCircle2 className="w-4 h-4 text-emerald-400 flex-shrink-0" />
+                <span>Cosa prevede questa modalità:</span>
+              </div>
+              <ul className="space-y-1.5 pl-6 list-disc text-zinc-400 light:text-slate-600">
+                <li><strong>30 quiz bilanciati</strong> estratti con algoritmo Fair Coverage AeCI.</li>
+                <li><strong>Nessun timer</strong>: rifletti con calma su ogni concetto teorico.</li>
+                <li><strong>Feedback immediato</strong> con la spiegazione normativa e i tranelli tipici.</li>
+                <li>Gli errori confluiscono automaticamente nel tuo <strong>Quaderno Errori</strong>.</li>
+              </ul>
+            </div>
+
             <button
               id="btn-start-tutor-exam"
               onClick={() => startExam('tutor')}
-              className="w-full py-3.5 rounded-xl bg-amber-600 hover:bg-amber-500 text-white font-bold text-sm shadow-lg shadow-amber-950/40 flex items-center justify-center gap-2 transition-all active:scale-[0.99]"
+              className="w-full py-3.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-sm shadow-lg shadow-emerald-950/40 flex items-center justify-center gap-2 transition-all active:scale-[0.99]"
             >
               <span>Avvia Simulazione Didattica (30 Quiz)</span>
               <ArrowRight className="w-4 h-4" />
             </button>
           </div>
 
-          {/* Opzione 2: Esame Ufficiale AeCI - Prova Formale */}
-          <div className="p-4 bg-zinc-900/60 border border-zinc-800 hover:border-zinc-700 rounded-2xl transition-all light:bg-slate-50 light:border-slate-200 space-y-3">
-            <div className="space-y-1">
-              <h3 className="font-bold text-sm text-zinc-200 light:text-slate-800 flex items-center gap-2">
-                <Timer className="w-4 h-4 text-amber-400" />
-                <span>Esame Ufficiale AeCI</span>
-              </h3>
-              <p className="text-xs text-zinc-400 light:text-slate-600 leading-relaxed">
-                30 quesiti, timer countdown di 45 minuti e debriefing finale degli errori alla consegna (simulazione prova reale d'esame).
-              </p>
-            </div>
+          {/* Switch rapido a Esame Ufficiale */}
+          <div className="text-center pt-1">
             <button
-              id="btn-start-exam"
-              onClick={() => startExam('official')}
-              className="w-full py-3 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-zinc-200 light:bg-slate-200 light:text-slate-800 light:hover:bg-slate-300 font-semibold text-xs flex items-center justify-center gap-2 transition-colors"
+              id="btn-switch-to-official"
+              onClick={() => {
+                if (onSwitchMode) onSwitchMode('official');
+                else setExamMode('official');
+              }}
+              className="text-xs text-zinc-400 hover:text-sky-400 light:text-slate-500 light:hover:text-sky-600 transition-colors inline-flex items-center gap-1.5"
             >
-              <Timer className="w-3.5 h-3.5" />
-              <span>Avvia Esame Ufficiale (45 min)</span>
+              <Timer className="w-3.5 h-3.5 text-sky-400" />
+              <span>Vuoi metterti alla prova col timer? Passa a <strong>Esame Ufficiale (45 min)</strong></span>
             </button>
           </div>
-
-          {/* Opzione 3: Maratona Intensiva */}
-          <button
-            id="btn-start-marathon"
-            onClick={() => startExam('marathon')}
-            className="w-full py-2.5 rounded-xl border border-zinc-800 hover:border-zinc-700 text-zinc-400 hover:text-zinc-200 light:border-slate-300 light:text-slate-600 light:hover:text-slate-900 text-xs font-medium flex items-center justify-center gap-1.5 transition-colors"
-          >
-            <ListFilter className="w-3.5 h-3.5" />
-            <span>Maratona Intensiva (60 Quiz - 60 min)</span>
-          </button>
 
           {onNavigateHome && (
             <div className="flex justify-center pt-2">
@@ -450,6 +462,100 @@ export const ExamScreen: React.FC<ExamScreenProps> = ({ initialMode = 'tutor', o
             </div>
           )}
         </div>
+      );
+    }
+
+    // Default per 'official' ed eventuale 'marathon'
+    return (
+      <div className="max-w-2xl mx-auto px-4 py-4 space-y-4">
+        {/* Card Principale Esame Ufficiale AeCI */}
+        <div className="p-5 sm:p-6 bg-zinc-900 border-2 border-sky-500/50 hover:border-sky-500 rounded-2xl transition-all shadow-md light:bg-white light:border-sky-500/60 space-y-4">
+          <div className="space-y-2">
+            <div className="flex items-center justify-between gap-2">
+              <span className="px-2.5 py-0.5 rounded-full bg-sky-500/20 text-sky-300 light:bg-sky-100 light:text-sky-800 text-[10px] font-bold uppercase tracking-wider font-mono">
+                Quota AeCI Certificata • D.P.R. 133/2010
+              </span>
+              <span className="text-[11px] font-mono text-zinc-400 light:text-slate-500">
+                30 Quiz • 45 Minuti
+              </span>
+            </div>
+            <h2 className="font-bold text-lg sm:text-xl text-zinc-100 light:text-slate-900 flex items-center gap-2.5">
+              <Timer className="w-6 h-6 text-sky-400" />
+              <span>Esame Ufficiale AeCI</span>
+            </h2>
+            <p className="text-xs sm:text-sm text-zinc-400 light:text-slate-600 leading-relaxed">
+              Simulazione formale fedele alla prova d'esame per l'attestato VDS/VL. 30 quesiti a risposta multipla con countdown reale di 45 minuti e debriefing finale alla consegna.
+            </p>
+          </div>
+
+          <div className="p-3.5 bg-zinc-950/60 light:bg-slate-50 border border-zinc-800 light:border-slate-200 rounded-xl space-y-2 text-xs text-zinc-300 light:text-slate-700">
+            <div className="font-semibold text-zinc-200 light:text-slate-800 flex items-center gap-1.5">
+              <CheckCircle2 className="w-4 h-4 text-sky-400 flex-shrink-0" />
+              <span>Regolamento della sessione:</span>
+            </div>
+            <ul className="space-y-1.5 pl-6 list-disc text-zinc-400 light:text-slate-600">
+              <li><strong>30 quesiti ufficiali</strong> ripartiti esattamente secondo le 9 materie d'esame.</li>
+              <li><strong>Countdown di 45 minuti</strong> con avviso visivo negli ultimi minuti.</li>
+              <li><strong>Idoneità conseguita</strong> con un massimo di <strong>3 errori</strong> (minimo 27 risposte esatte).</li>
+              <li><strong>Nessun feedback durante la prova</strong>: correzione e spiegazioni complete nel debriefing alla consegna.</li>
+            </ul>
+          </div>
+
+          <button
+            id="btn-start-exam"
+            onClick={() => startExam('official')}
+            className="w-full py-3.5 rounded-xl bg-sky-600 hover:bg-sky-500 text-white font-bold text-sm shadow-lg shadow-sky-950/40 flex items-center justify-center gap-2 transition-all active:scale-[0.99] light:bg-sky-600 light:hover:bg-sky-700"
+          >
+            <Timer className="w-4 h-4" />
+            <span>Avvia Esame Ufficiale (45 min)</span>
+          </button>
+        </div>
+
+        {/* Opzione Maratona Intensiva (Secondaria) */}
+        <div className="p-4 bg-zinc-900/60 border border-zinc-800 hover:border-zinc-700 rounded-2xl transition-all light:bg-slate-50 light:border-slate-200 flex items-center justify-between gap-3">
+          <div className="space-y-0.5">
+            <div className="text-xs font-bold text-zinc-200 light:text-slate-800 flex items-center gap-1.5">
+              <ListFilter className="w-4 h-4 text-amber-400" />
+              <span>Maratona Intensiva (60 Quiz)</span>
+            </div>
+            <p className="text-[11px] text-zinc-400 light:text-slate-600">
+              Sessione estesa da 60 minuti con doppia quota quiz per testare resistenza e memoria.
+            </p>
+          </div>
+          <button
+            id="btn-start-marathon"
+            onClick={() => startExam('marathon')}
+            className="px-3.5 py-2 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-zinc-200 light:bg-slate-200 light:text-slate-800 light:hover:bg-slate-300 font-semibold text-xs whitespace-nowrap transition-colors flex-shrink-0"
+          >
+            Avvia Maratona
+          </button>
+        </div>
+
+        {/* Switch rapido a Tutor Didattico */}
+        <div className="text-center pt-1">
+          <button
+            id="btn-switch-to-tutor"
+            onClick={() => {
+              if (onSwitchMode) onSwitchMode('tutor');
+              else setExamMode('tutor');
+            }}
+            className="text-xs text-zinc-400 hover:text-emerald-400 light:text-slate-500 light:hover:text-emerald-600 transition-colors inline-flex items-center gap-1.5"
+          >
+            <BookOpen className="w-3.5 h-3.5 text-emerald-400" />
+            <span>Vuoi prima esercitarti senza limiti di tempo? Passa a <strong>Tutor Didattico</strong></span>
+          </button>
+        </div>
+
+        {onNavigateHome && (
+          <div className="flex justify-center pt-2">
+            <button
+              onClick={onNavigateHome}
+              className="text-xs font-semibold text-zinc-400 hover:text-zinc-200 light:text-slate-500 light:hover:text-slate-800 flex items-center gap-1.5 py-1 px-3 rounded-lg hover:bg-zinc-800/40 light:hover:bg-slate-200/60 transition-colors"
+            >
+              <span>← Torna al Cruscotto Home</span>
+            </button>
+          </div>
+        )}
       </div>
     );
   }
