@@ -287,6 +287,7 @@ export const ExamScreen: React.FC = () => {
     await saveExam(session);
     setCompletedSession(session);
     setExamState('review');
+    await dismissActiveSession();
 
     if (session.isPassed) {
       try {
@@ -299,7 +300,7 @@ export const ExamScreen: React.FC = () => {
         // Ignore
       }
     }
-  }, [answers, examQuestions, flags, isMarathon, examMode, elapsedSeconds, recordAnswer, saveExam, startTime]);
+  }, [answers, examQuestions, flags, isMarathon, examMode, elapsedSeconds, recordAnswer, saveExam, startTime, dismissActiveSession]);
 
   const tutorCorrectCount = Object.entries(answers).filter(([qid, ans]) => {
     const q = examQuestions.find(item => item.id === Number(qid));
@@ -509,6 +510,20 @@ export const ExamScreen: React.FC = () => {
           >
             <Timer className="w-4 h-4" />
             <span>Esame Ufficiale (45 min)</span>
+          </button>
+        </div>
+
+        {/* Torna alla schermata principale Esame */}
+        <div className="flex justify-center pt-0.5">
+          <button
+            id="btn-return-home"
+            onClick={() => {
+              setExamState('idle');
+              setCompletedSession(null);
+            }}
+            className="text-xs font-semibold text-zinc-400 hover:text-zinc-200 light:text-slate-500 light:hover:text-slate-800 flex items-center gap-1.5 py-1 px-3 rounded-lg hover:bg-zinc-800/40 light:hover:bg-slate-200/60 transition-colors"
+          >
+            <span>← Torna alla schermata iniziale Esame</span>
           </button>
         </div>
 

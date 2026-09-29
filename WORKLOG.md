@@ -16,6 +16,28 @@ Questo documento registra in ordine cronologico tutte le lavorazioni svolte nel 
 
 ---
 
+### [2026-09-29] - Collaudo Headless Multi-Viewport & Risoluzione Difetti (Session Dismiss, Debriefing Nav, Sync Guard)
+- **Cosa abbiamo fatto**:
+  - Eseguito un giro di collaudo visivo e funzionale automatizzato headless CDP approfondito su 10 contesti operativi e 3 viewport chiave: Mobile Portrait (390x844), Mobile Landscape (844x390) e Desktop (1440x900) con script dedicato [scripts/headless_full_audit.cjs](file:///d:/Github/Quiz_VDS-VL/scripts/headless_full_audit.cjs):
+    * Catturati e analizzati 31 snapshot ad altissima risoluzione per tutti i moduli (Home, Esame Ufficiale AeCI, Scheda Quiz, Modalità Guida, Archivio, Statistiche, Modale Impostazioni con tutti i tab, Modalità Chiaro/Scuro).
+  - Rilevati e risolti 3 difetti architetturali emersi durante il ciclo di test:
+    1. **Persistenza indebita sessione esame al completamento**: in [src/components/ExamScreen.tsx](file:///d:/Github/Quiz_VDS-VL/src/components/ExamScreen.tsx), alla consegna dell'esame (`handleSubmitExam`), la sessione rimaneva registrata nel database Dexie come sessione attiva da riprendere. Aggiunta l'invocazione di `await dismissActiveSession()` al salvataggio, prevenendo la comparsa di banner residui di recupero sessione dopo la conclusione dell'esame.
+    2. **Trappola di navigazione nel debriefing d'esame**: nella schermata di revisione post-esame (Debriefing), l'utente poteva solo avviare un nuovo esame o cambiare materia ma non tornare alla schermata iniziale Esame (`idle`). Aggiunto il pulsante `#btn-return-home` per consentire il ritorno immediato alla landing esame.
+    3. **Tentativo improprio di popup OAuth GIS a sincronizzazione disattivata**: in [src/context/QuizContext.tsx](file:///d:/Github/Quiz_VDS-VL/src/context/QuizContext.tsx), in `saveExam`, la chiamata `syncEngine.pushNow()` veniva effettuata incondizionatamente anche con auto-sync disabilitato (`isAutoSyncEnabled: false`), scatenando un tentativo non richiesto di apertura popup OAuth Google (`[GSI_LOGGER]: Failed to open popup window...`). Aggiunto controllo `if (syncEngine.getState().isAutoSyncEnabled)` prima del push immediato.
+  - In [src/components/QuestionCard.tsx](file:///d:/Github/Quiz_VDS-VL/src/components/QuestionCard.tsx): aggiunto `data-testid="option-${optNum}"` sui pulsanti delle opzioni risposta per un targeting deterministico e accessibile nei test automatici.
+  - Verificato che al termine del ciclo di collaudo headless:
+    * 0 errori in console JavaScript browser.
+    * 0 eccezioni runtime non gestite.
+    * 131 su 131 test unitari Vitest superati con successo (`npm run test:unit`).
+    * Build di produzione superata con esito positivo (`tsc && vite build`).
+- **Scelte architetturali & Rationale**:
+  - *Active Session Dismissal on Final Submit*: La sessione attiva in Dexie ha lo scopo di consentire il recupero dell'esame in caso di crash o ricaricamento pagina accidentale. Una volta che l'esame è formalmente archiviato in `db.sessions`, il puntatore `activeExamSession` deve essere immediatamente azzerato per evitare stati incoerenti tra revisione e nuovo avvio.
+  - *Defensive Cloud Sync Guard*: Il modulo di sincronizzazione cloud con Google Drive non deve mai avviare flussi interattivi GIS OAuth a meno che l'allievo non abbia esplicitamente abilitato l'auto-sync nelle impostazioni. Il controllo preliminare di `isAutoSyncEnabled` garantisce totale silenziosità e resilienza sia nei test headless che durante l'uso offline/aereo.
+- **Impatto sul Desiderata**:
+  - Esperienza utente solida, priva di trappole di navigazione al termine dell'esame e completamente immune da popup OAuth indesiderati durante il normale salvataggio delle schede.
+
+---
+
 ### [2026-09-29] - Portato in Primo Piano il Menu Rapido Impostazioni Voce (Fix Z-Index & Overflow)
 - **Cosa abbiamo fatto**:
   - Risolto il problema per cui il menu rapido delle voci (`VoiceQuickMenu`) si apriva "in background" o veniva tagliato e reso invisibile:

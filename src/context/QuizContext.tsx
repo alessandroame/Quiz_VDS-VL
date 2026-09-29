@@ -161,7 +161,9 @@ export const QuizProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const saveExam = async (session: ExamSession): Promise<number> => {
     const id = await db.sessions.add(session);
     await clearActiveSession();
-    syncEngine.pushNow().catch(() => {});
+    if (syncEngine.getState().isAutoSyncEnabled) {
+      syncEngine.pushNow().catch(() => {});
+    }
     return id;
   };
 

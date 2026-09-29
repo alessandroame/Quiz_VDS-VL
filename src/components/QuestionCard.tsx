@@ -473,6 +473,7 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({
             <button
               key={optNum}
               id={`btn-option-${optNum}`}
+              data-testid={`option-${optNum}`}
               data-answer-option={optNum}
               onClick={() => handleSelect(optNum)}
               disabled={showFeedback && selectedAnswer !== undefined}
