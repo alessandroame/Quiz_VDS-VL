@@ -1,35 +1,10 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import {
-  Headphones,
-  X,
-  Volume2,
-  Flag,
-  ArrowRight,
-  ArrowLeft,
-  CheckCircle2,
-  XCircle,
-  Play,
-  Pause,
-  Mic,
-  MicOff,
-  Lightbulb,
-  Zap,
-  ListFilter,
-  Flame,
-  Radio,
-  RotateCcw,
-  Check,
-  AlertTriangle,
-  HelpCircle,
-  Square,
-  GraduationCap
-} from 'lucide-react';
+import { XCircle } from 'lucide-react';
 import type { Question } from '../types/quiz';
 import type { ExamSession } from '../types/database';
 import { useQuiz } from '../context/QuizContext';
 import { generateExamQuestions } from '../utils/fairRandomizer';
 import { evaluateExam } from '../services/examEvaluator';
-import { formatTime } from '../utils/timer';
 import { soundFX } from '../utils/audio';
 import { triggerHapticFeedback } from '../utils/haptics';
 import { useAviationVoice } from '../hooks/useAviationVoice';
@@ -37,13 +12,14 @@ import { useWakeLock } from '../hooks/useWakeLock';
 import { useDriveVoiceCommands } from '../hooks/useDriveVoiceCommands';
 import { parseVoiceCommand, type VoiceCommand } from '../utils/voiceCommandParser';
 import { VoiceCommandsModal } from './VoiceCommandsModal';
-import { OfflineHUDTag } from './OfflineIndicator';
 import { AudioOfflinePromptModal } from './AudioOfflinePromptModal';
-import { AudioDownloadBanner } from './AudioDownloadBanner';
-import { VoiceQuickMenu } from './VoiceQuickMenu';
 import { audioDownloadManager } from '../services/audioDownloadManager';
 import { voiceService } from '../services/voiceService';
 import { backNavigation } from '../utils/backNavigation';
+import { DriveLauncher } from './drive/DriveLauncher';
+import { DriveActiveHUD } from './drive/DriveActiveHUD';
+import { DriveDebriefing } from './drive/DriveDebriefing';
+
 
 export interface DriveModeSessionContext {
   questions: Question[];
@@ -912,6 +888,24 @@ export const DriveModeScreen: React.FC<DriveModeScreenProps> = ({
     }
   };
 
+  const handleToggleAutopilot = () => {
+    const nextVal = !isAutopilotEnabled;
+    setIsAutopilotEnabled(nextVal);
+    updateSetting('driveModeAutopilot', nextVal);
+  };
+
+  const handleToggleVoiceCommands = () => {
+    const nextVal = !isVoiceCommandsEnabled;
+    setIsVoiceCommandsEnabled(nextVal);
+    updateSetting('driveModeVoiceCommands', nextVal);
+  };
+
+  const handleToggleTutor = () => {
+    const nextVal = !isTutorEnabled;
+    setIsTutorEnabled(nextVal);
+    updateSetting('driveModeTutor', nextVal);
+  };
+
   if (!isOpen) return null;
 
   return (
@@ -929,937 +923,90 @@ export const DriveModeScreen: React.FC<DriveModeScreenProps> = ({
 
       {/* --- STATO 1: LAUNCHER GUIDA --- */}
       {internalMode === 'launcher' && (
-        <div className="flex-1 flex flex-col justify-between p-4 sm:p-6 max-w-lg mx-auto w-full">
-          {/* Header Launcher */}
-          <div className="flex items-center justify-between pb-3 border-b border-zinc-800 light:border-slate-200">
-            <div className="flex items-center gap-2.5">
-              <div className="w-10 h-10 rounded-xl bg-amber-500/20 text-amber-400 light:bg-amber-100 light:text-amber-700 flex items-center justify-center">
-                <Headphones className="w-6 h-6" />
-              </div>
-              <div>
-                <h1 className="text-xl font-black tracking-tight text-white light:text-slate-900 flex items-center gap-2">
-                  <span>Modalità Audio</span>
-                  <OfflineHUDTag />
-                </h1>
-                <p className="text-xs text-zinc-400 light:text-slate-500 font-medium">
-                  Stile audiolibro • Macro-target bici/corsa • Zero-scroll
-                </p>
-              </div>
-            </div>
-            <div className="flex items-center gap-2">
-              <VoiceQuickMenu
-                id="btn-drive-launcher-voice-menu"
-                onOpenVoiceGuide={() => setIsVoiceGuideOpen(true)}
-                onReplaySpokenGuide={handleReplayIntro}
-                onOpenChange={setIsVoiceMenuOpen}
-              />
-              <button
-                id="btn-drive-exit"
-                onClick={handleClose}
-                className="p-2.5 rounded-xl bg-zinc-900 border border-zinc-800 text-zinc-400 hover:text-white light:bg-white light:border-slate-200 light:text-slate-600 light:hover:text-slate-900 light:shadow-sm"
-                title="Esci dalla Modalità Audio"
-              >
-                <X className="w-6 h-6" />
-              </button>
-            </div>
-          </div>
-
-          {/* Quick Settings Bar */}
-          <div className="grid grid-cols-2 gap-2.5 py-3">
-            <button
-              onClick={() => setIsAutopilotEnabled(!isAutopilotEnabled)}
-              className={`p-3 rounded-xl border flex items-center gap-2 text-xs font-bold transition-all ${
-                isAutopilotEnabled
-                  ? 'bg-amber-950/80 border-amber-500 text-amber-200 light:bg-amber-100 light:border-amber-500 light:text-amber-900'
-                  : 'bg-zinc-900 border-zinc-800 text-zinc-400 light:bg-white light:border-slate-200 light:text-slate-700 light:shadow-sm'
-              }`}
-            >
-              <Radio className="w-4 h-4 flex-shrink-0" />
-              <div className="text-left">
-                <div className="text-[10px] text-zinc-400 light:text-slate-500 uppercase font-semibold">Pilota Automatico</div>
-                <div>{isAutopilotEnabled ? 'ATTIVO (Radio)' : 'Manuale'}</div>
-              </div>
-            </button>
-
-            <button
-              id="btn-drive-toggle-voice-launcher"
-              onClick={() => {
-                const nextVal = !isVoiceCommandsEnabled;
-                setIsVoiceCommandsEnabled(nextVal);
-                updateSetting('driveModeVoiceCommands', nextVal);
-              }}
-              disabled={!isVoiceSupported}
-              className={`p-3 rounded-xl border flex items-center gap-2 text-xs font-bold transition-all ${
-                isVoiceCommandsEnabled
-                  ? 'bg-emerald-950/80 border-emerald-500 text-emerald-200 shadow-[0_0_12px_rgba(16,185,129,0.2)] light:bg-emerald-100 light:border-emerald-500 light:text-emerald-900'
-                  : 'bg-zinc-900 border-zinc-800 text-zinc-400 light:bg-white light:border-slate-200 light:text-slate-700 light:shadow-sm'
-              }`}
-            >
-              <div className="relative flex items-center justify-center flex-shrink-0">
-                {isVoiceCommandsEnabled ? (
-                  <Mic className="w-4 h-4 text-emerald-400" />
-                ) : (
-                  <MicOff className="w-4 h-4" />
-                )}
-              </div>
-              <div className="text-left">
-                <div className="text-[10px] text-zinc-400 light:text-slate-500 uppercase font-semibold">Comandi Vocali</div>
-                <div>{isVoiceSupported ? (isVoiceCommandsEnabled ? 'ATTIVO (in sessione)' : 'Spento') : 'Non supportato'}</div>
-              </div>
-            </button>
-
-            {/* Toggle Modalità Tutor Didattica nel Launcher */}
-            <button
-              id="btn-drive-toggle-tutor-launcher"
-              onClick={() => {
-                const nextVal = !isTutorEnabled;
-                setIsTutorEnabled(nextVal);
-                updateSetting('driveModeTutor', nextVal);
-              }}
-              className={`col-span-2 p-2.5 rounded-xl border flex items-center justify-between text-xs font-bold transition-all ${
-                isTutorEnabled
-                  ? 'bg-amber-950/80 border-amber-500 text-amber-200 ring-1 ring-amber-500/50 light:bg-amber-100 light:border-amber-500 light:text-amber-900'
-                  : 'bg-zinc-900 border-zinc-800 text-zinc-400 hover:text-zinc-200 light:bg-white light:border-slate-200 light:text-slate-700 light:hover:text-slate-900 light:shadow-sm'
-              }`}
-            >
-              <div className="flex items-center gap-2">
-                <GraduationCap className={`w-4 h-4 flex-shrink-0 ${isTutorEnabled ? 'text-amber-400' : 'text-zinc-500'}`} />
-                <div className="text-left">
-                  <div className="text-[10px] text-zinc-400 light:text-slate-500 uppercase font-semibold">Modalità Tutor Didattica</div>
-                  <div className="text-xs font-medium">{isTutorEnabled ? 'ATTIVA (Regola + Tranello a voce)' : 'Disattivata (Avanzamento rapido)'}</div>
-                </div>
-              </div>
-              <span className={`text-[10px] font-mono font-bold px-2 py-0.5 rounded-full ${isTutorEnabled ? 'bg-amber-500 text-zinc-950 font-black' : 'bg-zinc-800 text-zinc-400 light:bg-slate-200 light:text-slate-600'}`}>
-                {isTutorEnabled ? 'TUTOR ON' : 'OFF'}
-              </span>
-            </button>
-          </div>
-
-          {/* Spiegazione Vocale Briefing Banner (se attiva) */}
-          {isIntroActive && (
-            <div className="p-3.5 rounded-2xl bg-amber-950/80 border-2 border-amber-500/80 text-amber-100 light:bg-amber-50 light:border-amber-400 light:text-amber-950 shadow-2xl light:shadow-md animate-in fade-in slide-in-from-top-2 mb-2">
-              <div className="flex items-center justify-between gap-3">
-                <div className="flex items-center gap-2.5 min-w-0">
-                  <div className="relative flex items-center justify-center w-9 h-9 rounded-xl bg-amber-500 text-zinc-950 font-black flex-shrink-0">
-                    <Volume2 className="w-5 h-5 animate-pulse" />
-                    <span className="absolute -top-1 -right-1 flex h-2.5 w-2.5">
-                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
-                      <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-amber-500"></span>
-                    </span>
-                  </div>
-                  <div className="min-w-0">
-                    <div className="text-xs font-black text-amber-200 light:text-amber-900 uppercase tracking-wider flex items-center gap-1.5">
-                      <span>Guida Vocale Iniziale</span>
-                      <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-300 light:bg-amber-200 light:text-amber-900 font-bold">AUDIO</span>
-                    </div>
-                    <p className="text-[11px] text-zinc-300 light:text-amber-900 truncate">
-                      Ascolto spiegazione: comandi vocali e risposte touch...
-                    </p>
-                  </div>
-                </div>
-                <button
-                  id="btn-skip-drive-intro"
-                  onClick={handleDismissIntro}
-                  className="px-3 py-1.5 rounded-xl bg-amber-500 hover:bg-amber-400 active:scale-95 text-zinc-950 font-bold text-xs flex items-center gap-1 shadow-md transition-all flex-shrink-0"
-                  title="Salta introduzione vocale"
-                >
-                  <span>Salta</span>
-                  <ArrowRight className="w-3.5 h-3.5" />
-                </button>
-              </div>
-            </div>
-          )}
-
-          {/* Link Guida Comandi Vocali & Riascolto Spiegazione */}
-          <div className="flex items-center justify-center gap-2 -mt-1 mb-2">
-            <button
-              id="btn-replay-drive-intro"
-              type="button"
-              onClick={handleReplayIntro}
-              className={`px-3 py-1.5 rounded-full border text-xs font-semibold flex items-center gap-1.5 transition-colors ${
-                isIntroActive
-                  ? 'bg-amber-500/20 border-amber-500 text-amber-300 animate-pulse light:bg-amber-100 light:border-amber-400 light:text-amber-800'
-                  : 'bg-zinc-900 border-zinc-800 hover:border-amber-500/50 text-zinc-300 hover:text-amber-300 light:bg-white light:border-slate-200 light:text-slate-700 light:hover:text-amber-700 light:shadow-sm'
-              }`}
-              title="Riascolta spiegazione vocale"
-            >
-              <Volume2 className="w-3.5 h-3.5 text-amber-400" />
-              <span>Spiegazione Vocale</span>
-            </button>
-            <button
-              id="btn-drive-voice-guide-launcher"
-              type="button"
-              onClick={() => setIsVoiceGuideOpen(true)}
-              className="px-3.5 py-1.5 rounded-full bg-zinc-900 border border-zinc-800 hover:border-emerald-500/50 text-zinc-400 hover:text-emerald-300 light:bg-white light:border-slate-200 light:text-slate-700 light:hover:text-emerald-700 light:shadow-sm text-xs font-semibold flex items-center gap-1.5 transition-colors"
-            >
-              <HelpCircle className="w-3.5 h-3.5 text-emerald-400" />
-              <span>Guida Comandi</span>
-            </button>
-          </div>
-
-          {/* Banner Progressione Download Voci in Background */}
-          <AudioDownloadBanner className="w-full mb-2 pointer-events-auto" />
-
-          {/* Opzioni di Avvio Rapido */}
-          <div className="flex-1 flex flex-col justify-center gap-3.5">
-            <button
-              id="btn-drive-start-exam"
-              onClick={() => startDriveExam(false)}
-              className="w-full py-5 px-6 rounded-2xl bg-amber-600 hover:bg-amber-500 active:scale-[0.98] text-white font-black text-lg flex items-center justify-between shadow-xl transition-all"
-            >
-              <div className="flex items-center gap-3">
-                <Zap className="w-7 h-7 text-amber-200" />
-                <div className="text-left">
-                  <div>Esame Ufficiale AeCI</div>
-                  <div className="text-xs text-amber-200 font-medium">30 Quiz • 45 Minuti • Max 3 Errori</div>
-                </div>
-              </div>
-              <ArrowRight className="w-6 h-6" />
-            </button>
-
-            <button
-              id="btn-drive-start-radio"
-              onClick={startDriveRadioQuiz}
-              className="w-full py-5 px-6 rounded-2xl bg-amber-600 hover:bg-amber-500 active:scale-[0.98] text-white font-black text-lg flex items-center justify-between shadow-xl transition-all"
-            >
-              <div className="flex items-center gap-3">
-                <Radio className="w-7 h-7 text-amber-200" />
-                <div className="text-left">
-                  <div>Radio Quiz Continuo</div>
-                  <div className="text-xs text-amber-200 font-medium">Tutti i 504 quiz con ascolto continuo</div>
-                </div>
-              </div>
-              <ArrowRight className="w-6 h-6" />
-            </button>
-
-            <button
-              id="btn-drive-start-mistakes"
-              onClick={startDriveMistakes}
-              className="w-full py-4 px-6 rounded-2xl bg-zinc-900 border border-zinc-800 hover:border-zinc-700 active:scale-[0.98] text-rose-300 light:bg-white light:border-slate-200 light:hover:border-rose-300 light:text-rose-600 light:shadow-sm font-bold text-base flex items-center justify-between transition-all"
-            >
-              <div className="flex items-center gap-3">
-                <Flame className="w-6 h-6 text-rose-400" />
-                <div className="text-left">
-                  <div>Ripasso Quaderno Errori</div>
-                  <div className="text-xs text-zinc-400 light:text-slate-500 font-medium">Solo le domande con errori attivi</div>
-                </div>
-              </div>
-              <ArrowRight className="w-5 h-5 text-zinc-400 light:text-slate-400" />
-            </button>
-
-            <button
-              id="btn-drive-start-marathon"
-              onClick={() => startDriveExam(true)}
-              className="w-full py-3.5 px-6 rounded-2xl bg-zinc-900/60 border border-zinc-800 text-zinc-400 light:bg-white light:border-slate-200 light:text-slate-700 light:shadow-sm font-semibold text-sm flex items-center justify-between transition-all"
-            >
-              <div className="flex items-center gap-2">
-                <ListFilter className="w-4 h-4" />
-                <span>Maratona Intensiva (60 Quiz)</span>
-              </div>
-              <ArrowRight className="w-4 h-4" />
-            </button>
-          </div>
-
-          {/* Indicatori Sicurezza & Wake Lock */}
-          <div className="pt-3 border-t border-zinc-900 light:border-slate-200 flex items-center justify-between text-xs text-zinc-500 light:text-slate-500">
-            <div className="flex items-center gap-1.5">
-              <Lightbulb className={`w-3.5 h-3.5 ${isWakeLockActive ? 'text-emerald-400' : 'text-zinc-600'}`} />
-              <span>{isWakeLockActive ? 'Schermo sempre acceso durante la guida' : 'Standby schermo attivo'}</span>
-            </div>
-            <span>VDS-VL 2017</span>
-          </div>
-        </div>
+        <DriveLauncher
+          isAutopilotEnabled={isAutopilotEnabled}
+          onToggleAutopilot={handleToggleAutopilot}
+          isVoiceCommandsEnabled={isVoiceCommandsEnabled}
+          isVoiceSupported={isVoiceSupported}
+          onToggleVoiceCommands={handleToggleVoiceCommands}
+          isTutorEnabled={isTutorEnabled}
+          onToggleTutor={handleToggleTutor}
+          isIntroActive={isIntroActive}
+          onDismissIntro={handleDismissIntro}
+          onReplayIntro={handleReplayIntro}
+          onOpenVoiceGuide={() => setIsVoiceGuideOpen(true)}
+          setIsVoiceMenuOpen={setIsVoiceMenuOpen}
+          onStartExam={startDriveExam}
+          onStartRadioQuiz={startDriveRadioQuiz}
+          onStartMistakesQuiz={startDriveMistakes}
+          isWakeLockActive={isWakeLockActive}
+          onClose={handleClose}
+        />
       )}
 
       {/* --- STATO 2: QUIZ ATTIVO IN MODALITÀ GUIDA (ZERO-SCROLL 100dvh) --- */}
       {internalMode === 'running' && currentQ && (
-        <div className="flex-1 flex flex-col justify-between p-3 sm:p-5 max-w-2xl mx-auto w-full h-full overflow-hidden">
-          {/* Spoken Intro Active HUD Banner */}
-          {isIntroActive && (
-            <div className="mb-2 p-2.5 rounded-xl bg-amber-500/20 border border-amber-500/40 light:bg-amber-50 light:border-amber-300 flex items-center justify-between gap-2 animate-in fade-in">
-              <div className="flex items-center gap-2 text-xs text-amber-200 light:text-amber-900">
-                <Volume2 className="w-4 h-4 text-amber-400 animate-pulse flex-shrink-0" />
-                <span>Introduzione vocale in corso... Ascolta o tocca Salta</span>
-              </div>
-              <button
-                type="button"
-                onClick={handleDismissIntro}
-                className="px-2.5 py-1 rounded-lg bg-zinc-900 border border-zinc-700 text-zinc-300 hover:text-white light:bg-white light:border-slate-200 light:text-slate-700 light:hover:text-slate-900 light:shadow-sm text-xs font-bold transition-colors"
-              >
-                Salta
-              </button>
-            </div>
-          )}
-
-          {/* Top Bar HUD */}
-          <div className="flex items-center justify-between gap-2 pb-2 border-b border-zinc-800/90 light:border-slate-200 text-xs">
-            {sessionContext ? (
-              <button
-                id="btn-drive-exit"
-                onClick={executeClose}
-                className="px-3 py-1.5 rounded-xl border border-zinc-700 bg-zinc-900 text-zinc-200 hover:text-white hover:border-zinc-500 light:bg-white light:border-slate-300 light:text-slate-800 font-bold flex items-center gap-1.5 transition-all flex-shrink-0 shadow-sm active:scale-95"
-                title="Torna alla visualizzazione normale del quiz sullo schermo"
-              >
-                <ArrowLeft className="w-4 h-4" />
-                <span>Torna al Quiz</span>
-              </button>
-            ) : (
-              <button
-                id="btn-drive-exit"
-                onClick={handleClose}
-                className={`px-3 py-1.5 rounded-xl border font-bold flex items-center gap-1 transition-colors flex-shrink-0 ${
-                  isExamSession
-                    ? 'bg-rose-500/10 border-rose-500/40 text-rose-400 hover:bg-rose-500/20 light:bg-rose-50 light:border-rose-300 light:text-rose-700'
-                    : 'bg-zinc-900 border-zinc-800 text-zinc-300 hover:text-white light:bg-white light:border-slate-200 light:text-slate-700 light:hover:text-slate-900 light:shadow-sm'
-                }`}
-                title={isExamSession ? 'Interrompi la simulazione d\'esame' : 'Esci dalla Modalità Audio'}
-              >
-                <X className="w-4 h-4" />
-                <span>{isExamSession ? 'Interrompi' : 'Esci'}</span>
-              </button>
-            )}
-
-            <div className="flex items-center gap-2 font-mono flex-shrink-0">
-              <span className="font-black text-sm text-amber-400 light:text-amber-600">
-                {currentIndex + 1} / {totalCount}
-              </span>
-              {isExamSession && (
-                <span className="px-2 py-0.5 rounded-md bg-amber-500/20 text-amber-300 light:bg-amber-100 light:text-amber-800 font-bold text-xs">
-                  ⏱ {formatTime(secondsRemaining)}
-                </span>
-              )}
-              <OfflineHUDTag />
-            </div>
-
-            <div className="flex items-center gap-1 sm:gap-1.5 flex-shrink-0">
-              {/* Menu Rapido Impostazioni Voce */}
-              <VoiceQuickMenu
-                id="btn-drive-voice-quick-menu"
-                onOpenVoiceGuide={() => setIsVoiceGuideOpen(true)}
-                onReplaySpokenGuide={handleReplayIntro}
-                onOpenChange={setIsVoiceMenuOpen}
-              />
-
-              {/* Toggle Pilota Automatico */}
-              <button
-                id="btn-drive-autopilot-toggle"
-                onClick={() => {
-                  if (isAutopilotEnabled) {
-                    setIsAutopilotEnabled(false);
-                    stopVoice();
-                  } else {
-                    setIsAutopilotEnabled(true);
-                    playFullSequence();
-                  }
-                }}
-                className={`p-1.5 rounded-lg text-xs font-bold flex items-center gap-1 transition-colors ${
-                  isAutopilotEnabled
-                    ? 'bg-amber-500/30 text-amber-300 ring-1 ring-amber-500/50 light:bg-amber-100 light:text-amber-800 light:ring-amber-400'
-                    : 'bg-zinc-900 text-zinc-500 border border-zinc-800 light:bg-white light:text-slate-600 light:border-slate-200 light:shadow-sm'
-                }`}
-                title="Pilota Automatico"
-              >
-                {isAutopilotEnabled ? <Pause className="w-3.5 h-3.5" /> : <Play className="w-3.5 h-3.5" />}
-                <span className="hidden sm:inline">{isAutopilotEnabled ? 'Pilota ON' : 'Manuale'}</span>
-              </button>
-
-              {/* Toggle Modalità Tutor Didattica */}
-              <button
-                id="btn-drive-tutor-toggle"
-                onClick={() => {
-                  const nextVal = !isTutorEnabled;
-                  setIsTutorEnabled(nextVal);
-                  updateSetting('driveModeTutor', nextVal);
-                  showToast(nextVal ? '🎓 Tutor Didattico ATTIVO' : '🎓 Tutor Disattivato');
-                }}
-                className={`p-1.5 rounded-lg text-xs font-bold flex items-center gap-1 transition-colors ${
-                  isTutorEnabled
-                    ? 'bg-amber-500/30 text-amber-300 ring-1 ring-amber-500/50 shadow-[0_0_10px_rgba(245,158,11,0.2)] light:bg-amber-100 light:text-amber-800 light:ring-amber-400'
-                    : 'bg-zinc-900 text-zinc-500 border border-zinc-800 hover:text-zinc-300 light:bg-white light:text-slate-600 light:border-slate-200 light:hover:text-slate-900 light:shadow-sm'
-                }`}
-                title={isTutorEnabled ? 'Modalità Tutor attiva (tocca per disattivare)' : 'Attiva modalità tutor (Regola + Tranello)'}
-              >
-                <GraduationCap className="w-3.5 h-3.5" />
-                <span className="hidden sm:inline">{isTutorEnabled ? 'Tutor ON' : 'Tutor'}</span>
-              </button>
-
-              {/* Toggle Comandi Vocali & Guida Rapida */}
-              {isVoiceSupported && (
-                <div className="flex items-center gap-1">
-                  <button
-                    id="btn-drive-toggle-voice"
-                    onClick={() => {
-                      const nextVal = !isVoiceCommandsEnabled;
-                      setIsVoiceCommandsEnabled(nextVal);
-                      updateSetting('driveModeVoiceCommands', nextVal);
-                    }}
-                    className={`relative p-1.5 rounded-lg text-xs font-bold transition-all ${
-                      !isVoiceCommandsEnabled
-                        ? 'bg-zinc-900 text-zinc-500 border border-zinc-800 light:bg-white light:text-slate-600 light:border-slate-200 light:shadow-sm'
-                        : voiceError
-                        ? 'bg-rose-950/60 border border-rose-500 text-rose-300 light:bg-rose-50 light:border-rose-300 light:text-rose-700'
-                        : isVoiceReceiving
-                        ? 'bg-emerald-500/40 text-emerald-200 ring-2 ring-emerald-400 shadow-[0_0_12px_rgba(52,211,153,0.6)] light:bg-emerald-100 light:text-emerald-900 light:ring-emerald-500'
-                        : 'bg-emerald-500/30 text-emerald-300 ring-1 ring-emerald-500/50 light:bg-emerald-100 light:text-emerald-800 light:ring-emerald-400'
-                    }`}
-                    title={
-                      !isVoiceCommandsEnabled
-                        ? 'Attiva comandi vocali'
-                        : voiceError
-                        ? `Errore microfono: ${voiceError}`
-                        : isVoiceReceiving
-                        ? 'Microfono: ricezione comandi vocali...'
-                        : isVoiceListening
-                        ? 'Microfono in ascolto (tocca per disattivare)'
-                        : 'Microfono attivo'
-                    }
-                  >
-                    {isVoiceCommandsEnabled ? (
-                      <div className="relative flex items-center justify-center">
-                        <Mic
-                          className={`w-3.5 h-3.5 transition-transform ${
-                            isVoiceReceiving
-                              ? 'animate-pulse text-emerald-200 scale-125'
-                              : isVoiceListening
-                              ? 'text-emerald-300'
-                              : 'text-emerald-400/70'
-                          }`}
-                        />
-                        {/* Radial ping wave while receiving commands */}
-                        {isVoiceReceiving && (
-                          <span className="absolute -inset-1 rounded-full bg-emerald-400 opacity-75 animate-ping pointer-events-none" />
-                        )}
-                      </div>
-                    ) : (
-                      <MicOff className="w-3.5 h-3.5" />
-                    )}
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={() => setIsVoiceGuideOpen(true)}
-                    className="p-1.5 rounded-lg text-xs font-bold bg-zinc-900 hover:bg-zinc-800 text-zinc-400 hover:text-white border border-zinc-800 light:bg-white light:hover:bg-slate-100 light:text-slate-600 light:hover:text-slate-900 light:border-slate-200 light:shadow-sm transition-colors"
-                    title="Guida comandi vocali"
-                  >
-                    <HelpCircle className="w-3.5 h-3.5" />
-                  </button>
-                </div>
-              )}
-            </div>
-          </div>
-
-          {/* Banner Spiegazione Vocale Iniziale in Running Mode */}
-          {isIntroActive && (
-            <div className="my-2 p-3 sm:p-4 rounded-2xl bg-amber-950/90 border-2 border-amber-500 text-amber-100 light:bg-amber-50 light:border-amber-400 light:text-amber-950 shadow-2xl light:shadow-md animate-in fade-in slide-in-from-top-2">
-              <div className="flex items-center justify-between gap-3">
-                <div className="flex items-center gap-2.5 min-w-0">
-                  <div className="relative flex items-center justify-center w-10 h-10 rounded-xl bg-amber-500 text-zinc-950 font-black flex-shrink-0">
-                    <Volume2 className="w-5 h-5 animate-pulse" />
-                    <span className="absolute -top-1 -right-1 flex h-2.5 w-2.5">
-                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
-                      <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-amber-500"></span>
-                    </span>
-                  </div>
-                  <div className="min-w-0">
-                    <div className="text-xs font-black text-amber-200 light:text-amber-900 uppercase tracking-wider flex items-center gap-1.5">
-                      <span>Guida Vocale Iniziale</span>
-                      <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-300 light:bg-amber-200 light:text-amber-900 font-bold">AUDIO</span>
-                    </div>
-                    <p className="text-xs text-zinc-300 light:text-amber-900 mt-0.5 truncate sm:text-clip">
-                      Ascolto briefing: rispondi a voce ("Uno", "Due", "Tre") o tocca le fasce.
-                    </p>
-                  </div>
-                </div>
-                <button
-                  id="btn-skip-running-intro"
-                  onClick={handleDismissIntro}
-                  className="px-3.5 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 active:scale-95 text-zinc-950 font-bold text-xs flex items-center gap-1 shadow-md transition-all flex-shrink-0"
-                  title="Inizia subito il quiz"
-                >
-                  <span>Inizia Quiz</span>
-                  <ArrowRight className="w-3.5 h-3.5" />
-                </button>
-              </div>
-            </div>
-          )}
-
-          {/* Area Domanda (Zero Scroll) */}
-          <div className="my-2 p-3 sm:p-4 rounded-2xl bg-zinc-900/90 border border-zinc-800/80 light:bg-white light:border-slate-200 light:shadow-sm flex items-start gap-3">
-            <div className="flex-1 min-w-0">
-              <div className="flex items-center gap-2 mb-1">
-                <span className="font-mono text-xs font-bold text-amber-400 bg-amber-950 border border-amber-800/50 light:text-amber-700 light:bg-amber-100 light:border-amber-300 px-2 py-0.5 rounded">
-                  #{currentQ.id}
-                </span>
-                <span className="text-xs text-zinc-400 light:text-slate-500 font-semibold truncate">
-                  {currentQ.subjectName}
-                </span>
-              </div>
-              <h2
-                lang="it"
-                translate="no"
-                className={`text-base sm:text-xl font-bold leading-snug tracking-tight transition-colors line-clamp-3 sm:line-clamp-4 ${
-                  isPartPlaying('question') ? 'text-amber-300 light:text-amber-600' : 'text-white light:text-slate-900'
-                }`}
-              >
-                {currentQ.question}
-              </h2>
-            </div>
-
-            <div className="flex flex-col gap-1.5 flex-shrink-0">
-              <button
-                id="btn-drive-play-pause"
-                onClick={() => togglePlayPause()}
-                className={`p-3 rounded-xl transition-all ${
-                  isPlaying
-                    ? 'bg-amber-500 text-zinc-950 animate-pulse'
-                    : isPaused
-                    ? 'bg-amber-500 text-zinc-950 ring-2 ring-amber-400'
-                    : 'bg-zinc-800 text-zinc-300 hover:text-white light:bg-slate-100 light:text-slate-700 light:hover:text-slate-900'
-                }`}
-                title={isPlaying ? 'Pausa (Tasto P)' : isPaused ? 'Riprendi (Tasto P)' : 'Ascolta quesito (Tasto Q)'}
-              >
-                {isPlaying ? <Pause className="w-6 h-6" /> : isPaused ? <Play className="w-6 h-6" /> : <Volume2 className="w-6 h-6" />}
-              </button>
-
-              {(isPlaying || isPaused || waitingCountdown !== null) && (
-                <div className="flex items-center gap-1 animate-in fade-in">
-                  <button
-                    id="btn-drive-repeat"
-                    onClick={() => {
-                      if (countdownTimerRef.current) {
-                        clearInterval(countdownTimerRef.current);
-                        countdownTimerRef.current = null;
-                      }
-                      setWaitingCountdown(null);
-                      restartCurrentOrSequence();
-                    }}
-                    className="p-2 rounded-lg bg-zinc-800/80 hover:bg-zinc-700 text-zinc-400 hover:text-white light:bg-slate-100 light:hover:bg-slate-200 light:text-slate-600 light:hover:text-slate-900 transition-colors flex items-center justify-center flex-1"
-                    title="Ripeti elemento attivo (Tasto R)"
-                  >
-                    <RotateCcw className="w-4 h-4" />
-                  </button>
-
-                  <button
-                    id="btn-drive-stop"
-                    onClick={() => {
-                      setIsAutopilotEnabled(false);
-                      stopVoice();
-                      if (countdownTimerRef.current) {
-                        clearInterval(countdownTimerRef.current);
-                        countdownTimerRef.current = null;
-                      }
-                      setWaitingCountdown(null);
-                    }}
-                    className="p-2 rounded-lg bg-zinc-800/80 hover:bg-rose-950/40 text-zinc-400 hover:text-rose-400 border border-transparent hover:border-rose-800/50 light:bg-slate-100 light:hover:bg-rose-50 light:text-slate-500 light:hover:text-rose-600 light:hover:border-rose-200 transition-colors flex items-center justify-center"
-                    title="Ferma audio (Esc)"
-                  >
-                    <Square className="w-3.5 h-3.5" />
-                  </button>
-                </div>
-              )}
-            </div>
-          </div>
-
-          {/* Countdown attesa Pilota Automatico */}
-          {waitingCountdown !== null && (
-            <div
-              className={`flex items-center justify-between px-3 py-1.5 border rounded-xl text-xs font-bold transition-all ${
-                isVoiceReceiving
-                  ? 'bg-emerald-950/80 border-emerald-400 text-emerald-200 shadow-[0_0_12px_rgba(52,211,153,0.3)] light:bg-emerald-100 light:border-emerald-500 light:text-emerald-900'
-                  : 'bg-amber-500/20 border-amber-500/40 text-amber-300 light:bg-amber-50 light:border-amber-300 light:text-amber-900'
-              }`}
-            >
-              <div className="flex items-center gap-2 truncate">
-                <div className="relative flex items-center justify-center flex-shrink-0">
-                  <Mic
-                    className={`w-4 h-4 transition-transform ${
-                      isVoiceReceiving ? 'text-emerald-300 animate-pulse scale-125' : 'text-amber-400'
-                    }`}
-                  />
-                  {isVoiceReceiving && (
-                    <span className="absolute -inset-1 rounded-full bg-emerald-400 opacity-75 animate-ping pointer-events-none" />
-                  )}
-                </div>
-                {isVoiceReceiving ? (
-                  <span className="truncate text-white light:text-slate-900 font-bold animate-pulse">
-                    In ricezione: "{voiceInterimTranscript || voiceLastTranscript || 'Ascolto...'}"
-                  </span>
-                ) : (
-                  <div className="flex items-center gap-1.5 truncate">
-                    <span className="w-2 h-2 rounded-full bg-amber-400 animate-ping flex-shrink-0" />
-                    <span className="truncate">In attesa di risposta... dì "Uno", "Due" o "Tre"</span>
-                  </div>
-                )}
-              </div>
-              <span className="font-mono text-sm ml-2 flex-shrink-0">{waitingCountdown}s</span>
-            </div>
-          )}
-
-          {/* HUD Suggerimento Vocale Live */}
-          {waitingCountdown === null && isVoiceCommandsEnabled && isVoiceSupported && (
-            <button
-              type="button"
-              onClick={() => setIsVoiceGuideOpen(true)}
-              className={`flex items-center justify-between px-3 py-1.5 rounded-xl text-xs font-medium transition-all cursor-pointer ${
-                voiceError
-                  ? 'bg-rose-950/50 border border-rose-500/40 text-rose-300 light:bg-rose-50 light:border-rose-300 light:text-rose-700'
-                  : isVoiceReceiving
-                  ? 'bg-emerald-950/90 border-2 border-emerald-400 text-emerald-100 shadow-[0_0_15px_rgba(52,211,153,0.3)] light:bg-emerald-100 light:border-emerald-500 light:text-emerald-900'
-                  : 'bg-emerald-950/40 border border-emerald-500/30 hover:border-emerald-500/60 text-emerald-300 light:bg-emerald-50 light:border-emerald-300 light:text-emerald-900'
-              }`}
-              title="Tocca per visualizzare tutti i comandi vocali"
-            >
-              <div className="flex items-center gap-2 truncate">
-                {/* Icona microfono con animazione di pulsazione durante la ricezione */}
-                <div className="relative flex items-center justify-center flex-shrink-0">
-                  <Mic
-                    className={`w-4 h-4 transition-transform ${
-                      voiceError
-                        ? 'text-rose-400'
-                        : isVoiceReceiving
-                        ? 'text-emerald-300 animate-pulse scale-125'
-                        : isVoiceListening
-                        ? 'text-emerald-400'
-                        : 'text-zinc-500'
-                    }`}
-                  />
-                  {isVoiceReceiving && (
-                    <span className="absolute -inset-1 rounded-full bg-emerald-400 opacity-75 animate-ping pointer-events-none" />
-                  )}
-                </div>
-
-                {/* Testo di stato reattivo */}
-                {voiceError ? (
-                  <span className="truncate text-rose-300 light:text-rose-700 font-semibold">
-                    {voiceError === 'not-allowed'
-                      ? 'Microfono non consentito: abilita l\'accesso nel browser'
-                      : voiceError === 'network'
-                      ? 'Riconoscimento vocale: richiede connessione internet'
-                      : `Errore microfono: ${voiceError}`}
-                  </span>
-                ) : isVoiceReceiving ? (
-                  <div className="flex items-center gap-1.5 truncate">
-                    <span className="font-black text-emerald-300 flex-shrink-0 animate-pulse">
-                      In ricezione:
-                    </span>
-                    <span className="text-white light:text-slate-900 font-bold truncate">
-                      "{voiceInterimTranscript || voiceLastTranscript || 'Rilevamento voce...'}"
-                    </span>
-                  </div>
-                ) : lastRecognizedLabel ? (
-                  <div className="flex items-center gap-1.5 truncate">
-                    <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400 flex-shrink-0" />
-                    <span className="font-bold text-emerald-300 flex-shrink-0">Comando:</span>
-                    <span className="text-white light:text-slate-900 font-black truncate">{lastRecognizedLabel} ✓</span>
-                  </div>
-                ) : unrecognizedSpeech ? (
-                  <div className="flex items-center gap-1.5 truncate">
-                    <AlertTriangle className="w-3.5 h-3.5 text-amber-400 flex-shrink-0" />
-                    <span className="font-bold text-amber-400 flex-shrink-0">Sentito:</span>
-                    <span className="text-zinc-200 light:text-slate-700 truncate">"{unrecognizedSpeech}" (non riconosciuto)</span>
-                  </div>
-                ) : (
-                  <div className="flex items-center gap-1.5 truncate">
-                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse flex-shrink-0" />
-                    <span className="font-bold text-emerald-400 flex-shrink-0">In ascolto:</span>
-                    <span className="text-emerald-200/90 light:text-emerald-800 truncate">{VOICE_HINTS[voiceHintIndex]}</span>
-                  </div>
-                )}
-              </div>
-
-              <div className="flex items-center gap-1 text-[11px] text-emerald-400/80 font-bold ml-2 flex-shrink-0">
-                <HelpCircle className="w-3.5 h-3.5" />
-                <span className="hidden sm:inline">Guida</span>
-              </div>
-            </button>
-          )}
-
-          {/* 3 Macro-Fasce di Risposta & Card Didattica (Regola + Tranello) */}
-          <div className="flex-1 flex flex-col gap-2.5 sm:gap-3.5 my-1 sm:my-2 min-h-0">
-            {(() => {
-              const isCurrentRevealed = revealedQuestionId === currentQ.id || ((!isExamSession || isTutorEnabled) && answers[currentQ.id] !== undefined);
-
-              return (
-                <>
-                  <div className={`flex flex-col gap-2.5 sm:gap-3.5 ${isCurrentRevealed ? 'flex-none' : 'flex-1'} min-h-0`}>
-                    {currentQ.options.map((opt, idx) => {
-                      const optNum = (idx + 1) as 1 | 2 | 3;
-                      const isSelected = answers[currentQ.id] === optNum;
-                      const isCorrectAnswer = currentQ.correctAnswer === optNum;
-                      const isCurrentOptPlaying = isPartPlaying(`opt${optNum}` as any);
-
-                      let style = 'bg-zinc-900/80 border-zinc-800 text-zinc-100 hover:border-zinc-700 active:scale-[0.99] light:bg-white light:border-slate-200 light:text-slate-900 light:hover:border-slate-300 light:shadow-sm';
-
-                      if (isCurrentRevealed) {
-                        if (isCorrectAnswer) {
-                          style = 'bg-emerald-950/80 border-emerald-500 text-emerald-100 ring-2 ring-emerald-500 font-bold light:bg-emerald-50 light:border-emerald-500 light:text-emerald-950';
-                        } else if (isSelected && !isCorrectAnswer) {
-                          style = 'bg-rose-950/80 border-rose-500 text-rose-100 ring-2 ring-rose-500 light:bg-rose-50 light:border-rose-500 light:text-rose-950';
-                        } else {
-                          style = 'opacity-40 bg-zinc-950 border-zinc-900 text-zinc-400 light:bg-slate-100 light:border-slate-200 light:text-slate-400';
-                        }
-                      } else if (isSelected) {
-                        style = 'bg-amber-950 border-amber-500 text-amber-100 ring-2 ring-amber-500 font-bold light:bg-amber-50 light:border-amber-500 light:text-amber-950';
-                      } else if (isCurrentOptPlaying) {
-                        style = 'bg-amber-950/60 border-amber-400 text-amber-200 ring-1 ring-amber-400 light:bg-amber-50 light:border-amber-400 light:text-amber-950 light:ring-amber-400';
-                      }
-
-                      return (
-                        <button
-                          key={optNum}
-                          id={`btn-drive-opt-${optNum}`}
-                          lang="it"
-                          translate="no"
-                          onClick={() => handleSelectAnswer(optNum)}
-                          className={`${
-                            isCurrentRevealed
-                              ? 'w-full rounded-xl border p-2 sm:p-2.5 flex items-center gap-2.5 sm:gap-3 text-left transition-all'
-                              : 'flex-1 w-full min-h-[78px] sm:min-h-[85px] rounded-2xl border-2 p-3.5 sm:p-4 flex items-center gap-3.5 sm:gap-5 text-left transition-all shadow-md active:scale-[0.98]'
-                          } ${style}`}
-                        >
-                          <div
-                            className={`${
-                              isCurrentRevealed
-                                ? 'w-7 h-7 sm:w-8 sm:h-8 rounded-lg font-black text-xs sm:text-sm'
-                                : 'w-11 h-11 sm:w-14 sm:h-14 rounded-xl font-black text-xl sm:text-2xl ring-2 ring-black/20'
-                            } flex items-center justify-center flex-shrink-0 ${
-                              isCurrentRevealed && isCorrectAnswer
-                                ? 'bg-emerald-500 text-white'
-                                : isSelected
-                                ? 'bg-amber-500 text-zinc-950'
-                                : isCurrentOptPlaying
-                                ? 'bg-amber-500 text-zinc-950 animate-pulse'
-                                : 'bg-zinc-800 text-zinc-300 light:bg-slate-100 light:text-slate-700'
-                            }`}
-                          >
-                            {optNum}
-                          </div>
-
-                          <div
-                            lang="it"
-                            className={`flex-1 ${
-                              isCurrentRevealed
-                                ? 'text-xs sm:text-sm font-medium leading-tight line-clamp-2'
-                                : 'text-base sm:text-xl font-semibold leading-snug'
-                            }`}
-                          >
-                            {opt}
-                          </div>
-
-                          {isCurrentRevealed && isCorrectAnswer && (
-                            <CheckCircle2 className={`${isCurrentRevealed ? 'w-5 h-5' : 'w-7 h-7'} text-emerald-400 flex-shrink-0`} />
-                          )}
-                          {isCurrentRevealed && isSelected && !isCorrectAnswer && (
-                            <XCircle className={`${isCurrentRevealed ? 'w-5 h-5' : 'w-7 h-7'} text-rose-400 flex-shrink-0`} />
-                          )}
-                        </button>
-                      );
-                    })}
-                  </div>
-
-                  {/* Scheda Didattica (Regola e Tranello) in Debriefing / Tutor Mode */}
-                  {isCurrentRevealed && currentQ.explanation && (
-                    <div
-                      id="drive-didactic-card"
-                      lang="it"
-                      translate="no"
-                      className="flex-1 min-h-0 mt-1 p-2.5 sm:p-3 rounded-2xl bg-zinc-900/95 border-2 border-amber-500/50 text-zinc-100 light:bg-white light:border-amber-500/60 light:text-slate-900 shadow-2xl light:shadow-md flex flex-col justify-between overflow-hidden animate-in fade-in slide-in-from-bottom-2"
-                    >
-                      <div className="overflow-y-auto custom-scrollbar space-y-2 pr-1">
-                        {/* Header Scheda Didattica */}
-                        <div className="flex items-center justify-between gap-2 pb-1.5 border-b border-zinc-800 light:border-slate-200 text-xs">
-                          <div className="flex items-center gap-1.5 font-bold text-amber-400 light:text-amber-600">
-                            <GraduationCap className="w-4 h-4 text-amber-400 light:text-amber-600 flex-shrink-0" />
-                            <span>Spiegazione Didattica</span>
-                          </div>
-
-                          <div className="flex items-center gap-2">
-                            {isExplanationPlaying ? (
-                              <span className="flex items-center gap-1 text-[11px] font-mono text-emerald-400 font-bold animate-pulse">
-                                <Volume2 className="w-3.5 h-3.5" />
-                                <span>Lettura in corso...</span>
-                              </span>
-                            ) : assimilationCountdown !== null ? (
-                              <span className="text-[11px] font-mono text-amber-400 font-bold animate-pulse">
-                                Prossima in {assimilationCountdown}s
-                              </span>
-                            ) : (
-                              <button
-                                type="button"
-                                id="btn-drive-replay-explanation"
-                                onClick={() => playExplanation()}
-                                className="px-2 py-0.5 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-zinc-300 hover:text-white light:bg-slate-100 light:hover:bg-slate-200 light:text-slate-700 light:hover:text-slate-900 text-[11px] font-bold flex items-center gap-1 transition-colors"
-                                title="Riascolta spiegazione vocale"
-                              >
-                                <RotateCcw className="w-3 h-3" />
-                                <span>Riascolta</span>
-                              </button>
-                            )}
-                          </div>
-                        </div>
-
-                        {/* Regola */}
-                        {currentQ.explanation.rule && (
-                          <div className="flex items-start gap-2 text-xs sm:text-sm">
-                            <span className="px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-300 light:bg-amber-100 light:text-amber-800 font-black text-[10px] uppercase tracking-wider flex-shrink-0 mt-0.5">
-                              Regola
-                            </span>
-                            <p className="text-zinc-200 light:text-slate-800 font-medium leading-relaxed">
-                              {currentQ.explanation.rule}
-                            </p>
-                          </div>
-                        )}
-
-                        {/* Tranello (se presente) */}
-                        {currentQ.explanation.trap && (
-                          <div className="flex items-start gap-2 text-xs sm:text-sm pt-1 border-t border-zinc-800/60 light:border-slate-200">
-                            <span className="px-1.5 py-0.5 rounded bg-rose-500/20 text-rose-300 light:bg-rose-100 light:text-rose-800 font-black text-[10px] uppercase tracking-wider flex-shrink-0 mt-0.5">
-                              Tranello
-                            </span>
-                            <p className="text-zinc-300 light:text-slate-700 font-medium leading-relaxed">
-                              {currentQ.explanation.trap}
-                            </p>
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  )}
-                </>
-              );
-            })()}
-          </div>
-
-          {/* Barra Azioni Inferiore (Pulsanti Giganti) */}
-          <div className="grid grid-cols-12 gap-2 pt-2 border-t border-zinc-800/90 light:border-slate-200">
-            <button
-              onClick={handlePrevQuestion}
-              disabled={currentIndex === 0}
-              className="col-span-4 py-3.5 rounded-xl bg-zinc-900 border border-zinc-800 text-zinc-200 hover:text-white light:bg-white light:border-slate-200 light:text-slate-700 light:hover:text-slate-900 light:shadow-sm font-black text-sm flex items-center justify-center gap-1.5 disabled:opacity-30 active:scale-[0.98]"
-            >
-              <ArrowLeft className="w-5 h-5" />
-              <span>Prec</span>
-            </button>
-
-            <button
-              onClick={handleToggleFlag}
-              className={`col-span-4 py-3.5 rounded-xl border font-black text-sm flex items-center justify-center gap-1.5 transition-colors active:scale-[0.98] ${
-                flags[currentQ.id]
-                  ? 'bg-amber-500 border-amber-400 text-black'
-                  : 'bg-zinc-900 border-zinc-800 text-amber-400 hover:bg-zinc-800 light:bg-white light:border-slate-200 light:text-amber-600 light:hover:bg-slate-100 light:shadow-sm'
-              }`}
-            >
-              <Flag className={`w-5 h-5 ${flags[currentQ.id] ? 'fill-black' : ''}`} />
-              <span>Rivedi</span>
-            </button>
-
-            {currentIndex === totalCount - 1 && isExamSession ? (
-              <button
-                onClick={handleSubmitExam}
-                className="col-span-4 py-3.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-black text-sm flex items-center justify-center gap-1 shadow-lg shadow-emerald-950 light:shadow-emerald-200 active:scale-[0.98]"
-              >
-                <Check className="w-5 h-5" />
-                <span>Consegna</span>
-              </button>
-            ) : (
-              <button
-                onClick={handleNextQuestion}
-                disabled={currentIndex === totalCount - 1 && !isExamSession}
-                className="col-span-4 py-3.5 rounded-xl bg-amber-600 hover:bg-amber-500 text-white font-black text-sm flex items-center justify-center gap-1.5 disabled:opacity-30 shadow-lg shadow-amber-950 light:shadow-amber-200 active:scale-[0.98]"
-              >
-                <span>Succ</span>
-                <ArrowRight className="w-5 h-5" />
-              </button>
-            )}
-          </div>
-        </div>
+        <DriveActiveHUD
+          currentQ={currentQ}
+          currentIndex={currentIndex}
+          totalCount={totalCount}
+          isExamSession={isExamSession}
+          secondsRemaining={secondsRemaining}
+          sessionContext={sessionContext}
+          isIntroActive={isIntroActive}
+          onDismissIntro={handleDismissIntro}
+          onReplayIntro={handleReplayIntro}
+          onOpenVoiceGuide={() => setIsVoiceGuideOpen(true)}
+          setIsVoiceMenuOpen={setIsVoiceMenuOpen}
+          onClose={handleClose}
+          onExecuteClose={executeClose}
+          isAutopilotEnabled={isAutopilotEnabled}
+          onToggleAutopilot={handleToggleAutopilot}
+          isTutorEnabled={isTutorEnabled}
+          onToggleTutor={handleToggleTutor}
+          isVoiceSupported={isVoiceSupported}
+          isVoiceCommandsEnabled={isVoiceCommandsEnabled}
+          voiceError={voiceError}
+          isVoiceReceiving={isVoiceReceiving}
+          isVoiceListening={isVoiceListening}
+          onToggleVoiceCommands={handleToggleVoiceCommands}
+          isPlaying={isPlaying}
+          isPaused={isPaused}
+          isPartPlaying={isPartPlaying}
+          isExplanationPlaying={isExplanationPlaying}
+          onTogglePlayPause={togglePlayPause}
+          onRestartCurrentOrSequence={restartCurrentOrSequence}
+          onStopVoice={stopVoice}
+          onPlayExplanation={playExplanation}
+          waitingCountdown={waitingCountdown}
+          assimilationCountdown={assimilationCountdown}
+          voiceInterimTranscript={voiceInterimTranscript}
+          voiceLastTranscript={voiceLastTranscript}
+          lastRecognizedLabel={lastRecognizedLabel}
+          unrecognizedSpeech={unrecognizedSpeech}
+          voiceHint={VOICE_HINTS[voiceHintIndex]}
+          answers={answers}
+          flags={flags}
+          revealedQuestionId={revealedQuestionId}
+          onSelectAnswer={handleSelectAnswer}
+          onPrevQuestion={handlePrevQuestion}
+          onNextQuestion={handleNextQuestion}
+          onToggleFlag={handleToggleFlag}
+          onSubmitExam={handleSubmitExam}
+        />
       )}
 
       {/* --- STATO 3: DEBRIEFING ESITO ESAME --- */}
       {internalMode === 'debriefing' && completedSession && (
-        <div className="flex-1 flex flex-col justify-between p-4 sm:p-6 max-w-lg mx-auto w-full">
-          {/* Header Debriefing */}
-          <div className="flex items-center justify-between pb-3 border-b border-zinc-800 light:border-slate-200">
-            <div className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-lg bg-amber-500/20 text-amber-400 light:bg-amber-100 light:text-amber-700 flex items-center justify-center font-bold text-xs">
-                VDS
-              </div>
-              <span className="text-sm font-bold text-zinc-300 light:text-slate-700">Riepilogo Esame</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <VoiceQuickMenu
-                id="btn-drive-debriefing-voice-menu"
-                onOpenVoiceGuide={() => setIsVoiceGuideOpen(true)}
-                onReplaySpokenGuide={handleReplayIntro}
-                onOpenChange={setIsVoiceMenuOpen}
-              />
-              <button
-                id="btn-drive-debriefing-exit"
-                onClick={handleClose}
-                className="p-2 rounded-xl bg-zinc-900 border border-zinc-800 text-zinc-400 hover:text-white light:bg-white light:border-slate-200 light:text-slate-600 light:hover:text-slate-900 light:shadow-sm"
-                title="Esci dalla modalità guida"
-              >
-                <X className="w-5 h-5" />
-              </button>
-            </div>
-          </div>
-
-          <div className="space-y-6 pt-4 text-center">
-            <div
-              className={`p-6 rounded-3xl border-2 space-y-3 ${
-                completedSession.isPassed
-                  ? 'bg-emerald-950/40 border-emerald-500 text-emerald-100 light:bg-emerald-50 light:border-emerald-500 light:text-emerald-950'
-                  : 'bg-rose-950/40 border-rose-500 text-rose-100 light:bg-rose-50 light:border-rose-500 light:text-rose-950'
-              }`}
-            >
-              <div className="inline-flex items-center justify-center w-16 h-16 rounded-full mx-auto">
-                {completedSession.isPassed ? (
-                  <CheckCircle2 className="w-16 h-16 text-emerald-400" />
-                ) : (
-                  <XCircle className="w-16 h-16 text-rose-400" />
-                )}
-              </div>
-              <h2 className="text-3xl font-black tracking-tight">
-                {completedSession.isPassed ? 'ESAME IDONEO' : 'NON IDONEO'}
-              </h2>
-              <p className="text-sm font-semibold opacity-90">
-                {completedSession.isPassed
-                  ? `Complimenti! ${completedSession.wrongAnswers} errori (massimo 3 ammessi)`
-                  : `${completedSession.wrongAnswers} errori su ${completedSession.totalQuestions} quesiti`}
-              </p>
-            </div>
-
-            <div className="grid grid-cols-2 gap-3">
-              <div className="p-4 rounded-2xl bg-zinc-900 border border-zinc-800 text-center light:bg-white light:border-slate-200 light:shadow-sm">
-                <div className="text-2xl font-black text-emerald-400">
-                  {completedSession.correctAnswers}
-                </div>
-                <div className="text-xs text-zinc-400 light:text-slate-500 font-bold uppercase">Esatte</div>
-              </div>
-              <div className="p-4 rounded-2xl bg-zinc-900 border border-zinc-800 text-center light:bg-white light:border-slate-200 light:shadow-sm">
-                <div className="text-2xl font-black text-rose-400">
-                  {completedSession.wrongAnswers}
-                </div>
-                <div className="text-xs text-zinc-400 light:text-slate-500 font-bold uppercase">Errate</div>
-              </div>
-            </div>
-          </div>
-
-          <div className="space-y-3 pb-4">
-            <button
-              onClick={() => startDriveExam(isMarathon)}
-              className="w-full py-4 rounded-2xl bg-amber-600 hover:bg-amber-500 text-white font-black text-lg flex items-center justify-center gap-2 shadow-lg shadow-amber-950 light:shadow-amber-200 active:scale-[0.98]"
-            >
-              <RotateCcw className="w-5 h-5" />
-              <span>Riprova Esame</span>
-            </button>
-            <button
-              onClick={handleClose}
-              className="w-full py-4 rounded-2xl bg-zinc-900 border border-zinc-800 text-zinc-300 hover:text-white light:bg-white light:border-slate-200 light:text-slate-700 light:hover:text-slate-900 light:shadow-sm font-bold text-base flex items-center justify-center gap-2"
-            >
-              <span>Chiudi Modalità Audio</span>
-            </button>
-          </div>
-        </div>
+        <DriveDebriefing
+          completedSession={completedSession}
+          isMarathon={isMarathon}
+          onRestartExam={startDriveExam}
+          onClose={handleClose}
+          onOpenVoiceGuide={() => setIsVoiceGuideOpen(true)}
+          onReplayIntro={handleReplayIntro}
+          setIsVoiceMenuOpen={setIsVoiceMenuOpen}
+        />
       )}
 
       {/* Modale Guida Comandi Vocali (Cheat Sheet) */}

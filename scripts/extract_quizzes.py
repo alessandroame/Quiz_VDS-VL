@@ -169,14 +169,13 @@ def main():
 
     # Assicura le cartelle di destinazione
     os.makedirs("src/data", exist_ok=True)
-    os.makedirs("public/data", exist_ok=True)
     os.makedirs("src/types", exist_ok=True)
 
-    # Scrittura JSON
-    for dest in ["src/data/questions.json", "public/data/questions.json"]:
-        with open(dest, "w", encoding="utf-8") as f:
-            json.dump(questions, f, ensure_ascii=False, indent=2)
-        print(f"File salvato: {dest} ({os.path.getsize(dest)} bytes)")
+    # Scrittura JSON (Single Source of Truth)
+    dest = "src/data/questions.json"
+    with open(dest, "w", encoding="utf-8") as f:
+        json.dump(questions, f, ensure_ascii=False, indent=2)
+    print(f"File salvato: {dest} ({os.path.getsize(dest)} bytes)")
 
     # Scrittura TypeScript types
     ts_types = """// Tipi per il catalogo quiz VDS-VL

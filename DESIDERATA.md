@@ -121,7 +121,7 @@ Questo documento rappresenta la **bussola strategica e funzionale** del progetto
 
 | Modulo / Requisito | Stato | Note per il Prossimo Agente |
 | :--- | :---: | :--- |
-| Dataset 504 Quiz AeCI | 🟢 Completato | File statici in `src/data/questions.json` e `public/data/questions.json`. |
+| Dataset 504 Quiz AeCI | 🟢 Completato | Single Source of Truth (SSOT) in `src/data/questions.json` isolato nel chunk rollup `quiz-dataset.js`. Duplicato `public/data/questions.json` rimosso per ottimizzazione precache. |
 | Fair Coverage Randomizer | 🟢 Completato | Logica in `src/services/randomizer.ts` e `src/utils/fairRandomizer.ts`. |
 | Database Dexie (IndexedDB) | 🟢 Completato | Schema in `src/db/index.ts`, tipi in `src/types/database.ts`. |
 | Simulatore Esame Ufficiale & Didattico | 🟢 Completato | 30 quiz, modalità Tutor (senza tempo, feedback immediato Regola+Tranello) ed Esame Ufficiale (45 min), griglia 30 slot reattiva, evaluator in `src/services/examEvaluator.ts`. |

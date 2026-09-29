@@ -14,6 +14,43 @@ Questo documento registra in ordine cronologico tutte le lavorazioni svolte nel 
 - **Impatto sul Desiderata**: <Come questo intervento contribuisce al desiderata (cfr. DESIDERATA.md) e indicazioni per il prossimo agente>
 ```
 
+# Worklog 2026-09-29: Fase 9.5 (Decomposizione Modulare DriveModeScreen) & Fase 9.6 (De-duplicazione questions.json & Ottimizzazione Precache) 🛩️
+
+## Cosa Abbiamo Fatto
+
+1. **Fase 9.5 - Decomposizione Modulare di `DriveModeScreen.tsx`**:
+   - Scomposto il componente monolitico `DriveModeScreen.tsx` (originariamente 1.941 righe) estraendo tre sotto-componenti dedicati e autonomi nella nuova directory `src/components/drive/`:
+     * [`src/components/drive/DriveLauncher.tsx`](file:///d:/Github/Quiz_VDS-VL/src/components/drive/DriveLauncher.tsx): schermata iniziale di selezione modalità (Esame, Esame Maratona, Radio Quiz, Quaderno Errori), toggles rapidi Pilota Automatico / Tutor / Comandi Vocali, banner briefing vocale iniziale e indicatore wake lock.
+     * [`src/components/drive/DriveActiveHUD.tsx`](file:///d:/Github/Quiz_VDS-VL/src/components/drive/DriveActiveHUD.tsx): interfaccia quiz attiva `100dvh` zero-scroll, 3 macro-fasce touch a tutta larghezza con feedback aptico, card didattiche compatte Regola & Tranello per la modalità Tutor, timer esame, indicatori visivi di ascolto microfono (radar visualizer) e chip comandi vocali.
+     * [`src/components/drive/DriveDebriefing.tsx`](file:///d:/Github/Quiz_VDS-VL/src/components/drive/DriveDebriefing.tsx): schermata riassuntiva di fine esame con esito Idoneo/Non Idoneo, conteggio risposte esatte ed errate (soglia max 3 errori) e pulsanti per riprovare o chiudere.
+   - Snellito `DriveModeScreen.tsx` da **1.941 righe a 1.070 righe** (-871 righe), conservando il puro ruolo architetturale di coordinatore e store reattivo dello stato (timer esame, comandi vocali, sequenza audio, integrazione `QuizContext`).
+   - Pruning delle icone Lucide non utilizzate nel componente genitore (ridotte alla sola `XCircle`).
+
+2. **Fase 9.6 - De-duplicazione Dataset & Ottimizzazione PWA Precache**:
+   - Eseguito audit approfondito delle referenze a `questions.json`: accertata l'assenza totale di chiamate `fetch` a runtime verso `public/data/questions.json`. L'intera logica applicativa (`QuizContext.tsx`, `audioDownloadManager.ts` e le 22 suite di test) importa tipitamente `src/data/questions.json`, isolato da Rollup in `dist/assets/quiz-dataset-*.js` (393 kB, 94.78 kB gzip).
+   - Rimossa la voce ridondante `'data/questions.json'` da `includeAssets` in [`vite.config.ts`](file:///d:/Github/Quiz_VDS-VL/vite.config.ts).
+   - Eliminato definitivamente `public/data/questions.json` dal repository, stabilendo `src/data/questions.json` come **Single Source of Truth (SSOT)**.
+   - Aggiornato [`scripts/extract_quizzes.py`](file:///d:/Github/Quiz_VDS-VL/scripts/extract_quizzes.py) per generare esclusivamente `src/data/questions.json`.
+   - Ridotto il payload complessivo di precache del Service Worker da **5.246 KiB a 4.804 KiB** (-441.77 KiB) e le voci di precache da 49 a 47, azzerando la duplicazione nella `CacheStorage` dei browser.
+
+---
+
+## Scelte Architetturali & Rationale
+
+- **Single Responsibility nei Componenti Drive**: La separazione dei tre stati visuali (Launcher, Active HUD, Debriefing) in file isolati garantisce modularità, leggibilità e facilita l'eventuale collaudo visuale mirato senza dover gestire un file monolitico da quasi 2.000 righe.
+- **Single Source of Truth (SSOT) per i Quiz**: Mantenere il file JSON in una sola cartella (`src/data/questions.json`) previene disallineamenti silenti tra build e runtime. La distribuzione avviene tramite chunk JS gzippato (94 kB anziché 452 kB di JSON non compresso), con tipizzazione TypeScript verificata a tempo di compilazione.
+
+---
+
+## Impatto sul Desiderata & Istruzioni per il Prossimo Agente
+
+- **Stato del Progetto**: Tutte le Fasi da 0 a 9 sono completate al **100%**.
+- **Test Unitari**: 22 file, 201/201 test superati in ~800ms (`npm run test:unit`).
+- **Build di Produzione**: `dist/assets/index.js` a 163.25 kB (38.30 kB gzip), `dist/assets/DriveModeScreen.js` a 60.57 kB (14.63 kB gzip), PWA precache ottimizzata a 4.8 MB.
+- **Collaudi Visivi Headless E2E**: Convalida superata con 0 errori console per `test:visual:drive:flow`, `test:visual:review` e `test:visual:nav`.
+
+---
+
 ### [2026-09-29] - Fase 9 Hardening Tecnico: Resilienza Autoplay, E2E Headless, De-sottoscrizione Vocale e Code-Splitting Bundle
 - **Cosa abbiamo fatto**:
   - **Stabilizzazione Autoplay (`src/components/QuestionCard.tsx`)**:

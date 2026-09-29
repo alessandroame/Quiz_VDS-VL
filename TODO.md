@@ -1,7 +1,7 @@
 # 📋 VDS-VL Quiz Master - Avanzamento Lavori (TODO)
 
 **Data Inizio**: 27/09/2026  
-**Stato Generale**: 🟡 **Fasi 0-6 Completate (100%), Fase 7 (Collaudo Manuale E2E) Pronta, Fase 8 (Nuove Funzionalità) Completata, Fase 9 (Hardening Post-Audit: P1 e P2 Completati al 100%, P3 Pianificato)**
+**Stato Generale**: 🟢 **Fasi 0-6 Completate (100%), Fase 7 (Collaudo Manuale E2E) Pronta, Fasi 8 e 9 Completate al 100% (Hardening, Voice Reactivity, Code-Splitting, Modularizzazione & Precache Optimization)**
 
 ---
 
@@ -322,18 +322,23 @@ Questo piano raccoglie e prioritizza gli interventi strutturali emersi dall'audi
   - [x] Ricalibrato `manualChunks` in `vite.config.ts` per isolare `quiz-dataset` (~393 kB) e `vendor` (~334 kB).
   - [x] Portato il bundle principale `dist/assets/index.js` da **~931 kB** a **163 kB** (abbattimento dell'82.5%), azzerando qualsiasi warning Vite (`chunkSizeWarningLimit`).
 
-### 5. [P3] Decomposizione Modulare di `DriveModeScreen.tsx`
-- [ ] **Scomposizione del Monolite da 1.941 Righe**:
-  - [ ] Suddividere `DriveModeScreen.tsx` in tre sotto-componenti dedicati a responsabilità singola nella directory `src/components/drive/`:
+### 5. [x] [P3] Decomposizione Modulare di `DriveModeScreen.tsx`
+- [x] **Scomposizione del Monolite da 1.941 Righe**:
+  - [x] Suddividere `DriveModeScreen.tsx` in tre sotto-componenti dedicati a responsabilità singola nella directory `src/components/drive/`:
     - `DriveLauncher.tsx`: schermata iniziale di selezione modalità, impostazioni rapide, test microfono e briefing di benvenuto.
     - `DriveActiveHUD.tsx`: visualizzazione quiz a tutto schermo `100dvh` zero-scroll, macro-fasce touch Fitts's law, scheda didattica tutor Regola/Tranello e visualizzatore microfono radar.
     - `DriveDebriefing.tsx`: riepilogo finale della sessione di guida con statistiche di idoneità ed elenco errori.
+  - [x] Riduzione del componente genitore `DriveModeScreen.tsx` da 1.941 righe a 1.070 righe (-871 righe), conservando il puro ruolo di orchestrazione reattiva dello stato.
+  - [x] Certificato con test interattivo E2E `npm run test:visual:drive:flow` a 0 errori console.
 
-### 6. [P3] De-duplicazione Dati `questions.json` & PWA Precache
-- [ ] **Audit Architettura Distribuzione Dataset**:
-  - [ ] Analizzare l'opportunità di eliminare la doppia presenza di `questions.json` (452 kB sia incorporato staticamente in TypeScript sia precachato in `public/data/questions.json`).
-  - [ ] Opzione A: Caricamento asincrono al boot da CacheStorage locale.
-  - [ ] Opzione B: Mantenere l'import TypeScript per type checking rigoroso e rimuovere il precache ridondante da `public/` per risparmiare storage nella cache del browser.
+### 6. [x] [P3] De-duplicazione Dati `questions.json` & PWA Precache
+- [x] **Audit Architettura Distribuzione Dataset & Implementazione Opzione B**:
+  - [x] Audit completato: confermata assenza totale di chiamate `fetch` a runtime verso `public/data/questions.json`. L'intera applicazione importa tipitamente `src/data/questions.json` isolato da Rollup nel chunk `quiz-dataset.js` (393 kB, gzip: 94.78 kB).
+  - [x] Rimosso `data/questions.json` da `includeAssets` in `vite.config.ts`.
+  - [x] Rimosso `public/data/questions.json` come duplicato ridondante, stabilendo `src/data/questions.json` come Single Source of Truth (SSOT).
+  - [x] Aggiornato `scripts/extract_quizzes.py` per scrivere unicamente su `src/data/questions.json`.
+  - [x] Ridotto il payload di precache Service Worker da **5.246 KiB a 4.804 KiB** (-441.77 KiB) e le voci precache da 49 a 47, azzerando il doppio consumo di memoria nella CacheStorage del browser.
+
 
 
 
