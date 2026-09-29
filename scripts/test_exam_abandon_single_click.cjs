@@ -26,6 +26,28 @@ async function run() {
   const port = 9556;
   const tempProfile = path.join(os.tmpdir(), `chrome_test_abandon_${Date.now()}`);
 
+  // Ensure preview server is running
+  let previewProc = null;
+  const isServerRunning = await new Promise(resolve => {
+    http.get('http://localhost:5173', () => resolve(true)).on('error', () => resolve(false));
+  });
+
+  if (!isServerRunning) {
+    console.log('Starting preview server on port 5173...');
+    previewProc = spawn('npx.cmd', ['vite', 'preview', '--port', '5173', '--strictPort'], {
+      cwd: process.cwd(),
+      shell: true,
+      stdio: 'ignore'
+    });
+    for (let i = 0; i < 30; i++) {
+      await sleep(200);
+      const ready = await new Promise(resolve => {
+        http.get('http://localhost:5173', () => resolve(true)).on('error', () => resolve(false));
+      });
+      if (ready) break;
+    }
+  }
+
   const browser = spawn(BROWSER_BIN, [
     '--headless=new',
     `--remote-debugging-port=${port}`,
@@ -184,7 +206,10 @@ async function run() {
 
     ws.close();
   } finally {
-    browser.kill();
+    try { browser.kill(); } catch (e) {}
+    if (previewProc) {
+      try { previewProc.kill(); } catch (e) {}
+    }
     try {
       fs.rmSync(tempProfile, { recursive: true, force: true });
     } catch (e) {}

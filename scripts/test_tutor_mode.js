@@ -27,7 +27,7 @@ async function main() {
   if (!isServerRunning) {
     console.log('Starting preview server on port 5173...');
     viteProc = spawn('npx.cmd', ['vite', 'preview', '--port', '5173', '--strictPort'], {
-      cwd: 'd:\\Github\\Quiz_VDS-VL',
+      cwd: process.cwd(),
       shell: true,
       stdio: 'ignore'
     });

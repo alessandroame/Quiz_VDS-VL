@@ -6,7 +6,6 @@ import {
   CheckCircle2,
   XCircle,
   ArrowRight,
-  ArrowLeft,
   RotateCcw,
   ListFilter,
   Car,
@@ -20,6 +19,7 @@ import { evaluateExam } from '../services/examEvaluator';
 import { formatTime } from '../utils/timer';
 import { QuestionCard } from './QuestionCard';
 import { voiceService } from '../services/voiceService';
+import { QuizBottomBar } from './QuizBottomBar';
 
 export const ExamScreen: React.FC = () => {
   const {
@@ -525,7 +525,7 @@ export const ExamScreen: React.FC = () => {
 
   // --- Schermata RUNNING: Esame o Simulazione in Corso ---
   return (
-    <div className="max-w-2xl mx-auto px-4 py-4 space-y-4">
+    <div className="max-w-2xl mx-auto px-4 py-4 space-y-4 pb-28 sm:pb-32">
       {/* Top Bar: Timer, Progresso, Consegna */}
       <div className="flex items-center justify-between gap-2 p-3 bg-zinc-900 border border-zinc-800 rounded-xl dark:bg-zinc-900 light:bg-white light:border-slate-200 shadow-sm sticky top-[102px] sm:top-[106px] z-20">
         <div className="flex items-center gap-2">
@@ -667,52 +667,6 @@ export const ExamScreen: React.FC = () => {
         />
       )}
 
-      {/* In modalità tutor, pulsante rapido per avanzare alla domanda successiva se già risposta */}
-      {examMode === 'tutor' && currentQuestion && answers[currentQuestion.id] !== undefined && (
-        <div className="pt-1">
-          {currentIndex < totalCount - 1 ? (
-            <button
-              id="btn-tutor-next-question"
-              onClick={() => changeIndex(currentIndex + 1)}
-              className="w-full py-3 rounded-xl bg-amber-600 hover:bg-amber-500 text-white font-bold text-xs sm:text-sm shadow-md flex items-center justify-center gap-2 transition-all active:scale-[0.99] animate-in fade-in"
-            >
-              <span>Prossima Domanda ({currentIndex + 2}/{totalCount})</span>
-              <ArrowRight className="w-4 h-4" />
-            </button>
-          ) : (
-            <button
-              id="btn-tutor-complete-exam"
-              onClick={() => setShowSubmitModal(true)}
-              className="w-full py-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs sm:text-sm shadow-md flex items-center justify-center gap-2 transition-all active:scale-[0.99] animate-in fade-in"
-            >
-              <CheckCircle2 className="w-4 h-4" />
-              <span>Completa Simulazione e Mostra Debriefing</span>
-            </button>
-          )}
-        </div>
-      )}
-
-      {/* Controlli Precedente / Successiva standard */}
-      <div className="flex items-center justify-between gap-3 pt-2">
-        <button
-          onClick={() => changeIndex(Math.max(0, currentIndex - 1))}
-          disabled={currentIndex === 0}
-          className="px-4 py-2.5 rounded-xl border border-zinc-800 bg-zinc-900 text-zinc-300 light:bg-white light:border-slate-200 light:text-slate-700 text-xs font-semibold flex items-center gap-1.5 disabled:opacity-30"
-        >
-          <ArrowLeft className="w-4 h-4" />
-          <span>Precedente</span>
-        </button>
-
-        <button
-          onClick={() => changeIndex(Math.min(totalCount - 1, currentIndex + 1))}
-          disabled={currentIndex === totalCount - 1}
-          className="px-4 py-2.5 rounded-xl border border-zinc-800 bg-zinc-900 text-zinc-300 light:bg-white light:border-slate-200 light:text-slate-700 text-xs font-semibold flex items-center gap-1.5 disabled:opacity-30"
-        >
-          <span>Successiva</span>
-          <ArrowRight className="w-4 h-4" />
-        </button>
-      </div>
-
       {/* Link secondario inferiore per interrompere esame */}
       <div className="flex justify-center pt-2">
         <button
@@ -724,6 +678,55 @@ export const ExamScreen: React.FC = () => {
           <span>Interrompi simulazione d'esame</span>
         </button>
       </div>
+
+      {/* Barra Navigazione Quiz Ancorata in Basso */}
+      <QuizBottomBar
+        currentIndex={currentIndex}
+        totalCount={totalCount}
+        onPrevious={() => changeIndex(Math.max(0, currentIndex - 1))}
+        onNext={() => changeIndex(Math.min(totalCount - 1, currentIndex + 1))}
+        isPreviousDisabled={currentIndex === 0}
+        isNextDisabled={currentIndex === totalCount - 1}
+        previousId="btn-prev-question"
+        nextId="btn-next-question"
+        flagAction={currentQuestion ? {
+          isFlagged: flags[currentQuestion.id] === true,
+          onToggle: () => handleToggleFlag(currentQuestion.id),
+          id: 'btn-flag-question-bottom'
+        } : undefined}
+        centerContent={
+          <span className="font-mono text-zinc-400 light:text-slate-500 font-medium">
+            {currentIndex + 1} / {totalCount}
+          </span>
+        }
+        primaryAction={
+          examMode === 'tutor' && currentQuestion && answers[currentQuestion.id] !== undefined
+            ? (currentIndex < totalCount - 1
+                ? {
+                    id: 'btn-tutor-next-question',
+                    label: `Prossima Domanda (${currentIndex + 2}/${totalCount})`,
+                    variant: 'amber',
+                    icon: <ArrowRight className="w-4 h-4" />,
+                    onClick: () => changeIndex(currentIndex + 1)
+                  }
+                : {
+                    id: 'btn-tutor-complete-exam',
+                    label: `Completa Simulazione (${answeredCount}/${totalCount})`,
+                    variant: 'emerald',
+                    icon: <CheckCircle2 className="w-4 h-4" />,
+                    onClick: () => setShowSubmitModal(true)
+                  })
+            : (currentIndex === totalCount - 1
+                ? {
+                    id: 'btn-submit-exam-bottom',
+                    label: `Consegna (${answeredCount}/${totalCount})`,
+                    variant: 'emerald',
+                    icon: <CheckCircle2 className="w-4 h-4" />,
+                    onClick: () => setShowSubmitModal(true)
+                  }
+                : undefined)
+        }
+      />
 
       {/* Modal di Conferma Consegna */}
       {showSubmitModal && (

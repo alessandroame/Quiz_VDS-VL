@@ -8,6 +8,7 @@ import {
 import type { Question } from '../types/quiz';
 import { useQuiz } from '../context/QuizContext';
 import { QuestionCard } from './QuestionCard';
+import { QuizBottomBar } from './QuizBottomBar';
 
 export const TopicsScreen: React.FC = () => {
   const {
@@ -131,7 +132,7 @@ export const TopicsScreen: React.FC = () => {
     const currentSubjectMeta = subjectsAnalytics.find(s => s.id === activeSubjectId);
 
     return (
-      <div className="max-w-2xl mx-auto px-4 py-4 space-y-4">
+      <div className="max-w-2xl mx-auto px-4 py-4 space-y-4 pb-28 sm:pb-32">
         {/* Top bar sessione */}
         <div className="flex items-center justify-between p-3 bg-zinc-900 border border-zinc-800 rounded-xl light:bg-white light:border-slate-200">
           <button
@@ -187,38 +188,35 @@ export const TopicsScreen: React.FC = () => {
           totalNumber={sessionQuestions.length}
         />
 
-        {/* Navigazione */}
-        <div className="flex items-center justify-between gap-3 pt-2">
-          <button
-            onClick={() => changeIndex(Math.max(0, currentIndex - 1))}
-            disabled={currentIndex === 0}
-            className="px-4 py-2.5 rounded-xl border border-zinc-800 bg-zinc-900 text-zinc-300 light:bg-white light:border-slate-200 text-xs font-semibold flex items-center gap-1.5 disabled:opacity-30"
-          >
-            <ArrowLeft className="w-4 h-4" />
-            <span>Precedente</span>
-          </button>
-
-          {currentIndex < sessionQuestions.length - 1 ? (
-            <button
-              onClick={() => changeIndex(currentIndex + 1)}
-              className="px-4 py-2.5 rounded-xl bg-amber-600 hover:bg-amber-500 text-white text-xs font-semibold flex items-center gap-1.5 shadow-sm"
-            >
-              <span>Successiva</span>
-              <ArrowRight className="w-4 h-4" />
-            </button>
-          ) : (
-            <button
-              onClick={() => {
-                setActiveSubjectId(null);
-                dismissActiveSession();
-              }}
-              className="px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold flex items-center gap-1.5 shadow-sm"
-            >
-              <CheckCircle2 className="w-4 h-4" />
-              <span>Concludi ({answeredCount})</span>
-            </button>
-          )}
-        </div>
+        {/* Barra Navigazione Quiz Ancorata in Basso */}
+        <QuizBottomBar
+          currentIndex={currentIndex}
+          totalCount={sessionQuestions.length}
+          onPrevious={() => changeIndex(Math.max(0, currentIndex - 1))}
+          onNext={() => changeIndex(currentIndex + 1)}
+          isPreviousDisabled={currentIndex === 0}
+          previousId="btn-topics-prev-question"
+          nextId="btn-topics-next-question"
+          centerContent={
+            <span className="font-mono text-zinc-400 light:text-slate-500 font-semibold">
+              {currentIndex + 1} / {sessionQuestions.length}
+            </span>
+          }
+          primaryAction={
+            currentIndex === sessionQuestions.length - 1
+              ? {
+                  id: 'btn-topics-complete',
+                  label: `Concludi (${answeredCount})`,
+                  variant: 'emerald',
+                  icon: <CheckCircle2 className="w-4 h-4" />,
+                  onClick: () => {
+                    setActiveSubjectId(null);
+                    dismissActiveSession();
+                  }
+                }
+              : undefined
+          }
+        />
       </div>
     );
   }

@@ -144,7 +144,7 @@ Questo documento rappresenta la **bussola strategica e funzionale** del progetto
 | Blocco Menu di Navigazione al Top | 🟢 Completato | Barra di navigazione permanently fixed al top (`fixed top-0 left-0 right-0 z-40`), eliminata la bottom nav fissa e rimosso il preamble fuffa dalla schermata esame. |
 | Impostazioni ad Accordion Compresso Singolo | 📋 Pianificato (TODO) | Sostituzione pills menu con accordion verticale mutuo-esclusivo (1 sola sezione aperta alla volta). |
 | Visualizzazione Globale Versione App | 🟢 Completato | Badge di versione dinamico (`__APP_VERSION__` e `__APP_BUILD_ID__`) visibile in Navbar e header Impostazioni. |
-| Barra Navigazione Quiz Ancorata in Basso | 📋 Pianificato (TODO) | Controlli "Precedente/Successiva" permanentemente visibili e ancorati in basso durante esame e studio. |
+| Barra Navigazione Quiz Ancorata in Basso | 🟢 Completato | Componente `QuizBottomBar` ancorato in basso al viewport (`fixed bottom-0 z-30`) con Precedente, Successiva, flag rapido, Prossima Domanda Tutor e Consegna su `ExamScreen`, `TopicsScreen` e `MistakesScreen`. |
 | Modalità Tutor nella Modalità Guida | 📋 Pianificato (TODO) | Lettura vocale Regola+Tranello sincronizzata col Pilota Automatico e toggle dedicato. |
 
 

@@ -4,13 +4,14 @@ import { audioDownloadManager, VoiceDownloadProgress, VoiceName } from '../servi
 
 export interface AudioDownloadBannerProps {
   className?: string;
+  elevated?: boolean;
 }
 
 /**
  * Bottom banner for audio download progression.
  * Sits directly above the bottom navigation bar to prevent top-header UI overflow.
  */
-export const AudioDownloadBanner: React.FC<AudioDownloadBannerProps> = ({ className = '' }) => {
+export const AudioDownloadBanner: React.FC<AudioDownloadBannerProps> = ({ className = '', elevated = false }) => {
   const [statuses, setStatuses] = useState<Record<VoiceName, VoiceDownloadProgress>>(
     audioDownloadManager.getAllStatuses()
   );
@@ -59,7 +60,9 @@ export const AudioDownloadBanner: React.FC<AudioDownloadBannerProps> = ({ classN
       aria-label={`Progressione scaricamento voci: ${percent}%`}
       className={
         className ||
-        'fixed bottom-3 sm:bottom-4 left-0 right-0 z-30 pointer-events-none px-3 sm:px-4 pb-1.5'
+        (elevated
+          ? 'fixed bottom-16 sm:bottom-20 left-0 right-0 z-30 pointer-events-none px-3 sm:px-4 pb-1.5 transition-all duration-300'
+          : 'fixed bottom-3 sm:bottom-4 left-0 right-0 z-30 pointer-events-none px-3 sm:px-4 pb-1.5 transition-all duration-300')
       }
     >
       <div className="max-w-md sm:max-w-lg mx-auto pointer-events-auto bg-zinc-900/95 dark:bg-zinc-900/95 light:bg-white/95 border border-amber-500/40 light:border-amber-400/60 rounded-2xl p-2.5 sm:p-3 shadow-2xl backdrop-blur-md text-zinc-100 light:text-slate-900 transition-all animate-in slide-in-from-bottom-2 fade-in">

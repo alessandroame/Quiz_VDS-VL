@@ -199,22 +199,23 @@ Questa sezione raccoglie le nuove funzionalità e i miglioramenti di interfaccia
   - [x] Collegata la visualizzazione direttamente alla costante `__APP_VERSION__` definita in `vite.config.ts` (derivata dinamicamente da `package.json`) e arricchita con `__APP_BUILD_ID__` / commit hash, azzerando le stringhe di versione cablate manualmente (hardcoded).
 
 ### 5. Barra di Navigazione Quiz Ancorata in Basso (Sticky / Fixed Bottom Action Bar)
-- [ ] **Ancoraggio Permanente dei Controlli "Precedente" e "Successiva"**:
-  - Rendere i controlli di navigazione tra i quesiti (`Precedente` e `Successiva`, oltre al pulsante di completamento scheda/conclusione ripasso e al tasto rapido tutor "Prossima Domanda") **costantemente visibili e ancorati in basso** al viewport durante l'esecuzione del quiz:
+- [x] **Ancoraggio Permanente dei Controlli "Precedente" e "Successiva"**:
+  - [x] Rendere i controlli di navigazione tra i quesiti (`Precedente` e `Successiva`, oltre al pulsante di completamento scheda/conclusione ripasso e al tasto rapido tutor "Prossima Domanda") **costantemente visibili e ancorati in basso** al viewport durante l'esecuzione del quiz:
     - In modalità **Simulazione Esame** (sia Esame Ufficiale che Didattica Tutor in `src/components/ExamScreen.tsx`).
     - Nello **Studio per Materie** (`src/components/TopicsScreen.tsx`).
     - Nel ripasso del **Quaderno Errori** (`src/components/MistakesScreen.tsx`).
-  - Azzerare la necessità per l'allievo pilota di dover scorrere verso il fondo della schermata per avanzare o retrocedere quando il testo del quesito, le opzioni di risposta o le card didattiche espanse (Regola e Tranello) superano l'altezza visibile dello smartphone.
-- [ ] **Ergonomia Cockpit, Styling & Safe Area**:
-  - Posizionamento `fixed bottom-0 inset-x-0` (o `sticky bottom-0`) con elevazione coordinata (`z-30`), sfondo con effetto `backdrop-blur-md` e styling coerente con i temi avionici (`bg-zinc-950/90 border-t border-zinc-800` in Cockpit Dark; `bg-white/95 border-t border-slate-200` in Hangar Light).
-  - Pieno supporto ai margini di sicurezza inferiori per smartphone con gesture bar (`pb-safe` / `env(safe-area-inset-bottom)`).
-  - Target tattili ampi e comodi secondo la legge di Fitts per il tocco immediato con il pollice a una sola mano, con stati disabilitati chiari (`disabled:opacity-30`).
-- [ ] **Prevenzione Sovrapposizioni (Content Clearance)**:
-  - Calibrazione del padding inferiore sul container scorrevole dei contenuti (`pb-24` o `pb-28`) in `ExamScreen.tsx`, `TopicsScreen.tsx` e `MistakesScreen.tsx`, affinché l'ultima opzione di risposta, il feedback didattico o il link di abbandono simulazione non vengano mai nascosti o sovrapposti dalla barra ancorata.
-- [ ] **Sinergia con il Menu di Navigazione al Top**:
-  - Armonizzazione con la riorganizzazione della Navbar al top (Obiettivo 2 di Fase 8): quando i 5 tab di sezione generali sono posizionati stabilmente in alto, l'area inferiore del viewport è dedicata esclusivamente ai comandi operativi del quiz attivo.
-- [ ] **Collaudo Visivo Headless & Multi-Viewport**:
-  - Verifica tramite CDP headless a 390x844 (mobile portrait), 844x390 (mobile landscape) e 1440x900 (desktop) per garantire la fluidità di interazione, l'assenza di salti di layout e 0 errori in console.
+  - [x] Azzerare la necessità per l'allievo pilota di dover scorrere verso il fondo della schermata per avanzare o retrocedere quando il testo del quesito, le opzioni di risposta o le card didattiche espanse (Regola e Tranello) superano l'altezza visibile dello smartphone.
+- [x] **Ergonomia Cockpit, Styling & Safe Area**:
+  - [x] Creato il componente dedicato `src/components/QuizBottomBar.tsx` posizionato `fixed bottom-0 inset-x-0 z-30`, sfondo con effetto `backdrop-blur-md` e styling coerente con i temi avionici (`bg-zinc-950/95 border-t border-zinc-800` in Cockpit Dark; `bg-white/95 border-t border-slate-200` in Hangar Light).
+  - [x] Pieno supporto ai margini di sicurezza inferiori per smartphone con gesture bar (`pb-[max(0.75rem,env(safe-area-inset-bottom))]`).
+  - [x] Target tattili ampi e comodi secondo la legge di Fitts per il tocco immediato con il pollice a una sola mano, con stati disabilitati chiari (`disabled:opacity-30 disabled:cursor-not-allowed`) e pulsante bandierina `⚑ Rivedi` integrato a portata di pollice.
+- [x] **Prevenzione Sovrapposizioni (Content Clearance)**:
+  - [x] Calibrato il padding inferiore sui container dei quiz (`pb-28 sm:pb-32`) in `ExamScreen.tsx`, `TopicsScreen.tsx` e `MistakesScreen.tsx`, affinché l'ultima opzione di risposta, il feedback didattico o il link di abbandono simulazione non vengano mai nascosti o coperti dalla barra ancorata.
+  - [x] Elevato il banner di avanzamento download voci (`AudioDownloadBanner.tsx`) a `bottom-16 sm:bottom-20` tramite prop `elevated` quando un quiz o esame è attivo per eliminare collisioni visive.
+- [x] **Sinergia con il Menu di Navigazione al Top**:
+  - [x] Piena sinergia con la Navbar al top: l'area inferiore del viewport è interamente e pulitamente dedicata ai comandi operativi del quiz attivo.
+- [x] **Collaudo Visivo Headless & Multi-Viewport**:
+  - [x] Verificato con suite automatizzata `scripts/test_quiz_bottom_bar.cjs` su CDP headless a 390x844 (mobile portrait), 844x390 (mobile landscape) e 1440x900 (desktop): bottom bar agganciata con precisione sub-pixel, 0 shift su scroll di 300px, avanzamento tutor fluido e 0 errori in console browser.
 
 ### 6. Modalità Tutor Didattica nella Modalità Alla Guida (Hands-Free Voice Tutor)
 - [ ] **Flusso Didattico Vocale Esteso**:

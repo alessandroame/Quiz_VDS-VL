@@ -16,6 +16,38 @@ Questo documento registra in ordine cronologico tutte le lavorazioni svolte nel 
 
 ---
 
+### [2026-09-29] - Barra di Navigazione Quiz Ancorata in Basso (Fase 8.5) & Ergonomia Mobile ad Una Mano
+- **Cosa abbiamo fatto**:
+  - **Componente Reattivo e Modulare `QuizBottomBar` ([src/components/QuizBottomBar.tsx](file:///c:/github/Quiz_VDS-VL/src/components/QuizBottomBar.tsx))**:
+    * Sviluppato il nuovo componente avionico ancorato sul fondo del viewport (`fixed bottom-0 left-0 right-0 z-30`), con sfondo sfumato ad alto contrasto (`bg-zinc-950/95` in Cockpit Dark, `bg-white/95` in Hangar Light) e `backdrop-blur-md`.
+    * Pieno supporto per le safe area inferiori dei dispositivi mobili (`pb-[max(0.75rem,env(safe-area-inset-bottom))]`).
+    * Controlli completi: pulsante `Precedente` disabilitato deterministamente al primo quesito, pulsante bandierina `⚑ Segna/Rivedi` a portata di pollice, contatore numerico o contenuti centrali, e pulsante prioritario `Successiva` / `Prossima Domanda` / `Concludi/Consegna`.
+  - **Integrazione in tutte le Modalità di Quiz Attive**:
+    * **Simulazione Esame ([src/components/ExamScreen.tsx](file:///c:/github/Quiz_VDS-VL/src/components/ExamScreen.tsx))**: integrato `QuizBottomBar` sia in modalità Didattica Tutor che Esame Ufficiale AeCI. In modalità Tutor, non appena l'allievo risponde a un quesito, il pulsante prioritario `#btn-tutor-next-question` ("Prossima Domanda (N/30) →") compare direttamente nella barra inferiore in Aviation Amber, eliminando qualsiasi necessità di scorrimento verticale oltre le spiegazioni didattiche (Regola e Tranello). All'ultima domanda, il pulsante commuta su `#btn-tutor-complete-exam` ("Completa Simulazione"). In esame ufficiale, all'ultima domanda mostra `#btn-submit-exam-bottom` ("Consegna"). Calibrato il padding inferiore di clearance a `pb-28 sm:pb-32`.
+    * **Studio per Materie ([src/components/TopicsScreen.tsx](file:///c:/github/Quiz_VDS-VL/src/components/TopicsScreen.tsx))**: sostituita la vecchia navigazione inline con `QuizBottomBar`, integrando contatore quesiti `N / Totale` e pulsante di conclusione set.
+    * **Quaderno Errori ([src/components/MistakesScreen.tsx](file:///c:/github/Quiz_VDS-VL/src/components/MistakesScreen.tsx))**: sostituita la vecchia navigazione inline con `QuizBottomBar`, integrando contatore quesiti ed esito ripasso.
+  - **Prevenzione Collisioni con il Banner Audio ([src/components/AudioDownloadBanner.tsx](file:///c:/github/Quiz_VDS-VL/src/components/AudioDownloadBanner.tsx) e [src/components/Navbar.tsx](file:///c:/github/Quiz_VDS-VL/src/components/Navbar.tsx))**:
+    * Aggiunta la prop `elevated?: boolean` in `AudioDownloadBanner`.
+    * Quando una sessione o esame è attivo, `AudioDownloadBanner` viene automaticamente traslato a `bottom-16 sm:bottom-20`, fluttuando sopra la barra di navigazione quiz senza alcuna sovrapposizione visiva.
+  - **Suite di Collaudo Automatizzato Multi-Viewport**:
+    * Creato lo script dedicato [scripts/test_quiz_bottom_bar.cjs](file:///c:/github/Quiz_VDS-VL/scripts/test_quiz_bottom_bar.cjs) con connessione Chrome CDP:
+      - Mobile Portrait (390x844): verificate coordinate viewport (`bottom: 844`), test di scorrimento di 300px con invarianza di posizione, risposta a quesito, comparsa di `#btn-tutor-next-question` dentro la barra, avanzamento al quesito 2, attivazione flag da bottom bar e abbandono pulito.
+      - Mobile Landscape (844x390): testata la compattezza e l'assenza di sovrapposizioni.
+      - Desktop (1440x900): verificata la centratura ergonomica (`max-w-2xl mx-auto`) e il layout fluido.
+      - Acquisiti snapshot ufficiali [public/test_anchored_bottom_bar_mobile.png](file:///c:/github/Quiz_VDS-VL/public/test_anchored_bottom_bar_mobile.png) e [public/test_anchored_bottom_bar_desktop.png](file:///c:/github/Quiz_VDS-VL/public/test_anchored_bottom_bar_desktop.png).
+      - Zero errori in console browser JavaScript.
+    * Verificati i test storici e di regressione (`test_tutor_mode.js`, `test_exam_abandon_single_click.cjs`).
+    * 131 su 131 test unitari Vitest superati (`npm run test:unit`).
+    * Compilazione della build di produzione verificata con successo (`tsc && vite build`).
+- **Scelte architetturali & Rationale**:
+  - *Sinergia Architetturale Top-Navbar / Bottom-Quiz-Bar*: Con i 5 tab generali fissati in alto (Fase 8.2), la parte inferiore dello schermo è sgombra da elementi globali e può essere interamente dedicata all'azione di studio del quiz in esecuzione.
+  - *Thumb-Zone Ergonomics & Fitts's Law*: Nei quiz con spiegazioni didattiche dettagliate (Regola + Tranello), l'allievo doveva precedentemente scorrere fino a fondo pagina per avanzare. Ancorare l'azione "Prossima Domanda" sul fondo consente una digitazione rapidissima e rilassata con il solo pollice, aumentando l'efficienza dello studio.
+  - *Dynamic Elevation of AudioDownloadBanner*: Spostare il banner audio verso l'alto (`bottom-16 sm:bottom-20`) solo quando un quiz è attivo garantisce isolamento visivo e previene qualsiasi conflitto di stacking context.
+- **Impatto sul Desiderata**:
+  - Soddisfatto al 100% l'Obiettivo 5 di Fase 8 ([DESIDERATA.md](file:///c:/github/Quiz_VDS-VL/DESIDERATA.md) Sezione 2.10 e [TODO.md](file:///c:/github/Quiz_VDS-VL/TODO.md)).
+
+---
+
 ### [2026-09-29] - Risoluzione Race Condition Interruzione Esame al Primo Click (Single-Click Exam Abandon)
 - **Cosa abbiamo fatto**:
   - **Analisi e Diagnosi Causa Radice (Double-Click Bug)**:

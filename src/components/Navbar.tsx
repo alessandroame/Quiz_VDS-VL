@@ -30,7 +30,7 @@ interface NavbarProps {
 
 export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab, openSettings }) => {
   const { theme, cycleTheme } = useTheme();
-  const { mistakesCount, readinessScore, isExamRunning, openDriveMode, settings, syncState } = useQuiz();
+  const { mistakesCount, readinessScore, isExamRunning, activeSession, openDriveMode, settings, syncState } = useQuiz();
 
   const getSyncTooltip = () => {
     switch (syncState.status) {
@@ -213,7 +213,7 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab, openSet
       </header>
 
       {/* Audio Download Bottom Banner */}
-      <AudioDownloadBanner />
+      <AudioDownloadBanner elevated={isExamRunning || Boolean(activeSession)} />
     </>
   );
 };
