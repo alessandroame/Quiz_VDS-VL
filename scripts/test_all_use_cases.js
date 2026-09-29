@@ -242,8 +242,12 @@ async function run() {
 
     // Verifica apertura Guida Comandi Vocali dal launcher
     await evalJS(`
-      const btnGuide = Array.from(document.querySelectorAll('button')).find(b => b.innerText.includes('Guida Rapida') || b.innerText.includes('Comandi Vocali'));
-      if (btnGuide) btnGuide.click();
+      (() => {
+        const dismissBtn = Array.from(document.querySelectorAll('button')).find(b => b.innerText.includes('Non ora'));
+        if (dismissBtn) dismissBtn.click();
+        const btnGuide = document.getElementById('btn-drive-voice-guide-launcher') || Array.from(document.querySelectorAll('button')).find(b => b.innerText.includes('Guida Comandi'));
+        if (btnGuide) btnGuide.click();
+      })()
     `);
     await sleep(400);
 

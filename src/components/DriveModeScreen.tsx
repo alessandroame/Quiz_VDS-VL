@@ -896,6 +896,7 @@ export const DriveModeScreen: React.FC<DriveModeScreenProps> = ({
               <span>Spiegazione Vocale</span>
             </button>
             <button
+              id="btn-drive-voice-guide-launcher"
               type="button"
               onClick={() => setIsVoiceGuideOpen(true)}
               className="px-3.5 py-1.5 rounded-full bg-zinc-900 border border-zinc-800 hover:border-emerald-500/50 text-zinc-400 hover:text-emerald-300 text-xs font-semibold flex items-center gap-1.5 transition-colors"
