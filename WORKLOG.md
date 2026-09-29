@@ -14,6 +14,32 @@ Questo documento registra in ordine cronologico tutte le lavorazioni svolte nel 
 - **Impatto sul Desiderata**: <Come questo intervento contribuisce al desiderata (cfr. DESIDERATA.md) e indicazioni per il prossimo agente>
 ```
 
+### [2026-09-29] - Piano di Riorganizzazione Ergonomica Cockpit V2, Home Hub & Roadmap TODO
+- **Cosa abbiamo fatto**:
+  - **Definizione Architettura dei 6 Scenari Puri**:
+    * Scomposti e formalizzati i 6 scenari d'uso prioritari dell'allievo pilota: `TUTOR` (apprendimento continuo a feedback immediato senza tempo), `MATERIE` (studio 01-09 per argomento), `ESAME` (simulazione formale AeCI 45 min), `ERRORI` (quaderno spaced repetition), `CERCA` (archivio rapido) e `STATS` (telemetria).
+  - **Valutazione e Potatura del Deltaplano (Focus 100% Parapendio)**:
+    * Analizzati i 504 quiz AeCI: confermati 474 quiz per parapendio (428 comuni + 46 parapendio) ed esclusione pianificata dei 30 quiz esclusivi del deltaplano per azzerare rumore didattico, selettori sparsi e modali.
+  - **Pattern "Home Hub + Back Navigation"**:
+    * Scartata la top bar permanente a 6 segmenti (che consumava 50-60px verticali nei quiz) in favore di una schermata `HomeScreen` a 6 macro-pulsanti e mini-header con `[← Home]` nei quiz per massimizzare l'area di lettura.
+  - **Layout Zero-Scroll a Margini Compatti**:
+    * Progettato il layout vincolato a `100dvh` con padding ridotti (`p-3`), testo a leading compatto e pulsanti a 44px min-height per eliminare qualsiasi scroll su mobile (390x844).
+  - **Riconcettualizzazione "Modalità Audio" (Audiolibro Hands-Free)**:
+    * Trasformata la vecchia "Modalità Guida" in "Modalità Audio" con icona cuffie/altoparlante monocromatica.
+    * Previsto switch istantaneo universale con tasto `AUDIO` nell'header di Tutor, Materie, Esame ed Errori senza perdita di stato o progresso.
+  - **Ricerca No-Keyboard nell'Archivio**:
+    * Progettati pulsantiera rapida materie `01`-`09` + `TUTTE`, filtri stato a 1 tocco, quick chips tematiche e pad salto rapido per #ID.
+  - **Documentazione & Matrice TODO**:
+    * Redatto l'artifact di piano `piano_riorganizzazione_ux_quiz_vds.md`.
+    * Aggiornato [DESIDERATA.md](file:///d:/Github/Quiz_VDS-VL/DESIDERATA.md) con la nuova matrice di stato e i 5 task TODO dettagliati.
+- **Scelte architetturali & Rationale**:
+  - *Home Hub vs Persistent Tabs*: L'obiettivo principale dell'allievo durante il quiz è la lettura e la concentrazione. Una barra a 6 tab ruba spazio verticale costringendo a scorrere; il pattern Home Hub garantisce zero-scroll durante la prova e accesso a 1 tocco dalla home.
+  - *Audiobook Paradigm*: Riconoscere che l'ascolto hands-free è utile ovunque (non solo alla guida di un'auto) estende la modalità a un utilizzo quotidiano a mani libere.
+- **Impatto sul Desiderata**:
+  - Allinea l'applicazione ai massimi standard di ergonomia minimale (stile Dieter Rams / avionica Garmin) senza fronzoli commerciali, focalizzandosi interamente sull'efficacia dell'apprendimento per il parapendio.
+
+---
+
 ### [2026-09-29] - Parapendio Default (474 Quiz) & Pulizia Cockpit Selettori Disciplina
 - **Cosa abbiamo fatto**:
   - **Parapendio come Default Immediato**:
