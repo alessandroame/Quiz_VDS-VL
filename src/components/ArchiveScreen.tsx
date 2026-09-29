@@ -34,13 +34,17 @@ import { triggerHapticFeedback } from '../utils/haptics';
 import { backNavigation } from '../utils/backNavigation';
 import type { Question } from '../types/quiz';
 
+interface ArchiveItemExpandedContentProps {
+  question: Question;
+}
+
 interface ArchiveItemProps {
   question: Question;
   isExpanded: boolean;
   onToggle: () => void;
 }
 
-const ArchiveItem: React.FC<ArchiveItemProps> = ({ question: q, isExpanded, onToggle }) => {
+const ArchiveItemExpandedContent: React.FC<ArchiveItemExpandedContentProps> = ({ question: q }) => {
   const { statsMap, settings, saveNote } = useQuiz();
   const stat = statsMap.get(q.id);
 
@@ -71,61 +75,8 @@ const ArchiveItem: React.FC<ArchiveItemProps> = ({ question: q, isExpanded, onTo
   } = useAviationVoice(q.id);
 
   return (
-    <div className="border border-zinc-800 rounded-xl overflow-hidden bg-zinc-900/40 light:bg-white light:border-slate-200">
-      <div
-        id={`archive-item-${q.id}`}
-        onClick={onToggle}
-        className="p-3.5 flex items-start justify-between gap-3 cursor-pointer hover:bg-zinc-800/40 light:hover:bg-slate-50 transition-colors"
-      >
-        <div className="space-y-1 flex-1">
-          <div className="flex items-center gap-2">
-            <span className="font-mono font-bold text-amber-400 text-xs">
-              #{q.id}
-            </span>
-            <span className="text-[11px] text-zinc-400 light:text-slate-500">
-              {q.subjectName}
-            </span>
-            {stat?.isBookmarked && (
-              <Bookmark className="w-3 h-3 text-amber-400 fill-amber-400" />
-            )}
-            {stat?.userNote && (
-              <span className="inline-flex items-center gap-1 text-[10px] px-1.5 py-0.2 rounded bg-amber-500/20 text-amber-400 light:bg-amber-100 light:text-amber-800 font-medium">
-                <FileText className="w-3 h-3" />
-                <span>Nota</span>
-              </span>
-            )}
-          </div>
-          <p className="text-xs text-zinc-200 light:text-slate-800 font-medium line-clamp-2">
-            {q.question}
-          </p>
-          {stat?.userNote && (
-            <div className="flex items-center gap-1.5 mt-1 text-[11px] text-amber-400 light:text-amber-800 bg-amber-950/50 light:bg-amber-50 px-2 py-0.5 rounded border border-amber-800/40 light:border-amber-200 w-fit max-w-full">
-              <FileText className="w-3 h-3 flex-shrink-0 text-amber-400 light:text-amber-600" />
-              <span className="truncate italic font-normal">"{stat.userNote}"</span>
-            </div>
-          )}
-        </div>
-
-        <div className="flex items-center gap-2 text-zinc-400 flex-shrink-0 mt-1">
-          {stat?.lastResult && (
-            <span
-              className={`text-[10px] px-1.5 py-0.5 rounded font-bold ${
-                stat.lastResult === 'correct'
-                  ? 'bg-emerald-500/20 text-emerald-400'
-                  : 'bg-rose-500/20 text-rose-400'
-              }`}
-            >
-              {stat.lastResult === 'correct' ? 'OK' : 'ERR'}
-            </span>
-          )}
-          {isExpanded ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
-        </div>
-      </div>
-
-      {/* Sezione Espansa */}
-      {isExpanded && (
-        <div className="p-3.5 border-t border-zinc-800/80 light:border-slate-100 bg-zinc-950/60 light:bg-slate-50 space-y-3">
-          {/* Barra comandi vocali rapidi */}
+    <div className="p-3.5 border-t border-zinc-800/80 light:border-slate-100 bg-zinc-950/60 light:bg-slate-50 space-y-3">
+      {/* Barra comandi vocali rapidi */}
           {settings.ttsEnabled && (
             <div className="flex items-center justify-between pb-2 border-b border-zinc-800/60 light:border-slate-200 text-xs">
               <span className="text-[11px] text-zinc-400 font-medium">
@@ -446,8 +397,67 @@ const ArchiveItem: React.FC<ArchiveItemProps> = ({ question: q, isExpanded, onTo
               <span>Aggiungi una nota personale sulla domanda #{q.id}</span>
             </button>
           )}
+    </div>
+  );
+};
+
+const ArchiveItem: React.FC<ArchiveItemProps> = ({ question: q, isExpanded, onToggle }) => {
+  const { statsMap } = useQuiz();
+  const stat = statsMap.get(q.id);
+
+  return (
+    <div className="border border-zinc-800 rounded-xl overflow-hidden bg-zinc-900/40 light:bg-white light:border-slate-200">
+      <div
+        id={`archive-item-${q.id}`}
+        onClick={onToggle}
+        className="p-3.5 flex items-start justify-between gap-3 cursor-pointer hover:bg-zinc-800/40 light:hover:bg-slate-50 transition-colors"
+      >
+        <div className="space-y-1 flex-1">
+          <div className="flex items-center gap-2">
+            <span className="font-mono font-bold text-amber-400 text-xs">
+              #{q.id}
+            </span>
+            <span className="text-[11px] text-zinc-400 light:text-slate-500">
+              {q.subjectName}
+            </span>
+            {stat?.isBookmarked && (
+              <Bookmark className="w-3 h-3 text-amber-400 fill-amber-400" />
+            )}
+            {stat?.userNote && (
+              <span className="inline-flex items-center gap-1 text-[10px] px-1.5 py-0.2 rounded bg-amber-500/20 text-amber-400 light:bg-amber-100 light:text-amber-800 font-medium">
+                <FileText className="w-3 h-3" />
+                <span>Nota</span>
+              </span>
+            )}
+          </div>
+          <p className="text-xs text-zinc-200 light:text-slate-800 font-medium line-clamp-2">
+            {q.question}
+          </p>
+          {stat?.userNote && (
+            <div className="flex items-center gap-1.5 mt-1 text-[11px] text-amber-400 light:text-amber-800 bg-amber-950/50 light:bg-amber-50 px-2 py-0.5 rounded border border-amber-800/40 light:border-amber-200 w-fit max-w-full">
+              <FileText className="w-3 h-3 flex-shrink-0 text-amber-400 light:text-amber-600" />
+              <span className="truncate italic font-normal">"{stat.userNote}"</span>
+            </div>
+          )}
         </div>
-      )}
+
+        <div className="flex items-center gap-2 text-zinc-400 flex-shrink-0 mt-1">
+          {stat?.lastResult && (
+            <span
+              className={`text-[10px] px-1.5 py-0.5 rounded font-bold ${
+                stat.lastResult === 'correct'
+                  ? 'bg-emerald-500/20 text-emerald-400'
+                  : 'bg-rose-500/20 text-rose-400'
+              }`}
+            >
+              {stat.lastResult === 'correct' ? 'OK' : 'ERR'}
+            </span>
+          )}
+          {isExpanded ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+        </div>
+      </div>
+
+      {isExpanded && <ArchiveItemExpandedContent question={q} />}
     </div>
   );
 };
@@ -462,6 +472,14 @@ export const ArchiveScreen: React.FC = () => {
   const [isKeypadOpen, setIsKeypadOpen] = useState(false);
   const [numericBuffer, setNumericBuffer] = useState('');
   const [expandedId, setExpandedId] = useState<number | null>(null);
+
+  const INITIAL_PAGE_SIZE = 50;
+  const [visibleCount, setVisibleCount] = useState<number>(INITIAL_PAGE_SIZE);
+
+  // Reset visibleCount when filters change
+  useEffect(() => {
+    setVisibleCount(INITIAL_PAGE_SIZE);
+  }, [searchQuery, selectedSubject, statusFilter, activeConceptChipId]);
 
   // Register #ID keypad as submodal so hardware back button closes it
   useEffect(() => {
@@ -486,6 +504,16 @@ export const ArchiveScreen: React.FC = () => {
       conceptChipId: activeConceptChipId
     });
   }, [questions, statsMap, searchQuery, selectedSubject, statusFilter, activeConceptChipId]);
+
+  // Ensure expanded question is within visible list
+  useEffect(() => {
+    if (expandedId !== null) {
+      const idx = filteredQuestions.findIndex(q => q.id === expandedId);
+      if (idx >= visibleCount) {
+        setVisibleCount(Math.max(visibleCount, idx + 20));
+      }
+    }
+  }, [expandedId, filteredQuestions, visibleCount]);
 
   const hasActiveFilters = Boolean(
     searchQuery.trim() ||
@@ -822,14 +850,30 @@ export const ArchiveScreen: React.FC = () => {
             Nessun quiz trovato con i filtri attuali
           </div>
         ) : (
-          filteredQuestions.map(q => (
-            <ArchiveItem
-              key={q.id}
-              question={q}
-              isExpanded={expandedId === q.id}
-              onToggle={() => setExpandedId(expandedId === q.id ? null : q.id)}
-            />
-          ))
+          <>
+            {filteredQuestions.slice(0, visibleCount).map(q => (
+              <ArchiveItem
+                key={q.id}
+                question={q}
+                isExpanded={expandedId === q.id}
+                onToggle={() => setExpandedId(expandedId === q.id ? null : q.id)}
+              />
+            ))}
+            {filteredQuestions.length > visibleCount && (
+              <div className="pt-3 pb-2 text-center">
+                <button
+                  id="btn-archive-load-more"
+                  onClick={() => {
+                    setVisibleCount(prev => prev + 50);
+                    triggerHapticFeedback('tap');
+                  }}
+                  className="px-4 py-2.5 rounded-xl border border-zinc-800 bg-zinc-900 hover:bg-zinc-800 text-xs font-bold text-amber-400 light:bg-white light:border-slate-200 light:text-amber-700 light:hover:bg-slate-50 transition-all shadow-sm"
+                >
+                  Mostra altri ({filteredQuestions.length - visibleCount} rimanenti)
+                </button>
+              </div>
+            )}
+          </>
         )}
       </div>
     </div>

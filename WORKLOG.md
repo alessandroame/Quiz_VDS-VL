@@ -14,6 +14,34 @@ Questo documento registra in ordine cronologico tutte le lavorazioni svolte nel 
 - **Impatto sul Desiderata**: <Come questo intervento contribuisce al desiderata (cfr. DESIDERATA.md) e indicazioni per il prossimo agente>
 ```
 
+### [2026-09-29] - Fase 9 Hardening Tecnico: Resilienza Autoplay, E2E Headless, De-sottoscrizione Vocale e Code-Splitting Bundle
+- **Cosa abbiamo fatto**:
+  - **Stabilizzazione Autoplay (`src/components/QuestionCard.tsx`)**:
+    * Rimosso `isThisQuestionActive` dall'array delle dipendenze dell'`useEffect` di riproduzione automatica.
+    * Impiegato `isThisQuestionActiveRef` per consentire alla funzione di cleanup di arrestare l'audio esclusivamente se la domanda in fase di smontaggio era quella attiva.
+    * Eliminato il loop ricorsivo di mount/re-trigger e gli errori browser `AbortError` dell'elemento audio HTML5.
+  - **Consolidamento Suite Collaudi E2E Headless (`package.json`, `scripts/test_drive_flow_interactive.cjs`)**:
+    * Registrato lo script `"test:visual:review"` per verificare ad ogni commit il ciclo completo di simulazione esame, debriefing e rientro home a 0 errori console.
+    * Creato lo script `scripts/test_drive_flow_interactive.cjs` e registrato `"test:visual:drive:flow"` per testare l'apertura della Modalità Audio, avvio Radio Quiz, risposta touch/vocale e chiusura a 0 errori console.
+  - **De-sottoscrizione Vocale e Paginazione Catalogo (`src/components/ArchiveScreen.tsx`)**:
+    * Estratto il sotto-componente `<ArchiveItemExpandedContent>` affinché l'hook `useAviationVoice(q.id)` sia invocato esclusivamente quando la card del quiz è espansa (`isExpanded === true`).
+    * Ridotti i listener concorrenti in `voiceService` da 474 a 0 (o 1 solo per il quiz aperto), azzerando i 474 re-render concorrenti ad ogni transizione audio.
+    * Introdotta paginazione progressiva con batch iniziale da 50 quesiti e pulsante "Mostra altri", con auto-inclusione per salto rapido #ID.
+  - **Code-Splitting Dinamico con `React.lazy()` & Chunks Rollup (`src/App.tsx`, `vite.config.ts`)**:
+    * Convertite con `React.lazy()` e fallback `Suspense` minimale tutte le viste secondarie pesanti (`DriveModeScreen`, `SettingsModal`, `ArchiveScreen`, `StatsScreen`, `TopicsScreen`, `MistakesScreen`).
+    * Ricalibrato `manualChunks` in `vite.config.ts` isolando `quiz-dataset` (~393 kB) e `vendor` (~334 kB).
+    * Ridotto il bundle di ingresso principale `dist/assets/index.js` da **931.78 kB** a **163.25 kB** (abbattimento dell'82.5%), eliminando qualsiasi warning di Vite (`chunkSizeWarningLimit`).
+  - **Aggiornamento Avanzamento Lavori (`TODO.md`)**:
+    * Spuntati come completati al 100% i punti 1, 2, 3 e 4 della Fase 9.
+- **Scelte architetturali & Rationale**:
+    * *Ref per stato audio attivo*: Disaccoppiare la reattività del flag audio dai trigger di ciclo di vita della scheda impedisce a React di riavviare gli effetti audio a cascata.
+    * *Montaggio condizionale dell'hook vocale*: Invocare hook in 474 card statiche creava un collo di bottiglia inaccettabile su smartphone; montare la logica audio solo all'espansione garantisce performance da app nativa.
+    * *Code-Splitting del dataset vs inline*: Separare il JSON da 450 kB in un chunk autonomo consente al browser e a Workbox di memorizzarlo in cache separatamente dal codice applicativo, rendendo gli aggiornamenti di versione quasi istantanei.
+- **Impatto sul Desiderata**:
+    * Garantita massima reattività, velocità di cold-start e stabilità runtime a zero errori console su mobile, rispettando pienamente i requisiti di affidabilità della PWA.
+
+---
+
 ---
 
 ### [2026-09-29] - Audit Tecnico Approfondito e Piano di Hardening (Fase 9)

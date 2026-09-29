@@ -21,6 +21,8 @@
     "test:visual:discipline": "node scripts/test_discipline_filters.cjs",
     "test:visual:onboarding": "node scripts/test_discipline_onboarding.cjs",
     "test:visual:nav": "node scripts/test_navigator_visual.cjs",
+    "test:visual:review": "node scripts/test_review_navigation_and_voice.cjs",
+    "test:visual:drive:flow": "node scripts/test_drive_flow_interactive.cjs",
     "build:audio:manifest": "python scripts/generate_audio_manifest.py",
     "worklog:consolidate": "node scripts/consolidate_worklog.cjs",
     "worklog:consolidate:dry": "node scripts/consolidate_worklog.cjs --dry-run"

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Bookmark, Flag, Edit3, CheckCircle2, XCircle, Volume2, Play, Pause, RotateCcw, Square, FileText, Trash2 } from 'lucide-react';
 import type { Question } from '../types/quiz';
 import { useQuiz } from '../context/QuizContext';
@@ -58,17 +58,23 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({
 
   const isBookmarked = stat?.isBookmarked || false;
 
+  // Track whether this question is active in audio playback without triggering effect re-execution
+  const isThisQuestionActiveRef = useRef(isThisQuestionActive);
+  useEffect(() => {
+    isThisQuestionActiveRef.current = isThisQuestionActive;
+  }, [isThisQuestionActive]);
+
   // Stops audio on question change, or starts autoplay if enabled
   useEffect(() => {
     if (settings.ttsEnabled && settings.ttsAutoPlayQuestion) {
       playFullSequence();
     }
     return () => {
-      if (isThisQuestionActive) {
+      if (isThisQuestionActiveRef.current) {
         stop();
       }
     };
-  }, [question.id, isThisQuestionActive, playFullSequence, stop, settings.ttsEnabled, settings.ttsAutoPlayQuestion]);
+  }, [question.id, playFullSequence, stop, settings.ttsEnabled, settings.ttsAutoPlayQuestion]);
 
   // Speech keyboard shortcuts (V: Play/Pause sequence, R or Shift+V: Restart sequence, Q: Question toggle, Shift+Q: Restart question, Alt+1/2/3: Option toggle, Alt+Shift+1/2/3: Restart option, E: Explanation toggle, Shift+E: Restart explanation, Esc: Stop)
   useEffect(() => {

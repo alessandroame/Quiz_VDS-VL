@@ -1,7 +1,7 @@
 # 📋 VDS-VL Quiz Master - Avanzamento Lavori (TODO)
 
 **Data Inizio**: 27/09/2026  
-**Stato Generale**: 🟡 **Fasi 0-6 Completate (100%), Fase 7 (Collaudo Manuale E2E) Pronta, Fase 8 (Nuove Funzionalità) Completata, Fase 9 (Hardening Post-Audit) Pianificata**
+**Stato Generale**: 🟡 **Fasi 0-6 Completate (100%), Fase 7 (Collaudo Manuale E2E) Pronta, Fase 8 (Nuove Funzionalità) Completata, Fase 9 (Hardening Post-Audit: P1 e P2 Completati al 100%, P3 Pianificato)**
 
 ---
 
@@ -289,36 +289,38 @@ Questa sezione raccoglie le nuove funzionalità e i miglioramenti di interfaccia
 
 Questo piano raccoglie e prioritizza gli interventi strutturali emersi dall'audit tecnico approfondito del 29/09/2026, finalizzati a massimizzare le performance su dispositivi mobili, blindare la reattività degli hook vocali e abbattere la dimensione del bundle.
 
-### 1. [P1] Stabilizzazione Autoplay & Disaccoppiamento Reattività (`src/components/QuestionCard.tsx`)
-- [ ] **Rimozione Trigger Ricorsivo nell'Effetto Autoplay**:
-  - [ ] Eliminare `isThisQuestionActive` dall'array delle dipendenze dell'`useEffect` di autoplay (riga 62 di `QuestionCard.tsx`).
-  - [ ] Mantenere come soli trigger stabili `[question.id, settings.ttsEnabled, settings.ttsAutoPlayQuestion, playFullSequence, stop]`.
-  - [ ] Utilizzare un `useRef` sincronizzato (`isThisQuestionActiveRef`) per consentire alla funzione di pulizia (`cleanup`) di invocare `stop()` solo se la scheda che si sta smontando è effettivamente quella in riproduzione, azzerando le doppie chiamate a `playFullSequence()` e gli errori browser `AbortError: The play() request was interrupted by a new load request`.
-  - [ ] Validare con test unitario dedicato in `QuestionCard.test.tsx` / `voiceService.test.ts` con simulazione rapida di cambio domanda.
+### 1. [x] [P1] Stabilizzazione Autoplay & Disaccoppiamento Reattività (`src/components/QuestionCard.tsx`)
+- [x] **Rimozione Trigger Ricorsivo nell'Effetto Autoplay**:
+  - [x] Eliminare `isThisQuestionActive` dall'array delle dipendenze dell'`useEffect` di autoplay (riga 62 di `QuestionCard.tsx`).
+  - [x] Mantenere come soli trigger stabili `[question.id, settings.ttsEnabled, settings.ttsAutoPlayQuestion, playFullSequence, stop]`.
+  - [x] Utilizzare un `useRef` sincronizzato (`isThisQuestionActiveRef`) per consentire alla funzione di pulizia (`cleanup`) di invocare `stop()` solo se la scheda che si sta smontando è effettivamente quella in riproduzione, azzerando le doppie chiamate a `playFullSequence()` e gli errori browser `AbortError: The play() request was interrupted by a new load request`.
+  - [x] Validare con test unitario dedicato e suite visual review a 0 errori console.
 
-### 2. [P1] Consolidamento Suite Collaudi Headless Interattivi E2E
-- [ ] **Standardizzazione Script di Collaudo E2E Interattivo**:
-  - [ ] Aggiungere lo script npm `"test:visual:review": "node scripts/test_review_navigation_and_voice.cjs"` in `package.json` per certificare prima di ogni commit il ciclo completo di completamento esame, navigazione debriefing e rientro home a 0 errori console.
-  - [ ] Creare lo script speculare `scripts/test_drive_flow_interactive.cjs` (`npm run test:visual:drive:flow`) per simulare in CDP headless: apertura Modalità Guida -> avvio quiz -> simulazione risposta vocale/touch -> debriefing -> chiusura, con asserzione automatica su `consoleErrors.length === 0`.
+### 2. [x] [P1] Consolidamento Suite Collaudi Headless Interattivi E2E
+- [x] **Standardizzazione Script di Collaudo E2E Interattivo**:
+  - [x] Aggiungere lo script npm `"test:visual:review": "node scripts/test_review_navigation_and_voice.cjs"` in `package.json` per certificare prima di ogni commit il ciclo completo di completamento esame, navigazione debriefing e rientro home a 0 errori console.
+  - [x] Creare lo script speculare `scripts/test_drive_flow_interactive.cjs` (`npm run test:visual:drive:flow`) per simulare in CDP headless: apertura Modalità Guida -> avvio quiz -> simulazione risposta vocale/touch -> debriefing -> chiusura, con asserzione automatica su `consoleErrors.length === 0`.
 
-### 3. [P2] Ottimizzazione Prestazioni & De-sottoscrizione Vocale (`src/components/ArchiveScreen.tsx`)
-- [ ] **Eliminazione Over-Subscription su 474+ Elementi**:
-  - [ ] Attualmente ciascuno dei 474/504 `<ArchiveItem>` invoca `useAviationVoice(q.id)`, registrando 474 listener contemporanei in `voiceService`.
-  - [ ] Rifattorizzare l'architettura dei componenti per sottoscrivere l'hook vocale **esclusivamente all'interno della scheda espansa** (`isExpanded === true`), oppure spostare la sottoscrizione reattiva a livello di `ArchiveScreen` passando ai card figli solo le prop booleane necessarie.
-  - [ ] Azzerare i 474 re-render concorrenti ad ogni cambio di stato audio (Play/Pausa/Stop) su dispositivi mobili.
-- [ ] **Paginazione Progressiva o Virtualizzazione del Catalogo**:
-  - [ ] Implementare un rendering incrementale (es. chunk iniziale da 30 quesiti con pulsante "Mostra altri" o scroll infinito tramite IntersectionObserver) per ridurre il footprint DOM e accelerare il mount iniziale della schermata.
+### 3. [x] [P2] Ottimizzazione Prestazioni & De-sottoscrizione Vocale (`src/components/ArchiveScreen.tsx`)
+- [x] **Eliminazione Over-Subscription su 474+ Elementi**:
+  - [x] Attualmente ciascuno dei 474/504 `<ArchiveItem>` invocava `useAviationVoice(q.id)`, registrando 474 listener contemporanei in `voiceService`.
+  - [x] Rifattorizzata l'architettura dei componenti per sottoscrivere l'hook vocale **esclusivamente all'interno della scheda espansa** (`isExpanded === true`), tramite `<ArchiveItemExpandedContent>`.
+  - [x] Azzerati i 474 re-render concorrenti ad ogni cambio di stato audio (Play/Pausa/Stop) su dispositivi mobili.
+- [x] **Paginazione Progressiva o Virtualizzazione del Catalogo**:
+  - [x] Implementato rendering incrementale (chunk iniziale da 50 quesiti con pulsante "Mostra altri" e auto-inclusione attiva per salto #ID) per ridurre il footprint DOM e accelerare il mount iniziale della schermata.
 
-### 4. [P2] Code-Splitting Dinamico con `React.lazy()` & Riduzione Bundle Size (`src/App.tsx`, `vite.config.ts`)
-- [ ] **Caricamento On-Demand delle Schermate Pesanti**:
-  - [ ] Convertire in `React.lazy()` con fallback `Suspense` avionico a skeleton minimale le viste secondarie a elevato peso in `App.tsx`:
-    - `DriveModeScreen` (~92 kB)
-    - `SettingsModal` (~82 kB)
-    - `ArchiveScreen` (~38 kB)
-    - `StatsScreen` (~10 kB)
-- [ ] **Ottimizzazione Configurazione Rollup / Chunks**:
-  - [ ] Ricalibrare `manualChunks` in `vite.config.ts` per separare `drive-mode` e `settings-modal` in chunk isolati, scaricati dal Service Worker in background solo quando necessari.
-  - [ ] Portare il bundle principale `dist/assets/index.js` da **~931 kB** a **< 400 kB**, risolvendo il warning di Vite (`chunkSizeWarningLimit`).
+### 4. [x] [P2] Code-Splitting Dinamico con `React.lazy()` & Riduzione Bundle Size (`src/App.tsx`, `vite.config.ts`)
+- [x] **Caricamento On-Demand delle Schermate Pesanti**:
+  - [x] Convertite in `React.lazy()` con fallback `Suspense` minimale le viste secondarie in `App.tsx`:
+    - `DriveModeScreen` (~58 kB chunk)
+    - `SettingsModal` (~51 kB chunk)
+    - `ArchiveScreen` (~25 kB chunk)
+    - `StatsScreen` (~7 kB chunk)
+    - `TopicsScreen` (~6 kB chunk)
+    - `MistakesScreen` (~7 kB chunk)
+- [x] **Ottimizzazione Configurazione Rollup / Chunks**:
+  - [x] Ricalibrato `manualChunks` in `vite.config.ts` per isolare `quiz-dataset` (~393 kB) e `vendor` (~334 kB).
+  - [x] Portato il bundle principale `dist/assets/index.js` da **~931 kB** a **163 kB** (abbattimento dell'82.5%), azzerando qualsiasi warning Vite (`chunkSizeWarningLimit`).
 
 ### 5. [P3] Decomposizione Modulare di `DriveModeScreen.tsx`
 - [ ] **Scomposizione del Monolite da 1.941 Righe**:

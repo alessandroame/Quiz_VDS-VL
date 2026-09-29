@@ -1,16 +1,10 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, lazy, Suspense } from 'react';
 import { ThemeProvider } from './context/ThemeContext';
 import { QuizProvider, useQuiz } from './context/QuizContext';
 import { Navbar, type NavTab } from './components/Navbar';
 import { HomeScreen } from './components/HomeScreen';
 import { getTabLabel } from './utils/navigation';
 import { ExamScreen } from './components/ExamScreen';
-import { TopicsScreen } from './components/TopicsScreen';
-import { MistakesScreen } from './components/MistakesScreen';
-import { ArchiveScreen } from './components/ArchiveScreen';
-import { StatsScreen } from './components/StatsScreen';
-import { SettingsModal } from './components/SettingsModal';
-import { DriveModeScreen } from './components/DriveModeScreen';
 import { OfflineBanner } from './components/OfflineIndicator';
 import { Download, AlertTriangle, Play, ArrowRight, X } from 'lucide-react';
 import { voiceService } from './services/voiceService';
@@ -21,6 +15,20 @@ import {
   executeBackAction,
   type BackNavigationContext
 } from './utils/backNavigation';
+
+// Lazy-loaded secondary screens for code-splitting and bundle reduction
+const TopicsScreen = lazy(() => import('./components/TopicsScreen').then(m => ({ default: m.TopicsScreen })));
+const MistakesScreen = lazy(() => import('./components/MistakesScreen').then(m => ({ default: m.MistakesScreen })));
+const ArchiveScreen = lazy(() => import('./components/ArchiveScreen').then(m => ({ default: m.ArchiveScreen })));
+const StatsScreen = lazy(() => import('./components/StatsScreen').then(m => ({ default: m.StatsScreen })));
+const SettingsModal = lazy(() => import('./components/SettingsModal').then(m => ({ default: m.SettingsModal })));
+const DriveModeScreen = lazy(() => import('./components/DriveModeScreen').then(m => ({ default: m.DriveModeScreen })));
+
+const ScreenFallback = () => (
+  <div className="flex items-center justify-center p-16 text-zinc-500 text-xs">
+    <div className="w-5 h-5 border-2 border-amber-500/40 border-t-amber-500 rounded-full animate-spin" />
+  </div>
+);
 
 function AppContent() {
   const {
@@ -332,41 +340,51 @@ function AppContent() {
 
       {/* Schermata Attiva */}
       <main>
-        {activeTab === 'home' && <HomeScreen onSelectTab={handleSelectTab} />}
-        {activeTab === 'tutor' && (
-          <ExamScreen
-            key="tutor"
-            initialMode="tutor"
-            onNavigateHome={() => handleSelectTab('home')}
-            onSwitchMode={(mode) => handleSelectTab(mode === 'tutor' ? 'tutor' : 'exam')}
-          />
-        )}
-        {activeTab === 'exam' && (
-          <ExamScreen
-            key="exam"
-            initialMode="official"
-            onNavigateHome={() => handleSelectTab('home')}
-            onSwitchMode={(mode) => handleSelectTab(mode === 'tutor' ? 'tutor' : 'exam')}
-          />
-        )}
-        {activeTab === 'topics' && <TopicsScreen />}
-        {activeTab === 'mistakes' && <MistakesScreen />}
-        {activeTab === 'archive' && <ArchiveScreen />}
-        {activeTab === 'stats' && <StatsScreen />}
+        <Suspense fallback={<ScreenFallback />}>
+          {activeTab === 'home' && <HomeScreen onSelectTab={handleSelectTab} />}
+          {activeTab === 'tutor' && (
+            <ExamScreen
+              key="tutor"
+              initialMode="tutor"
+              onNavigateHome={() => handleSelectTab('home')}
+              onSwitchMode={(mode) => handleSelectTab(mode === 'tutor' ? 'tutor' : 'exam')}
+            />
+          )}
+          {activeTab === 'exam' && (
+            <ExamScreen
+              key="exam"
+              initialMode="official"
+              onNavigateHome={() => handleSelectTab('home')}
+              onSwitchMode={(mode) => handleSelectTab(mode === 'tutor' ? 'tutor' : 'exam')}
+            />
+          )}
+          {activeTab === 'topics' && <TopicsScreen />}
+          {activeTab === 'mistakes' && <MistakesScreen />}
+          {activeTab === 'archive' && <ArchiveScreen />}
+          {activeTab === 'stats' && <StatsScreen />}
+        </Suspense>
       </main>
 
       {/* Schermata Impostazioni Fullscreen */}
-      <SettingsModal
-        isOpen={isSettingsOpen}
-        onClose={handleCloseSettings}
-      />
+      {isSettingsOpen && (
+        <Suspense fallback={null}>
+          <SettingsModal
+            isOpen={isSettingsOpen}
+            onClose={handleCloseSettings}
+          />
+        </Suspense>
+      )}
 
       {/* Modalità Audio Fullscreen */}
-      <DriveModeScreen
-        isOpen={isDriveModeOpen}
-        onClose={handleCloseDriveMode}
-        sessionContext={driveSessionContext || undefined}
-      />
+      {isDriveModeOpen && (
+        <Suspense fallback={null}>
+          <DriveModeScreen
+            isOpen={isDriveModeOpen}
+            onClose={handleCloseDriveMode}
+            sessionContext={driveSessionContext || undefined}
+          />
+        </Suspense>
+      )}
 
       {/* Modal di Avviso Cambio Pagina durante Esame Attivo */}
       {pendingTab && (
