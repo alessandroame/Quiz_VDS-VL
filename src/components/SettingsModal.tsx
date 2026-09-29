@@ -26,7 +26,8 @@ import {
   ArrowLeft,
   Maximize2,
   Minimize2,
-  ChevronDown
+  ChevronDown,
+  RefreshCw
 } from 'lucide-react';
 import { useTheme } from '../context/ThemeContext';
 import { useQuiz } from '../context/QuizContext';
@@ -35,7 +36,12 @@ import { voiceService } from '../services/voiceService';
 import { exportDatabaseBackup, importDatabaseBackup, db } from '../db';
 import type { ThemeMode } from '../types/database';
 import { VoiceCommandsModal } from './VoiceCommandsModal';
-import { audioDownloadManager, VoiceName, VoiceDownloadProgress } from '../services/audioDownloadManager';
+import {
+  audioDownloadManager,
+  VoiceName,
+  VoiceDownloadProgress,
+  AudioUpdateCheckResult
+} from '../services/audioDownloadManager';
 import { DisciplineSelector } from './DisciplineSelector';
 
 export type SettingsTab = 'appearance' | 'voice' | 'drive' | 'cloud' | 'data' | 'about';
@@ -163,7 +169,51 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
   const [audioStatuses, setAudioStatuses] = useState<Record<VoiceName, VoiceDownloadProgress>>(
     audioDownloadManager.getAllStatuses()
   );
+  const [updateCheckResult, setUpdateCheckResult] = useState<AudioUpdateCheckResult | null>(null);
+  const [isCheckingAudioUpdates, setIsCheckingAudioUpdates] = useState(false);
+  const [updatingVoices, setUpdatingVoices] = useState<Partial<Record<VoiceName, boolean>>>({});
+  const [voiceUpdateProgress, setVoiceUpdateProgress] = useState<Partial<Record<VoiceName, number>>>({});
+  const [audioUpdateToast, setAudioUpdateToast] = useState<string | null>(null);
   const sectionRefs = useRef<Record<string, HTMLDivElement | null>>({});
+
+  const handleCheckAudioUpdates = async () => {
+    setIsCheckingAudioUpdates(true);
+    try {
+      const res = await audioDownloadManager.checkAudioUpdates();
+      setUpdateCheckResult(res);
+      if (!res.hasUpdates) {
+        setAudioUpdateToast(res.isOffline ? 'Offline: impossibile verificare aggiornamenti' : 'Archivio audio già aggiornato!');
+        setTimeout(() => setAudioUpdateToast(null), 3000);
+      }
+    } catch {
+      setAudioUpdateToast('Errore durante la verifica');
+      setTimeout(() => setAudioUpdateToast(null), 3000);
+    } finally {
+      setIsCheckingAudioUpdates(false);
+    }
+  };
+
+  const handleApplyAudioUpdates = async (voice: VoiceName) => {
+    setUpdatingVoices(prev => ({ ...prev, [voice]: true }));
+    setVoiceUpdateProgress(prev => ({ ...prev, [voice]: 0 }));
+    try {
+      const res = await audioDownloadManager.applyAudioUpdates(voice, (pct) => {
+        setVoiceUpdateProgress(prev => ({ ...prev, [voice]: pct }));
+      });
+      if (res.updatedCount > 0) {
+        setAudioUpdateToast(`Aggiornati ${res.updatedCount} file audio di ${voice === 'giuseppe' ? 'Giuseppe' : 'Elsa'}`);
+        setTimeout(() => setAudioUpdateToast(null), 3500);
+      }
+      const updatedCheck = await audioDownloadManager.checkAudioUpdates();
+      setUpdateCheckResult(updatedCheck);
+    } catch (err: any) {
+      setAudioUpdateToast(err?.message || 'Errore aggiornamento');
+      setTimeout(() => setAudioUpdateToast(null), 3000);
+    } finally {
+      setUpdatingVoices(prev => ({ ...prev, [voice]: false }));
+    }
+  };
+
 
   useEffect(() => {
     if (isOpen) {
