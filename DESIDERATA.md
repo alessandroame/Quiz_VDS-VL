@@ -148,7 +148,7 @@ Questo documento rappresenta la **bussola strategica e funzionale** del progetto
 | Modalità Tutor nella Modalità Guida | 🟢 Completato | Lettura vocale Regola+Tranello sincronizzata col Pilota Automatico, Scheda Didattica HUD zero-scroll 100dvh, toggle in Launcher/HUD/Settings/QuickMenu e comandi vocali. |
 | Risoluzione Interruzione Spiegazione Vocale | 🟢 Completato | Eliminato timeout prematuro 3.5s, sincronizzazione event-driven con audio ended + pausa di assimilazione (2.5s) e safety guard 4.5s. |
 | Perfezionamento Spiegazioni Didattiche (Regola & Tranello) | 🟢 Completato (504/504 Quiz - 100%) | Revisione semantica e didattica completata per tutti i 504 quiz AeCI (9 materie su 9). Ogni domanda dispone di Regola e Tranello specifici, univoci al 100% e certificati dal test DATA-09. Refusi OCR storici del PDF cartaceo eliminati da tutte le materie. Database audio neurale Giuseppe ed Elsa completamente allineato con manifest.json. |
-| Riorganizzazione Home Hub & Back Navigation | 🟡 In Roadmap (TODO) | Pattern a cruscotto Home con 6 macro-pulsanti tattili (`TUTOR`, `MATERIE`, `ESAME`, `ERRORI`, `CERCA`, `STATS`) e mini-header con `[← Home]` nei quiz per liberare oltre 50px verticali. |
+| Riorganizzazione Home Hub & Back Navigation | 🟢 Completato | Pattern a cruscotto Home con 6 macro-pulsanti tattili (`TUTOR`, `MATERIE`, `ESAME`, `ERRORI`, `CERCA`, `STATS`), banner sessione attiva e mini-header con `[← Home]` nei quiz per liberare oltre 50px verticali. |
 | Potatura Radicale Quiz Deltaplano | 🟢 Completato | Focus 100% su Parapendio (474 quiz), rimozione definitiva dei 30 quiz deltaplano e pulizia di tutti i selettori, modali e badge correlati. |
 | Layout Zero-Scroll a Margini Compatti | 🟡 In Roadmap (TODO) | Viewport bloccato a `100dvh` con padding ridotti (`p-3`), card compatta e leading stretto per visualizzare sempre domanda, opzioni e pulsanti senza scroll su mobile. |
 | Modalità Audio (Audiolibro Hands-Free) & Switch Universale | 🟡 In Roadmap (TODO) | Riconcettualizzazione da "Modalità Guida" a "Modalità Audio" con pulsante `AUDIO` accessibile in qualunque quiz per passare al volo all'ascolto senza perdere lo stato. |
@@ -166,10 +166,10 @@ Questa roadmap sintetizza il piano di riorganizzazione per massimizzare l'usabil
    - Esclusione dei 30 quesiti specifici per il deltaplano, fissando il pool stabile a **474 quiz**.
    - Eliminazione definitiva del componente `DisciplineSelector` dalle schermate e impostazioni.
    - Rimozione dei badge grafici "Deltaplano / Parapendio" su tutte le card dei quiz.
-2. **TODO-02: Architettura "Home Hub + Back Navigation"**:
+2. **TODO-02: Architettura "Home Hub + Back Navigation"** `[COMPLETATO]`:
    - Creazione del componente `HomeScreen.tsx` con 6 macro-pulsanti ad alto contrasto.
    - Eliminazione della top bar permanente a 6 voci nelle schermate interne.
-   - Adozione di una mini-header (~40px) con pulsante `[← Home]`, titolo essenziale e toggle `AUDIO`.
+   - Adozione di una mini-header (~48px) con pulsante `[← Home]`, titolo essenziale e toggle `AUDIO`.
 3. **TODO-03: Modalità Audio (Stile Audiolibro Hands-Free) & Macro-Target Bici/Corsa**:
    - Rinominare "Modalità Guida" in "Modalità Audio" con iconografia monocromatica a cuffie.
    - 3 macro-fasce risposta a tutta larghezza con altezza minima 75-85px, spaziatura protetta e feedback aptico per prevenire miss-clicks su manubrio o durante la corsa.

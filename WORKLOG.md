@@ -14,6 +14,49 @@ Questo documento registra in ordine cronologico tutte le lavorazioni svolte nel 
 - **Impatto sul Desiderata**: <Come questo intervento contribuisce al desiderata (cfr. DESIDERATA.md) e indicazioni per il prossimo agente>
 ```
 
+# Registro di Bordo: TODO-02 Architettura Home Hub & Back Navigation
+
+- **Data**: 2026-09-29
+- **Autore/Agente**: Antigravity Cockpit Specialist
+- **Tipo di Intervento**: `feat(navigation)`
+- **Argomento**: Implementazione Home Hub Cockpit V2, eliminazione barra a 6 tab permanente e mini-header con back navigation.
+
+---
+
+### 1. Cosa abbiamo fatto
+- **Modulo di Navigazione Puro (`src/utils/navigation.ts`)**:
+  - Definiti i tipi `ScenarioTab` e `AppTab` ('home' + 6 scenari: 'tutor', 'topics', 'exam', 'mistakes', 'archive', 'stats').
+  - Mappati i 6 macro-pulsanti con label avioniche brevi, shortcut numerici `1`..`6`, descrizioni d'azione e colori tematici.
+  - Implementate funzioni pure di utilità: `getShortcutKey`, `getTabByShortcut`, `isQuizScenario`, `getHeaderTitle`, `isScenarioTab`.
+- **Suite di Test Dedicata (`src/utils/navigation.test.ts`)**:
+  - 5 test unitari (`NAV-01`..`NAV-05`) a copertura totale delle utility pure di navigazione e validazione dei 6 scenari.
+- **Componente Home Hub (`src/components/HomeScreen.tsx`)**:
+  - 6 macro-pulsanti tattili ad alto contrasto (griglia 2x3 o 3x2) con badge scorciatoia tastiera `[1]`..`[6]`.
+  - Telemetria d'allievo in evidenza: % prontezza esame, quiz esplorati su 474, errori pendenti nel quaderno Leitner.
+  - Accesso rapido alla Modalità Audio direttamente dalla Home.
+  - Banner di ripresa sessione d'esame attiva qualora l'utente torni alla Home prima di concludere.
+- **Cockpit Navbar Snella & Mini-Header (`src/components/Navbar.tsx`)**:
+  - In schermata `'home'`: single-tier compatto (56px) con brand Aero Shield, versione app, audio toggle, rete offline, guida rapida e impostazioni.
+  - Nelle schermate interne di studio/esame: eliminata completamente la barra secondaria a schede (risparmio di ~50-60px verticali). Introdotto mini-header ultra-compatto (48px) con pulsante `[← Home]`, indicatore testuale dello scenario e pulsante rapido `AUDIO`.
+- **Integrazione `ExamScreen.tsx` e `App.tsx`**:
+  - Ricalibrato l'offset sticky per l'HUD esame (`top-[52px]` anziché `top-[102px]`).
+  - Salvaguardia abbandono esame: se l'allievo preme `[← Home]` durante un esame attivo, si apre la modale di conferma per prevenire perdite involontarie di progresso.
+  - Supporto nativo per i 6 scenari e tab iniziale `'home'`.
+
+---
+
+### 2. Scelte Architetturali & Rationale
+- **Recupero Verticale per Layout Zero-Scroll**: La rimozione del secondo tier della Navbar nei quiz recupera spazio prezioso sul mobile (390x844), permettendo a testo della domanda, 3 opzioni e bottom bar di coesistere senza scorrimento verticale.
+- **Disaccoppiamento della Navigazione**: Logica dei tasti e shortcut isolata in `navigation.ts` senza dipendenze da React, testabile a 0ms con Vitest.
+
+---
+
+### 3. Impatto sul Desiderata
+- Completa al 100% il punto 2 della Roadmap Cockpit V2 (**TODO-02** in [DESIDERATA.md](file:///d:/Github/Quiz_VDS-VL/DESIDERATA.md)).
+- Prepara il terreno per **TODO-03** (Modalità Audio con Macro-Target Bici/Corsa e switch universale senza perdita di stato) e **TODO-04** (Layout Zero-Scroll).
+
+---
+
 ### [2026-09-29] - TODO-01: Potatura Radicale del Deltaplano (Focus 100% Parapendio)
 - **Cosa abbiamo fatto**:
   - **Fissaggio Pool Stabile a 474 Quiz (100% Parapendio)**:
