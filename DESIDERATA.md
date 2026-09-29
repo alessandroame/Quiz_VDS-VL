@@ -6,11 +6,11 @@ Questo documento rappresenta la **bussola strategica e funzionale** del progetto
 
 ## 1. Visione del Prodotto
 
-**VDS-VL Quiz Master** è una Progressive Web App (PWA) moderna, ad alte prestazioni, 100% offline-first e con interfaccia ergonomica in stile avionico (*cockpit*).  
+**VDS-VL Quiz Master** è una Progressive Web App (PWA) moderna, ad alte prestazioni, 100% offline-first e con interfaccia ergonomica minimale (zero distrazioni).  
 È progettata per gli allievi piloti di **Volo Libero (Parapendio e Deltaplano)** che preparano l'esame teorico per il conseguimento dell'attestato VDS/VL (Volo da Diporto o Sportivo) secondo le norme vigenti dell'Aero Club d'Italia (AeCI) e del D.P.R. 133/2010.
 
 ### Principi Filosofici
-1. **Zero Distrazioni, Cockpit Style**: L'interfaccia deve richiamare la strumentazione avionica: contrasto elevatissimo, leggibilità perfetta sotto la luce solare diretta sul campo di volo o in decollo, microcopy secco e telegrafico, zero fronzoli grafici non funzionali.
+1. **Zero Distrazioni & Ergonomia di Studio**: L'interfaccia è studiata per massimizzare la concentrazione e l'apprendimento veloce: contrasto elevato, leggibilità perfetta su qualsiasi schermo e condizione di luce, microcopy secco ed essenziale, zero fronzoli grafici non funzionali. L'utente sta studiando la teoria del volo per superare l'esame: ogni elemento a schermo deve servire l'apprendimento senza attrito cognitivo.
 2. **Offline-First Assoluto & Zero Backend**: L'applicazione non dispone di alcun server o database remoto proprietario. Funziona al 100% offline tramite Service Worker. I dati utente risiedono esclusivamente nel browser (IndexedDB via Dexie.js).
 3. **Privacy & Sovranità dei Dati**: Nessun tracciamento o profilazione. Il salvataggio cloud è opzionale, gestito direttamente dall'utente verso la propria cartella privata Google Drive (`appDataFolder`) o tramite file JSON esportabili.
 4. **Apprendimento Deterministico & Anti-Frustrazione**: Risoluzione del problema statistico del "collezionista di figurine" tramite il *Fair Coverage Randomizer*, e consolidamento degli errori tramite ripetizione spaziata (Leitner).
@@ -70,20 +70,20 @@ Questo documento rappresenta la **bussola strategica e funzionale** del progetto
    - Storico temporale delle sessioni d'esame e grafico di tendenza.
    - Elenco dei quiz più sbagliati (Top 10 ostacoli).
 
-6. **Audio & Feedback Sonoro Avionico**:
-   - Suoni cockpit di conferma/allerta opzionali.
+6. **Audio & Feedback Sonoro Didattico**:
+   - Suoni di conferma/allerta opzionali.
    - Sintesi vocale neurale italiana (voci Giuseppe/Elsa) con fonetica aeronautica ICAO ed estrema concisione (pronuncia del solo testo della domanda, omettendo numero e materia per azzerare i preamboli verbali).
    - **Controlli Parlato Interattivi**: Riproduzione flessibile con Play, Pausa (con preservazione della posizione esatta senza ricominciare da capo), Riprendi, e Riavvio istantaneo dall'inizio ("Da capo" / tasto `R` o `Shift+V`) anche mentre l'audio sta parlando.
    - Quick Speech Menu sempre accessibile nell'header: controllo istantaneo a 1 clic per voce istruttore (Giuseppe/Elsa), velocità di riproduzione, lettura automatica e muting senza interruzioni o modali pesanti.
    - **Invalidazione & Aggiornamento Differenziale Audio Offline (Opzione A + Opzione 1)**: meccanismo intelligente per mantenere allineati i file audio MP3 salvati in `CacheStorage`. Manifest leggero con hash MD5 a 8 caratteri (`public/audio/manifest.json`), strategia Workbox `NetworkFirst`, download selettivo dei soli frammenti modificati senza riscaricare l'intero archivio da 150 MB, sincronizzazione automatica silenziosa all'avvio dell'app se connessi a Internet e soppressione del prompt di download in Modalità Guida se le voci sono già state salvate localmente.
 
-7. **Modalità Alla Guida (Truck & Cockpit Drive Mode)**:
+7. **Modalità Alla Guida (Truck & Drive Mode)**:
    - Vista a tutto schermo con viewport bloccato (`100dvh`) e zero-scroll.
    - Tre macro-fasce tattili ad altissima leggibilità e contrasto elevato (Fitts's Law estrema).
    - Screen Wake Lock API integrato per prevenire lo spegnimento dello schermo su supporto/cruscotto.
    - Pilota Automatico ("Radio Quiz") continuo per studio e ripasso a mani libere senza tocco fisico.
    - Comandi vocali in lingua italiana tramite Web Speech Recognition ("Uno", "Due", "Tre", "Avanti", "Ripeti", "Pausa", "Aiuto").
-   - **Menu Rapido Impostazioni Voce Integrato (Quick Speech Menu)**: Controllo vocale istantaneo a 1 tocco integrato in tutti gli stati della guida (Launcher, HUD superiore durante il quiz attivo e Debriefing), con styling nativo Cockpit Dark (Zero-Blue) antiriflesso.
+   - **Menu Rapido Impostazioni Voce Integrato (Quick Speech Menu)**: Controllo vocale istantaneo a 1 tocco integrato in tutti gli stati della guida (Launcher, HUD superiore durante il quiz attivo e Debriefing), con styling nativo Dark (Zero-Blue) antiriflesso.
    - **Guida Contestuale & Feedback Vocale Reattivo**: icona microfono pulsante con onda radar durante la ricezione comandi, trascrizione in tempo reale nel banner HUD, conferme comando, diagnostica trasparente su frasi non riconosciute e Cheat Sheet rapido con pulsante '?'.
    - **Spiegazione Vocale di Benvenuto (Audio Briefing Run-Once)**: All'avvio della modalità alla guida, un audio neurale conciso illustra il funzionamento a mani libere (Wake Lock, lettura automatica quesiti, risposte touch e comandi vocali "Uno", "Due", "Tre", "Ripeti", "Aiuto"). Eseguito una sola volta in automatico (`driveModeIntroPlayed: true`), con possibilità di riascolto on-demand (Launcher, Cheat Sheet) o riattivazione all'avvio dalle Impostazioni.
    - **Modalità Tutor Didattica nella Modalità Guida**: Funzionalità hands-free avanzata per lo studio approfondito a mani libere durante la guida. Invece della sola risposta corretta, il motore vocale neurale pronuncia l'intera spiegazione didattica (**Regola** e **Tranello**), mentre l'HUD visualizza le card didattiche ad alto contrasto rispettando il layout zero-scroll a `100dvh`. Il Pilota Automatico sincronizza la prosecuzione attendendo la fine della voce, e sono disponibili comandi vocali dedicati (*"Spiega"*, *"Regola"*, *"Tutor"*).
@@ -92,9 +92,9 @@ Questo documento rappresenta la **bussola strategica e funzionale** del progetto
    - Schermata impostazioni fullscreen nativa articolata su 6 aree tematiche (Aspetto, Voce, Guida, Cloud/Backup, Dati & Reset, About con riferimenti normativi AeCI e D.P.R. 133/2010).
    - Layout ad **accordion verticale compresso a mutua esclusione**: apertura di una sola sezione alla volta (`openSection: SettingsTab | null`), chiusura automatica delle altre, anteprime dinamiche dello stato attivo nei badge di testata, pulsante di collasso totale per una panoramica compatta a 1 schermata e zero layout shift.
 
-9. **Identità Visiva, Iconografia & Tema Carbon Cockpit (Zero-Blue)**:
+9. **Identità Visiva, Iconografia & Sistema Temi (Zero-Blue)**:
    - **Icona Ufficiale Aero Shield**: Logo PWA geometrico che unisce l'arco a cassoni del parapendio con l'ala triangolare a freccia 'V' del deltaplano (trave di chiglia e barra di controllo A-frame). Vettore SVG di precisione e icone PNG 192x192 e 512x512.
-   - **Tema Scuro Carbon Cockpit**: Eliminazione totale di qualsiasi dominante fredda o blu dal dark mode. Superfici carbon/grafite (`zinc-950`, `zinc-900`, `zinc-800`) e caldi accenti strumentali **Aviation Amber** (`amber-500` / `amber-600`) per la massima fedeltà e comfort visivo avionico.
+   - **Tema Scuro Minimale (Zero-Blue)**: Eliminazione totale di qualsiasi dominante fredda o blu dal dark mode. Superfici grafite (`zinc-950`, `zinc-900`, `zinc-800`) e caldi accenti ambra (`amber-500` / `amber-600`) per il massimo comfort visivo nello studio prolungato.
 
 10. **Ergonomia di Navigazione & Filtro Disciplina (Deltaplano / Parapendio)**:
    - **Barra di Navigazione Bloccata al Top**: Fissaggio permanente del menu di navigazione in alto (top sticky/fixed bar) per liberare la parte inferiore del viewport da barre fisse, ottimizzando l'area utile di lettura dei quiz e delle opzioni di risposta.
@@ -110,7 +110,7 @@ Questo documento rappresenta la **bussola strategica e funzionale** del progetto
 | :--- | :--- | :--- |
 | **Piattaforma** | PWA (Progressive Web App) | Installabile su iOS, Android, macOS e Windows senza store di terze parti. |
 | **Build Tool & Framework** | Vite + React 19 + TypeScript | Velocità estrema di build, HMR istantaneo, type safety rigorosa (`strict: true`). |
-| **Styling** | Tailwind CSS | Palette cockpit personalizzata, contrasto elevato, zero runtime CSS overhead. |
+| **Styling** | Tailwind CSS | Palette minimale personalizzata ad alto contrasto, zero runtime CSS overhead. |
 | **Persistenza (SSOT)** | Dexie.js (IndexedDB) | Storage asincrono, strutturato, indicizzato e reattivo; nessun limite dei 5MB di LocalStorage. |
 | **Randomizzazione** | Fair Coverage Algorithm | Assegnazione a bucket (`times_seen == 0` prima di tutto) per evitare il coupon collector problem. |
 | **Testing** | Vitest + fake-indexeddb | Suite veloce (<500ms), SRP puro per funzioni di calcolo, BVA, zero dipendenza da browser reale. |
@@ -129,18 +129,18 @@ Questo documento rappresenta la **bussola strategica e funzionale** del progetto
 | Quaderno Errori Leitner | 🟢 Completato | Uscita vincolata a 2 risposte esatte consecutive. |
 | Archivio & Ricerca Full-Text | 🟢 Completato | Ricerca istantanea, preferiti e note personali salvate in Dexie. |
 | Dashboard Statistiche | 🟢 Completato | Radar materie, preparazione esame e storico sessioni. |
-| Temi Carbon Cockpit & Hangar Light, Icona Aero Shield | 🟢 Completato | Zero dominante blu (`zinc` + `amber`), icona Aero Shield vettoriale e PNG 192/512. |
+| Temi Scuro & Chiaro, Icona Aero Shield | 🟢 Completato | Zero dominante blu (`zinc` + `amber`), icona Aero Shield vettoriale e PNG 192/512. |
 | Suite Vitest (Unit & BVA) | 🟢 Completato | 130 test attivi su 15 suite, soglie limite verificate, isolamento in-memory. |
-| Supporto Audio Avionico | 🟢 Completato | Sintesi vocale neurale con controlli Play/Pausa e Da Capo universali su domanda, singole opzioni e spiegazione; feedback cockpit Web Audio API e fonetica ICAO. |
+| Supporto Audio | 🟢 Completato | Sintesi vocale neurale con controlli Play/Pausa e Da Capo universali su domanda, singole opzioni e spiegazione; feedback Web Audio API e fonetica ICAO. |
 | Gestione Offline Audio & Fallback | 🟢 Completato | Download in background non bloccante via CacheStorage, prompt non invasivo al primo avvio Guida, gestione granulare Impostazioni, fallback automatico offline su voce scaricata e Range Requests Safari. |
 | Google Drive Cloud Sync | 🟢 Completato | Integrazione GIS con `appDataFolder` privata e fallback JSON export/import. |
-| Modalità Alla Guida | 🟢 Completato | Layout zero-scroll, Screen Wake Lock, Pilota Auto Radio Quiz, Speech Recognition, Quick Speech Menu integrato in tutti gli stati (Launcher, HUD quiz attivo, Debriefing) e pieno supporto bivalente Cockpit Dark / Hangar Light. |
+| Modalità Alla Guida | 🟢 Completato | Layout zero-scroll, Screen Wake Lock, Pilota Auto Radio Quiz, Speech Recognition, Quick Speech Menu integrato in tutti gli stati (Launcher, HUD quiz attivo, Debriefing) e pieno supporto Scuro / Chiaro. |
 | Quick Speech Menu (1-Click) | 🟢 Completato | Flyout compatto in Navbar e integrato a tutto schermo in Modalità Guida per controllo vocale rapido a 1 tocco. |
 | Schermata Impostazioni Fullscreen & About | 🟢 Completato | Esperienza nativa a tutto schermo (mobile & desktop), segmented tabs per 6 argomenti con scheda About (normativa AeCI e D.P.R. 133/2010) e supporto Schermo Intero. |
 | Guida Contestuale Comandi Vocali | 🟢 Completato | HUD live rotativo, Cheat Sheet modale a 1 tocco, trigger 'Aiuto' e box in Impostazioni. |
 | Indicatore Stato Offline & HUD Rete | 🟢 Completato | Pillola ambra in Navbar e HUD Guida, banner informativo e modale di briefing via createPortal con feedback di riconnessione ONLINE. |
 | Spiegazione Vocale Modalità Guida | 🟢 Completato | Audio briefing iniziale run-once con Edge-TTS (Giuseppe/Elsa), tasto Salta, persistenza Dexie, riascolto 1-click e riattivazione in Impostazioni. |
-| Filtro Quiz Esclusivi Deltaplano / Parapendio | 🟢 Completato | Parapendio impostato come default immediato (474 quiz: 428 comuni + 46 parapendio). Rimosso popup di onboarding iniziale e rimossi i selettori inline da Esame, Materie e Archivio per un cockpit essenziale e zero distrazioni. Selezione disciplina gestibile esclusivamente nelle Impostazioni. |
+| Filtro Quiz Esclusivi Deltaplano / Parapendio | 🟢 Completato | Parapendio impostato come default immediato (474 quiz: 428 comuni + 46 parapendio). Rimosso popup di onboarding iniziale e rimossi i selettori inline da Esame, Materie e Archivio per un'interfaccia essenziale e zero distrazioni. Selezione disciplina gestibile esclusivamente nelle Impostazioni. |
 | Blocco Menu di Navigazione al Top | 🟢 Completato | Barra di navigazione permanently fixed al top (`fixed top-0 left-0 right-0 z-40`), eliminata la bottom nav fissa e rimosso il preamble fuffa dalla schermata esame. |
 | Impostazioni ad Accordion Compresso Singolo | 🟢 Completato | Sostituzione pills menu con accordion verticale mutuo-esclusivo (1 sola sezione aperta alla volta, anteprime badge live, pulsante comprimi tutto ed espansione selettiva). |
 | Visualizzazione Globale Versione App | 🟢 Completato | Badge di versione dinamico (`__APP_VERSION__` e `__APP_BUILD_ID__`) visibile in Navbar e header Impostazioni. |
@@ -159,7 +159,7 @@ Questo documento rappresenta la **bussola strategica e funzionale** del progetto
 
 ---
 
-## 5. Roadmap di Riorganizzazione Ergonomica Cockpit V2 (TODO)
+## 5. Roadmap di Riorganizzazione Ergonomica V2 (TODO)
 
 Questa roadmap sintetizza il piano di riorganizzazione per massimizzare l'usabilità con il minimo numero di clic, zero scritte inutili e zero fronzoli commerciali:
 

@@ -20,7 +20,7 @@
 - [x] `.agents/skills/vds-exam-examiner` (Regolamento ufficiale AeCI & D.P.R. 133/2010)
 - [x] `.agents/skills/vds-quiz-extractor` (Pipeline estrazione PDF, normalizzazione, validazione)
 - [x] `.agents/skills/pwa-quiz-engine` (Fair Coverage Randomizer, Dexie DB, Drive Backup, PWA)
-- [x] `.agents/skills/aviation-ui-ux` (Design cockpit avionico, microcopy minimale, temi chiaro/scuro/auto)
+- [x] `.agents/skills/minimal-ui-ux` (Design system minimale per lo studio, microcopy essenziale, temi chiaro/scuro/auto)
 - [x] `.agents/skills/git-pro` (Procedure professionali Git, commit atomici, gestione amend)
 
 ---

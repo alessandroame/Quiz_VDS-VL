@@ -14,6 +14,32 @@ Questo documento registra in ordine cronologico tutte le lavorazioni svolte nel 
 - **Impatto sul Desiderata**: <Come questo intervento contribuisce al desiderata (cfr. DESIDERATA.md) e indicazioni per il prossimo agente>
 ```
 
+# Worklog Fragment: Transizione a minimal-ui-ux ed Ergonomia di Studio
+
+- **Data**: 2026-09-29
+- **Autore**: AI Agent
+- **Topic**: Transizione da `aviation-ui-ux` a `minimal-ui-ux` e ridefinizione concettuale
+
+### Cosa abbiamo fatto
+- Ridenominata la skill da `.agents/skills/aviation-ui-ux` a `.agents/skills/minimal-ui-ux`.
+- Riscritto il file [SKILL.md](file:///d:/Github/Quiz_VDS-VL/.agents/skills/minimal-ui-ux/SKILL.md) rifocalizzando l'intera filosofia dell'interfaccia: l'utente è un allievo pilota che studia la teoria dei 504 quiz AeCI, non un pilota in volo o in cabina di pilotaggio.
+- Eliminata la terminologia forzata da "cockpit", "avionica", "Hangar Light" e "Cockpit Dark", sostituita da un design system essenziale per lo studio teorico con temi Scuro / Chiaro ad alto contrasto e microcopy telegrafico.
+- Aggiornati i riferimenti nei documenti di governance e memoria:
+  * [.agents/AGENTS.md](file:///d:/Github/Quiz_VDS-VL/.agents/AGENTS.md)
+  * [.agents/rules/constraints.md](file:///d:/Github/Quiz_VDS-VL/.agents/rules/constraints.md)
+  * [DESIDERATA.md](file:///d:/Github/Quiz_VDS-VL/DESIDERATA.md)
+  * [MEMORY.md](file:///d:/Github/Quiz_VDS-VL/MEMORY.md)
+  * [TODO.md](file:///d:/Github/Quiz_VDS-VL/TODO.md)
+
+### Scelte architetturali & Rationale
+- **Fine della Metafora "Cockpit"**: L'app è una web app di studio e simulazione esame teorico. Insistere su concetti di avionica di bordo creava ridondanza e allucinazioni terminologiche nelle conversazioni con l'utente.
+- **Preservazione dell'Ergonomia Minimale**: Restano pienamente validi e rafforzati i principi cardine di usabilità: microcopy secco di 1-2 parole (*Esame*, *Errori*, *IDONEO*), target di tocco ampi per mobile, scorciatoie da tastiera per desktop e assenza totale di preamboli o testi inutili.
+
+### Impatto sul Desiderata
+- Riconferma e chiarimento del Principio Filosofico 1 di [DESIDERATA.md](file:///d:/Github/Quiz_VDS-VL/DESIDERATA.md): "Zero Distrazioni & Ergonomia di Studio", orientando qualsiasi sviluppo futuro della UI verso la massima concentrazione ed efficacia didattica.
+
+---
+
 # Registro di Bordo: Schermate Dedicate per Tutor Didattico ed Esame Ufficiale AeCI
 
 - **Data**: 2026-09-29

@@ -21,7 +21,7 @@ L'alberatura delle configurazioni dell'agente è standardizzata, modulare e ordi
 │   ├── autonomous-loops/       # Circuit breaker salva-token per cicli di build e test
 │   ├── self-correction-loop/   # Cattura permanente delle correzioni su MEMORY.md
 │   ├── headless-pwa-tester/    # Collaudo visivo CDP zero-dipendenze (mobile 390x844 e desktop)
-│   ├── aviation-ui-ux/         # Design system avionico, microcopy minimale e palette cockpit
+│   ├── minimal-ui-ux/          # Design system minimale per lo studio, microcopy essenziale ed ergonomia zero-distrazioni
 │   ├── pwa-quiz-engine/        # Fair Coverage Randomizer, persistenza Dexie e gestione offline
 │   ├── vds-exam-examiner/      # Regolamento esame ufficiale AeCI (30 quiz, 45 min, max 3 errori)
 │   ├── vds-quiz-extractor/     # Pipeline estrazione e normalizzazione dei 504 quiz dal PDF ufficiale

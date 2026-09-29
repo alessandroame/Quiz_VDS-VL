@@ -4,7 +4,7 @@
 - **Stack**: Vite + TypeScript + Tailwind CSS (nessun framework monolitico pesante superfluo).
 - **Persistenza**: Dexie.js (IndexedDB) è l'unica sorgente di verità (**Single Source of Truth**) per lo storico esami, le statistiche dei quiz, i bookmark e le note.
 - **PWA & Offline First**: Funzionamento garantito al 100% offline via Service Worker; la sincronizzazione Google Drive è rigorosamente on-demand e opzionale.
-- **Microcopy**: Rispettare categoricamente il Cockpit Style definito in `aviation-ui-ux` (nessun testo superfluo o verboso).
+- **Microcopy**: Rispettare categoricamente lo stile minimale definito in `minimal-ui-ux` (nessun testo superfluo o verboso, focus sullo studio).
 
 ## 2. Standard di Codice, Commenti e Lingua Inglese (Strict English in Source Code & Git)
 - **Lingua Esclusiva nei Sorgenti (Code & Comments)**:

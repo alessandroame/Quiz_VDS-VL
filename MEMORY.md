@@ -33,16 +33,17 @@ Questo file costituisce la **memoria tecnica permanente** del progetto. Raccogli
 ---
 
 ## 3. UI/UX, Iconografia & Sistema Temi
-- **Divieto Assoluto di Slogan e Buzzword Inutili**: Evitare categoricamente diciture come "Cockpit Avionics Design", "Zero-Blue Theme", "Cockpit Edition" o altri slogan di facciata/marketing. L'interfaccia deve essere sobria, pulita, diretta e incentrata unicamente su informazioni utili e pratiche per l'allievo pilota.
+- **Design per lo Studio Teorico (Minimal UI/UX)**: L'utente è un allievo che studia la teoria del volo per l'esame AeCI (non è in volo, non è in un cockpit). L'interfaccia è orientata all'apprendimento rapido, senza distrazioni o metafore forzate di pilotaggio.
+- **Divieto Assoluto di Slogan e Buzzword Inutili**: Evitare categoricamente diciture come "Cockpit Avionics Design", "Zero-Blue Theme", "Cockpit Edition" o altri slogan di facciata. L'interfaccia deve essere sobria, pulita, diretta e incentrata unicamente su informazioni utili e pratiche per l'allievo pilota.
 - **Stile Diretto ed Essenziale**: Zero preamboli, etichette essenziali (**Esame**, **Materie**, **Errori**, **Archivio**, **Stats**).
 - **Feedback**: Secco e chiaro (`Esatta`, `Errata`, `⚑ Rivedi`, `IDONEO`, `NON IDONEO`).
 - **Desktop Keyboard**: Tasti `1`, `2`, `3` per risposta, `F` per flag, frecce o `Spazio` per navigazione.
 - **Iconografia Ufficiale PWA (Paraglider Question Mark)**:
   * **Concept**: Sintesi concettuale che unisce in un unico simbolo il Volo Libero e lo studio dei quiz: l'arco aerodinamico a celle cassonate del parapendio forma la testa del punto interrogativo (`?`), mentre il pilota imbracato con i comandi ne costituisce il punto inferiore.
   * **Asset**: Vettore SVG di precisione ([favicon.svg](file:///d:/Github/Quiz_VDS-VL/public/favicon.svg)), icone raster pixel-perfect [icon-192x192.png](file:///d:/Github/Quiz_VDS-VL/public/icons/icon-192x192.png), [icon-512x512.png](file:///d:/Github/Quiz_VDS-VL/public/icons/icon-512x512.png) e [apple-touch-icon.png](file:///d:/Github/Quiz_VDS-VL/public/apple-touch-icon.png) renderizzate via CDP.
-- **Sistema Temi & Palette (Zero-Blue Carbon Cockpit / Hangar Light)**:
-  * **Carbon Cockpit (Dark Mode)**: Dominante blu categoricamente azzerata (0% cool hue). Sfondo carbon `#09090b` (`zinc-950`), superfici `#18181b` (`zinc-900`), bordi `#27272a` (`zinc-800`), testo `#f4f4f5` (`zinc-100`) e accento primario avionico **Aviation Amber** (`amber-500` / `amber-600`, bagliore cockpit).
-  * **Hangar Light (Outdoor High-Contrast)**: Registrata variante `light:` in `tailwind.config.js` (`addVariant('light', ':is(.light &)')`). Tutte le classi chiare sono confinate a `light:*` (`light:bg-white`, `light:border-slate-200`, `light:text-slate-900`).
+- **Sistema Temi & Palette (Zero-Blue Minimal Dark / High-Contrast Light)**:
+  * **Minimal Dark Mode**: Dominante blu categoricamente azzerata (0% cool hue). Sfondo `#09090b` (`zinc-950`), superfici `#18181b` (`zinc-900`), bordi `#27272a` (`zinc-800`), testo `#f4f4f5` (`zinc-100`) e accento primario ambra (`amber-500` / `amber-600`) per il massimo comfort visivo nello studio prolungato.
+  * **High-Contrast Light Mode**: Registrata variante `light:` in `tailwind.config.js` (`addVariant('light', ':is(.light &)')`). Tutte le classi chiare sono confinate a `light:*` (`light:bg-white`, `light:border-slate-200`, `light:text-slate-900`).
   * In `index.html`, `<body>` include sia le classi scure che quelle chiare (`bg-zinc-950 text-zinc-100 light:bg-slate-50 light:text-slate-900`).
   * Il ciclo tema (`cycleTheme`) passa subito da tema scuro a tema chiaro al primo click.
   * In `ThemeContext.tsx`, l'idratazione iniziale verifica l'esistenza reale di una chiave salvata in Dexie prima di sovrascrivere `localStorage`.
@@ -71,32 +72,32 @@ Questo file costituisce la **memoria tecnica permanente** del progetto. Raccogli
 
 ## 6. Motore Vocale Neurale (TTS Offline & Multi-Voce)
 - **Voci Disponibili**:
-  - `giuseppe`: Maschile, tono calmo cockpit (`it-IT-DiegoNeural`, rate -4%, pitch -4Hz).
+  - `giuseppe`: Maschile, tono calmo ed equilibrato (`it-IT-DiegoNeural`, rate -4%, pitch -4Hz).
   - `elsa`: Femminile, dizione cristallina e brillante (`it-IT-ElsaNeural`, rate -2%, pitch +0Hz).
 - **Archiviazione Segmenti Audio**:
   - `public/audio/{voice}/{qid}_{part}.mp3` dove `part` è `q` (domanda), `1`, `2`, `3` (opzioni) ed `e` (spiegazione didattica su errore).
   - 2.520 segmenti per ciascuna voce (504 quiz x 5 file), totale 5.040 segmenti audio.
 - **Normalizzazione Fonetica Aeronautica (`src/utils/aviationPhonetics.ts`)**:
   - Tutti i testi passano dal normalizzatore per espansione acronimi (`D.P.R. 133/2010`, `VDS/VL`, `AeCI`, `hPa`, `FL`, `km/h`, `kt`, `m/s`).
-  - Pronuncia domanda concisa (Cockpit Minimalist): le tracce audio delle domande (`_q.mp3`) contengono esclusivamente il testo della domanda normalizzato, omettendo tassativamente prefissi verbali come il numero (*"Domanda X"*) o il nome della materia/categoria per azzerare la latenza d'ascolto.
-  - Pronuncia opzioni in stile cockpit standard: *"Uno. [testo]"*, *"Due. [testo]"*, *"Tre. [testo]"*.
+  - Pronuncia domanda concisa (Zero Preamboli): le tracce audio delle domande (`_q.mp3`) contengono esclusivamente il testo della domanda normalizzato, omettendo tassativamente prefissi verbali come il numero (*"Domanda X"*) o il nome della materia/categoria per azzerare la latenza d'ascolto.
+  - Pronuncia opzioni essenziale: *"Uno. [testo]"*, *"Due. [testo]"*, *"Tre. [testo]"*.
 - **Persistenza & Switch**: Selezione della voce salvata in Dexie (`settings.ttsVoice: 'giuseppe' | 'elsa'`) e commutabile istantaneamente dalle impostazioni.
 - **Gestione Offline & Fallback Intelligente (`src/services/audioDownloadManager.ts`)**:
   - Prompt non invasivo al primo avvio della Modalità alla Guida (`AudioOfflinePromptModal`) con scelta a un tocco (voce attiva consigliata ~154 MB, entrambe ~302 MB, o skip "Non ora").
   - Download in background non bloccante via worker a pool concorrente (8 connessioni contemporanee) verso CacheStorage (`vds-audio-giuseppe` e `vds-audio-elsa`).
   - Banner di avanzamento download audio non invasivo agganciato in basso sopra la barra di navigazione (`AudioDownloadBanner`), con percentuale, conteggio file, barra di progresso e tasto annulla, prevenendo l'overflow orizzontale della UI su mobile.
   - Gestione granulare nelle Impostazioni (Voce): stato download, progress bar, storage size, pulsante scarica ed elimina per voce.
-  - Fallback offline automatico in `voiceService`: se l'app è offline (`!navigator.onLine`) e la voce selezionata non è presente nella cache del dispositivo, il motore commuta in modo trasparente e immediato sull'altra voce scaricata con notifica cockpit.
+  - Fallback offline automatico in `voiceService`: se l'app è offline (`!navigator.onLine`) e la voce selezionata non è presente nella cache del dispositivo, il motore commuta in modo trasparente e immediato sull'altra voce scaricata con notifica discreta.
   - PWA Service Worker: regole Workbox dedicate con `rangeRequests: true` per garantire compatibilità con lo streaming audio su iOS Safari.
 - **Spiegazione Vocale Modalità Guida (`drive_intro.mp3`)**:
   - Traccia audio di briefing in `public/audio/{voice}/drive_intro.mp3` generata con Edge-TTS (Giuseppe/Elsa) con fallback a `window.speechSynthesis`.
-  - Riproduzione automatica al primo accesso (nel Launcher o all'avvio del quiz), con banner cockpit e tasto `[Salta]`.
+  - Riproduzione automatica al primo accesso (nel Launcher o all'avvio del quiz), con banner discreto e tasto `[Salta]`.
   - Logica run-once: una volta riprodotta o saltata, salva `driveModeIntroPlayed: true` in Dexie settings e non si ripete più automaticamente.
   - Riascolto on-demand (Launcher `btn-replay-drive-intro`, modale comandi `VoiceCommandsModal`) e riattivazione all'avvio da `SettingsModal` (scheda Guida).
 
 ---
 
-## 7. Modalità di Interazione (Cockpit Executive Mode)
+## 7. Modalità di Interazione (Executive Mode - Focus Diretto)
 - **Executive Summary First (Max 3 bullet)**: Risposte chiare e ad alto livello: *Cosa ho fatto*, *Dove intervenire*, *Cosa decidere*. Nessun muro di testo.
 - **Progressive Disclosure**: Dettagli implementativi e codice esteso confinati in file sorgente o Artifacts, non nella chat.
 - **Decisioni Rapide (`ask_question`)**: Bivi architetturali e scelte operative presentati tramite modali a selezione rapida con opzione consigliata in cima.
