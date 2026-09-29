@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react';
 import { ThemeProvider } from './context/ThemeContext';
 import { QuizProvider, useQuiz } from './context/QuizContext';
 import { Navbar, type NavTab } from './components/Navbar';
+import { HomeScreen } from './components/HomeScreen';
+import { getTabLabel } from './utils/navigation';
 import { ExamScreen } from './components/ExamScreen';
 import { TopicsScreen } from './components/TopicsScreen';
 import { MistakesScreen } from './components/MistakesScreen';
@@ -26,7 +28,7 @@ function AppContent() {
     settings,
     isSettingsLoaded
   } = useQuiz();
-  const [activeTab, setActiveTab] = useState<NavTab>('exam');
+  const [activeTab, setActiveTab] = useState<NavTab>('home');
   const [pendingTab, setPendingTab] = useState<NavTab | null>(null);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
@@ -109,25 +111,20 @@ function AppContent() {
 
   const handleResumeActiveSession = () => {
     if (!activeSession) return;
-    if (activeSession.type === 'exam') handleSelectTab('exam');
-    else if (activeSession.type === 'topic') handleSelectTab('topics');
-    else if (activeSession.type === 'mistakes') handleSelectTab('mistakes');
-  };
-
-  const getTabLabel = (tab: NavTab | null) => {
-    switch (tab) {
-      case 'exam': return 'Esame';
-      case 'topics': return 'Materie';
-      case 'mistakes': return 'Errori';
-      case 'archive': return 'Archivio';
-      case 'stats': return 'Stats';
-      default: return '';
+    if (activeSession.type === 'exam') {
+      handleSelectTab(activeSession.examMode === 'tutor' ? 'tutor' : 'exam');
+    } else if (activeSession.type === 'topic') {
+      handleSelectTab('topics');
+    } else if (activeSession.type === 'mistakes') {
+      handleSelectTab('mistakes');
     }
   };
 
   return (
     <div
-      className={`min-h-screen bg-zinc-950 text-zinc-100 dark:bg-zinc-950 dark:text-zinc-100 light:bg-slate-50 light:text-slate-900 transition-colors pt-[98px] sm:pt-[104px] ${
+      className={`min-h-screen bg-zinc-950 text-zinc-100 dark:bg-zinc-950 dark:text-zinc-100 light:bg-slate-50 light:text-slate-900 transition-colors ${
+        activeTab === 'home' ? 'pt-16 sm:pt-[70px]' : 'pt-14 sm:pt-[58px]'
+      } ${
         isAudioDownloading ? 'pb-28' : 'pb-8'
       }`}
     >
@@ -140,8 +137,8 @@ function AppContent() {
       {/* Avviso Notifica Stato Offline */}
       <OfflineBanner />
 
-      {/* Banner Ripresa Rapida Sessione Cross-Device */}
-      {activeSession && !isExamRunning && activeTab !== activeSession.type && (
+      {/* Banner Ripresa Rapida Sessione Cross-Device (se fuori da Home) */}
+      {activeSession && !isExamRunning && activeTab !== 'home' && activeTab !== activeSession.type && (
         <div className="max-w-2xl mx-auto px-4 pt-3">
           <div className="p-3 bg-amber-950/30 border border-amber-500/40 rounded-xl flex items-center justify-between gap-3 text-xs shadow-lg animate-in fade-in light:bg-amber-50 light:border-amber-300">
             <div className="flex items-center gap-2.5 min-w-0">
@@ -199,7 +196,9 @@ function AppContent() {
 
       {/* Schermata Attiva */}
       <main>
-        {activeTab === 'exam' && <ExamScreen />}
+        {activeTab === 'home' && <HomeScreen onSelectTab={handleSelectTab} />}
+        {activeTab === 'tutor' && <ExamScreen initialMode="tutor" onNavigateHome={() => handleSelectTab('home')} />}
+        {activeTab === 'exam' && <ExamScreen initialMode="official" onNavigateHome={() => handleSelectTab('home')} />}
         {activeTab === 'topics' && <TopicsScreen />}
         {activeTab === 'mistakes' && <MistakesScreen />}
         {activeTab === 'archive' && <ArchiveScreen />}

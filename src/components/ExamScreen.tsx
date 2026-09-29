@@ -21,7 +21,12 @@ import { QuestionCard } from './QuestionCard';
 import { voiceService } from '../services/voiceService';
 import { QuizBottomBar } from './QuizBottomBar';
 
-export const ExamScreen: React.FC = () => {
+interface ExamScreenProps {
+  initialMode?: ExamModeType;
+  onNavigateHome?: () => void;
+}
+
+export const ExamScreen: React.FC<ExamScreenProps> = ({ initialMode = 'tutor', onNavigateHome }) => {
   const {
     questions,
     filteredQuestions,
@@ -38,7 +43,7 @@ export const ExamScreen: React.FC = () => {
 
   // Exam state
   const [examState, setExamState] = useState<'idle' | 'running' | 'review'>('idle');
-  const [examMode, setExamMode] = useState<ExamModeType>('tutor');
+  const [examMode, setExamMode] = useState<ExamModeType>(initialMode);
   const [examQuestions, setExamQuestions] = useState<Question[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [answers, setAnswers] = useState<Record<number, 1 | 2 | 3>>({});
@@ -377,6 +382,17 @@ export const ExamScreen: React.FC = () => {
             <ListFilter className="w-3.5 h-3.5" />
             <span>Maratona Intensiva (60 Quiz - 60 min)</span>
           </button>
+
+          {onNavigateHome && (
+            <div className="flex justify-center pt-2">
+              <button
+                onClick={onNavigateHome}
+                className="text-xs font-semibold text-zinc-400 hover:text-zinc-200 light:text-slate-500 light:hover:text-slate-800 flex items-center gap-1.5 py-1 px-3 rounded-lg hover:bg-zinc-800/40 light:hover:bg-slate-200/60 transition-colors"
+              >
+                <span>← Torna al Cruscotto Home</span>
+              </button>
+            </div>
+          )}
         </div>
       </div>
     );
@@ -484,17 +500,21 @@ export const ExamScreen: React.FC = () => {
           </button>
         </div>
 
-        {/* Torna alla schermata principale Esame */}
+        {/* Torna alla schermata principale Esame o Home */}
         <div className="flex justify-center pt-0.5">
           <button
             id="btn-return-home"
             onClick={() => {
-              setExamState('idle');
-              setCompletedSession(null);
+              if (onNavigateHome) {
+                onNavigateHome();
+              } else {
+                setExamState('idle');
+                setCompletedSession(null);
+              }
             }}
             className="text-xs font-semibold text-zinc-400 hover:text-zinc-200 light:text-slate-500 light:hover:text-slate-800 flex items-center gap-1.5 py-1 px-3 rounded-lg hover:bg-zinc-800/40 light:hover:bg-slate-200/60 transition-colors"
           >
-            <span>← Torna alla schermata iniziale Esame</span>
+            <span>← Torna al Cruscotto Home</span>
           </button>
         </div>
 
@@ -528,7 +548,7 @@ export const ExamScreen: React.FC = () => {
   return (
     <div className="max-w-2xl mx-auto px-4 py-4 space-y-4 pb-28 sm:pb-32">
       {/* Top Bar: Timer, Progresso, Consegna */}
-      <div className="flex items-center justify-between gap-2 p-3 bg-zinc-900 border border-zinc-800 rounded-xl dark:bg-zinc-900 light:bg-white light:border-slate-200 shadow-sm sticky top-[102px] sm:top-[106px] z-20">
+      <div className="flex items-center justify-between gap-2 p-3 bg-zinc-900 border border-zinc-800 rounded-xl dark:bg-zinc-900 light:bg-white light:border-slate-200 shadow-sm sticky top-[52px] z-20">
         <div className="flex items-center gap-2">
           {examMode === 'tutor' ? (
             <div className="flex items-center gap-1.5 font-mono font-bold text-sm px-2.5 py-1 rounded-lg bg-zinc-950 text-zinc-100 light:bg-slate-100 light:text-slate-800 border border-emerald-500/30">
