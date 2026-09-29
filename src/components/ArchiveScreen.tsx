@@ -13,10 +13,24 @@ import {
   Square,
   Edit3,
   Trash2,
-  Plus
+  Plus,
+  Hash,
+  Delete,
+  CornerDownLeft,
+  X,
+  Sparkles
 } from 'lucide-react';
 import { useQuiz } from '../context/QuizContext';
 import { useAviationVoice } from '../hooks/useAviationVoice';
+import {
+  formatSubjectCode,
+  findQuestionById,
+  getArchiveStatusCounts,
+  filterArchiveQuestions,
+  ARCHIVE_CONCEPT_CHIPS,
+  type ArchiveStatusFilter
+} from '../utils/archiveFilters';
+import { triggerHapticFeedback } from '../utils/haptics';
 import type { Question } from '../types/quiz';
 
 interface ArchiveItemProps {
@@ -442,115 +456,357 @@ export const ArchiveScreen: React.FC = () => {
 
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedSubject, setSelectedSubject] = useState<number | 'all'>('all');
-  const [onlyBookmarks, setOnlyBookmarks] = useState(false);
-  const [onlyWithNotes, setOnlyWithNotes] = useState(false);
+  const [statusFilter, setStatusFilter] = useState<ArchiveStatusFilter>('all');
+  const [activeConceptChipId, setActiveConceptChipId] = useState<string | null>(null);
+  const [isKeypadOpen, setIsKeypadOpen] = useState(false);
+  const [numericBuffer, setNumericBuffer] = useState('');
   const [expandedId, setExpandedId] = useState<number | null>(null);
 
+  // Compute status counts dynamically based on current subject scope
+  const statusCounts = useMemo(() => {
+    return getArchiveStatusCounts(questions, statsMap, selectedSubject);
+  }, [questions, statsMap, selectedSubject]);
+
+  // Filter questions using pure business utility
   const filteredQuestions = useMemo(() => {
-    return questions.filter(q => {
-      const stat = statsMap.get(q.id);
-
-      if (searchQuery.trim()) {
-        const query = searchQuery.toLowerCase().trim();
-        const matchesId = q.id.toString().includes(query);
-        const matchesText = q.question.toLowerCase().includes(query);
-        const matchesOptions = q.options.some(opt => opt.toLowerCase().includes(query));
-        if (!matchesId && !matchesText && !matchesOptions) return false;
-      }
-
-      if (selectedSubject !== 'all' && q.subjectId !== selectedSubject) {
-        return false;
-      }
-
-      if (onlyBookmarks && !stat?.isBookmarked) {
-        return false;
-      }
-
-      if (onlyWithNotes && !stat?.userNote) {
-        return false;
-      }
-
-      return true;
+    return filterArchiveQuestions(questions, statsMap, {
+      searchQuery,
+      subjectId: selectedSubject,
+      statusFilter,
+      conceptChipId: activeConceptChipId
     });
-  }, [questions, statsMap, searchQuery, selectedSubject, onlyBookmarks, onlyWithNotes]);
+  }, [questions, statsMap, searchQuery, selectedSubject, statusFilter, activeConceptChipId]);
+
+  const hasActiveFilters = Boolean(
+    searchQuery.trim() ||
+    selectedSubject !== 'all' ||
+    statusFilter !== 'all' ||
+    activeConceptChipId ||
+    numericBuffer
+  );
+
+  const handleResetAllFilters = () => {
+    setSearchQuery('');
+    setSelectedSubject('all');
+    setStatusFilter('all');
+    setActiveConceptChipId(null);
+    setNumericBuffer('');
+    setIsKeypadOpen(false);
+    triggerHapticFeedback('tap');
+  };
+
+  const handleKeypadDigit = (digit: string) => {
+    triggerHapticFeedback('tap');
+    const nextBuf = (numericBuffer + digit).slice(0, 4);
+    setNumericBuffer(nextBuf);
+    setSearchQuery(nextBuf);
+
+    if (nextBuf.length === 4) {
+      const target = findQuestionById(questions, Number(nextBuf));
+      if (target) {
+        setExpandedId(target.id);
+        triggerHapticFeedback('success');
+        setTimeout(() => {
+          document.getElementById(`archive-item-${target.id}`)?.scrollIntoView({
+            behavior: 'smooth',
+            block: 'center'
+          });
+        }, 120);
+      }
+    }
+  };
+
+  const handleKeypadBackspace = () => {
+    triggerHapticFeedback('tap');
+    const nextBuf = numericBuffer.slice(0, -1);
+    setNumericBuffer(nextBuf);
+    setSearchQuery(nextBuf);
+  };
+
+  const handleKeypadSubmit = () => {
+    if (!numericBuffer) return;
+    const target = findQuestionById(questions, Number(numericBuffer));
+    if (target) {
+      setExpandedId(target.id);
+      setIsKeypadOpen(false);
+      triggerHapticFeedback('success');
+      setTimeout(() => {
+        document.getElementById(`archive-item-${target.id}`)?.scrollIntoView({
+          behavior: 'smooth',
+          block: 'center'
+        });
+      }, 120);
+    } else {
+      triggerHapticFeedback('warning');
+    }
+  };
 
   return (
-    <div className="max-w-2xl mx-auto px-4 py-6 space-y-4">
-      <div>
-        <h1 className="text-xl font-bold tracking-tight">Archivio Completo</h1>
-        <p className="text-xs text-zinc-400 light:text-slate-600">
-          Catalogo 474 quiz: Parapendio e teoria comune AeCI
-        </p>
-      </div>
-
-      {/* Barra di Ricerca */}
-      <div className="relative">
-        <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400" />
-        <input
-          id="archive-search-input"
-          type="text"
-          value={searchQuery}
-          onChange={e => setSearchQuery(e.target.value)}
-          placeholder="Cerca per testo, parola chiave o #ID (es. #1001)..."
-          className="w-full pl-10 pr-4 py-2.5 bg-zinc-900 border border-zinc-800 rounded-xl text-xs text-zinc-100 placeholder-zinc-500 outline-none focus:border-amber-500 light:bg-white light:border-slate-200 light:text-slate-900 transition-colors"
-        />
-        {searchQuery && (
-          <button
-            onClick={() => setSearchQuery('')}
-            className="absolute right-3.5 top-1/2 -translate-y-1/2 text-xs text-zinc-500 hover:text-zinc-300"
-          >
-            ✕
-          </button>
-        )}
-      </div>
-
-      {/* Filtri Rapidi */}
-      <div className="flex flex-wrap items-center gap-2 pt-1">
-        <select
-          value={selectedSubject}
-          onChange={e => setSelectedSubject(e.target.value === 'all' ? 'all' : Number(e.target.value))}
-          className="bg-zinc-900 border border-zinc-800 rounded-lg px-2.5 py-1.5 text-xs text-zinc-300 outline-none light:bg-white light:border-slate-200 light:text-slate-700"
-        >
-          <option value="all">Tutte le materie ({subjectsAnalytics.length})</option>
-          {subjectsAnalytics.map(sub => (
-            <option key={sub.id} value={sub.id}>
-              {sub.name} ({sub.total})
-            </option>
-          ))}
-        </select>
-
-        <button
-          onClick={() => setOnlyBookmarks(!onlyBookmarks)}
-          className={`px-2.5 py-1.5 rounded-lg border text-xs font-semibold flex items-center gap-1.5 transition-colors ${
-            onlyBookmarks
-              ? 'border-amber-500/50 bg-amber-500/20 text-amber-400'
-              : 'border-zinc-800 bg-zinc-900 text-zinc-400 hover:text-zinc-200 light:bg-white light:border-slate-200'
-          }`}
-        >
-          <Bookmark className="w-3 h-3" />
-          <span>Solo Preferiti</span>
-        </button>
-
-        <button
-          id="btn-filter-notes"
-          onClick={() => setOnlyWithNotes(!onlyWithNotes)}
-          className={`px-2.5 py-1.5 rounded-lg border text-xs font-semibold flex items-center gap-1.5 transition-colors ${
-            onlyWithNotes
-              ? 'border-amber-500/50 bg-amber-500/20 text-amber-400'
-              : 'border-zinc-800 bg-zinc-900 text-zinc-400 hover:text-zinc-200 light:bg-white light:border-slate-200'
-          }`}
-        >
-          <FileText className="w-3 h-3" />
-          <span>Con Note</span>
-        </button>
-
-        <div className="ml-auto text-xs text-zinc-500">
-          {filteredQuestions.length} quiz
+    <div className="max-w-2xl mx-auto px-2.5 sm:px-4 py-3 sm:py-5 space-y-3 sm:space-y-4 pb-20 sm:pb-24">
+      {/* Header Catalogo */}
+      <div className="flex items-center justify-between gap-3">
+        <div>
+          <h1 className="text-xl font-bold tracking-tight">Archivio Completo</h1>
+          <p className="text-xs text-zinc-400 light:text-slate-600">
+            Catalogo 474 quiz: Parapendio e teoria comune AeCI
+          </p>
+        </div>
+        <div className="text-xs font-mono font-bold px-2.5 py-1 rounded-lg bg-zinc-900 border border-zinc-800 text-amber-400 light:bg-slate-100 light:border-slate-200 shrink-0">
+          {filteredQuestions.length} / {questions.length}
         </div>
       </div>
 
+      {/* Barra di Ricerca & Tasto Pad Numerico */}
+      <div className="flex items-center gap-2">
+        <div className="relative flex-1">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400" />
+          <input
+            id="archive-search-input"
+            type="text"
+            value={searchQuery}
+            onChange={e => {
+              setSearchQuery(e.target.value);
+              if (numericBuffer && !e.target.value) setNumericBuffer('');
+            }}
+            placeholder="Cerca testo, parola chiave o #ID..."
+            className="w-full pl-9 pr-8 py-2.5 bg-zinc-900 border border-zinc-800 rounded-xl text-xs text-zinc-100 placeholder-zinc-500 outline-none focus:border-amber-500 light:bg-white light:border-slate-200 light:text-slate-900 transition-colors"
+          />
+          {searchQuery && (
+            <button
+              onClick={() => {
+                setSearchQuery('');
+                setNumericBuffer('');
+                triggerHapticFeedback('tap');
+              }}
+              className="absolute right-2.5 top-1/2 -translate-y-1/2 text-xs text-zinc-400 hover:text-zinc-200 p-0.5"
+              title="Cancella ricerca"
+            >
+              <X className="w-3.5 h-3.5" />
+            </button>
+          )}
+        </div>
+
+        {/* Pulsante Tastierino #ID No-Keyboard */}
+        <button
+          id="btn-toggle-keypad"
+          onClick={() => {
+            setIsKeypadOpen(!isKeypadOpen);
+            triggerHapticFeedback('tap');
+          }}
+          className={`px-3 py-2.5 rounded-xl border text-xs font-bold font-mono flex items-center gap-1.5 shrink-0 transition-all ${
+            isKeypadOpen
+              ? 'border-amber-500 bg-amber-500/20 text-amber-300 shadow-[0_0_10px_rgba(245,158,11,0.2)]'
+              : 'border-zinc-800 bg-zinc-900 text-zinc-300 hover:text-white hover:bg-zinc-800 light:bg-white light:border-slate-200 light:text-slate-700'
+          }`}
+          title="Apri tastierino rapido per salto a #ID"
+        >
+          <Hash className="w-3.5 h-3.5 text-amber-400" />
+          <span>#ID</span>
+        </button>
+      </div>
+
+      {/* Tastierino Numerico Rapido (#ID Jump) */}
+      {isKeypadOpen && (
+        <div className="p-3 bg-zinc-900/95 backdrop-blur-md border border-zinc-800 rounded-2xl space-y-2.5 light:bg-white light:border-slate-200 shadow-xl animate-in fade-in duration-150">
+          <div className="flex items-center justify-between px-1">
+            <span className="text-[11px] font-semibold text-zinc-400 light:text-slate-500">
+              Salto rapido a #ID:
+            </span>
+            <div className="flex items-center gap-2">
+              <span className="font-mono text-base font-bold text-amber-400 tracking-wider">
+                #{numericBuffer || '____'}
+              </span>
+              {numericBuffer && (
+                <button
+                  onClick={() => {
+                    setNumericBuffer('');
+                    setSearchQuery('');
+                    triggerHapticFeedback('tap');
+                  }}
+                  className="text-[11px] text-zinc-500 hover:text-zinc-300 p-0.5"
+                  title="Cancella inserimento"
+                >
+                  <X className="w-3.5 h-3.5" />
+                </button>
+              )}
+            </div>
+          </div>
+
+          {/* Griglia Pad 4x3 */}
+          <div className="grid grid-cols-3 gap-1.5">
+            {[1, 2, 3, 4, 5, 6, 7, 8, 9].map(num => (
+              <button
+                key={num}
+                onClick={() => handleKeypadDigit(num.toString())}
+                className="py-2.5 rounded-xl border border-zinc-800 bg-zinc-950 hover:bg-zinc-800 active:scale-95 text-sm font-mono font-bold text-zinc-200 transition-all light:bg-slate-100 light:border-slate-200 light:text-slate-800"
+              >
+                {num}
+              </button>
+            ))}
+            <button
+              onClick={handleKeypadBackspace}
+              className="py-2.5 rounded-xl border border-zinc-800 bg-zinc-950 hover:bg-zinc-800 active:scale-95 text-xs font-semibold text-zinc-400 flex items-center justify-center transition-all light:bg-slate-100 light:border-slate-200 light:text-slate-700"
+              title="Cancella ultima cifra"
+            >
+              <Delete className="w-4 h-4" />
+            </button>
+            <button
+              onClick={() => handleKeypadDigit('0')}
+              className="py-2.5 rounded-xl border border-zinc-800 bg-zinc-950 hover:bg-zinc-800 active:scale-95 text-sm font-mono font-bold text-zinc-200 transition-all light:bg-slate-100 light:border-slate-200 light:text-slate-800"
+            >
+              0
+            </button>
+            <button
+              onClick={handleKeypadSubmit}
+              className="py-2.5 rounded-xl border border-amber-600/80 bg-amber-600 hover:bg-amber-500 active:scale-95 text-xs font-bold text-white flex items-center justify-center gap-1 transition-all shadow-sm"
+              title="Vai alla domanda"
+            >
+              <span>VAI</span>
+              <CornerDownLeft className="w-3.5 h-3.5" />
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* 1. Barra Rapida Materie (01..09 + TUTTE) */}
+      <div className="space-y-1">
+        <div className="flex items-center justify-between text-[11px] text-zinc-400 light:text-slate-500 font-medium px-0.5">
+          <span>Filtro Materia</span>
+          {selectedSubject !== 'all' && (
+            <button
+              onClick={() => {
+                setSelectedSubject('all');
+                triggerHapticFeedback('tap');
+              }}
+              className="text-amber-400 hover:underline"
+            >
+              Mostra tutte
+            </button>
+          )}
+        </div>
+        <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-0.5">
+          <button
+            onClick={() => {
+              setSelectedSubject('all');
+              triggerHapticFeedback('tap');
+            }}
+            className={`px-3 py-1.5 rounded-lg border text-xs font-bold transition-all shrink-0 ${
+              selectedSubject === 'all'
+                ? 'bg-amber-500 text-zinc-950 border-amber-500 shadow-sm'
+                : 'bg-zinc-900 border-zinc-800 text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800 light:bg-white light:border-slate-200 light:text-slate-700'
+            }`}
+          >
+            TUTTE
+          </button>
+          {[1, 2, 3, 4, 5, 6, 7, 8, 9].map(id => {
+            const subName = subjectsAnalytics.find(s => s.id === id)?.name || `Materia ${id}`;
+            const isSelected = selectedSubject === id;
+            return (
+              <button
+                key={id}
+                onClick={() => {
+                  setSelectedSubject(id);
+                  triggerHapticFeedback('tap');
+                }}
+                title={`${formatSubjectCode(id)} - ${subName}`}
+                className={`px-2.5 py-1.5 rounded-lg border font-mono text-xs font-bold transition-all shrink-0 ${
+                  isSelected
+                    ? 'bg-amber-500 text-zinc-950 border-amber-500 shadow-sm'
+                    : 'bg-zinc-900 border-zinc-800 text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800 light:bg-white light:border-slate-200 light:text-slate-700'
+                }`}
+              >
+                {formatSubjectCode(id)}
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* 2. Filtri di Stato a Tocco Singolo */}
+      <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-0.5">
+        {(
+          [
+            { id: 'all', label: 'Tutte', count: statusCounts.all },
+            { id: 'unseen', label: 'Non viste', count: statusCounts.unseen },
+            { id: 'incorrect', label: 'Errate', count: statusCounts.incorrect },
+            { id: 'bookmarked', label: 'Preferiti', count: statusCounts.bookmarked },
+            { id: 'with_notes', label: 'Note', count: statusCounts.with_notes }
+          ] as const
+        ).map(filter => {
+          const isActive = statusFilter === filter.id;
+          return (
+            <button
+              key={filter.id}
+              id={filter.id === 'with_notes' ? 'btn-filter-notes' : undefined}
+              onClick={() => {
+                setStatusFilter(filter.id);
+                triggerHapticFeedback('tap');
+              }}
+              className={`px-2.5 py-1.5 rounded-lg border text-xs font-semibold flex items-center gap-1.5 shrink-0 transition-all ${
+                isActive
+                  ? 'bg-zinc-200 text-zinc-950 border-zinc-200 font-bold light:bg-zinc-800 light:text-white'
+                  : 'bg-zinc-900 border-zinc-800 text-zinc-400 hover:text-zinc-200 light:bg-white light:border-slate-200 light:text-slate-700'
+              }`}
+            >
+              <span>{filter.label}</span>
+              <span
+                className={`text-[10px] px-1 py-0.2 rounded-full font-mono ${
+                  isActive
+                    ? 'bg-zinc-400/40 text-zinc-950 font-bold light:bg-zinc-700 light:text-white'
+                    : 'bg-zinc-800 text-zinc-400 light:bg-slate-100 light:text-slate-600'
+                }`}
+              >
+                {filter.count}
+              </span>
+            </button>
+          );
+        })}
+      </div>
+
+      {/* 3. Quick Chips Concetti Frequenti */}
+      <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-0.5">
+        <div className="flex items-center gap-1 text-[11px] text-zinc-500 shrink-0 font-medium pl-0.5">
+          <Sparkles className="w-3 h-3 text-amber-400" />
+          <span>Temi:</span>
+        </div>
+        {ARCHIVE_CONCEPT_CHIPS.map(chip => {
+          const isActive = activeConceptChipId === chip.id;
+          return (
+            <button
+              key={chip.id}
+              onClick={() => {
+                setActiveConceptChipId(isActive ? null : chip.id);
+                triggerHapticFeedback('tap');
+              }}
+              className={`px-2.5 py-1 rounded-full border text-[11px] font-medium transition-all shrink-0 ${
+                isActive
+                  ? 'border-amber-500/80 bg-amber-500/20 text-amber-300 shadow-[0_0_8px_rgba(245,158,11,0.2)]'
+                  : 'border-zinc-800 bg-zinc-900/60 text-zinc-400 hover:text-zinc-200 light:bg-white light:border-slate-200 light:text-slate-600'
+              }`}
+            >
+              {chip.label}
+            </button>
+          );
+        })}
+      </div>
+
+      {/* Reset filtri attivi */}
+      {hasActiveFilters && (
+        <div className="flex items-center justify-between text-xs pt-1 px-0.5">
+          <span className="text-zinc-500 text-[11px]">
+            Filtri applicati ({filteredQuestions.length} risultati)
+          </span>
+          <button
+            onClick={handleResetAllFilters}
+            className="text-xs text-amber-400 hover:text-amber-300 font-medium"
+          >
+            Azzera tutti i filtri
+          </button>
+        </div>
+      )}
+
       {/* Lista Domande */}
-      <div className="space-y-2">
+      <div className="space-y-2 pt-1">
         {filteredQuestions.length === 0 ? (
           <div className="text-center py-12 text-zinc-500 text-xs border border-dashed border-zinc-800 rounded-xl">
             Nessun quiz trovato con i filtri attuali

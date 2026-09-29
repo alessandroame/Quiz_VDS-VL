@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import {
   VolumeX,
-  Headphones,
+  Volume2,
   Check,
   X,
   Mic
@@ -112,7 +112,7 @@ export const VoiceQuickMenu: React.FC<VoiceQuickMenuProps> = ({
         } ${buttonClassName}`}
       >
         {isEnabled ? (
-          <Headphones className={`w-4 h-4 text-amber-400 ${forceDark ? '' : 'light:text-amber-600'}`} />
+          <Volume2 className={`w-4 h-4 text-amber-400 ${forceDark ? '' : 'light:text-amber-600'}`} />
         ) : (
           <VolumeX className="w-4 h-4 text-zinc-500" />
         )}
