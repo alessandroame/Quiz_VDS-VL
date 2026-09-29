@@ -9,16 +9,17 @@
 
 - [Panoramica delle Funzionalità](#-panoramica-delle-funzionalità)
   - [1. Database Ufficiale dei Quiz (504 quesiti AeCI)](#1-database-ufficiale-dei-quiz-504-quesiti-aeci)
-  - [2. Simulatore d'Esame Ufficiale AeCI](#2-simulatore-desame-ufficiale-aeci)
-  - [3. Studio Guidato per Materie](#3-studio-guidato-per-materie)
-  - [4. Quaderno Errori con Ripetizione Spaziata](#4-quaderno-errori-con-ripetizione-spaziata)
-  - [5. Archivio Completo, Ricerca & Note Personali](#5-archivio-completo-ricerca--note-personali)
-  - [6. Statistiche Avanzate & Indice di Preparazione](#6-statistiche-avanzate--indice-di-preparazione)
-  - [7. Modalità Alla Guida (Truck & Cockpit Drive Mode)](#7-modalità-alla-guida-truck--cockpit-drive-mode)
-  - [8. Motore Vocale Neurale (TTS Multi-Voce Offline) & Audio Cockpit](#8-motore-vocale-neurale-tts-multi-voce-offline--audio-cockpit)
-  - [9. Ergonomia Cockpit, Temi & Scorciatoie da Tastiera](#9-ergonomia-cockpit-temi--scorciatoie-da-tastiera)
-  - [10. Fair Coverage Randomizer](#10-fair-coverage-randomizer)
-  - [11. Privacy, Offline-First & Sincronizzazione Dati](#11-privacy-offline-first--sincronizzazione-dati)
+  - [2. Filtro Disciplina per Mezzo (Deltaplano / Parapendio / Teoria Comune)](#2-filtro-disciplina-per-mezzo-deltaplano--parapendio--teoria-comune)
+  - [3. Simulatore d'Esame Ufficiale AeCI](#3-simulatore-desame-ufficiale-aeci)
+  - [4. Studio Guidato per Materie](#4-studio-guidato-per-materie)
+  - [5. Quaderno Errori con Ripetizione Spaziata](#5-quaderno-errori-con-ripetizione-spaziata)
+  - [6. Archivio Completo, Ricerca & Note Personali](#6-archivio-completo-ricerca--note-personali)
+  - [7. Statistiche Avanzate & Indice di Preparazione](#7-statistiche-avanzate--indice-di-preparazione)
+  - [8. Modalità Alla Guida (Truck & Cockpit Drive Mode)](#8-modalità-alla-guida-truck--cockpit-drive-mode)
+  - [9. Motore Vocale Neurale (TTS Multi-Voce Offline) & Audio Cockpit](#9-motore-vocale-neurale-tts-multi-voce-offline--audio-cockpit)
+  - [10. Ergonomia Cockpit, Temi & Scorciatoie da Tastiera](#10-ergonomia-cockpit-temi--scorciatoie-da-tastiera)
+  - [11. Fair Coverage Randomizer](#11-fair-coverage-randomizer)
+  - [12. Privacy, Offline-First & Sincronizzazione Dati](#12-privacy-offline-first--sincronizzazione-dati)
 - [Stack Tecnologico](#-stack-tecnologico)
 - [Guida all'Avvio Rapido](#-guida-allavvio-rapido)
 - [Testing & Quality Assurance](#-testing--quality-assurance)
@@ -36,7 +37,20 @@
   - **Regola**: il principio fisico, aerodinamico o la norma di legge alla base della risposta corretta.
   - **Tranello**: il bias cognitivo o l'ambiguità terminologica tipica della domanda.
 
-### 2. Simulatore d'Esame & Simulazione Didattica (Tutor)
+### 2. Filtro Disciplina per Mezzo (Deltaplano / Parapendio / Teoria Comune)
+- **Categorizzazione Semantica Rigorosa (Audit AeCI)**:
+  - 🪂 **Parapendio (474 quiz)**: include i 428 quesiti di teoria comune + 46 quesiti esclusivi per il mezzo ad ala flessibile a cassoni (comandi freni, fascio funicolare, elevatori, centine, chiusure asimmetriche e frontali).
+  - 📐 **Deltaplano (458 quiz)**: include i 428 quesiti di teoria comune + 30 quesiti esclusivi per l'ala pendolare (barra di controllo/trapezio A-frame, trave di chiglia, cavi e tubi strutturali, spostamento baricentro del pilota).
+  - 🌐 **Tutti i Quiz (504 quesiti)**: catalogo unificato completo per chi desidera una preparazione multidisciplinare a 360°.
+- **Salvaguardia Assoluta dei Quesiti Condivisi (Zero False Exclusion)**:
+  - Tutti i 428 quesiti di aerodinamica generale, meteorologia, normativa e spazi aerei (D.P.R. 133/2010), fisiopatologia, primo soccorso, sicurezza comune e strumentazione (variometro, altimetro, anemometro) rimangono tassativamente inclusi in entrambi i profili.
+- **Selettore Cockpit a Pillole & Persistenza**:
+  - Selettore ergonomico con icone e contatori dinamici presente nel launcher di **Simulazione Esame**, nello **Studio per Materie** e nell'**Archivio Completo**.
+  - Badge visivo discreto su ciascun quesito esclusivo (`Deltaplano` o `Parapendio`).
+  - Integrazione con il *Fair Coverage Randomizer* per estrarre le 30 domande d'esame rispettando le 9 quote ministeriali AeCI all'interno della disciplina scelta.
+  - Impostazione della disciplina predefinita salvata stabilmente su IndexedDB (*Impostazioni -> Aspetto & Studio*).
+
+### 3. Simulatore d'Esame & Simulazione Didattica (Tutor)
 - **Due Modalità di Simulazione Dedicate**:
   - 🎯 **Simulazione Didattica (Tutor - Consigliata per imparare)**:
     - 30 quesiti estratti con le quote ministeriali AeCI tramite il *Fair Coverage Randomizer*.
@@ -65,29 +79,29 @@
 - **Debriefing Finale**: esito immediato, tempo di esecuzione, riepilogo grafico ed elenco analitico delle risposte errate con accesso diretto alle spiegazioni.
 - **Navigation Guard (Protezione Sessione)**: avviso di sicurezza e blocco in caso di tentata navigazione verso altre schede o ricaricamento pagina (`beforeunload`), evitando la perdita accidentale della simulazione in corso.
 
-### 3. Studio Guidato per Materie
+### 4. Studio Guidato per Materie
 - Filtro rapido e dedicato per ciascuna delle 9 materie d'esame.
 - Feedback visivo e sonoro istantaneo alla selezione di una risposta (`Esatta` / `Errata`).
 - Visualizzazione immediata della spiegazione (*Regola* e *Tranello*) per massimizzare l'apprendimento sul campo.
 
-### 4. Quaderno Errori con Ripetizione Spaziata
+### 5. Quaderno Errori con Ripetizione Spaziata
 - Raccolta automatica di qualsiasi domanda errata durante le simulazioni o le sessioni di studio.
 - Algoritmo di **Spaced Repetition (Box Leitner)**: un quesito esce dal quaderno degli errori solo dopo **2 risposte corrette consecutive** (`consecutiveCorrect >= 2`).
 - Monitoraggio delle domande ancora da consolidare e avanzamento progressivo verso l'azzeramento degli errori.
 
-### 5. Archivio Completo, Ricerca & Note Personali
+### 6. Archivio Completo, Ricerca & Note Personali
 - Consultazione istantanea di tutti i 504 quiz con numerazione ufficiale.
 - **Ricerca Full-Text**: filtro in tempo reale nel testo della domanda, nelle opzioni e nelle spiegazioni.
 - **Preferiti (Segnalibri)**: memorizzazione delle domande più importanti o dubbie per un ripasso dedicato.
 - **Note Personali (CRUD Completo)**: possibilità di aggiungere, consultare, modificare ed eliminare annotazioni personali su ciascun quesito, con pill di visualizzazione rapida sia nell'Archivio che nelle schede di quiz.
 
-### 6. Statistiche Avanzate & Indice di Preparazione
+### 7. Statistiche Avanzate & Indice di Preparazione
 - **Indice di Preparazione Esame**: percentuale calcolata sull'accuratezza globale e sulla copertura delle materie.
 - **Radar Chart delle 9 Materie**: visualizzazione grafica poligonale per identificare all'istante le materie forti e i punti deboli su cui concentrare lo studio.
 - **Registro Storico Sessioni**: cronologia delle simulazioni svolte con esito (`IDONEO` / `NON IDONEO`), punteggio e tempo impiegato.
 - **Top 10 Domande Più Ostiche**: graduatoria dei quesiti che hanno registrato il maggior numero di risposte errate.
 
-### 7. Modalità Alla Guida (Truck & Cockpit Drive Mode)
+### 8. Modalità Alla Guida (Truck & Cockpit Drive Mode)
 - Pensata per lo studio e il ripasso sicuro durante i viaggi su veicolo o camion, con smartphone o tablet agganciato al cruscotto.
 - **Layout Ergonomico a Schermo Intero**: viewport bloccato a `100dvh` con **zero scrolling**.
 - **Macro-Fasce Tattili Giganti**: tre pulsanti di risposta ad altissima area di tocco e contrasto estremo (Fitts's Law).
@@ -127,7 +141,7 @@
     * Toggle rapido `[Tutor ON/OFF]` nel Launcher iniziale (`#btn-drive-toggle-tutor-launcher`), nella Top Bar HUD a quiz attivo (`#btn-drive-tutor-toggle`), nel Quick Speech Menu della Navbar e nelle Impostazioni (🚗 Guida).
     * Nuovi comandi vocali in italiano: *"Spiega"*, *"Regola"*, *"Tranello"*, *"Perché"* per ascoltare la spiegazione on-demand; *"Attiva Tutor"*, *"Disattiva Tutor"*, *"Tutor"* per commutare la modalità al volo mentre si guida.
 
-### 8. Motore Vocale Neurale (TTS Multi-Voce Offline) & Audio Cockpit
+### 9. Motore Vocale Neurale (TTS Multi-Voce Offline) & Audio Cockpit
 - **Oltre 5.000 Segmenti Audio Neurale Pre-Generati**: catalogo audio completo memorizzato localmente e funzionante al 100% offline.
 - **Due Voci Selezionabili**:
   - 👨‍✈️ **Giuseppe**: timbro baritonale calmo, impostato come un istruttore di volo in cockpit (`rate -5%`, `pitch -5Hz`).
@@ -150,7 +164,7 @@
 - **MediaSession API**: controllo della riproduzione vocale (Play/Pausa/Stop) dai pulsanti fisici o touch degli auricolari Bluetooth anche a schermo spento.
 - **Feedback Sonori Cockpit (Web Audio API)**: click meccanici, segnali di conferma, buzzer di errore e alert timer generati via oscillatori nativi senza pesanti file esterni.
 
-### 9. Ergonomia Cockpit, Iconografia Aero Shield & Temi
+### 10. Ergonomia Cockpit, Iconografia Aero Shield & Temi
 - **Icona Ufficiale PWA (Aero Shield)**:
   - Icona geometrica originale per il Volo Libero che unisce l'arco a celle cassonate del parapendio e l'ala a freccia triangolare del deltaplano (con trave di chiglia centrale e barra di controllo A-frame) a formare uno scudo alare 'V'.
   - Disponibile in formato vettoriale ad altissima precisione ([favicon.svg](file:///d:/Github/Quiz_VDS-VL/public/favicon.svg)) e rasterizzata per il manifest PWA a 192x192 e 512x512 px.
@@ -187,11 +201,11 @@
   - `E`: toggle Play / Pausa della spiegazione didattica (`Shift + E` per riavviare da capo).
   - `Esc`: stop e chiusura controlli audio in corso.
 
-### 10. Fair Coverage Randomizer
+### 11. Fair Coverage Randomizer
 - Algoritmo a bucket ponderati sviluppato per superare il noto problema statistico del *collezionista di figurine* (*Coupon Collector's Problem*).
 - Priorità assoluta ai quesiti mai estratti (`times_seen == 0`), garantendo la copertura equa di tutti i 504 quiz prima di riproporre domande già incontrate.
 
-### 11. Privacy, Offline-First, Auto-Sync & Smart Merge
+### 12. Privacy, Offline-First, Auto-Sync & Smart Merge
 - **100% Client-Side & Zero Profilazione**: nessun database proprietario centrale, nessun cookie pubblicitario o tracciamento.
 - **Persistenza Locale Dexie.js (IndexedDB)**: storage asincrono, strutturato e robusto sul browser dell'utente (Single Source of Truth).
 - **Service Worker PWA**: installazione come applicazione standalone su iOS, Android, macOS e Windows con funzionamento completo anche in assenza di segnale.
@@ -275,6 +289,9 @@ npm run test:visual:all
 
 # Collaudo specifico della Modalità Alla Guida (CDP Mobile 390x844)
 npm run test:visual:drive
+
+# Collaudo visivo del filtro disciplina Deltaplano / Parapendio (CDP Mobile & Desktop)
+npm run test:visual:discipline
 ```
 
 ---

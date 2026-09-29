@@ -4,6 +4,7 @@ import type { Question } from '../types/quiz';
 import { useQuiz } from '../context/QuizContext';
 import { soundFX } from '../utils/audio';
 import { useAviationVoice } from '../hooks/useAviationVoice';
+import { getDisciplineBadge } from '../utils/discipline';
 
 interface QuestionCardProps {
   question: Question;
@@ -171,6 +172,8 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({
     setShowNoteEditor(false);
   };
 
+  const disciplineBadge = getDisciplineBadge(question.discipline);
+
   return (
     <div className="w-full bg-zinc-900 border border-zinc-800 rounded-xl p-4 sm:p-6 shadow-md dark:bg-zinc-900 dark:border-zinc-800 light:bg-white light:border-slate-200 light:shadow-sm transition-all">
       {/* Top Header Card */}
@@ -182,6 +185,11 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({
           <span className="text-zinc-400 light:text-slate-500 truncate max-w-[150px] sm:max-w-xs font-medium">
             {question.subjectName}
           </span>
+          {disciplineBadge && (
+            <span className={`text-[10px] font-mono px-1.5 py-0.5 rounded font-semibold ${disciplineBadge.className}`}>
+              {disciplineBadge.label}
+            </span>
+          )}
           {indexNumber !== undefined && totalNumber !== undefined && (
             <span className="text-zinc-500 light:text-slate-400">
               ({indexNumber}/{totalNumber})

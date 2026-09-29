@@ -16,6 +16,38 @@ Questo documento registra in ordine cronologico tutte le lavorazioni svolte nel 
 
 ---
 
+### [2026-09-29] - Implementazione Filtro Domande Esclusive Deltaplano e Parapendio (Discipline Tagging con Salvaguardia Teoria Comune - Fase 8.1)
+- **Cosa abbiamo fatto**:
+  - Audit semantico approfondito dei 504 quiz ministeriali AeCI (edizione 2017) per identificare i quesiti esclusivi del deltaplano (30 quesiti: 18 in Pilotaggio 7062-7079, 6 in Materiali 8011-8016, 6 in Sicurezza 9037-9042), i quesiti esclusivi del parapendio (46 quesiti: 25 in Pilotaggio 7036, 7038-7061, 10 in Materiali 8001-8010, 11 in Sicurezza 9023-9024, 9026-9028, 9031-9036) e la teoria comune condivisa (428 quesiti trasversali, inclusi Q2147 effetto suolo, Q1036 precedenze tra mezzi e Q8017-8020 paracadute di soccorso).
+  - Tipizzazione ed estensione dello schema dati:
+    * In [src/types/quiz.ts](file:///c:/github/Quiz_VDS-VL/src/types/quiz.ts): aggiunto il tipo `Discipline = 'all' | 'hang_glider' | 'paraglider'` e la proprietà obbligatoria `discipline: Discipline` all'interfaccia `Question`.
+    * In [src/types/database.ts](file:///c:/github/Quiz_VDS-VL/src/types/database.ts): aggiunto `disciplinePreference?: Discipline` ad `AppSettings`.
+    * In [src/db/index.ts](file:///c:/github/Quiz_VDS-VL/src/db/index.ts): configurato `disciplinePreference: 'all'` in `DEFAULT_SETTINGS`.
+  - Aggiornato il dataset dei 504 quiz in [src/data/questions.json](file:///c:/github/Quiz_VDS-VL/src/data/questions.json) e [public/data/questions.json](file:///c:/github/Quiz_VDS-VL/public/data/questions.json) con il campo `discipline` su ogni singolo quesito (428 `all`, 30 `hang_glider`, 46 `paraglider`).
+  - Creato il modulo di utilità [src/utils/discipline.ts](file:///c:/github/Quiz_VDS-VL/src/utils/discipline.ts) contenente `DISCIPLINE_OPTIONS`, `filterQuestionsByDiscipline()` e `getDisciplineBadge()`.
+  - Creato il componente UI avionico [src/components/DisciplineSelector.tsx](file:///c:/github/Quiz_VDS-VL/src/components/DisciplineSelector.tsx) con pulsanti pill ergonomici, icone grafiche e contatori dinamici.
+  - Integrato il selettore disciplina e la logica di filtraggio nelle schermate operative:
+    * In [src/context/QuizContext.tsx](file:///c:/github/Quiz_VDS-VL/src/context/QuizContext.tsx): aggiunti `disciplineFilter`, `setDisciplineFilter` e `filteredQuestions`. Aggiornate le funzioni `subjectsAnalytics`, `totalSeen` e `readinessScore` per calcolare le metriche di studio sul catalogo filtrato per disciplina.
+    * In [src/components/ExamScreen.tsx](file:///c:/github/Quiz_VDS-VL/src/components/ExamScreen.tsx): selettore disciplina integrato nel launcher della simulazione d'esame. L'estrazione delle 30 domande attinge da `filteredQuestions`, garantendo il rispetto delle 9 quote ministeriali AeCI all'interno della disciplina scelta.
+    * In [src/components/TopicsScreen.tsx](file:///c:/github/Quiz_VDS-VL/src/components/TopicsScreen.tsx): selettore disciplina nell'header con contatori aggiornati e avvio sessioni di studio sincronizzato su `filteredQuestions` (es. Tecnica di Pilotaggio: 79 quiz in Tutti, 61 in Parapendio, 54 in Deltaplano).
+    * In [src/components/ArchiveScreen.tsx](file:///c:/github/Quiz_VDS-VL/src/components/ArchiveScreen.tsx): selettore disciplina nell'header, dropdown materie con conteggi dinamici ricalcolati e badge identificativo per ciascun quesito esclusivo nella lista.
+    * In [src/components/QuestionCard.tsx](file:///c:/github/Quiz_VDS-VL/src/components/QuestionCard.tsx): badge visivo compatto (`Deltaplano` o `Parapendio`) visualizzato accanto al badge della materia per le domande esclusive.
+    * In [src/components/SettingsModal.tsx](file:///c:/github/Quiz_VDS-VL/src/components/SettingsModal.tsx): aggiunta la configurazione "Disciplina Predefinita" nella scheda "Aspetto & Studio" con persistenza immediata in Dexie e anteprima badge dinamico nell'intestazione dell'accordion.
+  - Test e Collaudo di Qualità:
+    * In [src/data/questions.test.ts](file:///c:/github/Quiz_VDS-VL/src/data/questions.test.ts): aggiunto test `DATA-08` che verifica l'esatta distribuzione 428/30/46 dei quiz e la corretta assegnazione della disciplina.
+    * In [src/utils/discipline.test.ts](file:///c:/github/Quiz_VDS-VL/src/utils/discipline.test.ts): creata suite di 6 test unitari con copertura completa dei filtri, rispetto delle quote d'esame AeCI e generazione corretta dei badge.
+    * Eseguiti con successo tutti i 140 test unitari Vitest su 16 suite (`npm run test:unit`).
+    * Eseguito il build di produzione PWA (`npm run build`) con zero errori TypeScript e Vite.
+    * Creato lo script di collaudo headless CDP [scripts/test_discipline_filters.cjs](file:///c:/github/Quiz_VDS-VL/scripts/test_discipline_filters.cjs) (`npm run test:visual:discipline`) che ha certificato l'assenza totale di errori in console browser (0 errori) e salvato gli screenshot di verifica su Mobile Portrait 390x844 ([public/test_discipline_selector_mobile.png](file:///c:/github/Quiz_VDS-VL/public/test_discipline_selector_mobile.png)) e Desktop 1440x900 ([public/test_discipline_selector_desktop.png](file:///c:/github/Quiz_VDS-VL/public/test_discipline_selector_desktop.png)).
+- **Scelte architetturali & Rationale**:
+  - *Filosofia Zero False Exclusion (Protezione Assoluta Teoria Comune)*: L'esame VDS/VL unifica le nozioni di base del volo libero. Escludere erroneamente domande di aerodinamica generale, meteo, normativa o fisiopatologia priverebbe l'allievo di conoscenze indispensabili per la sicurezza del volo e il superamento dell'esame AeCI. L'audit semantico ha categorizzato come esclusive unicamente le domande le cui risposte contengono elementi tecnici strettamente dipendenti dal velivolo (es. barra trapezio, cavi di controventatura vs fascio funicolare, freni, cassoni).
+  - *Reactivity at Context Level (`filteredQuestions` as derived state)*: Invece di duplicare la logica di filtraggio nei singoli schermi, `QuizContext` espone `filteredQuestions` come stato derivato reattivo da `questions` e `disciplineFilter`. In questo modo le statistiche (`subjectsAnalytics`), l'indice di preparazione (`readinessScore`), l'archivio, le materie e il randomizzatore d'esame sono automaticamente e deterministicamente allineati alla disciplina attiva in tutta l'applicazione.
+  - *Soddisfacimento Quote Esame AeCI*: Verificato matematicamente e tramite test unitario che entrambe le discipline dispongono di un numero di quiz largamente superiore al fabbisogno minimo di ciascuna delle 9 quote ministeriali (anche nella materia con meno quiz, Primo Soccorso e Strumenti ne hanno 12-14, contro la quota di 1 richiesta).
+- **Impatto sul Desiderata**:
+  - Completa al 100% la Fase 8.1 del backlog, fornendo agli allievi piloti sia di parapendio che di deltaplano un percorso di studio e simulazione esame perfettamente mirato al proprio mezzo, senza alcuna contaminazione nozionistica e preservando intatta tutta la teoria fondamentale.
+
+---
+
 ### [2026-09-29] - Implementazione Modalità Tutor Didattica e Risoluzione Interruzione Spiegazione Vocale nella Modalità Alla Guida (Fase 8.6 & 8.7)
 - **Cosa abbiamo fatto**:
   - **Estensione dello Schema Database & Impostazioni**:

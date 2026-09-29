@@ -36,6 +36,7 @@ import { exportDatabaseBackup, importDatabaseBackup, db } from '../db';
 import type { ThemeMode } from '../types/database';
 import { VoiceCommandsModal } from './VoiceCommandsModal';
 import { audioDownloadManager, VoiceName, VoiceDownloadProgress } from '../services/audioDownloadManager';
+import { DisciplineSelector } from './DisciplineSelector';
 
 export type SettingsTab = 'appearance' | 'voice' | 'drive' | 'cloud' | 'data' | 'about';
 
@@ -319,7 +320,14 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
     }
   };
 
-  const appearanceSummary = `${theme === 'dark' ? 'Scuro' : theme === 'light' ? 'Chiaro' : 'Auto'} • ${
+  const disciplineLabel =
+    settings.disciplinePreference === 'paraglider'
+      ? 'Parapendio'
+      : settings.disciplinePreference === 'hang_glider'
+      ? 'Deltaplano'
+      : 'Tutti';
+
+  const appearanceSummary = `${theme === 'dark' ? 'Scuro' : theme === 'light' ? 'Chiaro' : 'Auto'} • ${disciplineLabel} • ${
     settings.immediateFeedbackInTopics ? 'Feedback ON' : 'Feedback OFF'
   }`;
 
@@ -529,6 +537,30 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                   </div>
                 </div>
               )}
+
+              {/* Disciplina Predefinita */}
+              <div className="space-y-2 pt-2 border-t border-zinc-800/80 light:border-slate-100">
+                <label className="text-xs font-bold text-zinc-400 uppercase tracking-wider block">
+                  Disciplina Predefinita
+                </label>
+                <div className="p-3 rounded-xl border border-zinc-800 bg-zinc-950/60 light:bg-slate-50 light:border-slate-200 space-y-2.5">
+                  <div>
+                    <span className="text-zinc-300 light:text-slate-700 font-medium block text-xs">
+                      Corso e Attestato VDS/VL
+                    </span>
+                    <span className="text-[11px] text-zinc-500 block">
+                      Filtra automaticamente le domande specifiche nelle sessioni d'esame, nelle materie e nell'archivio
+                    </span>
+                  </div>
+                  <DisciplineSelector
+                    value={settings.disciplinePreference || 'all'}
+                    onChange={val => updateSetting('disciplinePreference', val)}
+                    size="sm"
+                    idPrefix="setting-discipline"
+                    className="w-full justify-between"
+                  />
+                </div>
+              </div>
             </div>
           </AccordionCard>
 

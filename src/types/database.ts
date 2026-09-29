@@ -1,3 +1,5 @@
+import type { Discipline } from './quiz';
+
 export interface QuestionStat {
   questionId: number;
   timesSeen: number;
@@ -56,6 +58,7 @@ export interface AppSettings {
   driveModeIntroPlayed?: boolean;
   audioOfflinePromptDismissed?: boolean;
   driveModeTutor?: boolean;
+  disciplinePreference?: Discipline;
 }
 
 export interface InProgressSession {

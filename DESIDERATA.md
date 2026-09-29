@@ -139,8 +139,7 @@ Questo documento rappresenta la **bussola strategica e funzionale** del progetto
 | Guida Contestuale Comandi Vocali | 🟢 Completato | HUD live rotativo, Cheat Sheet modale a 1 tocco, trigger 'Aiuto' e box in Impostazioni. |
 | Indicatore Stato Offline & HUD Rete | 🟢 Completato | Pillola ambra in Navbar e HUD Guida, banner informativo e modale di briefing via createPortal con feedback di riconnessione ONLINE. |
 | Spiegazione Vocale Modalità Guida | 🟢 Completato | Audio briefing iniziale run-once con Edge-TTS (Giuseppe/Elsa), tasto Salta, persistenza Dexie, riascolto 1-click e riattivazione in Impostazioni. |
-| Protocollo Collaudo Manuale E2E | 🟢 Completato | Checklist completa a 9 aree operative in TODO.md per verifica pilota. |
-| Filtro Quiz Esclusivi Deltaplano | 📋 Pianificato (TODO) | Audit 504 quiz e tagging disciplina deltaplano/parapendio/comune con preservazione concetti condivisi. |
+| Filtro Quiz Esclusivi Deltaplano / Parapendio | 🟢 Completato | Audit semantico 504 quiz AeCI (428 comuni, 30 deltaplano, 46 parapendio), tagging disciplina, selettore pill cockpit in Esame/Materie/Archivio/Impostazioni, salvaguardia assoluta teoria comune e 140/140 unit test. |
 | Blocco Menu di Navigazione al Top | 🟢 Completato | Barra di navigazione permanently fixed al top (`fixed top-0 left-0 right-0 z-40`), eliminata la bottom nav fissa e rimosso il preamble fuffa dalla schermata esame. |
 | Impostazioni ad Accordion Compresso Singolo | 🟢 Completato | Sostituzione pills menu con accordion verticale mutuo-esclusivo (1 sola sezione aperta alla volta, anteprime badge live, pulsante comprimi tutto ed espansione selettiva). |
 | Visualizzazione Globale Versione App | 🟢 Completato | Badge di versione dinamico (`__APP_VERSION__` e `__APP_BUILD_ID__`) visibile in Navbar e header Impostazioni. |

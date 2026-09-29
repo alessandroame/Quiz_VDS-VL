@@ -18,6 +18,8 @@ import {
 import { useQuiz } from '../context/QuizContext';
 import { useAviationVoice } from '../hooks/useAviationVoice';
 import type { Question } from '../types/quiz';
+import { DisciplineSelector } from './DisciplineSelector';
+import { getDisciplineBadge } from '../utils/discipline';
 
 interface ArchiveItemProps {
   question: Question;
@@ -55,6 +57,8 @@ const ArchiveItem: React.FC<ArchiveItemProps> = ({ question: q, isExpanded, onTo
     stop
   } = useAviationVoice(q.id);
 
+  const disciplineBadge = getDisciplineBadge(q.discipline);
+
   return (
     <div className="border border-zinc-800 rounded-xl overflow-hidden bg-zinc-900/40 light:bg-white light:border-slate-200">
       <div
@@ -70,6 +74,11 @@ const ArchiveItem: React.FC<ArchiveItemProps> = ({ question: q, isExpanded, onTo
             <span className="text-[11px] text-zinc-400 light:text-slate-500">
               {q.subjectName}
             </span>
+            {disciplineBadge && (
+              <span className={`text-[10px] font-mono px-1.5 py-0.2 rounded font-semibold ${disciplineBadge.className}`}>
+                {disciplineBadge.label}
+              </span>
+            )}
             {stat?.isBookmarked && (
               <Bookmark className="w-3 h-3 text-amber-400 fill-amber-400" />
             )}
@@ -438,7 +447,7 @@ const ArchiveItem: React.FC<ArchiveItemProps> = ({ question: q, isExpanded, onTo
 };
 
 export const ArchiveScreen: React.FC = () => {
-  const { questions, statsMap } = useQuiz();
+  const { questions, statsMap, disciplineFilter, setDisciplineFilter, subjectsAnalytics } = useQuiz();
 
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedSubject, setSelectedSubject] = useState<number | 'all'>('all');
@@ -448,6 +457,11 @@ export const ArchiveScreen: React.FC = () => {
 
   const filteredQuestions = useMemo(() => {
     return questions.filter(q => {
+      // Filtro disciplina (All / Parapendio / Deltaplano)
+      if (disciplineFilter !== 'all' && q.discipline !== 'all' && q.discipline !== disciplineFilter) {
+        return false;
+      }
+
       const stat = statsMap.get(q.id);
 
       if (searchQuery.trim()) {
@@ -472,15 +486,27 @@ export const ArchiveScreen: React.FC = () => {
 
       return true;
     });
-  }, [questions, statsMap, searchQuery, selectedSubject, onlyBookmarks, onlyWithNotes]);
+  }, [questions, statsMap, disciplineFilter, searchQuery, selectedSubject, onlyBookmarks, onlyWithNotes]);
 
   return (
     <div className="max-w-2xl mx-auto px-4 py-6 space-y-4">
-      <div>
-        <h1 className="text-xl font-bold tracking-tight">Archivio Completo</h1>
-        <p className="text-xs text-zinc-400 light:text-slate-600">
-          Tutti i 504 quiz ufficiali AeCI: cerca, leggi e ascolta qualsiasi domanda
-        </p>
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        <div>
+          <h1 className="text-xl font-bold tracking-tight">Archivio Completo</h1>
+          <p className="text-xs text-zinc-400 light:text-slate-600">
+            {disciplineFilter === 'all'
+              ? 'Tutti i 504 quiz ufficiali AeCI: cerca, leggi e ascolta qualsiasi domanda'
+              : disciplineFilter === 'paraglider'
+              ? '474 quiz: Parapendio e teoria comune (esclusi 30 deltaplano)'
+              : '458 quiz: Deltaplano e teoria comune (esclusi 46 parapendio)'}
+          </p>
+        </div>
+        <DisciplineSelector
+          value={disciplineFilter}
+          onChange={setDisciplineFilter}
+          size="sm"
+          idPrefix="archive-discipline"
+        />
       </div>
 
       {/* Barra di Ricerca */}
@@ -511,16 +537,12 @@ export const ArchiveScreen: React.FC = () => {
           onChange={e => setSelectedSubject(e.target.value === 'all' ? 'all' : Number(e.target.value))}
           className="bg-zinc-900 border border-zinc-800 rounded-lg px-2.5 py-1.5 text-xs text-zinc-300 outline-none light:bg-white light:border-slate-200 light:text-slate-700"
         >
-          <option value="all">Tutte le materie (9)</option>
-          <option value="1">Normativa e Legislazione (40)</option>
-          <option value="2">Aerodinamica (150)</option>
-          <option value="3">Pronto Soccorso (20)</option>
-          <option value="4">Fisiopatologia (10)</option>
-          <option value="5">Meteorologia (120)</option>
-          <option value="6">Strumenti (20)</option>
-          <option value="7">Tecnica di Pilotaggio (79)</option>
-          <option value="8">Materiali (20)</option>
-          <option value="9">Sicurezza del Volo (45)</option>
+          <option value="all">Tutte le materie ({subjectsAnalytics.length})</option>
+          {subjectsAnalytics.map(sub => (
+            <option key={sub.id} value={sub.id}>
+              {sub.name} ({sub.total})
+            </option>
+          ))}
         </select>
 
         <button

@@ -1,8 +1,9 @@
 import React, { createContext, useContext, useMemo, useEffect, useState } from 'react';
 import { useLiveQuery } from 'dexie-react-hooks';
 import questionsData from '../data/questions.json';
-import type { Question } from '../types/quiz';
+import type { Question, Discipline } from '../types/quiz';
 import type { QuestionStat, ExamSession, AppSettings, InProgressSession } from '../types/database';
+import { filterQuestionsByDiscipline } from '../utils/discipline';
 import { voiceService } from '../services/voiceService';
 import { syncEngine, type SyncEngineState } from '../services/syncEngine';
 import {
@@ -51,6 +52,9 @@ interface QuizContextType {
   dismissActiveSession: () => Promise<void>;
   syncState: SyncEngineState;
   syncNow: () => Promise<{ success: boolean; message: string }>;
+  disciplineFilter: Discipline;
+  setDisciplineFilter: (discipline: Discipline) => Promise<void>;
+  filteredQuestions: Question[];
 }
 
 const QuizContext = createContext<QuizContextType | null>(null);
@@ -118,28 +122,45 @@ export const QuizProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return map;
   }, [statsList]);
 
-  // Metriche aggregate
+  // Gestione filtro disciplina (All / Parapendio / Deltaplano)
+  const disciplineFilter: Discipline = settings.disciplinePreference || 'all';
+
+  const setDisciplineFilter = async (discipline: Discipline) => {
+    await updateSetting('disciplinePreference', discipline);
+  };
+
+  const filteredQuestions = useMemo(() => {
+    return filterQuestionsByDiscipline(questions, disciplineFilter);
+  }, [questions, disciplineFilter]);
+
+  const filteredQuestionIdSet = useMemo(() => {
+    return new Set(filteredQuestions.map(q => q.id));
+  }, [filteredQuestions]);
+
+  // Metriche aggregate (calcolate sui quiz della disciplina attiva)
   const totalSeen = useMemo(() => {
-    return statsList.filter(s => s.timesSeen > 0).length;
-  }, [statsList]);
+    return statsList.filter(s => filteredQuestionIdSet.has(s.questionId) && s.timesSeen > 0).length;
+  }, [statsList, filteredQuestionIdSet]);
 
   const mistakesCount = useMemo(() => {
-    return calculateMistakesCount(statsList);
-  }, [statsList]);
+    const filteredStats = statsList.filter(s => filteredQuestionIdSet.has(s.questionId));
+    return calculateMistakesCount(filteredStats);
+  }, [statsList, filteredQuestionIdSet]);
 
   const bookmarksCount = useMemo(() => {
-    return statsList.filter(s => s.isBookmarked).length;
-  }, [statsList]);
+    return statsList.filter(s => filteredQuestionIdSet.has(s.questionId) && s.isBookmarked).length;
+  }, [statsList, filteredQuestionIdSet]);
 
   // Statistiche per materia
   const subjectsAnalytics = useMemo<SubjectAnalytics[]>(() => {
-    return calculateSubjectAnalytics(questions, statsMap);
-  }, [questions, statsMap]);
+    return calculateSubjectAnalytics(filteredQuestions, statsMap);
+  }, [filteredQuestions, statsMap]);
 
   // Indice di prontezza all'esame (0 - 100%)
   const readinessScore = useMemo(() => {
-    return calculateReadinessScore(questions.length, totalSeen, statsList, sessions);
-  }, [questions.length, totalSeen, statsList, sessions]);
+    const activeStats = statsList.filter(s => filteredQuestionIdSet.has(s.questionId));
+    return calculateReadinessScore(filteredQuestions.length, totalSeen, activeStats, sessions);
+  }, [filteredQuestions.length, totalSeen, statsList, filteredQuestionIdSet, sessions]);
 
   const updateSetting = async <K extends keyof AppSettings>(key: K, value: AppSettings[K]) => {
     await setSetting(key, value);
@@ -218,7 +239,10 @@ export const QuizProvider: React.FC<{ children: React.ReactNode }> = ({ children
         persistActiveSession,
         dismissActiveSession,
         syncState,
-        syncNow
+        syncNow,
+        disciplineFilter,
+        setDisciplineFilter,
+        filteredQuestions
       }}
     >
       {children}

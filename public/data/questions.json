@@ -3,6 +3,7 @@
     "id": 1001,
     "subjectId": 1,
     "subjectName": "Normativa e Legislazione",
+    "discipline": "all",
     "question": "Chi può praticare autonomamente il volo libero?",
     "options": [
       "Chiunque può praticare quest'attività sportiva purché abbia frequentato un apposito corso.",
@@ -19,6 +20,7 @@
     "id": 1002,
     "subjectId": 1,
     "subjectName": "Normativa e Legislazione",
+    "discipline": "all",
     "question": "Chi è l'unico responsabile della condotta del deltaplano e del parapendio?",
     "options": [
       "Il pilota.",
@@ -35,6 +37,7 @@
     "id": 1003,
     "subjectId": 1,
     "subjectName": "Normativa e Legislazione",
+    "discipline": "all",
     "question": "Qual è l'età minima, previo consenso dei genitori, per la pratica del Volo Libero?",
     "options": [
       "14 anni.",
@@ -51,6 +54,7 @@
     "id": 1004,
     "subjectId": 1,
     "subjectName": "Normativa e Legislazione",
+    "discipline": "all",
     "question": "Il Certificato Medico ha normalmente validità di",
     "options": [
       "18 mesi.",
@@ -67,6 +71,7 @@
     "id": 1005,
     "subjectId": 1,
     "subjectName": "Normativa e Legislazione",
+    "discipline": "all",
     "question": "La copertura assicurativa RCT è obbligatoria per la pratica del VDS/VL?",
     "options": [
       "Si, il pilota è obbligato ad assicurarsi.",
@@ -83,6 +88,7 @@
     "id": 1006,
     "subjectId": 1,
     "subjectName": "Normativa e Legislazione",
+    "discipline": "all",
     "question": "Nel Volo Libero qual è il criterio generale di precedenza nell'area di decollo?",
     "options": [
       "Ha la precedenza il pilota in fase d'atterraggio (top landing).",
@@ -99,6 +105,7 @@
     "id": 1007,
     "subjectId": 1,
     "subjectName": "Normativa e Legislazione",
+    "discipline": "all",
     "question": "È obbligatorio l'uso del casco per il Volo Libero?",
     "options": [
       "No.",
@@ -115,6 +122,7 @@
     "id": 1008,
     "subjectId": 1,
     "subjectName": "Normativa e Legislazione",
+    "discipline": "all",
     "question": "Qual è lo spazio aereo all'interno del quale si può praticare il Volo Libero?",
     "options": [
       "Qualsiasi spazio aereo purché ad una quota inferiore ai 1000 piedi. E LEGISLAZIONE",
@@ -131,6 +139,7 @@
     "id": 1009,
     "subjectId": 1,
     "subjectName": "Normativa e Legislazione",
+    "discipline": "all",
     "question": "Il criterio nello stabilire la suddivisione degli spazi aerei per la pratica del volo è:",
     "options": [
       "solo quello di limitare lo spazio aereo a disposizione degli sportivi che praticano il Volo Libero, in quanto ritenuta attività secondaria.",
@@ -147,6 +156,7 @@
     "id": 1010,
     "subjectId": 1,
     "subjectName": "Normativa e Legislazione",
+    "discipline": "all",
     "question": "Quale altezza minima si deve mantenere nella pratica del VDS/VL?",
     "options": [
       "500 piedi dal punto più elevato nel raggio di 3 km nei giorni feriali e 1000 piedi nei giorni festivi.",
@@ -163,6 +173,7 @@
     "id": 1011,
     "subjectId": 1,
     "subjectName": "Normativa e Legislazione",
+    "discipline": "all",
     "question": "Quale distanza minima occorre mantenere dalle nubi?",
     "options": [
       "1000 m.",
@@ -179,6 +190,7 @@
     "id": 1012,
     "subjectId": 1,
     "subjectName": "Normativa e Legislazione",
+    "discipline": "all",
     "question": "È consentito volare in nube con deltaplano e parapendio?",
     "options": [
       "No, perché non è garantita la separazione da eventuali ostacoli, dal terreno e da altri mezzi e poiché il disorientamento comporta la possibile perdita del controllo di assetto e velocità.",
@@ -195,6 +207,7 @@
     "id": 1013,
     "subjectId": 1,
     "subjectName": "Normativa e Legislazione",
+    "discipline": "all",
     "question": "Le tabelle chiamate effemeridi, sulle quali si possono trovare tutti i dati concernenti le posizioni in cielo delle stelle e dei pianeti durante l'anno, possono essere utili a chi pratica il Volo Libero perché:",
     "options": [
       "può essere utile condurre una navigazione stellare in certe condizioni.",
@@ -211,6 +224,7 @@
     "id": 1014,
     "subjectId": 1,
     "subjectName": "Normativa e Legislazione",
+    "discipline": "all",
     "question": "E' possibile svolgere attività di volo libero a meno di 4 km dai confini di Stato?",
     "options": [
       "No.",
@@ -227,6 +241,7 @@
     "id": 1015,
     "subjectId": 1,
     "subjectName": "Normativa e Legislazione",
+    "discipline": "all",
     "question": "Deltaplano e parapendio come sono classificati?",
     "options": [
       "Sono alianti.",
@@ -243,6 +258,7 @@
     "id": 1016,
     "subjectId": 1,
     "subjectName": "Normativa e Legislazione",
+    "discipline": "all",
     "question": "Che cosa s'intende per spazio aereo controllato?",
     "options": [
       "Una porzione di spazio aereo nazionale all'interno della quale tutto il traffico è controllato da apparecchiature radar.",
@@ -259,6 +275,7 @@
     "id": 1017,
     "subjectId": 1,
     "subjectName": "Normativa e Legislazione",
+    "discipline": "all",
     "question": "La Legge italiana stabilisce che:",
     "options": [
       "all'interno degli spazi aerei controllati si svolga normalmente solo attività di volo di aeromobili esclusi gli apparecchi VDS/VL se non preventivamente autorizzati.",
@@ -275,6 +292,7 @@
     "id": 1018,
     "subjectId": 1,
     "subjectName": "Normativa e Legislazione",
+    "discipline": "all",
     "question": "È consentito l'impegno degli spazi aerei controllati da parte degli apparecchi VDS/VL?",
     "options": [
       "Solo se preventivamente autorizzati.",
@@ -291,6 +309,7 @@
     "id": 1019,
     "subjectId": 1,
     "subjectName": "Normativa e Legislazione",
+    "discipline": "all",
     "question": "Praticando il Volo Libero a quale distanza è opportuno tenersi dagli aeroporti non situati all'interno di un ATZ?",
     "options": [
       "Ad almeno 5 km.",
@@ -307,6 +326,7 @@
     "id": 1020,
     "subjectId": 1,
     "subjectName": "Normativa e Legislazione",
+    "discipline": "all",
     "question": "Che cosa è una ATZ?",
     "options": [
       "Uno spazio aereo controllato situato intorno e sopra ad un aeroporto.",
@@ -323,6 +343,7 @@
     "id": 1021,
     "subjectId": 1,
     "subjectName": "Normativa e Legislazione",
+    "discipline": "all",
     "question": "E' consentito effettuare attività di volo libero in un'ATZ?",
     "options": [
       "Si.",
@@ -339,6 +360,7 @@
     "id": 1022,
     "subjectId": 1,
     "subjectName": "Normativa e Legislazione",
+    "discipline": "all",
     "question": "Che cosa è un CTR?",
     "options": [
       "Una porzione di spazio aereo controllato all'interno del quale si svolge attività di volo di aeromobili e i mezzi del VDS devono avere preventiva autorizzazione.",
@@ -355,6 +377,7 @@
     "id": 1023,
     "subjectId": 1,
     "subjectName": "Normativa e Legislazione",
+    "discipline": "all",
     "question": "E' possibile volare con deltaplano o parapendio all'interno di un CTR?",
     "options": [
       "Normalmente si.",
@@ -371,6 +394,7 @@
     "id": 1024,
     "subjectId": 1,
     "subjectName": "Normativa e Legislazione",
+    "discipline": "all",
     "question": "Che cosa è una TMA?",
     "options": [
       "Una porzione di spazio aereo riservata all' attività di velivoli militari.",
@@ -387,6 +411,7 @@
     "id": 1025,
     "subjectId": 1,
     "subjectName": "Normativa e Legislazione",
+    "discipline": "all",
     "question": "E' ammesso il VDS/VL all'interno di una TMA?",
     "options": [
       "Solo se autorizzato.",
@@ -403,6 +428,7 @@
     "id": 1026,
     "subjectId": 1,
     "subjectName": "Normativa e Legislazione",
+    "discipline": "all",
     "question": "Che cosa è una Aerovia o AWY?",
     "options": [
       "Una via di rullaggio a terra su un aeroporto.",
@@ -419,6 +445,7 @@
     "id": 1027,
     "subjectId": 1,
     "subjectName": "Normativa e Legislazione",
+    "discipline": "all",
     "question": "È ammesso volare in deltaplano o parapendio in un'aerovia o AWY?",
     "options": [
       "No.",
@@ -435,6 +462,7 @@
     "id": 1028,
     "subjectId": 1,
     "subjectName": "Normativa e Legislazione",
+    "discipline": "all",
     "question": "Che cosa è una zona P \"PAPA\"?",
     "options": [
       "Una porzione di spazio aereo all'interno della quale è normalmente proibito il volo a tutti gli aeromobili.",
@@ -451,6 +479,7 @@
     "id": 1029,
     "subjectId": 1,
     "subjectName": "Normativa e Legislazione",
+    "discipline": "all",
     "question": "Che cosa è una zona D \"DELTA\"?",
     "options": [
       "Una porzione di spazio aereo all'interno della quale è permesso volare in deltaplano.",
@@ -467,6 +496,7 @@
     "id": 1030,
     "subjectId": 1,
     "subjectName": "Normativa e Legislazione",
+    "discipline": "all",
     "question": "Che cosa è una zona R \"ROMEO\"?",
     "options": [
       "Una porzione di spazio aereo all'interno della quale il volo è raccomandato per tutti i tipi di aeromobile.",
@@ -483,6 +513,7 @@
     "id": 1031,
     "subjectId": 1,
     "subjectName": "Normativa e Legislazione",
+    "discipline": "all",
     "question": "È possibile normalmente volare con deltaplano e parapendio all'interno delle zone denominate nelle carte aeronautiche con le lettere P, D (\"PAPA\", \"DELTA\")?",
     "options": [
       "No.",
@@ -499,6 +530,7 @@
     "id": 1032,
     "subjectId": 1,
     "subjectName": "Normativa e Legislazione",
+    "discipline": "all",
     "question": "In termica decide il senso di rotazione:",
     "options": [
       "il pilota che per primo entra nella corrente ascensionale stabilisce il senso di rotazione.",
@@ -515,6 +547,7 @@
     "id": 1033,
     "subjectId": 1,
     "subjectName": "Normativa e Legislazione",
+    "discipline": "all",
     "question": "Tra un apparecchio per il volo libero ed un apparecchio a motore, chi ha la precedenza in caso di rotte convergenti?",
     "options": [
       "L'apparecchio a motore, in quanto più veloce.",
@@ -531,6 +564,7 @@
     "id": 1034,
     "subjectId": 1,
     "subjectName": "Normativa e Legislazione",
+    "discipline": "all",
     "question": "Due apparecchi VDS si trovano su rotte convergenti alla stessa quota. Come si devono comportare i rispettivi piloti?",
     "options": [
       "Uno mantiene la quota e l'altro la cambia per evitare la collisione.",
@@ -547,6 +581,7 @@
     "id": 1035,
     "subjectId": 1,
     "subjectName": "Normativa e Legislazione",
+    "discipline": "all",
     "question": "Due apparecchi per il VDS privi di motore compiono un volo di pendio e rischiano la collisione frontale. Come si comportano i rispettivi piloti?",
     "options": [
       "Quello con il pendio alla propria sinistra prosegue diritto, l'altro vira a sinistra per evitare la collisione.",
@@ -563,6 +598,7 @@
     "id": 1036,
     "subjectId": 1,
     "subjectName": "Normativa e Legislazione",
+    "discipline": "all",
     "question": "In caso di precedenza tra un parapendio monoposto, un parapendio biposto e un deltaplano biposto:",
     "options": [
       "ha precedenza il parapendio monoposto.",
@@ -579,6 +615,7 @@
     "id": 1037,
     "subjectId": 1,
     "subjectName": "Normativa e Legislazione",
+    "discipline": "all",
     "question": "Qual è il criterio generale di precedenza per deltaplani e parapendio in atterraggio?",
     "options": [
       "Dare la precedenza a tutti i deltaplani o parapendio più lenti indipendentemente dalla quota cui si trovano.",
@@ -595,6 +632,7 @@
     "id": 1038,
     "subjectId": 1,
     "subjectName": "Normativa e Legislazione",
+    "discipline": "all",
     "question": "Nel Volo Libero è obbligatoria l'assicurazione RCT del mezzo?",
     "options": [
       "No.",
@@ -611,6 +649,7 @@
     "id": 1039,
     "subjectId": 1,
     "subjectName": "Normativa e Legislazione",
+    "discipline": "all",
     "question": "Il riporto di un'infrazione alla vigente legge che regola l'attività di Volo Libero dovrebbe essere fatto in prima istanza alla Competente Autorità che è:",
     "options": [
       "la Polizia di Stato.",
@@ -627,6 +666,7 @@
     "id": 1040,
     "subjectId": 1,
     "subjectName": "Normativa e Legislazione",
+    "discipline": "all",
     "question": "Qual è uno dei requisiti richiesti per l'uso degli apparecchi biposto VDS/VL con passeggero a bordo?",
     "options": [
       "Attestato di pilota in corso di validità e abilitazione al trasporto del passeggero.",
@@ -643,6 +683,7 @@
     "id": 2001,
     "subjectId": 2,
     "subjectName": "Aerodinamica",
+    "discipline": "all",
     "question": "Che cosa studia l'aerodinamica?",
     "options": [
       "Le leggi della dinamica dei fluidi.",
@@ -659,6 +700,7 @@
     "id": 2002,
     "subjectId": 2,
     "subjectName": "Aerodinamica",
+    "discipline": "all",
     "question": "Che cosa è un'ala?",
     "options": [
       "È un corpo di forma prestabilita che genera portanza aerodinamica in ogni condizione.",
@@ -675,6 +717,7 @@
     "id": 2003,
     "subjectId": 2,
     "subjectName": "Aerodinamica",
+    "discipline": "all",
     "question": "Che cosa s'intende per \"profilo alare\"?",
     "options": [
       "La proiezione dell'ala sul piano orizzontale.",
@@ -691,6 +734,7 @@
     "id": 2004,
     "subjectId": 2,
     "subjectName": "Aerodinamica",
+    "discipline": "all",
     "question": "Quali sono i più comuni tipi di profilo alare utilizzati nel VDS/VL?",
     "options": [
       "Piano convesso ed ellittico simmetrico.",
@@ -707,6 +751,7 @@
     "id": 2005,
     "subjectId": 2,
     "subjectName": "Aerodinamica",
+    "discipline": "all",
     "question": "Che cosa s'intende rispettivamente per bordo d'attacco e per bordo d'uscita di un'ala?",
     "options": [
       "La parte dell'ala che si attacca alla fusoliera e l'estremità alare.",
@@ -723,6 +768,7 @@
     "id": 2006,
     "subjectId": 2,
     "subjectName": "Aerodinamica",
+    "discipline": "all",
     "question": "Che cosa è la corda alare o aerodinamica?",
     "options": [
       "È il segmento di retta che unisce il bordo d'attacco al bordo d'uscita del profilo alare.",
@@ -739,6 +785,7 @@
     "id": 2007,
     "subjectId": 2,
     "subjectName": "Aerodinamica",
+    "discipline": "all",
     "question": "Che cosa s'intende rispettivamente per estradosso e intradosso di un'ala?",
     "options": [
       "La superficie inferiore e la superficie superiore dell'ala stessa.",
@@ -755,6 +802,7 @@
     "id": 2008,
     "subjectId": 2,
     "subjectName": "Aerodinamica",
+    "discipline": "all",
     "question": "Che cosa s'intende per apertura alare?",
     "options": [
       "La distanza tra le due estremità alari.",
@@ -771,6 +819,7 @@
     "id": 2009,
     "subjectId": 2,
     "subjectName": "Aerodinamica",
+    "discipline": "all",
     "question": "Che cosa s'intende per allungamento di un'ala?",
     "options": [
       "È la distanza tra le estremità alari.",
@@ -787,6 +836,7 @@
     "id": 2010,
     "subjectId": 2,
     "subjectName": "Aerodinamica",
+    "discipline": "all",
     "question": "Quant'è l'allungamento di un'ala di 25 m2 di superficie dotata di un'apertura alare di 10 m?",
     "options": [
       "4 (quattro).",
@@ -803,6 +853,7 @@
     "id": 2011,
     "subjectId": 2,
     "subjectName": "Aerodinamica",
+    "discipline": "all",
     "question": "Quali sono gli assi attorno ai quali si muove un'ala?",
     "options": [
       "Quello longitudinale e quello verticale.",
@@ -819,6 +870,7 @@
     "id": 2012,
     "subjectId": 2,
     "subjectName": "Aerodinamica",
+    "discipline": "all",
     "question": "Come si chiama il movimento di un'ala rispetto al suo asse longitudinale?",
     "options": [
       "Rollio.",
@@ -835,6 +887,7 @@
     "id": 2013,
     "subjectId": 2,
     "subjectName": "Aerodinamica",
+    "discipline": "all",
     "question": "Come si chiama il movimento di un'ala rispetto al suo asse trasversale?",
     "options": [
       "Rollio.",
@@ -851,6 +904,7 @@
     "id": 2014,
     "subjectId": 2,
     "subjectName": "Aerodinamica",
+    "discipline": "all",
     "question": "Come si chiama il movimento di un'ala rispetto al suo asse verticale?",
     "options": [
       "Rollio.",
@@ -867,6 +921,7 @@
     "id": 2015,
     "subjectId": 2,
     "subjectName": "Aerodinamica",
+    "discipline": "all",
     "question": "L'ala può essere considerata una \"macchina\"?",
     "options": [
       "No, perché priva di particolari meccanismi.",
@@ -883,6 +938,7 @@
     "id": 2016,
     "subjectId": 2,
     "subjectName": "Aerodinamica",
+    "discipline": "all",
     "question": "Il movimento di un'ala:",
     "options": [
       "perturba l'aria circostante all'interno del così detto \"tubo di flusso\".",
@@ -899,6 +955,7 @@
     "id": 2017,
     "subjectId": 2,
     "subjectName": "Aerodinamica",
+    "discipline": "all",
     "question": "Per quale motivo parlando di aerodinamica è necessario fare riferimento al \"tubo di flusso\"?",
     "options": [
       "Perché si usa fare così in fisica.",
@@ -915,6 +972,7 @@
     "id": 2018,
     "subjectId": 2,
     "subjectName": "Aerodinamica",
+    "discipline": "all",
     "question": "Che cosa è un \"tubo di flusso\"?",
     "options": [
       "La porzione di aria perturbata dal passaggio di un'ala.",
@@ -931,6 +989,7 @@
     "id": 2019,
     "subjectId": 2,
     "subjectName": "Aerodinamica",
+    "discipline": "all",
     "question": "All'interno di un \"tubo di flusso\":",
     "options": [
       "la presenza di un solido perturba comunque il flusso del fluido.",
@@ -947,6 +1006,7 @@
     "id": 2020,
     "subjectId": 2,
     "subjectName": "Aerodinamica",
+    "discipline": "all",
     "question": "Un profilo investito da aria in movimento determina gli stessi effetti aerodinamici di un profilo che si muove nell'aria?",
     "options": [
       "No, indipendentemente dalla velocità e direzione del movimento relativo.",
@@ -963,6 +1023,7 @@
     "id": 2021,
     "subjectId": 2,
     "subjectName": "Aerodinamica",
+    "discipline": "all",
     "question": "Che cosa è il vento relativo?",
     "options": [
       "La differenza di velocità dell'aria che si riscontra sulle due semiali in virata.",
@@ -979,6 +1040,7 @@
     "id": 2022,
     "subjectId": 2,
     "subjectName": "Aerodinamica",
+    "discipline": "all",
     "question": "La velocità di cui è dotata un'ala e le forze a essa applicate quando vola sono:",
     "options": [
       "grandezze fisiche rappresentabili con vettori (con direzione, verso, intensità e punto d'applicazione definiti) che si possono comporre o scomporre tra loro.",
@@ -995,6 +1057,7 @@
     "id": 2023,
     "subjectId": 2,
     "subjectName": "Aerodinamica",
+    "discipline": "all",
     "question": "Quando si parla di pressione di un fluido su una superficie che cosa s'intende?",
     "options": [
       "È il prodotto della superficie per la forza che il fluido esercita sulla stessa.",
@@ -1011,6 +1074,7 @@
     "id": 2024,
     "subjectId": 2,
     "subjectName": "Aerodinamica",
+    "discipline": "all",
     "question": "La pressione di un fluido in movimento all'interno di un tubo di flusso è la somma di:",
     "options": [
       "pressione dinamica e peso del fluido.",
@@ -1027,6 +1091,7 @@
     "id": 2025,
     "subjectId": 2,
     "subjectName": "Aerodinamica",
+    "discipline": "all",
     "question": "Che cosa è la pressione statica di un fluido?",
     "options": [
       "È il rapporto tra peso e velocità del fluido.",
@@ -1043,6 +1108,7 @@
     "id": 2026,
     "subjectId": 2,
     "subjectName": "Aerodinamica",
+    "discipline": "all",
     "question": "Che cosa è la pressione dinamica di un fluido?",
     "options": [
       "È il rapporto tra la velocità di un fluido in movimento e la sua densità.",
@@ -1059,6 +1125,7 @@
     "id": 2027,
     "subjectId": 2,
     "subjectName": "Aerodinamica",
+    "discipline": "all",
     "question": "Che cosa rappresenta l'espressione \"1/2 ρ V2\"?",
     "options": [
       "La densità dell'aria ad una certa velocità.",
@@ -1075,6 +1142,7 @@
     "id": 2028,
     "subjectId": 2,
     "subjectName": "Aerodinamica",
+    "discipline": "all",
     "question": "La portanza e la resistenza sono direttamente proporzionali:",
     "options": [
       "alla pressione statica.",
@@ -1091,6 +1159,7 @@
     "id": 2029,
     "subjectId": 2,
     "subjectName": "Aerodinamica",
+    "discipline": "all",
     "question": "I filetti fluidi che incontrano un profilo alare generando portanza, con quale principale differenza scorrono sulle superfici?",
     "options": [
       "Differenza di velocità.",
@@ -1107,6 +1176,7 @@
     "id": 2030,
     "subjectId": 2,
     "subjectName": "Aerodinamica",
+    "discipline": "all",
     "question": "La velocità dell'aria su un'ala in volo è:",
     "options": [
       "maggiore sull'estradosso.",
@@ -1123,6 +1193,7 @@
     "id": 2031,
     "subjectId": 2,
     "subjectName": "Aerodinamica",
+    "discipline": "all",
     "question": "Un profilo in volo genera una pressione dinamica:",
     "options": [
       "maggiore sull'estradosso.",
@@ -1139,6 +1210,7 @@
     "id": 2032,
     "subjectId": 2,
     "subjectName": "Aerodinamica",
+    "discipline": "all",
     "question": "Un profilo in volo genera una pressione statica:",
     "options": [
       "identica sulle due superfici dell'ala.",
@@ -1155,6 +1227,7 @@
     "id": 2033,
     "subjectId": 2,
     "subjectName": "Aerodinamica",
+    "discipline": "all",
     "question": "La legge di Bernoully dice:",
     "options": [
       "che la somma della pressione statica e dinamica del fluido non è costante.",
@@ -1171,6 +1244,7 @@
     "id": 2034,
     "subjectId": 2,
     "subjectName": "Aerodinamica",
+    "discipline": "all",
     "question": "Che cosa mette in evidenza la legge di Bernoully in un tubo di Venturi a portata costante?",
     "options": [
       "Che variando la sezione del tubo, pressione e velocità del fluido rimangono invariate.",
@@ -1187,6 +1261,7 @@
     "id": 2035,
     "subjectId": 2,
     "subjectName": "Aerodinamica",
+    "discipline": "all",
     "question": "In un tubo di Venturi avente portata costante, al variare della sezione:",
     "options": [
       "la velocità del fluido varia.",
@@ -1203,6 +1278,7 @@
     "id": 2036,
     "subjectId": 2,
     "subjectName": "Aerodinamica",
+    "discipline": "all",
     "question": "In un tubo di Venturi avente portata costante la somma della pressione statica e della pressione dinamica del fluido (pressione totale):",
     "options": [
       "è variabile al variare della sezione.",
@@ -1219,6 +1295,7 @@
     "id": 2037,
     "subjectId": 2,
     "subjectName": "Aerodinamica",
+    "discipline": "all",
     "question": "All'interno di un tubo di flusso a portata costante, se la sezione diminuisce:",
     "options": [
       "la velocità del fluido aumenta e la sua pressione dinamica diminuisce.",
@@ -1235,6 +1312,7 @@
     "id": 2038,
     "subjectId": 2,
     "subjectName": "Aerodinamica",
+    "discipline": "all",
     "question": "All'interno di un tubo di flusso a portata costante dove la sezione aumenta:",
     "options": [
       "la velocità del fluido diminuisce e la sua pressione statica aumenta.",
@@ -1251,6 +1329,7 @@
     "id": 2039,
     "subjectId": 2,
     "subjectName": "Aerodinamica",
+    "discipline": "all",
     "question": "L'ala di un deltaplano o di un parapendio utilizza il principio di Bernoully applicato a un tubo Venturi?",
     "options": [
       "Si, ma non nel volo in termica.",
@@ -1267,6 +1346,7 @@
     "id": 2040,
     "subjectId": 2,
     "subjectName": "Aerodinamica",
+    "discipline": "all",
     "question": "I profili del deltaplano e del parapendio sono principalmente di tipo:",
     "options": [
       "biconvesso simmetrico.",
@@ -1283,6 +1363,7 @@
     "id": 2041,
     "subjectId": 2,
     "subjectName": "Aerodinamica",
+    "discipline": "all",
     "question": "Che cosa è la risultante aerodinamica?",
     "options": [
       "È la risultante di tutte le forze prodotte dall'ala in movimento rispetto all'aria.",
@@ -1299,6 +1380,7 @@
     "id": 2042,
     "subjectId": 2,
     "subjectName": "Aerodinamica",
+    "discipline": "all",
     "question": "La risultante aerodinamica è una forza:",
     "options": [
       "perpendicolare alla traiettoria di volo o al vento relativo.",
@@ -1315,6 +1397,7 @@
     "id": 2043,
     "subjectId": 2,
     "subjectName": "Aerodinamica",
+    "discipline": "all",
     "question": "La risultante aerodinamica si scompone in portanza e resistenza. Esse sono rispettivamente:",
     "options": [
       "la portanza perpendicolare alla corda alare e la resistenza parallela alla corda alare.",
@@ -1331,6 +1414,7 @@
     "id": 2044,
     "subjectId": 2,
     "subjectName": "Aerodinamica",
+    "discipline": "all",
     "question": "Se un profilo alare è investito da un vento relativo, si può sempre affermare che:",
     "options": [
       "si genera portanza.",
@@ -1347,6 +1431,7 @@
     "id": 2045,
     "subjectId": 2,
     "subjectName": "Aerodinamica",
+    "discipline": "all",
     "question": "Nel volo del deltaplano e del parapendio:",
     "options": [
       "la resistenza è uguale e opposta alla velocità sulla traiettoria.",
@@ -1363,6 +1448,7 @@
     "id": 2046,
     "subjectId": 2,
     "subjectName": "Aerodinamica",
+    "discipline": "all",
     "question": "La resistenza è una forza aerodinamica che può essere considerata:",
     "options": [
       "sempre perpendicolare alla traiettoria di volo.",
@@ -1379,6 +1465,7 @@
     "id": 2047,
     "subjectId": 2,
     "subjectName": "Aerodinamica",
+    "discipline": "all",
     "question": "Qual è la formula della resistenza?",
     "options": [
       "R = 1/2 ρ S C V2 r",
@@ -1395,6 +1482,7 @@
     "id": 2048,
     "subjectId": 2,
     "subjectName": "Aerodinamica",
+    "discipline": "all",
     "question": "In quale modo varia la resistenza aerodinamica di un'ala variando la densità dell'aria e la superficie dell'ala stessa?",
     "options": [
       "Non varia in alcun modo.",
@@ -1411,6 +1499,7 @@
     "id": 2049,
     "subjectId": 2,
     "subjectName": "Aerodinamica",
+    "discipline": "all",
     "question": "Di quanto varia la resistenza aerodinamica di un profilo alare triplicandone la velocità:",
     "options": [
       "del triplo.",
@@ -1427,6 +1516,7 @@
     "id": 2050,
     "subjectId": 2,
     "subjectName": "Aerodinamica",
+    "discipline": "all",
     "question": "Che cosa è il C? r",
     "options": [
       "Un coefficiente numerico che dipende dal carico alare.",
@@ -1443,6 +1533,7 @@
     "id": 2051,
     "subjectId": 2,
     "subjectName": "Aerodinamica",
+    "discipline": "all",
     "question": "Da quali tipi di resistenza è composta la resistenza aerodinamica di un'ala di deltaplano o parapendio?",
     "options": [
       "Dalla resistenza di attrito, da quella di forma e da quella indotta.",
@@ -1459,6 +1550,7 @@
     "id": 2052,
     "subjectId": 2,
     "subjectName": "Aerodinamica",
+    "discipline": "all",
     "question": "Che cosa è la resistenza di forma?",
     "options": [
       "È la parte di resistenza dovuta alla forma più o meno aerodinamica di un corpo.",
@@ -1475,6 +1567,7 @@
     "id": 2053,
     "subjectId": 2,
     "subjectName": "Aerodinamica",
+    "discipline": "all",
     "question": "Su quale tipo di resistenza influisce principalmente lo spessore del profilo alare?",
     "options": [
       "Sulla resistenza di attrito.",
@@ -1491,6 +1584,7 @@
     "id": 2054,
     "subjectId": 2,
     "subjectName": "Aerodinamica",
+    "discipline": "all",
     "question": "La resistenza di forma:",
     "options": [
       "aumenta all'aumentare della velocità.",
@@ -1507,6 +1601,7 @@
     "id": 2055,
     "subjectId": 2,
     "subjectName": "Aerodinamica",
+    "discipline": "all",
     "question": "Che cosa è la resistenza di attrito?",
     "options": [
       "È la parte di resistenza dovuta alle dimensioni dell'ala.",
@@ -1523,6 +1618,7 @@
     "id": 2056,
     "subjectId": 2,
     "subjectName": "Aerodinamica",
+    "discipline": "all",
     "question": "Che cosa s'intende per strato limite?",
     "options": [
       "Lo strato d'aria compreso tra superficie alare e superficie interna del tubo di flusso in cui vola l'ala.",
@@ -1539,6 +1635,7 @@
     "id": 2057,
     "subjectId": 2,
     "subjectName": "Aerodinamica",
+    "discipline": "all",
     "question": "La resistenza d'attrito:",
     "options": [
       "dipende anche dalla natura dello strato limite.",
@@ -1555,6 +1652,7 @@
     "id": 2058,
     "subjectId": 2,
     "subjectName": "Aerodinamica",
+    "discipline": "all",
     "question": "Come varia la resistenza d'attrito al variare della velocità?",
     "options": [
       "Aumenta al diminuire della velocità.",
@@ -1571,6 +1669,7 @@
     "id": 2059,
     "subjectId": 2,
     "subjectName": "Aerodinamica",
+    "discipline": "all",
     "question": "Che cosa è la resistenza indotta?",
     "options": [
       "È la parte di resistenza dovuta al prodursi dei vortici marginali o d'estremità alare.",
@@ -1587,6 +1686,7 @@
     "id": 2060,
     "subjectId": 2,
     "subjectName": "Aerodinamica",
+    "discipline": "all",
     "question": "La resistenza indotta è originata:",
     "options": [
       "dall'attrito dell'aria sulla superficie alare che produce i vortici marginali.",
@@ -1603,6 +1703,7 @@
     "id": 2061,
     "subjectId": 2,
     "subjectName": "Aerodinamica",
+    "discipline": "all",
     "question": "E' vero che la resistenza indotta dipende dall'allungamento alare?",
     "options": [
       "Si e da nessun altro parametro o fattore.",
@@ -1619,6 +1720,7 @@
     "id": 2062,
     "subjectId": 2,
     "subjectName": "Aerodinamica",
+    "discipline": "all",
     "question": "La resistenza indotta varia al variare della velocità?",
     "options": [
       "Si, aumenta all'aumentare della velocità.",
@@ -1635,6 +1737,7 @@
     "id": 2063,
     "subjectId": 2,
     "subjectName": "Aerodinamica",
+    "discipline": "all",
     "question": "A parità di altre condizioni un'ala con allungamento maggiore:",
     "options": [
       "è più efficiente.",
@@ -1651,6 +1754,7 @@
     "id": 2064,
     "subjectId": 2,
     "subjectName": "Aerodinamica",
+    "discipline": "all",
     "question": "Lo scopo principale per cui si tende ad aumentare l'allungamento è:",
     "options": [
       "ottenere minore resistenza di forma.",
@@ -1667,6 +1771,7 @@
     "id": 2065,
     "subjectId": 2,
     "subjectName": "Aerodinamica",
+    "discipline": "all",
     "question": "L'unica resistenza che diminuisce all'aumentare della velocità è:",
     "options": [
       "quella d'attrito.",
@@ -1683,6 +1788,7 @@
     "id": 2066,
     "subjectId": 2,
     "subjectName": "Aerodinamica",
+    "discipline": "all",
     "question": "In che modo la resistenza aerodinamica è proporzionale alla velocità?",
     "options": [
       "Direttamente.",
@@ -1699,6 +1805,7 @@
     "id": 2067,
     "subjectId": 2,
     "subjectName": "Aerodinamica",
+    "discipline": "all",
     "question": "Diminuendo la resistenza aerodinamica di un profilo a parità di altre condizioni si ottiene:",
     "options": [
       "un miglioramento delle prestazioni con una maggiore efficienza.",
@@ -1715,6 +1822,7 @@
     "id": 2068,
     "subjectId": 2,
     "subjectName": "Aerodinamica",
+    "discipline": "all",
     "question": "La resistenza aerodinamica varia al variare dell'angolo d'incidenza?",
     "options": [
       "No.",
@@ -1731,6 +1839,7 @@
     "id": 2069,
     "subjectId": 2,
     "subjectName": "Aerodinamica",
+    "discipline": "all",
     "question": "Si può diminuire la resistenza aerodinamica sino a ridurla a zero in volo?",
     "options": [
       "Si, variando opportunamente l'angolo d'incidenza",
@@ -1747,6 +1856,7 @@
     "id": 2070,
     "subjectId": 2,
     "subjectName": "Aerodinamica",
+    "discipline": "all",
     "question": "Adottando un profilo sottilissimo:",
     "options": [
       "la resistenza assume valore zero con incidenza zero.",
@@ -1763,6 +1873,7 @@
     "id": 2071,
     "subjectId": 2,
     "subjectName": "Aerodinamica",
+    "discipline": "all",
     "question": "Che cos'è la portanza?",
     "options": [
       "È una forza ed è la componente della risultante aerodinamica, parallela alla direzione del vento relativo o alla traiettoria di volo.",
@@ -1779,6 +1890,7 @@
     "id": 2072,
     "subjectId": 2,
     "subjectName": "Aerodinamica",
+    "discipline": "all",
     "question": "La portanza, in un profilo convenzionale, è generata prevalentemente:",
     "options": [
       "dalla diminuzione di pressione statica in corrispondenza dell'estradosso.",
@@ -1795,6 +1907,7 @@
     "id": 2073,
     "subjectId": 2,
     "subjectName": "Aerodinamica",
+    "discipline": "all",
     "question": "La portanza di un'ala dipende:",
     "options": [
       "dal suo disegno, dalla densità dell'aria, dalla superficie alare, dalla velocità con cui si muove e dalla sua incidenza.",
@@ -1811,6 +1924,7 @@
     "id": 2074,
     "subjectId": 2,
     "subjectName": "Aerodinamica",
+    "discipline": "all",
     "question": "Qual è la formula della portanza?",
     "options": [
       "P = 1/2 ρ S2 C V p",
@@ -1827,6 +1941,7 @@
     "id": 2075,
     "subjectId": 2,
     "subjectName": "Aerodinamica",
+    "discipline": "all",
     "question": "Nella formula della portanza il fattore C p detto coefficiente di portanza è:",
     "options": [
       "una forza perpendicolare alla traiettoria di volo o alla direzione del vento relativo.",
@@ -1843,6 +1958,7 @@
     "id": 2076,
     "subjectId": 2,
     "subjectName": "Aerodinamica",
+    "discipline": "all",
     "question": "Lo spessore del profilo influisce normalmente sul valore della portanza e della resistenza che esso genera?",
     "options": [
       "Si, la portanza mediamente aumenta mentre la resistenza diminuisce con l'aumentare dello spessore.",
@@ -1859,6 +1975,7 @@
     "id": 2077,
     "subjectId": 2,
     "subjectName": "Aerodinamica",
+    "discipline": "all",
     "question": "La portanza e la resistenza dipendono anche dalla densità dell'aria?",
     "options": [
       "Si.",
@@ -1875,6 +1992,7 @@
     "id": 2078,
     "subjectId": 2,
     "subjectName": "Aerodinamica",
+    "discipline": "all",
     "question": "Che cosa è l'angolo d'incidenza?",
     "options": [
       "È l'angolo compreso tra la corda alare e la direzione del vento relativo o traiettoria di volo.",
@@ -1891,6 +2009,7 @@
     "id": 2079,
     "subjectId": 2,
     "subjectName": "Aerodinamica",
+    "discipline": "all",
     "question": "L'assetto di un profilo rappresenta un'entità angolare ben distinta dall'incidenza. Esso è per definizione:",
     "options": [
       "l'angolo compreso tra la corda alare ed il piano orizzontale.",
@@ -1907,6 +2026,7 @@
     "id": 2080,
     "subjectId": 2,
     "subjectName": "Aerodinamica",
+    "discipline": "all",
     "question": "Se un profilo alare vola con un assetto di +6° e un'incidenza di +10° la sua traiettoria è:",
     "options": [
       "ascendente e inclinata verso l'alto rispetto al piano orizzontale di 4°.",
@@ -1923,6 +2043,7 @@
     "id": 2081,
     "subjectId": 2,
     "subjectName": "Aerodinamica",
+    "discipline": "all",
     "question": "In volo incidenza e assetto di un profilo coinciderebbero:",
     "options": [
       "qualora la traiettoria di volo fosse orizzontale in aria calma.",
@@ -1939,6 +2060,7 @@
     "id": 2082,
     "subjectId": 2,
     "subjectName": "Aerodinamica",
+    "discipline": "all",
     "question": "Perché nella formula della resistenza R = 1/2 ϱ C S V2 non compare l'angolo d'incidenza al r cui variare varia la resistenza stessa?",
     "options": [
       "Perché al variare dell'incidenza varia la sola superficie proiettata.",
@@ -1955,6 +2077,7 @@
     "id": 2083,
     "subjectId": 2,
     "subjectName": "Aerodinamica",
+    "discipline": "all",
     "question": "Per aumentare la portanza di un certo profilo alare è sufficiente aumentare l'angolo d'incidenza?",
     "options": [
       "Si, senza alcuna limitazione.",
@@ -1971,6 +2094,7 @@
     "id": 2084,
     "subjectId": 2,
     "subjectName": "Aerodinamica",
+    "discipline": "all",
     "question": "Variando l'incidenza di un profilo la portanza:",
     "options": [
       "varia.",
@@ -1987,6 +2111,7 @@
     "id": 2085,
     "subjectId": 2,
     "subjectName": "Aerodinamica",
+    "discipline": "all",
     "question": "Perché nella formula della portanza P = 1/2 ϱ C S V2 non compare l'angolo d'incidenza al p cui variare varia la portanza stessa?",
     "options": [
       "Perché al variare dell'incidenza varia la sola superficie proiettata.",
@@ -2003,6 +2128,7 @@
     "id": 2086,
     "subjectId": 2,
     "subjectName": "Aerodinamica",
+    "discipline": "all",
     "question": "Come può in volo il pilota variare la portanza?",
     "options": [
       "Diminuendo la resistenza aerodinamica.",
@@ -2019,6 +2145,7 @@
     "id": 2087,
     "subjectId": 2,
     "subjectName": "Aerodinamica",
+    "discipline": "all",
     "question": "Il peso del sistema ala-pilota, cui durante il volo si oppone la risultante aerodinamica, è una forza verticale diretta verso il basso, che si scompone in:",
     "options": [
       "trazione nella direzione della traiettoria di volo e peso apparente perpendicolarmente alla stessa.",
@@ -2035,6 +2162,7 @@
     "id": 2088,
     "subjectId": 2,
     "subjectName": "Aerodinamica",
+    "discipline": "all",
     "question": "L'energia motrice nel volo in deltaplano e parapendio è fornita:",
     "options": [
       "da forze di natura aerodinamica.",
@@ -2051,6 +2179,7 @@
     "id": 2089,
     "subjectId": 2,
     "subjectName": "Aerodinamica",
+    "discipline": "all",
     "question": "Come si chiama l'energia sfruttata dal sistema ala pilota in volo planato?",
     "options": [
       "Energia termica.",
@@ -2067,6 +2196,7 @@
     "id": 2090,
     "subjectId": 2,
     "subjectName": "Aerodinamica",
+    "discipline": "all",
     "question": "Che cosa è la trazione nel volo planato?",
     "options": [
       "È una forza ed è la componente del peso orientata nella direzione della traiettoria di volo.",
@@ -2083,6 +2213,7 @@
     "id": 2091,
     "subjectId": 2,
     "subjectName": "Aerodinamica",
+    "discipline": "all",
     "question": "Com'è possibile variare il valore della trazione in volo?",
     "options": [
       "Non può essere variato.",
@@ -2099,6 +2230,7 @@
     "id": 2092,
     "subjectId": 2,
     "subjectName": "Aerodinamica",
+    "discipline": "all",
     "question": "In volo librato rettilineo uniforme il peso apparente, che costituisce la componente del peso perpendicolare alla traiettoria di volo, è equilibrato dalla:",
     "options": [
       "resistenza.",
@@ -2115,6 +2247,7 @@
     "id": 2093,
     "subjectId": 2,
     "subjectName": "Aerodinamica",
+    "discipline": "all",
     "question": "In virata come variano il peso apparente e la superficie proiettata dell'ala?",
     "options": [
       "Aumentano entrambi, il peso apparente a causa dell'accelerazione centripeta, la superficie proiettata per motivi geometrici.",
@@ -2131,6 +2264,7 @@
     "id": 2094,
     "subjectId": 2,
     "subjectName": "Aerodinamica",
+    "discipline": "all",
     "question": "In virata a causa della forza centrifuga e dell''inclinazione laterale:",
     "options": [
       "il peso apparente è maggiore e la superficie proiettata è minore.",
@@ -2147,6 +2281,7 @@
     "id": 2095,
     "subjectId": 2,
     "subjectName": "Aerodinamica",
+    "discipline": "all",
     "question": "Che cosa s'intende per carico alare?",
     "options": [
       "Il rapporto tra il peso sostentato dall'ala e la superficie della stessa.",
@@ -2163,6 +2298,7 @@
     "id": 2096,
     "subjectId": 2,
     "subjectName": "Aerodinamica",
+    "discipline": "all",
     "question": "Se il pilota pesa 78 kg, l'attrezzatura di volo, ala compresa, 22 kg e la superficie proiettata è 25 m2, quanto sarà il carico alare?",
     "options": [
       "6 kg/m2.",
@@ -2179,6 +2315,7 @@
     "id": 2097,
     "subjectId": 2,
     "subjectName": "Aerodinamica",
+    "discipline": "all",
     "question": "Se a seguito di una parziale \"chiusura\" del parapendio la sua superficie alare si riduce:",
     "options": [
       "il carico alare rimane lo stesso.",
@@ -2195,6 +2332,7 @@
     "id": 2098,
     "subjectId": 2,
     "subjectName": "Aerodinamica",
+    "discipline": "all",
     "question": "Che cosa s'intende per fattore di carico?",
     "options": [
       "Un fattore numerico capace di indicare quante volte il peso del sistema ala-pilota varia per effetto dell'accelerazione centrifuga in virata o di altre accelerazioni positive o negative durante le manovre.",
@@ -2211,6 +2349,7 @@
     "id": 2099,
     "subjectId": 2,
     "subjectName": "Aerodinamica",
+    "discipline": "all",
     "question": "Durante una virata al sistema ala-pilota viene applicata, per effetto della forza centrifuga, un'accelerazione pari a due \"G\". Si può affermare che:",
     "options": [
       "il fattore il carico rimane invariato.",
@@ -2227,6 +2366,7 @@
     "id": 2100,
     "subjectId": 2,
     "subjectName": "Aerodinamica",
+    "discipline": "all",
     "question": "Se durante il volo per qualche motivo il fattore di carico raddoppia, il carico alare",
     "options": [
       "può anche rimanere invariato.",
@@ -2243,6 +2383,7 @@
     "id": 2101,
     "subjectId": 2,
     "subjectName": "Aerodinamica",
+    "discipline": "all",
     "question": "Che cosa s'intende per centro di pressione o di spinta?",
     "options": [
       "È il punto di applicazione della forza peso.",
@@ -2259,6 +2400,7 @@
     "id": 2102,
     "subjectId": 2,
     "subjectName": "Aerodinamica",
+    "discipline": "all",
     "question": "In volo può variare la posizione del centro di pressione?",
     "options": [
       "No, perché non dipende da fattori che variano in volo.",
@@ -2275,6 +2417,7 @@
     "id": 2103,
     "subjectId": 2,
     "subjectName": "Aerodinamica",
+    "discipline": "all",
     "question": "Come varia mediamente la posizione del centro di pressione al variare dell'incidenza su profili autostabili?",
     "options": [
       "Diminuendo l'incidenza il centro di pressione avanza ed aumentando l'incidenza il centro di pressione arretra.",
@@ -2291,6 +2434,7 @@
     "id": 2104,
     "subjectId": 2,
     "subjectName": "Aerodinamica",
+    "discipline": "all",
     "question": "Che cosa s'intende per baricentro di un apparecchio?",
     "options": [
       "Il punto di applicazione della forza peso.",
@@ -2307,6 +2451,7 @@
     "id": 2105,
     "subjectId": 2,
     "subjectName": "Aerodinamica",
+    "discipline": "all",
     "question": "Dove si trova normalmente il baricentro?",
     "options": [
       "Coincide con il baricentro del solo pilota.",
@@ -2323,6 +2468,7 @@
     "id": 2106,
     "subjectId": 2,
     "subjectName": "Aerodinamica",
+    "discipline": "all",
     "question": "La posizione del baricentro si sposta",
     "options": [
       "solo a seguito di manovre attorno all'asse trasversale.",
@@ -2339,6 +2485,7 @@
     "id": 2107,
     "subjectId": 2,
     "subjectName": "Aerodinamica",
+    "discipline": "all",
     "question": "L'efficienza aerodinamica è:",
     "options": [
       "il rapporto tra portanza e resistenza.",
@@ -2355,6 +2502,7 @@
     "id": 2108,
     "subjectId": 2,
     "subjectName": "Aerodinamica",
+    "discipline": "all",
     "question": "L'efficienza aerodinamica è:",
     "options": [
       "il rapporto tra la sua superficie ed il peso trasportato.",
@@ -2371,6 +2519,7 @@
     "id": 2109,
     "subjectId": 2,
     "subjectName": "Aerodinamica",
+    "discipline": "all",
     "question": "L'efficienza di un'ala si può esprimere come:",
     "options": [
       "il rapporto tra la velocità orizzontale e quella verticale.",
@@ -2387,6 +2536,7 @@
     "id": 2110,
     "subjectId": 2,
     "subjectName": "Aerodinamica",
+    "discipline": "all",
     "question": "Il rapporto tra portanza e resistenza generate da un'ala a un certo regime di volo, ne rappresenta l'efficienza e varia:",
     "options": [
       "al variare dell'angolo d'incidenza.",
@@ -2403,6 +2553,7 @@
     "id": 2111,
     "subjectId": 2,
     "subjectName": "Aerodinamica",
+    "discipline": "all",
     "question": "L'efficienza massima di un parapendio è uguale a 8. Che cosa significa?",
     "options": [
       "In aria calma può essere percorso 1 km perdendo 800 m di quota.",
@@ -2419,6 +2570,7 @@
     "id": 2112,
     "subjectId": 2,
     "subjectName": "Aerodinamica",
+    "discipline": "all",
     "question": "Al variare dell'incidenza varia l'efficienza di un'ala perché:",
     "options": [
       "varia solo il coefficiente di portanza C dell'ala. p",
@@ -2435,6 +2587,7 @@
     "id": 2113,
     "subjectId": 2,
     "subjectName": "Aerodinamica",
+    "discipline": "all",
     "question": "L'efficienza massima varia al variare del peso del pilota?",
     "options": [
       "Si, anche se l'ala al variare del peso non si deforma.",
@@ -2451,6 +2604,7 @@
     "id": 2114,
     "subjectId": 2,
     "subjectName": "Aerodinamica",
+    "discipline": "all",
     "question": "Volando in aria calma due piloti di peso diverso utilizzano lo stesso deltaplano o parapendio. Che risultati ottengono volando al medesimo regime di volo, se l'ala non si deforma al variare del carico?",
     "options": [
       "Percorrono la stessa distanza, ma in tempi diversi.",
@@ -2467,6 +2621,7 @@
     "id": 2115,
     "subjectId": 2,
     "subjectName": "Aerodinamica",
+    "discipline": "all",
     "question": "Volando in aria calma il peso del pilota, se l'ala non si deforma al variare del carico, influenzerà:",
     "options": [
       "la sola efficienza aerodinamica.",
@@ -2483,6 +2638,7 @@
     "id": 2116,
     "subjectId": 2,
     "subjectName": "Aerodinamica",
+    "discipline": "all",
     "question": "Un'ala in volo, iniziando una virata:",
     "options": [
       "aumenta il proprio tasso di caduta.",
@@ -2499,6 +2655,7 @@
     "id": 2117,
     "subjectId": 2,
     "subjectName": "Aerodinamica",
+    "discipline": "all",
     "question": "Aumentando il carico alare a condizione che l'ala non si deformi e volando con una certa incidenza, si realizzeranno:",
     "options": [
       "velocità e tasso di caduta maggiori.",
@@ -2515,6 +2672,7 @@
     "id": 2118,
     "subjectId": 2,
     "subjectName": "Aerodinamica",
+    "discipline": "all",
     "question": "E' possibile che un deltaplano o un parapendio volino stabilmente su una traiettoria orizzontale in condizioni di aria calma?",
     "options": [
       "Si, se il loro profilo è molto sofisticato.",
@@ -2531,6 +2689,7 @@
     "id": 2119,
     "subjectId": 2,
     "subjectName": "Aerodinamica",
+    "discipline": "all",
     "question": "Traiettorie orizzontali stabili sono realizzabili con deltaplano e parapendio:",
     "options": [
       "solo rispetto al terreno in condizioni di vento in coda sostenuto.",
@@ -2547,6 +2706,7 @@
     "id": 2120,
     "subjectId": 2,
     "subjectName": "Aerodinamica",
+    "discipline": "all",
     "question": "La polare di un'ala è una rappresentazione grafica che:",
     "options": [
       "indica i valori di velocità al suolo al variare dell'incidenza.",
@@ -2563,6 +2723,7 @@
     "id": 2121,
     "subjectId": 2,
     "subjectName": "Aerodinamica",
+    "discipline": "all",
     "question": "Che cosa è la polare delle velocità o odografa di un'ala?",
     "options": [
       "È un grafico sul quale sono riportati i valori delle velocità orizzontali e delle velocità verticali dell'ala al variare dell'angolo d'incidenza.",
@@ -2579,6 +2740,7 @@
     "id": 2122,
     "subjectId": 2,
     "subjectName": "Aerodinamica",
+    "discipline": "all",
     "question": "Se l'ala non si deforma, al variare del peso del pilota la polare delle velocità:",
     "options": [
       "si modifica e non si sposta rispetto agli assi cartesiani.",
@@ -2595,6 +2757,7 @@
     "id": 2123,
     "subjectId": 2,
     "subjectName": "Aerodinamica",
+    "discipline": "all",
     "question": "Quali valori si possono ricavare dalla polare delle velocità di un'ala?",
     "options": [
       "Quelli della portanza al variare dell'incidenza.",
@@ -2611,6 +2774,7 @@
     "id": 2124,
     "subjectId": 2,
     "subjectName": "Aerodinamica",
+    "discipline": "all",
     "question": "Sulla polare delle velocità di un'ala normalmente il minimo tasso di caduta si realizza volando:",
     "options": [
       "all'incidenza alla quale corrisponde il minimo valore della resistenza.",
@@ -2627,6 +2791,7 @@
     "id": 2125,
     "subjectId": 2,
     "subjectName": "Aerodinamica",
+    "discipline": "all",
     "question": "Sulla polare delle velocità di un'ala normalmente la massima velocità orizzontale si realizza volando:",
     "options": [
       "al valore d'incidenza cui corrisponde una resistenza maggiore a quella che si ottiene alla massima efficienza aria.",
@@ -2643,6 +2808,7 @@
     "id": 2126,
     "subjectId": 2,
     "subjectName": "Aerodinamica",
+    "discipline": "all",
     "question": "Sulla polare delle velocità di un'ala normalmente la massima efficienza in aria calma si realizza volando:",
     "options": [
       "con l'angolo d'incidenza cui corrisponde il valore massimo del rapporto tra resistenza e portanza.",
@@ -2659,6 +2825,7 @@
     "id": 2127,
     "subjectId": 2,
     "subjectName": "Aerodinamica",
+    "discipline": "all",
     "question": "In condizioni di ascendenza l'efficienza massima al suolo aumenta rispetto a quella che si otterrebbe in aria calma. Adeguando la polare delle velocità di un'ala a queste condizioni si vede che i migliori risultati si realizzano comunque volando:",
     "options": [
       "a velocità all'aria maggiore di quelle utilizzate in condizioni di aria calma.",
@@ -2675,6 +2842,7 @@
     "id": 2128,
     "subjectId": 2,
     "subjectName": "Aerodinamica",
+    "discipline": "all",
     "question": "In condizioni di discendenza l'efficienza massima al suolo diminuisce rispetto a quella che si otterrebbe in aria calma. Adeguando la polare delle velocità di un'ala a queste condizioni si vede che i migliori risultati comunque si realizzano volando:",
     "options": [
       "a velocità all'aria maggiori di quelle utilizzate in aria calma.",
@@ -2691,6 +2859,7 @@
     "id": 2129,
     "subjectId": 2,
     "subjectName": "Aerodinamica",
+    "discipline": "all",
     "question": "Con vento a favore la massima efficienza al suolo è maggiore di quella ottenibile in aria calma. Sulla polare delle velocità si vede che i migliori risultati si realizzano comunque volando:",
     "options": [
       "ad incidenza maggiore di quella che si utilizzerebbe per ottenere la massima efficienza in aria calma (velocità all'aria minore).",
@@ -2707,6 +2876,7 @@
     "id": 2130,
     "subjectId": 2,
     "subjectName": "Aerodinamica",
+    "discipline": "all",
     "question": "Con vento contrario la massima efficienza al suolo è minore di quella ottenibile in aria calma. Sulla polare delle velocità si vede che i migliori risultati si realizzano comunque volando:",
     "options": [
       "all'incidenza che si utilizzerebbe per ottenere la massima efficienza in aria calma.",
@@ -2723,6 +2893,7 @@
     "id": 2131,
     "subjectId": 2,
     "subjectName": "Aerodinamica",
+    "discipline": "all",
     "question": "A parità di condizioni, di capacità e di ala a disposizione veleggia più a lungo il pilota:",
     "options": [
       "più leggero.",
@@ -2739,6 +2910,7 @@
     "id": 2132,
     "subjectId": 2,
     "subjectName": "Aerodinamica",
+    "discipline": "all",
     "question": "In condizioni di vento contrario, usando la stessa ala, il pilota più pesante:",
     "options": [
       "volerà con un'efficienza massima al suolo minore di quella realizzata dal pilota più leggero.",
@@ -2755,6 +2927,7 @@
     "id": 2133,
     "subjectId": 2,
     "subjectName": "Aerodinamica",
+    "discipline": "all",
     "question": "In condizioni di vento a favore, usando la stessa ala, il pilota più pesante:",
     "options": [
       "volerà con un'efficienza massima al suolo minore di quella realizzata dal pilota più leggero.",
@@ -2771,6 +2944,7 @@
     "id": 2134,
     "subjectId": 2,
     "subjectName": "Aerodinamica",
+    "discipline": "all",
     "question": "In condizioni aerologiche sfavorevoli, quali vento contrario e discendenza, volando con la medesima ala è:",
     "options": [
       "sfavorito il pilota più pesante.",
@@ -2787,6 +2961,7 @@
     "id": 2135,
     "subjectId": 2,
     "subjectName": "Aerodinamica",
+    "discipline": "all",
     "question": "Che cosa è lo stallo?",
     "options": [
       "È una condizione di volo in cui si verifica il distacco dei filetti fluidi dall'ala a causa dell'eccessivo angolo d'incidenza.",
@@ -2803,6 +2978,7 @@
     "id": 2136,
     "subjectId": 2,
     "subjectName": "Aerodinamica",
+    "discipline": "all",
     "question": "Lo stallo di un'ala si può verificare:",
     "options": [
       "solo a bassa velocità indipendentemente dall'angolo d'incidenza.",
@@ -2819,6 +2995,7 @@
     "id": 2137,
     "subjectId": 2,
     "subjectName": "Aerodinamica",
+    "discipline": "all",
     "question": "In virata la velocità minima di volo e quella di stallo sono identiche a quelle del volo rettilineo?",
     "options": [
       "No, sono maggiori.",
@@ -2835,6 +3012,7 @@
     "id": 2138,
     "subjectId": 2,
     "subjectName": "Aerodinamica",
+    "discipline": "all",
     "question": "La velocità di stallo è influenzata dal carico alare?",
     "options": [
       "No.",
@@ -2851,6 +3029,7 @@
     "id": 2139,
     "subjectId": 2,
     "subjectName": "Aerodinamica",
+    "discipline": "all",
     "question": "E' possibile con il deltaplano e il parapendio andare in stallo ad alta velocità?",
     "options": [
       "No.",
@@ -2867,6 +3046,7 @@
     "id": 2140,
     "subjectId": 2,
     "subjectName": "Aerodinamica",
+    "discipline": "all",
     "question": "Un'ala stalla normalmente a diversi angoli d'incidenza se varia la velocità?",
     "options": [
       "Si, infatti lo stallo dipende solo dalla velocità.",
@@ -2883,6 +3063,7 @@
     "id": 2141,
     "subjectId": 2,
     "subjectName": "Aerodinamica",
+    "discipline": "all",
     "question": "Che cosa s'intende per autostabilità di un profilo?",
     "options": [
       "Una tendenza a cabrare o picchiare a seguito di un qualsiasi intervento del pilota sui comandi.",
@@ -2899,6 +3080,7 @@
     "id": 2142,
     "subjectId": 2,
     "subjectName": "Aerodinamica",
+    "discipline": "all",
     "question": "Perché deltaplano e parapendio sono macchine considerate autostabili?",
     "options": [
       "Perché reagiscono alle sollecitazioni aerodinamiche rispetto agli assi di rotazione tendendo a ritornare automaticamente in condizioni di equilibrio.",
@@ -2915,6 +3097,7 @@
     "id": 2143,
     "subjectId": 2,
     "subjectName": "Aerodinamica",
+    "discipline": "all",
     "question": "Che cosa succede al sistema ala - pilota se il suo baricentro viene abbassato rispetto al centro di pressione?",
     "options": [
       "Aumenta la sola stabilità laterale.",
@@ -2931,6 +3114,7 @@
     "id": 2144,
     "subjectId": 2,
     "subjectName": "Aerodinamica",
+    "discipline": "all",
     "question": "La posizione bassa del baricentro del parapendio comporta entro certi limiti:",
     "options": [
       "una maggiore stabilità in volo.",
@@ -2947,6 +3131,7 @@
     "id": 2145,
     "subjectId": 2,
     "subjectName": "Aerodinamica",
+    "discipline": "all",
     "question": "La posizione bassa del baricentro del parapendio comporta:",
     "options": [
       "una minore stabilità.",
@@ -2963,6 +3148,7 @@
     "id": 2146,
     "subjectId": 2,
     "subjectName": "Aerodinamica",
+    "discipline": "all",
     "question": "Lo svergolamento di un'ala, contribuisce alla stabilità in volo?",
     "options": [
       "No.",
@@ -2979,6 +3165,7 @@
     "id": 2147,
     "subjectId": 2,
     "subjectName": "Aerodinamica",
+    "discipline": "all",
     "question": "Volando in prossimità del terreno il deltaplano acquista prestazioni. Ciò è dovuto:",
     "options": [
       "al fatto che vicino a terra il pilota istintivamente aumenta l'incidenza.",
@@ -2995,6 +3182,7 @@
     "id": 2148,
     "subjectId": 2,
     "subjectName": "Aerodinamica",
+    "discipline": "all",
     "question": "A che cosa è dovuto principalmente l'effetto suolo?",
     "options": [
       "Solo ad una compressione dell'aria al suolo dovuta all'avvicinarsi dell'ala ad esso.",
@@ -3011,6 +3199,7 @@
     "id": 2149,
     "subjectId": 2,
     "subjectName": "Aerodinamica",
+    "discipline": "all",
     "question": "Che cosa s'intende per \"configurazione inusuale\"?",
     "options": [
       "Una situazione di volo in condizioni ambientali e meteorologiche estreme.",
@@ -3027,6 +3216,7 @@
     "id": 2150,
     "subjectId": 2,
     "subjectName": "Aerodinamica",
+    "discipline": "all",
     "question": "Quale parametro di volo può provocare una \"configurazione inusuale\"?",
     "options": [
       "L'angolo d'incidenza se eccede certi valori.",
@@ -3043,6 +3233,7 @@
     "id": 3001,
     "subjectId": 3,
     "subjectName": "Pronto Soccorso",
+    "discipline": "all",
     "question": "Quale comportamento è auspicabile appena effettuato un soccorso d'emergenza?",
     "options": [
       "Si trasporta il ferito all'ospedale con qualsiasi mezzo disponibile seguendolo da vicino.",
@@ -3059,6 +3250,7 @@
     "id": 3002,
     "subjectId": 3,
     "subjectName": "Pronto Soccorso",
+    "discipline": "all",
     "question": "Qual è, tra questi, il modo migliore per accompagnare un infortunato con una lesione leggera in grado di camminare?",
     "options": [
       "Procurandogli un paio di stampelle.",
@@ -3075,6 +3267,7 @@
     "id": 3003,
     "subjectId": 3,
     "subjectName": "Pronto Soccorso",
+    "discipline": "all",
     "question": "Come comportarsi alla presenza di un infortunato di cui si sospettano lesioni interne di entità sconosciuta?",
     "options": [
       "Ispezionarlo attentamente, interrogandolo sulle parti dolenti e facendolo muovere se può, indi chiamare i mezzi di soccorso.",
@@ -3091,6 +3284,7 @@
     "id": 3004,
     "subjectId": 3,
     "subjectName": "Pronto Soccorso",
+    "discipline": "all",
     "question": "Se, essendo l'unico presente, vi capita di dover soccorrere un traumatizzato, come dovete comportarvi?",
     "options": [
       "Cercate subito un medico nel paese più vicino.",
@@ -3107,6 +3301,7 @@
     "id": 3005,
     "subjectId": 3,
     "subjectName": "Pronto Soccorso",
+    "discipline": "all",
     "question": "Come intervenire su un infortunato che presenta una copiosa perdita di sangue da una ferita?",
     "options": [
       "Lasciare uscire più sangue possibile onde lavare la ferita. O SOCCORSO",
@@ -3123,6 +3318,7 @@
     "id": 3006,
     "subjectId": 3,
     "subjectName": "Pronto Soccorso",
+    "discipline": "all",
     "question": "Come si deve intervenire soccorrendo un infortunato che presenta solo una ferita?",
     "options": [
       "Cercare di aiutarlo a mettersi in piedi.",
@@ -3139,6 +3335,7 @@
     "id": 3007,
     "subjectId": 3,
     "subjectName": "Pronto Soccorso",
+    "discipline": "all",
     "question": "Come si deve intervenire in caso di forma lieve di fuoriuscita di sangue dal naso (epistassi)?",
     "options": [
       "Far reclinar la testa in avanti favorendo il drenaggio di sangue e muco.",
@@ -3155,6 +3352,7 @@
     "id": 3008,
     "subjectId": 3,
     "subjectName": "Pronto Soccorso",
+    "discipline": "all",
     "question": "Come si deve intervenire alla presenza di una persona colpita da soffocamento?",
     "options": [
       "Lasciare che l'infortunato riprenda a respirare dopo averlo adagiato supino.",
@@ -3171,6 +3369,7 @@
     "id": 3009,
     "subjectId": 3,
     "subjectName": "Pronto Soccorso",
+    "discipline": "all",
     "question": "Come intervenire alla presenza di una persona in stato di shock?",
     "options": [
       "Lasciarla tranquilla e alleggerirgli l'abbigliamento per evitare che sudi.",
@@ -3187,6 +3386,7 @@
     "id": 3010,
     "subjectId": 3,
     "subjectName": "Pronto Soccorso",
+    "discipline": "all",
     "question": "Se in un infortunato si sospetta una frattura, come dobbiamo comportarci?",
     "options": [
       "Tentare comunque di ridurre subito la frattura stessa ponendo prima in trazione l'arto o la parte interessata in attesa di idonei mezzi di soccorso.",
@@ -3203,6 +3403,7 @@
     "id": 3011,
     "subjectId": 3,
     "subjectName": "Pronto Soccorso",
+    "discipline": "all",
     "question": "Come si deve intervenire in presenza di un infortunato che presenta sospetto trauma cranico con fuoriuscita di sangue dall'orecchio, in attesa di idonei mezzi di soccorso?",
     "options": [
       "Tamponare la perdita di sangue.",
@@ -3219,6 +3420,7 @@
     "id": 3012,
     "subjectId": 3,
     "subjectName": "Pronto Soccorso",
+    "discipline": "all",
     "question": "Come s'interviene nel caso che una persona presenti un trauma all'addome?",
     "options": [
       "Si provvede a chiamare idonei mezzi di soccorso, mettendola in piedi per alleviarle il dolore.",
@@ -3235,6 +3437,7 @@
     "id": 3013,
     "subjectId": 3,
     "subjectName": "Pronto Soccorso",
+    "discipline": "all",
     "question": "Nel caso una persona sia colpita da scarica elettrica e che rimanga a contatto con il cavo di alta tensione, il soccorritore dovrà:",
     "options": [
       "avvicinarsi al più presto e prestarle soccorso.",
@@ -3251,6 +3454,7 @@
     "id": 3014,
     "subjectId": 3,
     "subjectName": "Pronto Soccorso",
+    "discipline": "all",
     "question": "Nel caso che una persona sia colpita da scarica elettrica e che rimanga a contatto con il cavo a bassa tensione, il soccorritore dovrà:",
     "options": [
       "rimanere a distanza di sicurezza.",
@@ -3267,6 +3471,7 @@
     "id": 3015,
     "subjectId": 3,
     "subjectName": "Pronto Soccorso",
+    "discipline": "all",
     "question": "Come intervenire in soccorso di un soggetto che presenti una distorsione al piede?",
     "options": [
       "Farlo camminare subito per ripristinargli la circolazione.",
@@ -3283,6 +3488,7 @@
     "id": 3016,
     "subjectId": 3,
     "subjectName": "Pronto Soccorso",
+    "discipline": "all",
     "question": "Come si riconosce una spalla lussata?",
     "options": [
       "Da un abbassamento dell'arto con infossamento all'altezza dell'articolazione.",
@@ -3299,6 +3505,7 @@
     "id": 3017,
     "subjectId": 3,
     "subjectName": "Pronto Soccorso",
+    "discipline": "all",
     "question": "Come s'interviene provvisoriamente in caso di grave scottatura?",
     "options": [
       "Si mantiene pulita e detersa la parte ustionata sino al momento in cui sono possibili interventi specialistici qualificati.",
@@ -3315,6 +3522,7 @@
     "id": 3018,
     "subjectId": 3,
     "subjectName": "Pronto Soccorso",
+    "discipline": "all",
     "question": "Come s'interviene per soccorrere persone che abbiano perso conoscenza?",
     "options": [
       "Si lasciano o si adagiano semplicemente in posizione prona.",
@@ -3331,6 +3539,7 @@
     "id": 3019,
     "subjectId": 3,
     "subjectName": "Pronto Soccorso",
+    "discipline": "all",
     "question": "Come s'interviene su una persona svenuta a seguito di trauma?",
     "options": [
       "Si prova a rianimarla energicamente scuotendola dopo aver chiamato idonei mezzi di soccorso.",
@@ -3347,6 +3556,7 @@
     "id": 3020,
     "subjectId": 3,
     "subjectName": "Pronto Soccorso",
+    "discipline": "all",
     "question": "Qual è il rimedio migliore in caso di principio di assideramento di una parte del corpo?",
     "options": [
       "Fare ingerire al paziente bevande alcoliche.",
@@ -3363,6 +3573,7 @@
     "id": 4001,
     "subjectId": 4,
     "subjectName": "Fisiopatologia del Volo",
+    "discipline": "all",
     "question": "Come varia la pressione parziale dell'ossigeno a livello polmonare, al variare dell'altitudine?",
     "options": [
       "Diminuisce all'aumentare dell'altitudine.",
@@ -3379,6 +3590,7 @@
     "id": 4002,
     "subjectId": 4,
     "subjectName": "Fisiopatologia del Volo",
+    "discipline": "all",
     "question": "Ad elevate altitudini nell'organismo umano si instaura una situazione alterata, prodotta dalla ridotta pressione di ossigeno. Essa prende il nome di:",
     "options": [
       "ipotermia.",
@@ -3395,6 +3607,7 @@
     "id": 4003,
     "subjectId": 4,
     "subjectName": "Fisiopatologia del Volo",
+    "discipline": "all",
     "question": "Che cosa è l'ipossia?",
     "options": [
       "È lo stato in cui l'organismo viene a trovarsi a causa dell'insufficiente pressione sanguigna dovuta alla quota.",
@@ -3411,6 +3624,7 @@
     "id": 4004,
     "subjectId": 4,
     "subjectName": "Fisiopatologia del Volo",
+    "discipline": "all",
     "question": "Quali sono gli effetti dell'ipossia?",
     "options": [
       "Diminuzione dell'efficienza mentale, nausea, euforia, aumento del ritmo di ventilazione polmonare.",
@@ -3427,6 +3641,7 @@
     "id": 4005,
     "subjectId": 4,
     "subjectName": "Fisiopatologia del Volo",
+    "discipline": "all",
     "question": "La decompressione da alta quota può dar luogo a liberazione di bolle gassose nel sangue, detti emboli. Qual è la condizione in cui questo pericoloso fenomeno può verificarsi con maggiore facilità?",
     "options": [
       "Lenta ascensione oltre i 7000 metri.",
@@ -3443,6 +3658,7 @@
     "id": 4006,
     "subjectId": 4,
     "subjectName": "Fisiopatologia del Volo",
+    "discipline": "all",
     "question": "Durante il volo il corpo umano è sottoposto a vari tipi di accelerazione. Quali sono meglio sopportate tra quelle positive (testa-piedi) e quelle negative (piedi-testa)?",
     "options": [
       "Entrambe in uguale misura.",
@@ -3459,6 +3675,7 @@
     "id": 4007,
     "subjectId": 4,
     "subjectName": "Fisiopatologia del Volo",
+    "discipline": "all",
     "question": "Le accelerazioni positive (testa-piedi) corrispondono a un aumento dei \"G\" o meglio a un aumento fittizio dell'accelerazione di gravità. Quando si possono manifestare in volo?",
     "options": [
       "Durante virate corrette.",
@@ -3475,6 +3692,7 @@
     "id": 4008,
     "subjectId": 4,
     "subjectName": "Fisiopatologia del Volo",
+    "discipline": "all",
     "question": "Le accelerazioni negative (piedi-testa) corrispondono a una diminuzione dei \"G\" o meglio a una diminuzione fittizia della accelerazione di gravità. Quando si possono manifestare in volo?",
     "options": [
       "Durante una brusca richiamata.",
@@ -3491,6 +3709,7 @@
     "id": 4009,
     "subjectId": 4,
     "subjectName": "Fisiopatologia del Volo",
+    "discipline": "all",
     "question": "Quando sussiste in volo il rischio che il pilota soffra di un oscuramento della vista a seguito di manovre che inducono forti accelerazioni?",
     "options": [
       "Quando le accelerazioni indotte sono del tipo positivo (testa-piedi) e superano i 4 \"G\" per un tempo superiore a 4 secondi.",
@@ -3507,6 +3726,7 @@
     "id": 4010,
     "subjectId": 4,
     "subjectName": "Fisiopatologia del Volo",
+    "discipline": "all",
     "question": "Considerate le caratteristiche fisiologiche dell'uomo, è possibile eseguire correttamente un volo in nube, facendo affidamento sul solo senso dell'equilibrio?",
     "options": [
       "No.",
@@ -3523,6 +3743,7 @@
     "id": 5001,
     "subjectId": 5,
     "subjectName": "Meteorologia e Aerologia",
+    "discipline": "all",
     "question": "Che cosa è l'atmosfera?",
     "options": [
       "È la massa gassosa che sovrasta la superficie terrestre e la cui altezza è praticamente illimitata.",
@@ -3539,6 +3760,7 @@
     "id": 5002,
     "subjectId": 5,
     "subjectName": "Meteorologia e Aerologia",
+    "discipline": "all",
     "question": "Come può essere definita la troposfera?",
     "options": [
       "È la porzione inferiore dell'atmosfera compresa tra la superficie terrestre e la quota alla quale la pressione atmosferica è praticamente nulla.",
@@ -3555,6 +3777,7 @@
     "id": 5003,
     "subjectId": 5,
     "subjectName": "Meteorologia e Aerologia",
+    "discipline": "all",
     "question": "I fenomeni meteorologici (meteore) si verificano normalmente:",
     "options": [
       "all'interno della porzione di atmosfera terrestre detta troposfera.",
@@ -3571,6 +3794,7 @@
     "id": 5004,
     "subjectId": 5,
     "subjectName": "Meteorologia e Aerologia",
+    "discipline": "all",
     "question": "La quota della tropopausa, intesa come limite superiore della troposfera:",
     "options": [
       "è ben determinata, non è variabile e il suo valore è di 12 km.",
@@ -3587,6 +3811,7 @@
     "id": 5005,
     "subjectId": 5,
     "subjectName": "Meteorologia e Aerologia",
+    "discipline": "all",
     "question": "L'aria è una miscela di gas formata prevalentemente da:",
     "options": [
       "ossigeno e gas rari.",
@@ -3603,6 +3828,7 @@
     "id": 5006,
     "subjectId": 5,
     "subjectName": "Meteorologia e Aerologia",
+    "discipline": "all",
     "question": "Quali sono le caratteristiche fisiche dell'aria la cui combinazione o variazione dà luogo normalmente ai fenomeni meteorologici?",
     "options": [
       "Pressione, temperatura e densità.",
@@ -3619,6 +3845,7 @@
     "id": 5007,
     "subjectId": 5,
     "subjectName": "Meteorologia e Aerologia",
+    "discipline": "all",
     "question": "Il vapore acqueo è un gas invisibile contenuto nell'aria in percentuali variabili?",
     "options": [
       "Si.",
@@ -3635,6 +3862,7 @@
     "id": 5008,
     "subjectId": 5,
     "subjectName": "Meteorologia e Aerologia",
+    "discipline": "all",
     "question": "In natura esiste normalmente aria totalmente priva di vapore acqueo, cioè assolutamente secca?",
     "options": [
       "No.",
@@ -3651,6 +3879,7 @@
     "id": 5009,
     "subjectId": 5,
     "subjectName": "Meteorologia e Aerologia",
+    "discipline": "all",
     "question": "Per umidità assoluta s'intende:",
     "options": [
       "la quantità in grammi di vapore acqueo contenuta in un metro cubo d'aria.",
@@ -3667,6 +3896,7 @@
     "id": 5010,
     "subjectId": 5,
     "subjectName": "Meteorologia e Aerologia",
+    "discipline": "all",
     "question": "Per umidità specifica s'intende:",
     "options": [
       "la quantità in grammi di vapore acqueo contenuta in un metro cubo d'aria.",
@@ -3683,6 +3913,7 @@
     "id": 5011,
     "subjectId": 5,
     "subjectName": "Meteorologia e Aerologia",
+    "discipline": "all",
     "question": "Per umidità relativa, che è sempre espressa in percentuale, s'intende:",
     "options": [
       "la quantità in volume di vapore acqueo contenuta in un metro cubo d'aria.",
@@ -3699,6 +3930,7 @@
     "id": 5012,
     "subjectId": 5,
     "subjectName": "Meteorologia e Aerologia",
+    "discipline": "all",
     "question": "Come varia l'umidità relativa dell'aria abbassandone la sola temperatura?",
     "options": [
       "L'umidità relativa aumenta sino a raggiungere anche il valore del 100%.",
@@ -3715,6 +3947,7 @@
     "id": 5013,
     "subjectId": 5,
     "subjectName": "Meteorologia e Aerologia",
+    "discipline": "all",
     "question": "Come varia l'umidità relativa dell'aria all'aumentare della sola pressione atmosferica?",
     "options": [
       "L'umidità relativa diminuisce.",
@@ -3731,6 +3964,7 @@
     "id": 5014,
     "subjectId": 5,
     "subjectName": "Meteorologia e Aerologia",
+    "discipline": "all",
     "question": "Che cosa è la temperatura di rugiada?",
     "options": [
       "La temperatura alla quale l'aria diverrebbe satura se raffreddata senza subire variazioni di pressione.",
@@ -3747,6 +3981,7 @@
     "id": 5015,
     "subjectId": 5,
     "subjectName": "Meteorologia e Aerologia",
+    "discipline": "all",
     "question": "Che cosa avviene quando per qualche motivo l'umidità relativa dell'aria raggiunge il valore del 100%?",
     "options": [
       "L'aria in questione diviene satura e in essa può aver luogo il processo di condensazione del vapore acqueo.",
@@ -3763,6 +3998,7 @@
     "id": 5016,
     "subjectId": 5,
     "subjectName": "Meteorologia e Aerologia",
+    "discipline": "all",
     "question": "Perché all'interno di una massa d'aria avvenga il processo di condensazione del vapore acqueo è necessario:",
     "options": [
       "abbassarne temperatura e pressione contemporaneamente.",
@@ -3779,6 +4015,7 @@
     "id": 5017,
     "subjectId": 5,
     "subjectName": "Meteorologia e Aerologia",
+    "discipline": "all",
     "question": "Il processo di condensazione del vapore acqueo nell'aria atmosferica determina il passaggio di stato dell'acqua da gas a liquido. È' possibile affermare che tale processo sprigiona energia termica (calore latente di condensazione) che è trasmessa all'aria stessa, la cui temperatura varia conseguentemente?",
     "options": [
       "Si.",
@@ -3795,6 +4032,7 @@
     "id": 5018,
     "subjectId": 5,
     "subjectName": "Meteorologia e Aerologia",
+    "discipline": "all",
     "question": "L'evaporazione dell'acqua è un processo endotermico?",
     "options": [
       "No, non è un processo endotermico.",
@@ -3811,6 +4049,7 @@
     "id": 5019,
     "subjectId": 5,
     "subjectName": "Meteorologia e Aerologia",
+    "discipline": "all",
     "question": "Quando all'interno di una massa d'aria si verifica il processo di condensazione del vapore acqueo la temperatura dell'aria stessa tende:",
     "options": [
       "a diminuire.",
@@ -3827,6 +4066,7 @@
     "id": 5020,
     "subjectId": 5,
     "subjectName": "Meteorologia e Aerologia",
+    "discipline": "all",
     "question": "Generalmente si può affermare che i processi di condensazione e di evaporazione dell'acqua:",
     "options": [
       "rispettivamente forniscono e sottraggono calore alla massa d'aria interessata.",
@@ -3843,6 +4083,7 @@
     "id": 5021,
     "subjectId": 5,
     "subjectName": "Meteorologia e Aerologia",
+    "discipline": "all",
     "question": "È vero che i fenomeni meteorologici sono anche causati dai processi di trasformazione dell'acqua da liquido a vapore o a solido e viceversa per via delle conseguenti cessioni o sottrazioni di energia termica alle masse d'aria?",
     "options": [
       "No, essi non hanno nulla a che vedere con quanto sopra.",
@@ -3859,6 +4100,7 @@
     "id": 5022,
     "subjectId": 5,
     "subjectName": "Meteorologia e Aerologia",
+    "discipline": "all",
     "question": "Le nubi, così come il fumo di una pentola in cui vi è acqua in ebollizione, sono costituite da vapore acqueo?",
     "options": [
       "No, ma da aerosol o piccolissime gocce di acqua allo stato liquido.",
@@ -3875,6 +4117,7 @@
     "id": 5023,
     "subjectId": 5,
     "subjectName": "Meteorologia e Aerologia",
+    "discipline": "all",
     "question": "La pressione atmosferica si definisce come:",
     "options": [
       "il peso di una colonna d'aria pari a quello di una colonna di mercurio alta 1013.2 millimetri.",
@@ -3891,6 +4134,7 @@
     "id": 5024,
     "subjectId": 5,
     "subjectName": "Meteorologia e Aerologia",
+    "discipline": "all",
     "question": "Lo strumento per misurare la pressione atmosferica è:",
     "options": [
       "l'anemometro.",
@@ -3907,6 +4151,7 @@
     "id": 5025,
     "subjectId": 5,
     "subjectName": "Meteorologia e Aerologia",
+    "discipline": "all",
     "question": "Salendo in quota il valore della pressione atmosferica diminuisce, infatti diminuisce il peso della colonna d'aria che insiste sull'unità di superficie. Tale diminuzione prende il nome di:",
     "options": [
       "gradiente barico orizzontale.",
@@ -3923,6 +4168,7 @@
     "id": 5026,
     "subjectId": 5,
     "subjectName": "Meteorologia e Aerologia",
+    "discipline": "all",
     "question": "Il valore approssimativo della pressione atmosferica a circa 5500 m di altitudine sul livello del mare è:",
     "options": [
       "circa zero.",
@@ -3939,6 +4185,7 @@
     "id": 5027,
     "subjectId": 5,
     "subjectName": "Meteorologia e Aerologia",
+    "discipline": "all",
     "question": "In atmosfera standard, quasi mai esistente in natura perché ideata dall'uomo come elemento di riferimento, la pressione al livello del mare è:",
     "options": [
       "1013.2 millibar o hectopascal.",
@@ -3955,6 +4202,7 @@
     "id": 5028,
     "subjectId": 5,
     "subjectName": "Meteorologia e Aerologia",
+    "discipline": "all",
     "question": "Se la pressione atmosferica in due punti della superficie terrestre dotati della medesima elevazione sul livello del mare è diversa si dice:",
     "options": [
       "che esiste un gradiente barico verticale.",
@@ -3971,6 +4219,7 @@
     "id": 5029,
     "subjectId": 5,
     "subjectName": "Meteorologia e Aerologia",
+    "discipline": "all",
     "question": "Che cosa sono le isobare?",
     "options": [
       "Le linee che uniscono i punti di uguale altitudine.",
@@ -3987,6 +4236,7 @@
     "id": 5030,
     "subjectId": 5,
     "subjectName": "Meteorologia e Aerologia",
+    "discipline": "all",
     "question": "Il vento cosiddetto di gradiente è normalmente:",
     "options": [
       "uno spostamento di aria nell'atmosfera da una zona a pressione maggiore ad una zona a pressione minore.",
@@ -4003,6 +4253,7 @@
     "id": 5031,
     "subjectId": 5,
     "subjectName": "Meteorologia e Aerologia",
+    "discipline": "all",
     "question": "Perché la direzione del vento non è mai rettilinea da una zona di alta pressione a una zona di bassa pressione?",
     "options": [
       "Solo perché la superficie terrestre è piena di ostacoli che il vento è costretto ad aggirare.",
@@ -4019,6 +4270,7 @@
     "id": 5032,
     "subjectId": 5,
     "subjectName": "Meteorologia e Aerologia",
+    "discipline": "all",
     "question": "Tutti i corpi, i liquidi e i gas in movimento rispetto alla superficie terrestre, dotati di una componente di moto parallela ai meridiani, vengono deviati dalla loro traiettoria inizialmente rettilinea. Come si chiama la forza deviante che determina ciò e a che cosa è dovuta?",
     "options": [
       "Forza di Coriolis, dovuta alla rotazione della Terra attorno al proprio asse.",
@@ -4035,6 +4287,7 @@
     "id": 5033,
     "subjectId": 5,
     "subjectName": "Meteorologia e Aerologia",
+    "discipline": "all",
     "question": "Nell'emisfero Nord la forza di Coriolis determina una deviazione del vento, nel suo dirigersi da una zona di alta pressione a una zona di bassa pressione, verso:",
     "options": [
       "sinistra.",
@@ -4051,6 +4304,7 @@
     "id": 5034,
     "subjectId": 5,
     "subjectName": "Meteorologia e Aerologia",
+    "discipline": "all",
     "question": "A seguito dell'intervento delle forze devianti, il vento nell'emisfero Nord circola attorno ad una zona od area di alta pressione in senso:",
     "options": [
       "antiorario se osservato dall'alto (es. da un satellite).",
@@ -4067,6 +4321,7 @@
     "id": 5035,
     "subjectId": 5,
     "subjectName": "Meteorologia e Aerologia",
+    "discipline": "all",
     "question": "A seguito dell'intervento delle forze devianti, il vento nell'emisfero Nord circola attorno ad una zona od area di bassa pressione in senso:",
     "options": [
       "antiorario se osservato dal basso.",
@@ -4083,6 +4338,7 @@
     "id": 5036,
     "subjectId": 5,
     "subjectName": "Meteorologia e Aerologia",
+    "discipline": "all",
     "question": "Come sono chiamate le zone o aree di bassa e di alta pressione?",
     "options": [
       "Aree cicloniche e anticicloniche e indicate rispettivamente con una H/A (high pressure/alta pressione) e una L/B (low pressure/bassa pressione) sulle carte meteorologiche.",
@@ -4099,6 +4355,7 @@
     "id": 5037,
     "subjectId": 5,
     "subjectName": "Meteorologia e Aerologia",
+    "discipline": "all",
     "question": "Se su una carta meteorologica si osservano isobare molto ravvicinate, si può affermare che:",
     "options": [
       "esiste un gradiente barico orizzontale minimo e il vento sarà sostenuto.",
@@ -4115,6 +4372,7 @@
     "id": 5038,
     "subjectId": 5,
     "subjectName": "Meteorologia e Aerologia",
+    "discipline": "all",
     "question": "L'osservazione delle isobare sulla carta del tempo ci consente di:",
     "options": [
       "individuare la direzione e l'intensità del vento in una certa zona oltre ad altri dati meteorologici utili alla previsione del tempo.",
@@ -4131,6 +4389,7 @@
     "id": 5039,
     "subjectId": 5,
     "subjectName": "Meteorologia e Aerologia",
+    "discipline": "all",
     "question": "Nella pratica del Volo Libero che cosa s'intende comunemente per \"vento meteorologico\"?",
     "options": [
       "Il vento generato da fenomeni meteorologici rilevanti quali temporali, forti precipitazioni ecc.",
@@ -4147,6 +4406,7 @@
     "id": 5040,
     "subjectId": 5,
     "subjectName": "Meteorologia e Aerologia",
+    "discipline": "all",
     "question": "A quale valore in gradi corrisponde la direzione di provenienza di un vento da Sud?",
     "options": [
       "135°",
@@ -4163,6 +4423,7 @@
     "id": 5041,
     "subjectId": 5,
     "subjectName": "Meteorologia e Aerologia",
+    "discipline": "all",
     "question": "Un vento proveniente da Nord-Est ha la seguente provenienza in gradi:",
     "options": [
       "45°",
@@ -4179,6 +4440,7 @@
     "id": 5042,
     "subjectId": 5,
     "subjectName": "Meteorologia e Aerologia",
+    "discipline": "all",
     "question": "Emisfero Nord. Una Bassa Pressione si trova centrata a Nord di un preciso punto della superficie terrestre. Il vento predominante (meteorologico) che ci si attende di avere in quel punto proverrà ragionevolmente da:",
     "options": [
       "Nord.",
@@ -4195,6 +4457,7 @@
     "id": 5043,
     "subjectId": 5,
     "subjectName": "Meteorologia e Aerologia",
+    "discipline": "all",
     "question": "Emisfero Nord. Una Bassa Pressione si trova centrata a Est di un preciso punto della superficie terrestre. Il vento predominante (meteorologico) che ci si attende di avere in quel punto proverrà ragionevolmente da:",
     "options": [
       "Nord.",
@@ -4211,6 +4474,7 @@
     "id": 5044,
     "subjectId": 5,
     "subjectName": "Meteorologia e Aerologia",
+    "discipline": "all",
     "question": "Emisfero Nord. Un'area di Alta Pressione si trova centrata a Nord di un preciso punto della superficie terrestre. Il vento predominante (meteorologico) che ci si attende di avere in quel punto proverrà ragionevolmente da:",
     "options": [
       "Ovest.",
@@ -4227,6 +4491,7 @@
     "id": 5045,
     "subjectId": 5,
     "subjectName": "Meteorologia e Aerologia",
+    "discipline": "all",
     "question": "Emisfero Nord. Un'area di Alta Pressione si trova centrata a Ovest di un preciso punto della superficie terrestre. Il vento predominante (meteorologico) che ci si attende di avere in quel punto proverrà ragionevolmente da:",
     "options": [
       "Sud.",
@@ -4243,6 +4508,7 @@
     "id": 5046,
     "subjectId": 5,
     "subjectName": "Meteorologia e Aerologia",
+    "discipline": "all",
     "question": "Il Sole è la fonte principale di calore capace di elevare la temperatura dell'aria. Nella troposfera l'energia termica è trasmessa dal Sole direttamente all'aria stessa?",
     "options": [
       "Si, in gran parte per irraggiamento.",
@@ -4259,6 +4525,7 @@
     "id": 5047,
     "subjectId": 5,
     "subjectName": "Meteorologia e Aerologia",
+    "discipline": "all",
     "question": "Il processo di trasmissione di energia termica secondo il quale il Sole riscalda la troposfera è:",
     "options": [
       "irraggiamento del suolo, conduzione di calore dal suolo all'aria sovrastante, circolazione convettiva di aria calda verso l'alto.",
@@ -4275,6 +4542,7 @@
     "id": 5048,
     "subjectId": 5,
     "subjectName": "Meteorologia e Aerologia",
+    "discipline": "all",
     "question": "Durante una salita effettuata nella troposfera la temperatura dell'aria varia nel modo seguente:",
     "options": [
       "mediamente aumenta.",
@@ -4291,6 +4559,7 @@
     "id": 5049,
     "subjectId": 5,
     "subjectName": "Meteorologia e Aerologia",
+    "discipline": "all",
     "question": "La variazione della temperatura dell'aria al variare della quota si chiama:",
     "options": [
       "gradiente termico orizzontale.",
@@ -4307,6 +4576,7 @@
     "id": 5050,
     "subjectId": 5,
     "subjectName": "Meteorologia e Aerologia",
+    "discipline": "all",
     "question": "Qual è il gradiente termico verticale dell'atmosfera standard, ideata dall'uomo come elemento di riferimento, ma i cui parametri sono difficilmente reperibili in natura?",
     "options": [
       "1°C ogni 100 m di quota.",
@@ -4323,6 +4593,7 @@
     "id": 5051,
     "subjectId": 5,
     "subjectName": "Meteorologia e Aerologia",
+    "discipline": "all",
     "question": "Se, salendo in quota, si rileva la temperatura dell'aria ogni 100 m e si riportano i suoi valori su un grafico, si costruisce:",
     "options": [
       "la curva o diagramma di stato dell'atmosfera di quella località a quell'ora.",
@@ -4339,6 +4610,7 @@
     "id": 5052,
     "subjectId": 5,
     "subjectName": "Meteorologia e Aerologia",
+    "discipline": "all",
     "question": "Il gradiente termico verticale dell'atmosfera in una determinata località a una certa ora si ricava:",
     "options": [
       "dalla curva di stato dell'atmosfera relativa a quella località ed a quell'ora della giornata.",
@@ -4355,6 +4627,7 @@
     "id": 5053,
     "subjectId": 5,
     "subjectName": "Meteorologia e Aerologia",
+    "discipline": "all",
     "question": "Una massa d' aria si solleva espandendosi con conseguente diminuzione della temperatura. Come si definisce il fenomeno e perchè?",
     "options": [
       "Sollevamento convettivo, perché avviene con scambio di calore con l'aria sovrastante.",
@@ -4371,6 +4644,7 @@
     "id": 5054,
     "subjectId": 5,
     "subjectName": "Meteorologia e Aerologia",
+    "discipline": "all",
     "question": "In pratica l'aria che si solleva adiabaticamente, senza condensazione del vapore acqueo, perde:",
     "options": [
       "6.5°C di temperatura ogni 1000 m.",
@@ -4387,6 +4661,7 @@
     "id": 5055,
     "subjectId": 5,
     "subjectName": "Meteorologia e Aerologia",
+    "discipline": "all",
     "question": "Il calo di temperatura dell'aria, che si solleva adiabaticamente di un certo valore di quota senza condensazione del vapore acqueo, si chiama:",
     "options": [
       "gradiente termico verticale e dipende dall'ora e dalla località in cui il fenomeno si verifica.",
@@ -4403,6 +4678,7 @@
     "id": 5056,
     "subjectId": 5,
     "subjectName": "Meteorologia e Aerologia",
+    "discipline": "all",
     "question": "L'aria che si solleva adiabaticamente contiene una certa quantità di vapore acqueo. Al diminuire della temperatura dell'aria si raggiungono le condizioni per cui il vapore acqueo inizia a condensare (temperatura dell'aria = temperatura di rugiada, umidità relativa = 100 %). L'ulteriore salita dell'aria determina un calo di temperatura di:",
     "options": [
       "1°C ogni 100 m (Il gradiente è sostanzialmente costante con la quota).",
@@ -4419,6 +4695,7 @@
     "id": 5057,
     "subjectId": 5,
     "subjectName": "Meteorologia e Aerologia",
+    "discipline": "all",
     "question": "Come chiamiamo il sollevamento di aria alla presenza di fenomeni di condensazione del vapore acqueo?",
     "options": [
       "Sollevamento adiabatico saturo o in regime di saturazione.",
@@ -4435,6 +4712,7 @@
     "id": 5058,
     "subjectId": 5,
     "subjectName": "Meteorologia e Aerologia",
+    "discipline": "all",
     "question": "Se il gradiente termico verticale della giornata è superiore ad 1° C ogni 100 m l'aria si definisce:",
     "options": [
       "stabile.",
@@ -4451,6 +4729,7 @@
     "id": 5059,
     "subjectId": 5,
     "subjectName": "Meteorologia e Aerologia",
+    "discipline": "all",
     "question": "Il fattore che ci indica se l'aria è stabile o instabile è:",
     "options": [
       "il gradiente adiabatico secco dell'aria.",
@@ -4467,6 +4746,7 @@
     "id": 5060,
     "subjectId": 5,
     "subjectName": "Meteorologia e Aerologia",
+    "discipline": "all",
     "question": "Se l'aria risulta instabile dall'osservazione del suo gradiente termico verticale ci dovremo attendere che:",
     "options": [
       "una bolla d'aria che si stacca dal suolo dotata di moto convettivo arresti la sua salita molto presto.",
@@ -4483,6 +4763,7 @@
     "id": 5061,
     "subjectId": 5,
     "subjectName": "Meteorologia e Aerologia",
+    "discipline": "all",
     "question": "Una massa d'aria molto umida, caratterizzata da diffuse formazioni nuvolose, si dice \"stabile\" quando:",
     "options": [
       "il suo gradiente termico verticale è inferiore al gradiente adiabatico saturo.",
@@ -4499,6 +4780,7 @@
     "id": 5062,
     "subjectId": 5,
     "subjectName": "Meteorologia e Aerologia",
+    "discipline": "all",
     "question": "Se il gradiente termico verticale di una massa d'aria asciutta (cioè non satura) è inferiore ad 1°C ogni 100 m si dice che essa è:",
     "options": [
       "stabile.",
@@ -4515,6 +4797,7 @@
     "id": 5063,
     "subjectId": 5,
     "subjectName": "Meteorologia e Aerologia",
+    "discipline": "all",
     "question": "A una certa quota la temperatura ambiente dell'aria è pari a 12°C. Se una bolla d'aria salendo si trova ad avere una temperatura di 14°C alla stessa quota essa:",
     "options": [
       "si arresterà immediatamente.",
@@ -4531,6 +4814,7 @@
     "id": 5064,
     "subjectId": 5,
     "subjectName": "Meteorologia e Aerologia",
+    "discipline": "all",
     "question": "Se una bolla d'aria contenente un'alta percentuale di umidità relativa inizia a salire dotata di moto convettivo, in che modo la condensazione del vapore acqueo influenza la sua salita?",
     "options": [
       "Probabilmente ne interrompe il moto ascensionale.",
@@ -4547,6 +4831,7 @@
     "id": 5065,
     "subjectId": 5,
     "subjectName": "Meteorologia e Aerologia",
+    "discipline": "all",
     "question": "Se l'aria è moderatamente instabile, una bolla d'aria umida che inizia a salire perché riscaldata dal terreno più dell'aria circostante, raggiunta la quota di condensazione:",
     "options": [
       "salirà sicuramente più veloce.",
@@ -4563,6 +4848,7 @@
     "id": 5066,
     "subjectId": 5,
     "subjectName": "Meteorologia e Aerologia",
+    "discipline": "all",
     "question": "Se l'aria è molto stabile, una bolla d'aria che per motivi convettivi inizi a salire staccandosi dal terreno:",
     "options": [
       "continuerà a salire sempre più velocemente.",
@@ -4579,6 +4865,7 @@
     "id": 5067,
     "subjectId": 5,
     "subjectName": "Meteorologia e Aerologia",
+    "discipline": "all",
     "question": "Supponendo di essere in presenza di aria umida ed instabile associata a condizioni di forte riscaldamento del terreno, vi è la possibilità che si creino:",
     "options": [
       "forti correnti ascensionali e nubi cumuliformi.",
@@ -4595,6 +4882,7 @@
     "id": 5068,
     "subjectId": 5,
     "subjectName": "Meteorologia e Aerologia",
+    "discipline": "all",
     "question": "I moti termo-convettivi dell'aria sono:",
     "options": [
       "moti orizzontali di masse d'aria da zone di alta pressione a zone di bassa.",
@@ -4611,6 +4899,7 @@
     "id": 5069,
     "subjectId": 5,
     "subjectName": "Meteorologia e Aerologia",
+    "discipline": "all",
     "question": "Quando il vento al suolo è assente o per lo più debole, l'attività termo-convettiva in pianura e nelle valli dà luogo a:",
     "options": [
       "vento di gradiente.",
@@ -4627,6 +4916,7 @@
     "id": 5070,
     "subjectId": 5,
     "subjectName": "Meteorologia e Aerologia",
+    "discipline": "all",
     "question": "Le bolle termiche saranno facilitate a staccarsi da terra, a parità di altre condizioni, da:",
     "options": [
       "calma di vento su superfici prive di ostacoli.",
@@ -4643,6 +4933,7 @@
     "id": 5071,
     "subjectId": 5,
     "subjectName": "Meteorologia e Aerologia",
+    "discipline": "all",
     "question": "I moti termo-convettivi sono determinati principalmente:",
     "options": [
       "da condizioni di stabilità dell'aria.",
@@ -4659,6 +4950,7 @@
     "id": 5072,
     "subjectId": 5,
     "subjectName": "Meteorologia e Aerologia",
+    "discipline": "all",
     "question": "La differente natura e colorazione del terreno favorisce:",
     "options": [
       "il crearsi delle condizioni di instabilità dell'aria.",
@@ -4675,6 +4967,7 @@
     "id": 5073,
     "subjectId": 5,
     "subjectName": "Meteorologia e Aerologia",
+    "discipline": "all",
     "question": "Se non vi è umidità sufficiente a consentire il raggiungimento delle condizioni di saturazione del vapore acqueo, le termiche che si formeranno saranno chiamate:",
     "options": [
       "termiche secche o blu.",
@@ -4691,6 +4984,7 @@
     "id": 5074,
     "subjectId": 5,
     "subjectName": "Meteorologia e Aerologia",
+    "discipline": "all",
     "question": "Se l'aria è sufficientemente umida potranno essere evidenziate le termiche esistenti e da che cosa?",
     "options": [
       "Si, dalla formazione di nubi stratificate ad una certa quota.",
@@ -4707,6 +5001,7 @@
     "id": 5075,
     "subjectId": 5,
     "subjectName": "Meteorologia e Aerologia",
+    "discipline": "all",
     "question": "Durante le ore più calde su quale tipo di terreno ci si può attendere con più probabilità di trovare movimento convettivo di aria?",
     "options": [
       "Su prati verdi.",
@@ -4723,6 +5018,7 @@
     "id": 5076,
     "subjectId": 5,
     "subjectName": "Meteorologia e Aerologia",
+    "discipline": "all",
     "question": "Oltre al moto convettivo dell'aria riscaldata per conduzione dal terreno sottostante, si può verificare un movimento ascensionale dell'aria per altri motivi?",
     "options": [
       "Si, per sollevamento forzato in presenza di vento in corrispondenza di rilievi.",
@@ -4739,6 +5035,7 @@
     "id": 5077,
     "subjectId": 5,
     "subjectName": "Meteorologia e Aerologia",
+    "discipline": "all",
     "question": "Come si chiama il sollevamento dell'aria generato dalla presenza di vento in corrispondenza di rilievi montuosi?",
     "options": [
       "Sollevamento dinamico o \"dinamica di pendio\" in gergo volo liberistico.",
@@ -4755,6 +5052,7 @@
     "id": 5078,
     "subjectId": 5,
     "subjectName": "Meteorologia e Aerologia",
+    "discipline": "all",
     "question": "Può un iniziale sollevamento dinamico generato dalla presenza di vento e di rilievi montuosi trasformarsi in sollevamento termico puro?",
     "options": [
       "Si, solo in presenza di condizioni di stabilità dell'aria.",
@@ -4771,6 +5069,7 @@
     "id": 5079,
     "subjectId": 5,
     "subjectName": "Meteorologia e Aerologia",
+    "discipline": "all",
     "question": "Che cosa si potrà verificare qualora si stacchino delle bolle termiche alla presenza di vento moderato che sospinge l'aria su per un pendio?",
     "options": [
       "Che si generino correnti ascensionali di notevole intensità.",
@@ -4787,6 +5086,7 @@
     "id": 5080,
     "subjectId": 5,
     "subjectName": "Meteorologia e Aerologia",
+    "discipline": "all",
     "question": "Che cosa s'intende per inversione termica?",
     "options": [
       "Una diminuzione anomala della temperatura dell'aria ad una certa quota.",
@@ -4803,6 +5103,7 @@
     "id": 5081,
     "subjectId": 5,
     "subjectName": "Meteorologia e Aerologia",
+    "discipline": "all",
     "question": "Quando si verifica un'inversione termica in prossimità del suolo può accadere che:",
     "options": [
       "si formi qualche nube cumuliforme con base quasi sul terreno.",
@@ -4819,6 +5120,7 @@
     "id": 5082,
     "subjectId": 5,
     "subjectName": "Meteorologia e Aerologia",
+    "discipline": "all",
     "question": "Come si riconosce dal pendio di decollo la presenza di un eventuale strato d'inversione sottostante?",
     "options": [
       "Dalla presenza di foschia sotto lo strato di inversione, caratterizzata da un limite piuttosto netto.",
@@ -4835,6 +5137,7 @@
     "id": 5083,
     "subjectId": 5,
     "subjectName": "Meteorologia e Aerologia",
+    "discipline": "all",
     "question": "Al decollo da un pendio, la presenza di uno strato d'inversione che tipo di messaggi può suggerirci?",
     "options": [
       "Nessun messaggio meteorologico o aerologico particolare.",
@@ -4851,6 +5154,7 @@
     "id": 5084,
     "subjectId": 5,
     "subjectName": "Meteorologia e Aerologia",
+    "discipline": "all",
     "question": "Che cosa s'intende per \"perturbazione meteorologica\" causata dal passaggio di un fronte?",
     "options": [
       "Il corpo nuvoloso ed i fenomeni associati alla presenza di una superficie di discontinuità esistente tra due masse d'aria aventi caratteristiche fisiche diverse.",
@@ -4867,6 +5171,7 @@
     "id": 5085,
     "subjectId": 5,
     "subjectName": "Meteorologia e Aerologia",
+    "discipline": "all",
     "question": "Che cos'è un fronte caldo?",
     "options": [
       "È la superficie di separazione tra una massa d'aria fredda che spostandosi raggiunge una massa d'aria più calda.",
@@ -4883,6 +5188,7 @@
     "id": 5086,
     "subjectId": 5,
     "subjectName": "Meteorologia e Aerologia",
+    "discipline": "all",
     "question": "Quali fenomeni meteorologici genera normalmente un fronte caldo al suo passaggio?",
     "options": [
       "Nubi a sviluppo prevalentemente verticale (tipicamente Cumuli congesti, Cumulonembi), precipitazioni violente ed a carattere discontinuo o in forma di rovescio, con aumento della temperatura media.",
@@ -4899,6 +5205,7 @@
     "id": 5087,
     "subjectId": 5,
     "subjectName": "Meteorologia e Aerologia",
+    "discipline": "all",
     "question": "Che cos'è un fronte freddo?",
     "options": [
       "È la superficie di separazione tra una massa d'aria fredda che spostandosi raggiunge una massa d'aria più calda.",
@@ -4915,6 +5222,7 @@
     "id": 5088,
     "subjectId": 5,
     "subjectName": "Meteorologia e Aerologia",
+    "discipline": "all",
     "question": "Quali fenomeni meteorologici genera normalmente un fronte freddo al suo passaggio?",
     "options": [
       "Nubi a sviluppo orizzontale, precipitazioni a carattere debole e continuo con diminuzione della temperatura.",
@@ -4931,6 +5239,7 @@
     "id": 5089,
     "subjectId": 5,
     "subjectName": "Meteorologia e Aerologia",
+    "discipline": "all",
     "question": "Presenza di nubi cumuliformi a ingente sviluppo verticale (tipicamente Cumuli congesti e Cumulonembi) e condizioni d'instabilità dell'aria sono generalmente associate al passaggio di:",
     "options": [
       "un fronte freddo.",
@@ -4947,6 +5256,7 @@
     "id": 5090,
     "subjectId": 5,
     "subjectName": "Meteorologia e Aerologia",
+    "discipline": "all",
     "question": "Le nubi stratiformi, anche di notevole spessore (tipicamente Nembostrati più o meno accompagnati da Altostrati e Strati) sono generalmente associate al passaggio di:",
     "options": [
       "un fronte freddo.",
@@ -4963,6 +5273,7 @@
     "id": 5091,
     "subjectId": 5,
     "subjectName": "Meteorologia e Aerologia",
+    "discipline": "all",
     "question": "Che cosa s'intende per fronte occluso?",
     "options": [
       "Una perturbazione complessa formata dall'insieme di un fronte freddo che ha raggiunto un fronte caldo e che da luogo a tutti i fenomeni meteorologici caratteristici di entrambi i fronti.",
@@ -4979,6 +5290,7 @@
     "id": 5092,
     "subjectId": 5,
     "subjectName": "Meteorologia e Aerologia",
+    "discipline": "all",
     "question": "In base alla classificazione convenzionale delle nubi, sono considerate nubi del livello basso:",
     "options": [
       "Strati, Nembostrati, Cirrostrati.",
@@ -4995,6 +5307,7 @@
     "id": 5093,
     "subjectId": 5,
     "subjectName": "Meteorologia e Aerologia",
+    "discipline": "all",
     "question": "In base alla classificazione convenzionale delle nubi, sono considerate nubi del livello medio:",
     "options": [
       "Altostrati e Altocumuli.",
@@ -5011,6 +5324,7 @@
     "id": 5094,
     "subjectId": 5,
     "subjectName": "Meteorologia e Aerologia",
+    "discipline": "all",
     "question": "In base alla classificazione convenzionale delle nubi, sono considerate nubi del livello alto:",
     "options": [
       "Altocumuli e Altostrati.",
@@ -5027,6 +5341,7 @@
     "id": 5095,
     "subjectId": 5,
     "subjectName": "Meteorologia e Aerologia",
+    "discipline": "all",
     "question": "A quale famiglia di nubi appartengono i Cumuli?",
     "options": [
       "Nubi a sviluppo verticale o convettive.",
@@ -5043,6 +5358,7 @@
     "id": 5096,
     "subjectId": 5,
     "subjectName": "Meteorologia e Aerologia",
+    "discipline": "all",
     "question": "Come può essere definito il Cumulo congesto?",
     "options": [
       "Un Cumulo in fase evolutiva avanzata caratterizzato da un elevato sviluppo verticale.",
@@ -5059,6 +5375,7 @@
     "id": 5097,
     "subjectId": 5,
     "subjectName": "Meteorologia e Aerologia",
+    "discipline": "all",
     "question": "Che cosa è un Cumulonembo?",
     "options": [
       "Un particolare tipo di Cumulo la cui base è piatta e densa appunto come un Nembostrato.",
@@ -5075,6 +5392,7 @@
     "id": 5098,
     "subjectId": 5,
     "subjectName": "Meteorologia e Aerologia",
+    "discipline": "all",
     "question": "In relazione al Volo Libero il Cumulonembo può essere considerato come:",
     "options": [
       "una nube di grande utilità per il volo.",
@@ -5091,6 +5409,7 @@
     "id": 5099,
     "subjectId": 5,
     "subjectName": "Meteorologia e Aerologia",
+    "discipline": "all",
     "question": "Qual è la sequenza tipica di sviluppo delle nubi convettive?",
     "options": [
       "Strato, Altocumulo, Cumulonembo, Cumulo.",
@@ -5107,6 +5426,7 @@
     "id": 5100,
     "subjectId": 5,
     "subjectName": "Meteorologia e Aerologia",
+    "discipline": "all",
     "question": "La presenza di nubi stratificate è positiva ai fini del Volo Libero, per la possibilità di correnti ascensionali?",
     "options": [
       "Si, in quanto sono possibili voli di distanza.",
@@ -5123,6 +5443,7 @@
     "id": 5101,
     "subjectId": 5,
     "subjectName": "Meteorologia e Aerologia",
+    "discipline": "all",
     "question": "La presenza di dense nubi stratificate a varie quote, esclude la possibilità che vi siano anche formazioni nuvolose cumuliformi consistenti?",
     "options": [
       "Si, perché le nubi stratificate sono sintomo di fronte caldo nel quale non è possibile incontrare nubi convettive.",
@@ -5139,6 +5460,7 @@
     "id": 5102,
     "subjectId": 5,
     "subjectName": "Meteorologia e Aerologia",
+    "discipline": "all",
     "question": "Quando un forte vento in quota interessa zone montuose, sovente s'innesca un fenomeno ondulatorio che è caratterizzato dalla presenza di:",
     "options": [
       "nubi stratificate alte del genere Cirrocumuli che tendono a stratificarsi in Cirrostrati per poi evolvere in Cumuli evidenziando il fenomeno ondulatorio.",
@@ -5155,6 +5477,7 @@
     "id": 5103,
     "subjectId": 5,
     "subjectName": "Meteorologia e Aerologia",
+    "discipline": "all",
     "question": "Una delle caratteristiche delle nubi lenticolari è:",
     "options": [
       "la tipica forma a sezione aerodinamica, simile a quella di una mandorla.",
@@ -5171,6 +5494,7 @@
     "id": 5104,
     "subjectId": 5,
     "subjectName": "Meteorologia e Aerologia",
+    "discipline": "all",
     "question": "Oltre al vento di gradiente è tipica del microclima di zone vallive e montuose la presenza di:",
     "options": [
       "brezze di monte la sera e brezze di valle il mattino.",
@@ -5187,6 +5511,7 @@
     "id": 5105,
     "subjectId": 5,
     "subjectName": "Meteorologia e Aerologia",
+    "discipline": "all",
     "question": "In zone marittime durante la giornata, a causa del diverso riscaldamento delle superfici acquee rispetto alle superfici terrestri, si generano:",
     "options": [
       "brezze dal mare durante le ore calde della giornata, e viceversa durante la notte.",
@@ -5203,6 +5528,7 @@
     "id": 5106,
     "subjectId": 5,
     "subjectName": "Meteorologia e Aerologia",
+    "discipline": "all",
     "question": "Generalmente le brezze di valle danno luogo a correnti di pendio anche sui versanti laterali delle valli stesse?",
     "options": [
       "Si, dipendentemente dalla morfologia del terreno.",
@@ -5219,6 +5545,7 @@
     "id": 5107,
     "subjectId": 5,
     "subjectName": "Meteorologia e Aerologia",
+    "discipline": "all",
     "question": "E' possibile che durante la giornata a causa della brezza di valle si formino nubi cumuliformi anche imponenti?",
     "options": [
       "Si, perché la brezza solleva aria lungo i pendii montuosi causando possibili fenomeni nuvolosi da sollevamento che in condizioni d'instabilità possono essere anche imponenti.",
@@ -5235,6 +5562,7 @@
     "id": 5108,
     "subjectId": 5,
     "subjectName": "Meteorologia e Aerologia",
+    "discipline": "all",
     "question": "Può una brezza di valle essere tanto forte da costituire un rischio per i praticanti del Volo Libero?",
     "options": [
       "Si, particolarmente in corrispondenza delle creste spartiacque.",
@@ -5251,6 +5579,7 @@
     "id": 5109,
     "subjectId": 5,
     "subjectName": "Meteorologia e Aerologia",
+    "discipline": "all",
     "question": "Quando un forte vento impatta di traverso una cresta o un crinale:",
     "options": [
       "l'aria sottovento a essi è in sostanza calma.",
@@ -5267,6 +5596,7 @@
     "id": 5110,
     "subjectId": 5,
     "subjectName": "Meteorologia e Aerologia",
+    "discipline": "all",
     "question": "Quando una valle è investita da vento forte la cui direzione è in sostanza parallela a quella del suo asse ci possiamo attendere:",
     "options": [
       "vento forte a scorrimento laminare.",
@@ -5283,6 +5613,7 @@
     "id": 5111,
     "subjectId": 5,
     "subjectName": "Meteorologia e Aerologia",
+    "discipline": "all",
     "question": "Quando una valle è interessata da vento forte la cui direzione forma un angolo superiore a 45° rispetto al suo asse ci possiamo attendere:",
     "options": [
       "vento quasi calmo lungo i pendii vallivi, ma forte al fondo valle.",
@@ -5299,6 +5630,7 @@
     "id": 5112,
     "subjectId": 5,
     "subjectName": "Meteorologia e Aerologia",
+    "discipline": "all",
     "question": "Se un rilievo isolato e tondeggiante è investito dal vento, si genereranno facilmente correnti ascensionali?",
     "options": [
       "Si, perché il vento è costretto comunque a scavalcare l'ostacolo.",
@@ -5315,6 +5647,7 @@
     "id": 5113,
     "subjectId": 5,
     "subjectName": "Meteorologia e Aerologia",
+    "discipline": "all",
     "question": "E' possibile che un rotore che si forma per effetto del vento in corrispondenza di un crinale o una cresta spartiacque dia luogo ad ascendenza costante o quasi?",
     "options": [
       "No, in nessun caso.",
@@ -5331,6 +5664,7 @@
     "id": 5114,
     "subjectId": 5,
     "subjectName": "Meteorologia e Aerologia",
+    "discipline": "all",
     "question": "La presenza di rotori sul pendio assolato di un versante vallivo situato in sottovento:",
     "options": [
       "facilita il distacco di termiche anche consistenti e violente dette appunto \"di sottovento\".",
@@ -5347,6 +5681,7 @@
     "id": 5115,
     "subjectId": 5,
     "subjectName": "Meteorologia e Aerologia",
+    "discipline": "all",
     "question": "A volte la presenza di rotori di sottovento specialmente in corrispondenza di crinali e creste elevate è segnalata:",
     "options": [
       "da formazioni nuvolose dotate di grande velocità di spostamento.",
@@ -5363,6 +5698,7 @@
     "id": 5116,
     "subjectId": 5,
     "subjectName": "Meteorologia e Aerologia",
+    "discipline": "all",
     "question": "Quando una catena montuosa è interessata dall'avvezione di una massa d'aria molto umida che tende a scavalcarla, si determinano particolari fenomeni detti:",
     "options": [
       "Stau sopravento con pesanti formazioni nuvolose e conseguenti precipitazioni, Foehn sottovento con vento a raffiche più caldo e secco.",
@@ -5379,6 +5715,7 @@
     "id": 5117,
     "subjectId": 5,
     "subjectName": "Meteorologia e Aerologia",
+    "discipline": "all",
     "question": "Nelle zone alpine del versante italiano, alla presenza del fenomeno di Foehn, sarà presente:",
     "options": [
       "aumento della temperatura, forte vento laminare caldo e secco, assenza di rotori e turbolenza.",
@@ -5395,6 +5732,7 @@
     "id": 5118,
     "subjectId": 5,
     "subjectName": "Meteorologia e Aerologia",
+    "discipline": "all",
     "question": "In presenza di una catena montuosa alta 3000 m aria umida ad una temperatura di pianura di 10°C si solleva dando luogo allo Stau sino in cresta e al Foehn in sottovento. Se la quota di condensazione sopravvento è di 1000 m quale sarà la temperatura dell'aria all'arrivo in pianura appena sotto alla catena montuosa?",
     "options": [
       "La stessa che sopravvento, cioè 10°C.",
@@ -5411,6 +5749,7 @@
     "id": 5119,
     "subjectId": 5,
     "subjectName": "Meteorologia e Aerologia",
+    "discipline": "all",
     "question": "Alla presenza di una catena montuosa alta 3000 m aria umida ad una temperatura di pianura di 10°C si solleva dando luogo a Stau sino in cresta e Foehn sottovento. Se la quota di condensazione sopravento è di 2000 m quale sarà la temperatura dell'aria all'arrivo in pianura appena sotto alla catena montuosa?",
     "options": [
       "La stessa che sopravvento, cioè 10°C.",
@@ -5427,6 +5766,7 @@
     "id": 5120,
     "subjectId": 5,
     "subjectName": "Meteorologia e Aerologia",
+    "discipline": "all",
     "question": "Quale tipo di microclima può avere una località posta immediatamente sottovento a una catena montuosa come quella alpina, rispetto a spostamenti di masse d'aria d'origine atlantica provenienti abitualmente dalla pianura francese?",
     "options": [
       "Piuttosto siccitoso e ventoso a causa dei fenomeni di Foehn.",
@@ -5443,6 +5783,7 @@
     "id": 6001,
     "subjectId": 6,
     "subjectName": "Strumenti",
+    "discipline": "all",
     "question": "Che cos'è l'altimetro?",
     "options": [
       "È lo strumento che misura sempre la distanza di un apparecchio dal suolo.",
@@ -5459,6 +5800,7 @@
     "id": 6002,
     "subjectId": 6,
     "subjectName": "Strumenti",
+    "discipline": "all",
     "question": "Come funziona normalmente un altimetro?",
     "options": [
       "Misura la pressione atmosferica e quindi l'altitudine, utilizzando una capsula aneroide o un sensore elettronico.",
@@ -5475,6 +5817,7 @@
     "id": 6003,
     "subjectId": 6,
     "subjectName": "Strumenti",
+    "discipline": "all",
     "question": "Per quale motivo un altimetro necessita di regolazioni?",
     "options": [
       "Perché la temperatura dell'aria varia in relazione alle condizioni atmosferiche ed al variare dell'altitudine.",
@@ -5491,6 +5834,7 @@
     "id": 6004,
     "subjectId": 6,
     "subjectName": "Strumenti",
+    "discipline": "all",
     "question": "Dopo aver regolato l'altimetro all'altitudine di decollo, effettuiamo il volo. Se all'atterraggio esso ci indica un'altitudine diversa da quella conosciuta, cosa può essere accaduto?",
     "options": [
       "La pressione atmosferica è cambiata.",
@@ -5507,6 +5851,7 @@
     "id": 6005,
     "subjectId": 6,
     "subjectName": "Strumenti",
+    "discipline": "all",
     "question": "Se regoliamo il nostro altimetro in base alla pressione presente al livello del mare (QNH), andando in volo potremo conoscere:",
     "options": [
       "l'altezza geometrica sul terreno sottostante.",
@@ -5523,6 +5868,7 @@
     "id": 6006,
     "subjectId": 6,
     "subjectName": "Strumenti",
+    "discipline": "all",
     "question": "Cosa è il variometro?",
     "options": [
       "È lo strumento che in volo misura la velocità verticale.",
@@ -5539,6 +5885,7 @@
     "id": 6007,
     "subjectId": 6,
     "subjectName": "Strumenti",
+    "discipline": "all",
     "question": "Come funziona un variometro?",
     "options": [
       "Misura la variazione istantanea della temperatura dell'aria a mezzo di un dispositivo elettronico.",
@@ -5555,6 +5902,7 @@
     "id": 6008,
     "subjectId": 6,
     "subjectName": "Strumenti",
+    "discipline": "all",
     "question": "In quali situazioni l'uso di un variometro può essere di grande aiuto per la sicurezza in volo?",
     "options": [
       "Ad esempio, volando con copertura nuvolosa o sotto un cumulo, le indicazioni del variometro ci possono aiutare a capire se c'è aspirazione e se è il caso o meno di affrettare la discesa verso l'atterraggio o dirigersi verso zone non soggette al fenomeno.",
@@ -5571,6 +5919,7 @@
     "id": 6009,
     "subjectId": 6,
     "subjectName": "Strumenti",
+    "discipline": "all",
     "question": "Che cosa può misurare l'anemometro durante un volo?",
     "options": [
       "È lo strumento che in volo misura la velocità all'aria.",
@@ -5587,6 +5936,7 @@
     "id": 6010,
     "subjectId": 6,
     "subjectName": "Strumenti",
+    "discipline": "all",
     "question": "Come funziona un anemometro?",
     "options": [
       "Misura la pressione statica di cui è dotato il vento relativo traducendola in indicazione di velocità.",
@@ -5603,6 +5953,7 @@
     "id": 6011,
     "subjectId": 6,
     "subjectName": "Strumenti",
+    "discipline": "all",
     "question": "In quale caso l'anemometro può indicare la velocità al suolo con buona approssimazione?",
     "options": [
       "Quando il volo è effettuato in aria calma, in assenza di vento e su traiettoria poco inclinata.",
@@ -5619,6 +5970,7 @@
     "id": 6012,
     "subjectId": 6,
     "subjectName": "Strumenti",
+    "discipline": "all",
     "question": "Che cosa è la bussola?",
     "options": [
       "È lo strumento che indica la direzione del Nord magnetico.",
@@ -5635,6 +5987,7 @@
     "id": 6013,
     "subjectId": 6,
     "subjectName": "Strumenti",
+    "discipline": "all",
     "question": "Come funziona la bussola?",
     "options": [
       "Rileva mediante una calamita la posizione in cui si trova il Nord geografico.",
@@ -5651,6 +6004,7 @@
     "id": 6014,
     "subjectId": 6,
     "subjectName": "Strumenti",
+    "discipline": "all",
     "question": "A cosa si deve prestare attenzione se vogliamo che la bussola funzioni nel modo più corretto possibile posizionandola tra gli strumenti?",
     "options": [
       "A nulla in particolare, la bussola indica sempre il nord magnetico.",
@@ -5667,6 +6021,7 @@
     "id": 6015,
     "subjectId": 6,
     "subjectName": "Strumenti",
+    "discipline": "all",
     "question": "E' possibile affermare che il Nord geografico coincide con il Nord magnetico?",
     "options": [
       "Si.",
@@ -5683,6 +6038,7 @@
     "id": 6016,
     "subjectId": 6,
     "subjectName": "Strumenti",
+    "discipline": "all",
     "question": "Con bussola, altimetro, anemometro e variometro è possibile effettuare attività vololiberistica in condizioni di volo strumentale, ad esempio in nube?",
     "options": [
       "Si, se adeguatamente addestrati.",
@@ -5699,6 +6055,7 @@
     "id": 6017,
     "subjectId": 6,
     "subjectName": "Strumenti",
+    "discipline": "all",
     "question": "Durante il volo, che cosa ci permette di misurare il GPS?",
     "options": [
       "La velocità al suolo.",
@@ -5715,6 +6072,7 @@
     "id": 6018,
     "subjectId": 6,
     "subjectName": "Strumenti",
+    "discipline": "all",
     "question": "Con il GPS è possibile volare con tranquillità nelle nubi?",
     "options": [
       "Si, in quanto il GPS indica la direzione in cui mi sto muovendo con esattezza.",
@@ -5731,6 +6089,7 @@
     "id": 6019,
     "subjectId": 6,
     "subjectName": "Strumenti",
+    "discipline": "all",
     "question": "Stiamo volando in presenza di vento molto forte. La nostra prua è diretta verso SUD. Sul display del GPS leggiamo una velocità di 3 km/h, direzione NORD. Cosa succede?",
     "options": [
       "Lo strumento è evidentemente rotto.",
@@ -5747,6 +6106,7 @@
     "id": 6020,
     "subjectId": 6,
     "subjectName": "Strumenti",
+    "discipline": "all",
     "question": "Come funziona un GPS?",
     "options": [
       "Calcola la posizione nello spazio mediante un sensore di movimento.",
@@ -5763,6 +6123,7 @@
     "id": 7001,
     "subjectId": 7,
     "subjectName": "Tecnica di Pilotaggio",
+    "discipline": "all",
     "question": "Prima di recarsi al decollo in atterraggio è necessario:",
     "options": [
       "verificare le condizioni del terreno.",
@@ -5779,6 +6140,7 @@
     "id": 7002,
     "subjectId": 7,
     "subjectName": "Tecnica di Pilotaggio",
+    "discipline": "all",
     "question": "Prima di intraprendere un volo di CrossCountry è necessario, oltre a tutto il resto:",
     "options": [
       "nutrirsi adeguatamente, bere molto per evitare disidratazione, organizzare il recupero, dotarsi di mezzi per trascorrere eventualmente la notte all'addiaccio.",
@@ -5795,6 +6157,7 @@
     "id": 7003,
     "subjectId": 7,
     "subjectName": "Tecnica di Pilotaggio",
+    "discipline": "all",
     "question": "Quale inclinazione del pendio, assicurata la possibilità di una graduale e corretta rincorsa, è da considerarsi ottimale e sicura per il decollo?",
     "options": [
       "Oltre i 20° e sino a 35°, risultando già così nettamente superiore alla pendenza della traiettoria di volo realizzabile.",
@@ -5811,6 +6174,7 @@
     "id": 7004,
     "subjectId": 7,
     "subjectName": "Tecnica di Pilotaggio",
+    "discipline": "all",
     "question": "Con quale tipo di corsa si deve effettuare il decollo in deltaplano e parapendio?",
     "options": [
       "Con falcata corta ed a velocità costante.",
@@ -5827,6 +6191,7 @@
     "id": 7005,
     "subjectId": 7,
     "subjectName": "Tecnica di Pilotaggio",
+    "discipline": "all",
     "question": "Qual è in fase di decollo con deltaplano e parapendio, la prima manovra da eseguire appena staccati da terra oltre a quelle finalizzate al controllo della direzione?",
     "options": [
       "Cabrare o trazionare i comandi rispettivamente, per non perdere eccessiva quota.",
@@ -5843,6 +6208,7 @@
     "id": 7006,
     "subjectId": 7,
     "subjectName": "Tecnica di Pilotaggio",
+    "discipline": "all",
     "question": "Come è possibile ottenere, a prescindere da altre condizioni, il minor tasso di caduta possibile con deltaplano e parapendio?",
     "options": [
       "Volando in linea retta ed all'incidenza massima consentita.",
@@ -5859,6 +6225,7 @@
     "id": 7007,
     "subjectId": 7,
     "subjectName": "Tecnica di Pilotaggio",
+    "discipline": "all",
     "question": "Come varia l'efficienza all'aria di un'ala aumentando il vento frontale?",
     "options": [
       "Aumenta.",
@@ -5875,6 +6242,7 @@
     "id": 7008,
     "subjectId": 7,
     "subjectName": "Tecnica di Pilotaggio",
+    "discipline": "all",
     "question": "Se vogliamo comunque realizzare la massima autonomia chilometrica in deltaplano o parapendio dovremo:",
     "options": [
       "limitare al massimo le manovre.",
@@ -5891,6 +6259,7 @@
     "id": 7009,
     "subjectId": 7,
     "subjectName": "Tecnica di Pilotaggio",
+    "discipline": "all",
     "question": "Se, in determinate condizioni aerologiche, vogliamo rimanere più tempo possibile in volo realizzando la massima autonomia oraria, dovremo:",
     "options": [
       "limitare al massimo le manovre.",
@@ -5907,6 +6276,7 @@
     "id": 7010,
     "subjectId": 7,
     "subjectName": "Tecnica di Pilotaggio",
+    "discipline": "all",
     "question": "Passando da condizioni di aria calma a condizioni di vento frontale, quale correttivo dobbiamo apportare alla velocità per garantirci la massima efficienza al suolo possibile?",
     "options": [
       "Diminuire la velocità rispetto a quella di massima efficienza in aria calma.",
@@ -5923,6 +6293,7 @@
     "id": 7011,
     "subjectId": 7,
     "subjectName": "Tecnica di Pilotaggio",
+    "discipline": "all",
     "question": "Volando in deltaplano o parapendio sappiamo che l'efficienza al suolo, quando il vento frontale varia, comunque:",
     "options": [
       "varia.",
@@ -5939,6 +6310,7 @@
     "id": 7012,
     "subjectId": 7,
     "subjectName": "Tecnica di Pilotaggio",
+    "discipline": "all",
     "question": "L'efficienza al suolo:",
     "options": [
       "diminuisce al diminuire del vento frontale.",
@@ -5955,6 +6327,7 @@
     "id": 7013,
     "subjectId": 7,
     "subjectName": "Tecnica di Pilotaggio",
+    "discipline": "all",
     "question": "In condizioni di ascendenza la massima efficienza al suolo si realizza volando:",
     "options": [
       "con una incidenza maggiore di quella corrispondente al regime di massima efficienza in aria calma.",
@@ -5971,6 +6344,7 @@
     "id": 7014,
     "subjectId": 7,
     "subjectName": "Tecnica di Pilotaggio",
+    "discipline": "all",
     "question": "In condizioni di discendenza la massima efficienza al suolo si realizza volando:",
     "options": [
       "con una incidenza minore di quella corrispondente al regime di massima efficienza in aria calma.",
@@ -5987,6 +6361,7 @@
     "id": 7015,
     "subjectId": 7,
     "subjectName": "Tecnica di Pilotaggio",
+    "discipline": "all",
     "question": "Stiamo volando ad una velocità rispetto al suolo di 10 km/h. C'è una componente di vento contrario pari a 30 km/h. Se avessimo l'anemometro quanto indicherebbe?",
     "options": [
       "10 km/h.",
@@ -6003,6 +6378,7 @@
     "id": 7016,
     "subjectId": 7,
     "subjectName": "Tecnica di Pilotaggio",
+    "discipline": "all",
     "question": "Stiamo volando ad una velocità rispetto al suolo di 60 km/h. C'è una componente di vento a favore pari a 30 km/h. Se avessimo l'anemometro quanto indicherebbe?",
     "options": [
       "90 km/h.",
@@ -6019,6 +6395,7 @@
     "id": 7017,
     "subjectId": 7,
     "subjectName": "Tecnica di Pilotaggio",
+    "discipline": "all",
     "question": "A quale scopo si utilizza l'acceleratore in parapendio?",
     "options": [
       "Per aumentare l'efficienza suolo in condizioni di vento contrario.",
@@ -6035,6 +6412,7 @@
     "id": 7018,
     "subjectId": 7,
     "subjectName": "Tecnica di Pilotaggio",
+    "discipline": "all",
     "question": "In presenza di vento meteorologico, come si esegue una virata di 360° la cui traccia al suolo sia più possibile circolare?",
     "options": [
       "Variando opportunamente l'inclinazione dell'ala durante la virata in funzione della deriva dovuta allo spostamento dell'aria rispetto al suolo.",
@@ -6051,6 +6429,7 @@
     "id": 7019,
     "subjectId": 7,
     "subjectName": "Tecnica di Pilotaggio",
+    "discipline": "all",
     "question": "Come si eseguono le virate in dinamica di pendio ed in prossimità dello stesso, se si vuole avere il miglior rendimento garantendosi il massimo della sicurezza?",
     "options": [
       "Eseguendo virate strette di 360° nel punto in corrispondenza del quale è massima l'ascendenza.",
@@ -6067,6 +6446,7 @@
     "id": 7020,
     "subjectId": 7,
     "subjectName": "Tecnica di Pilotaggio",
+    "discipline": "all",
     "question": "Perché si fanno virate di 360° in termica?",
     "options": [
       "Perché le termiche hanno sempre e solo un andamento ascendente elicoidale.",
@@ -6083,6 +6463,7 @@
     "id": 7021,
     "subjectId": 7,
     "subjectName": "Tecnica di Pilotaggio",
+    "discipline": "all",
     "question": "Per sfruttare meglio le condizioni il pilota, entrato in termica o in dinamica:",
     "options": [
       "interviene sui comandi per ridurre la velocità.",
@@ -6099,6 +6480,7 @@
     "id": 7022,
     "subjectId": 7,
     "subjectName": "Tecnica di Pilotaggio",
+    "discipline": "all",
     "question": "È possibile andare in stallo volando a velocità prossima alla massima?",
     "options": [
       "No.",
@@ -6115,6 +6497,7 @@
     "id": 7023,
     "subjectId": 7,
     "subjectName": "Tecnica di Pilotaggio",
+    "discipline": "all",
     "question": "A quale velocità è opportuno volare in forte turbolenza?",
     "options": [
       "Alla minima possibile per ridurre le sollecitazioni nel delta e per garantire la massima pressione nei cassoni del parapendio.",
@@ -6131,6 +6514,7 @@
     "id": 7024,
     "subjectId": 7,
     "subjectName": "Tecnica di Pilotaggio",
+    "discipline": "all",
     "question": "Come si determina dal volo la direzione del vento al suolo in assenza di manica a vento?",
     "options": [
       "Osservando ogni cosa che il vento può mettere in movimento (fumo, bandiere, panni appesi, alberi) e considerando l'eventuale presenza di deriva.",
@@ -6147,6 +6531,7 @@
     "id": 7025,
     "subjectId": 7,
     "subjectName": "Tecnica di Pilotaggio",
+    "discipline": "all",
     "question": "Che cosa si intende per circuito di avvicinamento ad \"otto\"?",
     "options": [
       "Un tipo di avvicinamento che consente al pilota di effettuare poche virate per arrivare in atterraggio.",
@@ -6163,6 +6548,7 @@
     "id": 7026,
     "subjectId": 7,
     "subjectName": "Tecnica di Pilotaggio",
+    "discipline": "all",
     "question": "Che cosa si intende per circuito a \"C\" o aeronautico?",
     "options": [
       "Un tipo di avvicinamento composto da tre fasi distinte dette \"sottovento\", \"base\" o \"virata base\" e \"finale\" che consente di arrivare al suolo con buona precisione evitando di fare molte manovre vicino al terreno.",
@@ -6179,6 +6565,7 @@
     "id": 7027,
     "subjectId": 7,
     "subjectName": "Tecnica di Pilotaggio",
+    "discipline": "all",
     "question": "L'area di atterraggio è molto frequentata. Se le altre condizioni lo permettono scegliamo di atterrare:",
     "options": [
       "effettuando un circuito di avvicinamento ad \"otto\".",
@@ -6195,6 +6582,7 @@
     "id": 7028,
     "subjectId": 7,
     "subjectName": "Tecnica di Pilotaggio",
+    "discipline": "all",
     "question": "In un atterraggio in cui si presentano contemporaneamente molti deltaplani e parapendio, sarà opportuno:",
     "options": [
       "impostare gli avvicinamenti con la tecnica a \"C\" rispettando le precedenze ed avviandosi all'atterraggio quando si è più in basso degli altri.",
@@ -6211,6 +6599,7 @@
     "id": 7029,
     "subjectId": 7,
     "subjectName": "Tecnica di Pilotaggio",
+    "discipline": "all",
     "question": "Quando è necessario tenere particolarmente conto del gradiente del vento?",
     "options": [
       "Volando in termica.",
@@ -6227,6 +6616,7 @@
     "id": 7030,
     "subjectId": 7,
     "subjectName": "Tecnica di Pilotaggio",
+    "discipline": "all",
     "question": "Effettuando un avvicinamento con circuito a \"C\" in condizioni di vento sostenuto, è necessario iniziare la virata base:",
     "options": [
       "ben oltre il traverso del punto di contatto.",
@@ -6243,6 +6633,7 @@
     "id": 7031,
     "subjectId": 7,
     "subjectName": "Tecnica di Pilotaggio",
+    "discipline": "all",
     "question": "Se, per errore, l'asse prescelto dal pilota per effettuare una serie di \"otto\" in avvicinamento è troppo prossimo al punto di contatto, per non mancare l'atterraggio il rischio è quello di dover:",
     "options": [
       "iniziare la virata in finale a quota molto alta.",
@@ -6259,6 +6650,7 @@
     "id": 7032,
     "subjectId": 7,
     "subjectName": "Tecnica di Pilotaggio",
+    "discipline": "all",
     "question": "Durante la fase finale dell'atterraggio con vento forte in deltaplano o parapendio il pilota deve:",
     "options": [
       "attendersi una traiettoria ripida, aumentare la velocità all'aria al massimo per minimizzare l'effetto del gradiente del vento o del wind shear, raccordare moderatamente e solo in prossimità del suolo.",
@@ -6275,6 +6667,7 @@
     "id": 7033,
     "subjectId": 7,
     "subjectName": "Tecnica di Pilotaggio",
+    "discipline": "all",
     "question": "Per effetto del gradiente del vento vicino al suolo in atterraggio il pilota deve attendersi:",
     "options": [
       "un aumento improvviso del tasso di caduta con probabile picchiata del mezzo che è possibile prevenire con una buona dose di velocità.",
@@ -6291,6 +6684,7 @@
     "id": 7034,
     "subjectId": 7,
     "subjectName": "Tecnica di Pilotaggio",
+    "discipline": "all",
     "question": "Il mantenimento della massima velocità in finale prima di iniziare a raccordare è necessario per:",
     "options": [
       "poter stallare meglio in prossimità del suolo.",
@@ -6307,6 +6701,7 @@
     "id": 7035,
     "subjectId": 7,
     "subjectName": "Tecnica di Pilotaggio",
+    "discipline": "all",
     "question": "Il vento in atterraggio è sostenuto, volando in deltaplano o parapendio, per aumentare il margine di sorvolo di eventuali ostacoli lungo la traiettoria, al pilota conviene tra le seguenti soluzioni:",
     "options": [
       "aumentare la velocità all'aria perché solo così facendo si ottiene la massima efficienza suolo possibile e quindi la minor pendenza di traiettoria reale.",
@@ -6323,6 +6718,7 @@
     "id": 7036,
     "subjectId": 7,
     "subjectName": "Tecnica di Pilotaggio",
+    "discipline": "paraglider",
     "question": "Quando è necessario controllare che i cordini del parapendio non siano attorcigliati o aggrovigliati?",
     "options": [
       "Dopo aver gonfiato, sollevato e frenato quanto basta l'ala in fase di decollo.",
@@ -6339,6 +6735,7 @@
     "id": 7037,
     "subjectId": 7,
     "subjectName": "Tecnica di Pilotaggio",
+    "discipline": "all",
     "question": "Durante un volo di cross non sempre è possibile atterrare dove previsto. Il pilota dovrebbe conoscere perfettamente:",
     "options": [
       "la tecnica per atterrare senza inconvenienti in un preciso punto di un pendio o una superficie ridotta.",
@@ -6355,6 +6752,7 @@
     "id": 7038,
     "subjectId": 7,
     "subjectName": "Tecnica di Pilotaggio",
+    "discipline": "paraglider",
     "question": "Immediatamente prima di effettuare un decollo in parapendio è necessario eseguire i controlli di sicurezza che sono:",
     "options": [
       "scarpe allacciate, selletta allacciata e regolata come previsto, bretelle e cordini correttamente predisposti ed impugnati, ala in posizione corretta, casco allacciato, vento e condizioni meteo favorevoli, spazio aereo libero.",
@@ -6371,6 +6769,7 @@
     "id": 7039,
     "subjectId": 7,
     "subjectName": "Tecnica di Pilotaggio",
+    "discipline": "paraglider",
     "question": "Nel parapendio oltre a curare che la posizione del pilota risulti in volo quella corretta, è indispensabile, affinché l'ala mantenga le caratteristiche garantite dall'omologazione, verificare che il tipo di selletta usato sia compatibile e che vengano rispettate le seguenti disposizioni:",
     "options": [
       "regolare la selletta per ottenere che la distanza tra le bretelle (destra e sinistra) sia sempre superiore a 40 cm.",
@@ -6387,6 +6786,7 @@
     "id": 7040,
     "subjectId": 7,
     "subjectName": "Tecnica di Pilotaggio",
+    "discipline": "paraglider",
     "question": "Se ci rendiamo conto che il nostro parapendio è umido, quali accorgimenti dobbiamo adottare durante il volo:",
     "options": [
       "effettuare le \"orecchie\" per scendere più velocemente.",
@@ -6403,6 +6803,7 @@
     "id": 7041,
     "subjectId": 7,
     "subjectName": "Tecnica di Pilotaggio",
+    "discipline": "paraglider",
     "question": "Il gonfiaggio del parapendio fronte all'ala (spalle al vento) è particolarmente consigliato:",
     "options": [
       "in condizioni di vento sostenuto.",
@@ -6419,6 +6820,7 @@
     "id": 7042,
     "subjectId": 7,
     "subjectName": "Tecnica di Pilotaggio",
+    "discipline": "paraglider",
     "question": "Le fasi in cui è possibile pensare di suddividere il decollo in parapendio sono:",
     "options": [
       "gonfiaggio, rincorsa, involo e successiva presa di velocità.",
@@ -6435,6 +6837,7 @@
     "id": 7043,
     "subjectId": 7,
     "subjectName": "Tecnica di Pilotaggio",
+    "discipline": "paraglider",
     "question": "Dopo il gonfiaggio del parapendio fronte all'ala finalizzato al decollo, al fine di evitare che l'ala si scomponga o passi davanti nel momento in cui ci si gira e si inizia la rincorsa, è importante:",
     "options": [
       "che la rotazione del pilota avvenga velocemente.",
@@ -6451,6 +6854,7 @@
     "id": 7044,
     "subjectId": 7,
     "subjectName": "Tecnica di Pilotaggio",
+    "discipline": "paraglider",
     "question": "È possibile il decollo in parapendio con limitata componente di vento al traverso?",
     "options": [
       "Si, senza particolari accorgimenti.",
@@ -6467,6 +6871,7 @@
     "id": 7045,
     "subjectId": 7,
     "subjectName": "Tecnica di Pilotaggio",
+    "discipline": "paraglider",
     "question": "Un corretto decollo in parapendio è quello in cui il pilota:",
     "options": [
       "valutata comunque sufficiente la portanza prodotta dall'ala interrompe la rincorsa e si sistema al più presto nella selletta.",
@@ -6483,6 +6888,7 @@
     "id": 7046,
     "subjectId": 7,
     "subjectName": "Tecnica di Pilotaggio",
+    "discipline": "paraglider",
     "question": "La sequenza di interruzione di un decollo in parapendio dovrebbe essere:",
     "options": [
       "interrompere al più presto la corsa e qualora possibile frenare completamente l'ala.",
@@ -6499,6 +6905,7 @@
     "id": 7047,
     "subjectId": 7,
     "subjectName": "Tecnica di Pilotaggio",
+    "discipline": "paraglider",
     "question": "Se, a gonfiaggio avvenuto, il pilota trattiene le bretelle anteriori, durante la corsa di decollo, è probabile che:",
     "options": [
       "il decollo avvenga con ritardo e sia necessario correre più a lungo.",
@@ -6515,6 +6922,7 @@
     "id": 7048,
     "subjectId": 7,
     "subjectName": "Tecnica di Pilotaggio",
+    "discipline": "paraglider",
     "question": "Se dopo il decollo si constata una chiusura laterale del parapendio, come deve comportarsi il pilota?",
     "options": [
       "Mantenere o ristabilire il controllo direzionale dell'ala e solo dopo averlo fatto intervenire opportunamente per provocare la riapertura dell'estremità collassata.",
@@ -6531,6 +6939,7 @@
     "id": 7049,
     "subjectId": 7,
     "subjectName": "Tecnica di Pilotaggio",
+    "discipline": "paraglider",
     "question": "E' possibile eseguire virate in parapendio con il solo spostamento laterale del peso del pilota?",
     "options": [
       "Si, in modo più o meno accentuato, dipendentemente dal tipo di selletta e dalla sua regolazione.",
@@ -6547,6 +6956,7 @@
     "id": 7050,
     "subjectId": 7,
     "subjectName": "Tecnica di Pilotaggio",
+    "discipline": "paraglider",
     "question": "Volendo sfruttare al meglio le prestazioni del parapendio, sarà opportuno che il pilota esegua virate utilizzando il peso e successivamente:",
     "options": [
       "rilasci entrambi i freni per poi trazionare quello interno alla virata.",
@@ -6563,6 +6973,7 @@
     "id": 7051,
     "subjectId": 7,
     "subjectName": "Tecnica di Pilotaggio",
+    "discipline": "paraglider",
     "question": "Il parapendio è un mezzo che presenta il vantaggio di poter girare abbastanza stretto da non uscire da una eventuale termica anche se di modeste dimensioni. Quali delle seguenti opzioni è preferibile per sfruttare meglio questo tipo di condizioni?",
     "options": [
       "Scegliere un ottimo compromesso tra inclinazione laterale e tasso di caduta che consenta comunque di non uscire dalla termica, tenendo conto del suo andamento verticale.",
@@ -6579,6 +6990,7 @@
     "id": 7052,
     "subjectId": 7,
     "subjectName": "Tecnica di Pilotaggio",
+    "discipline": "paraglider",
     "question": "E' possibile provare l'avvicinamento allo stallo in parapendio e con quale tecnica per garantirsi adeguati margini di sicurezza?",
     "options": [
       "Si, effettuandolo solo in quota indipendentemente dal modo in cui si interviene sui comandi.",
@@ -6595,6 +7007,7 @@
     "id": 7053,
     "subjectId": 7,
     "subjectName": "Tecnica di Pilotaggio",
+    "discipline": "paraglider",
     "question": "Come si riconosce uno stallo paracadutale del parapendio?",
     "options": [
       "Ala perfettamente gonfia, velocità all'aria praticamente nulla, tasso di caduta elevato.",
@@ -6611,6 +7024,7 @@
     "id": 7054,
     "subjectId": 7,
     "subjectName": "Tecnica di Pilotaggio",
+    "discipline": "paraglider",
     "question": "In volo con il parapendio può accadere che accidentalmente si raggiunga lo stallo volando troppo lenti. Per una corretta rimessa, il pilota dovrà:",
     "options": [
       "a stallo avvenuto rilasciare immediatamente e velocemente i comandi per poi trazionarli bruscamente durante l'abbattimento in avanti dell'ala.",
@@ -6627,6 +7041,7 @@
     "id": 7055,
     "subjectId": 7,
     "subjectName": "Tecnica di Pilotaggio",
+    "discipline": "paraglider",
     "question": "Quali sono le manovre di discesa rapida in parapendio?",
     "options": [
       "Effettuare virate continue che consentono di aumentare il carico alare.",
@@ -6643,6 +7058,7 @@
     "id": 7056,
     "subjectId": 7,
     "subjectName": "Tecnica di Pilotaggio",
+    "discipline": "paraglider",
     "question": "Qual è il risultato di una simmetrica e leggera tensione esercitata sugli elevatori posteriori del parapendio?",
     "options": [
       "Aumento della velocità e diminuzione della portanza.",
@@ -6659,6 +7075,7 @@
     "id": 7057,
     "subjectId": 7,
     "subjectName": "Tecnica di Pilotaggio",
+    "discipline": "paraglider",
     "question": "È possibile in parapendio pilotare facendo uso dei soli elevatori posteriori?",
     "options": [
       "Si.",
@@ -6675,6 +7092,7 @@
     "id": 7058,
     "subjectId": 7,
     "subjectName": "Tecnica di Pilotaggio",
+    "discipline": "paraglider",
     "question": "Il pilota che agisce sull'acceleratore sa di poter:",
     "options": [
       "variare l'assetto, l'incidenza e la velocità dell'ala entro limiti ben precisi.",
@@ -6691,6 +7109,7 @@
     "id": 7059,
     "subjectId": 7,
     "subjectName": "Tecnica di Pilotaggio",
+    "discipline": "paraglider",
     "question": "In volo rettilineo in uscita da una virata, se per effetto di una sovracorrezione si innescano oscillazioni laterali del parapendio il pilota dovrà:",
     "options": [
       "cercare di smorzarle insistendo ad agire sui comandi in contro fase.",
@@ -6707,6 +7126,7 @@
     "id": 7060,
     "subjectId": 7,
     "subjectName": "Tecnica di Pilotaggio",
+    "discipline": "paraglider",
     "question": "La corretta sequenza in finale per l'atterraggio in parapendio, in condizioni di vento moderato, è:",
     "options": [
       "massima velocità all'aria sino a circa un metro dal suolo quindi intervento deciso sui comandi per provocare lo stallo.",
@@ -6723,6 +7143,7 @@
     "id": 7061,
     "subjectId": 7,
     "subjectName": "Tecnica di Pilotaggio",
+    "discipline": "paraglider",
     "question": "Nella zona di decollo abbiamo vento sufficiente a consentire un gonfiaggio fronte vela ma il vento è laterale (25 gradi) rispetto alla massima pendenza del terreno.",
     "options": [
       "Predisponiamo la vela per il gonfiaggio lungo la massima pendenza per sfruttarla al meglio.",
@@ -6739,6 +7160,7 @@
     "id": 7062,
     "subjectId": 7,
     "subjectName": "Tecnica di Pilotaggio",
+    "discipline": "hang_glider",
     "question": "Decollo in deltaplano. Tra i controlli di sicurezza pre-decollo, uno in particolare risulta essenziale e deve essere eseguito con una tecnica ed una cura particolare perché ha causato svariati e gravi incidenti:",
     "options": [
       "il controllo del posizionamento del deltaplano.",
@@ -6755,6 +7177,7 @@
     "id": 7063,
     "subjectId": 7,
     "subjectName": "Tecnica di Pilotaggio",
+    "discipline": "hang_glider",
     "question": "Come è necessario verificare nel miglior modo l'avvenuto corretto aggancio del pilota al deltaplano?",
     "options": [
       "Facendo sorreggere la chiglia del deltaplano da un assistente, disponendosi in posizione orizzontale di volo sospesi all'aggancio, verificando oltre all'aggancio stesso la posizione del corpo rispetto alla barra.",
@@ -6771,6 +7194,7 @@
     "id": 7064,
     "subjectId": 7,
     "subjectName": "Tecnica di Pilotaggio",
+    "discipline": "hang_glider",
     "question": "Quali precauzioni si devono adottare se si intende decollare in deltaplano con vento sostenuto?",
     "options": [
       "Durante la fase immediatamente precedente il decollo far tenere l'estremità alare da un solo assistente.",
@@ -6787,6 +7211,7 @@
     "id": 7065,
     "subjectId": 7,
     "subjectName": "Tecnica di Pilotaggio",
+    "discipline": "hang_glider",
     "question": "Se il vento è angolato entro i 45° rispetto alla direzione di decollo, è possibile decollare in deltaplano e come?",
     "options": [
       "No, anche se la componente è moderata.",
@@ -6803,6 +7228,7 @@
     "id": 7066,
     "subjectId": 7,
     "subjectName": "Tecnica di Pilotaggio",
+    "discipline": "hang_glider",
     "question": "Se il pilota intraprende la corsa di decollo con il deltaplano molto cabrato:",
     "options": [
       "il decollo avviene prima ed è possibile sorvolare con più margine eventuali ostacoli sulla traiettoria.",
@@ -6819,6 +7245,7 @@
     "id": 7067,
     "subjectId": 7,
     "subjectName": "Tecnica di Pilotaggio",
+    "discipline": "hang_glider",
     "question": "È possibile l'interruzione di decollo in deltaplano e quali rischi comporta eventualmente?",
     "options": [
       "Si, solo in caso di estrema necessità, con alta probabilità di danni alla struttura e conseguenze per il pilota.",
@@ -6835,6 +7262,7 @@
     "id": 7068,
     "subjectId": 7,
     "subjectName": "Tecnica di Pilotaggio",
+    "discipline": "hang_glider",
     "question": "Quando è opportuno che il pilota si sistemi nell'imbrago dopo il decollo in deltaplano?",
     "options": [
       "Il più presto possibile dopo lo stacco.",
@@ -6851,6 +7279,7 @@
     "id": 7069,
     "subjectId": 7,
     "subjectName": "Tecnica di Pilotaggio",
+    "discipline": "hang_glider",
     "question": "Come si può variare l'angolo d'incidenza in volo con il deltaplano?",
     "options": [
       "Solo agendo sul dispositivo chiamato \"overdrive\".",
@@ -6867,6 +7296,7 @@
     "id": 7070,
     "subjectId": 7,
     "subjectName": "Tecnica di Pilotaggio",
+    "discipline": "hang_glider",
     "question": "Individuare la corretta sequenza per effettuare una virata in deltaplano:",
     "options": [
       "presa di velocità, spostamento laterale del corpo rispetto alla barra parallelamente alla chiglia, spinta sulla barra per coordinare la virata, riposizionamento del corpo in posizione centrata rispetto alla barra.",
@@ -6883,6 +7313,7 @@
     "id": 7071,
     "subjectId": 7,
     "subjectName": "Tecnica di Pilotaggio",
+    "discipline": "hang_glider",
     "question": "Quale errore di manovra causa generalmente una scivolata d'ala del deltaplano?",
     "options": [
       "Mancata coordinazione dei movimenti durante l'esecuzione di una virata.",
@@ -6899,6 +7330,7 @@
     "id": 7072,
     "subjectId": 7,
     "subjectName": "Tecnica di Pilotaggio",
+    "discipline": "hang_glider",
     "question": "Come si esegue il controllo di rollio in deltaplano?",
     "options": [
       "Facendo semplicemente ruotare l'asse del corpo rispetto alla barra.",
@@ -6915,6 +7347,7 @@
     "id": 7073,
     "subjectId": 7,
     "subjectName": "Tecnica di Pilotaggio",
+    "discipline": "hang_glider",
     "question": "Un ala rigida vira:",
     "options": [
       "grazie all'azione di comandi aerodinamici oltreché allo spostamento del peso.",
@@ -6931,6 +7364,7 @@
     "id": 7074,
     "subjectId": 7,
     "subjectName": "Tecnica di Pilotaggio",
+    "discipline": "hang_glider",
     "question": "A distanza di sicurezza dal terreno, come si esegue correttamente una prova di stallo in deltaplano?",
     "options": [
       "Si spinge dolcemente e gradualmente sulla barra per aumentare l'angolo di incidenza sino allo stallo ed a stallo avvenuto si ottiene la rimessa riaumentando la velocità al mezzo.",
@@ -6947,6 +7381,7 @@
     "id": 7075,
     "subjectId": 7,
     "subjectName": "Tecnica di Pilotaggio",
+    "discipline": "hang_glider",
     "question": "Come deve comportarsi il pilota di deltaplano una volta entrato in termica se vuole sfruttarla?",
     "options": [
       "Mantenere il regime di minimo tasso di caduta ed effettuare delle virate di 360° per rimanere in termica.",
@@ -6963,6 +7398,7 @@
     "id": 7076,
     "subjectId": 7,
     "subjectName": "Tecnica di Pilotaggio",
+    "discipline": "hang_glider",
     "question": "Cosa è il tumbling?",
     "options": [
       "È un manovra acrobatica.",
@@ -6979,6 +7415,7 @@
     "id": 7077,
     "subjectId": 7,
     "subjectName": "Tecnica di Pilotaggio",
+    "discipline": "hang_glider",
     "question": "Come è possibile intervenire per aumentare la velocità di trim del deltaplano?",
     "options": [
       "Spostando indietro il punto di aggancio del pilota rispetto alla struttura.",
@@ -6995,6 +7432,7 @@
     "id": 7078,
     "subjectId": 7,
     "subjectName": "Tecnica di Pilotaggio",
+    "discipline": "hang_glider",
     "question": "La corretta sequenza in finale per l'atterraggio con il deltaplano in condizioni di vento moderato è:",
     "options": [
       "raccordare adeguatamente in prossimità del suolo, mantenendo una traiettoria orizzontale sino al momento di \"aprire\" per stallare il deltaplano alla minima velocità di sostentamento possibile.",
@@ -7011,6 +7449,7 @@
     "id": 7079,
     "subjectId": 7,
     "subjectName": "Tecnica di Pilotaggio",
+    "discipline": "hang_glider",
     "question": "In quale momento ci si porta in posizione verticale per atterrare in deltaplano?",
     "options": [
       "Appena si avverte che il deltaplano risente dell'effetto suolo dopo aver raccordato in finale per l'atterraggio.",
@@ -7027,6 +7466,7 @@
     "id": 8001,
     "subjectId": 8,
     "subjectName": "Materiali",
+    "discipline": "paraglider",
     "question": "È più preoccupante un taglio sulla superficie del parapendio in corrispondenza:",
     "options": [
       "della parte anteriore centrale dell'estradosso.",
@@ -7043,6 +7483,7 @@
     "id": 8002,
     "subjectId": 8,
     "subjectName": "Materiali",
+    "discipline": "paraglider",
     "question": "I cordini del parapendio devono essere di materiale:",
     "options": [
       "più elastico possibile.",
@@ -7059,6 +7500,7 @@
     "id": 8003,
     "subjectId": 8,
     "subjectName": "Materiali",
+    "discipline": "paraglider",
     "question": "Durante il volo in parapendio sono sottoposti al maggior carico i cordini:",
     "options": [
       "anteriori.",
@@ -7075,6 +7517,7 @@
     "id": 8004,
     "subjectId": 8,
     "subjectName": "Materiali",
+    "discipline": "paraglider",
     "question": "Il parapendio è generalmente fabbricato con materiale \"rip-stop\". Che cosa significa?",
     "options": [
       "Che il tessuto stesso non può strapparsi, ma solo tagliarsi.",
@@ -7091,6 +7534,7 @@
     "id": 8005,
     "subjectId": 8,
     "subjectName": "Materiali",
+    "discipline": "paraglider",
     "question": "Il tessuto con cui è generalmente costruito un parapendio deve essere:",
     "options": [
       "resistente all'usura, molto elastico e gas permeabile.",
@@ -7107,6 +7551,7 @@
     "id": 8006,
     "subjectId": 8,
     "subjectName": "Materiali",
+    "discipline": "paraglider",
     "question": "Quali agenti esterni danneggiano maggiormente il tessuto di un parapendio rendendolo fragile e gas-permeabile?",
     "options": [
       "I raggi ultravioletti e l'umidità.",
@@ -7123,6 +7568,7 @@
     "id": 8007,
     "subjectId": 8,
     "subjectName": "Materiali",
+    "discipline": "paraglider",
     "question": "Se il tessuto di un parapendio è divenuto poroso:",
     "options": [
       "risulta compromesso solo il suo aspetto.",
@@ -7139,6 +7585,7 @@
     "id": 8008,
     "subjectId": 8,
     "subjectName": "Materiali",
+    "discipline": "paraglider",
     "question": "Dovendo riporre un parapendio si avrà cura di farlo:",
     "options": [
       "solo se la vela è asciutta ed in luogo secco, lontano da fonti di calore ed al riparo dalla luce solare.",
@@ -7155,6 +7602,7 @@
     "id": 8009,
     "subjectId": 8,
     "subjectName": "Materiali",
+    "discipline": "paraglider",
     "question": "Il cordino di un parapendio è rimasto impigliato ed il kevlar che ne costituisce l'anima è ora privo di rivestimento, ma integro:",
     "options": [
       "provvisoriamente lo accorciamo annodandolo per evitare che la parte scoperta sia soggetta a trazione.",
@@ -7171,6 +7619,7 @@
     "id": 8010,
     "subjectId": 8,
     "subjectName": "Materiali",
+    "discipline": "paraglider",
     "question": "Decidiamo di sostituire i maillons dell'imbrago con moschettoni. Avremo cura di:",
     "options": [
       "verificare che questi ultimi siano omologati e provvisti di ghiera a vite o a scatto.",
@@ -7187,6 +7636,7 @@
     "id": 8011,
     "subjectId": 8,
     "subjectName": "Materiali",
+    "discipline": "hang_glider",
     "question": "Che cosa è necessario verificare in corrispondenza di piombature di cavi e tiranti del deltaplano?",
     "options": [
       "Che i cavi ed i tiranti non siano rotti sotto la piombatura.",
@@ -7203,6 +7653,7 @@
     "id": 8012,
     "subjectId": 8,
     "subjectName": "Materiali",
+    "discipline": "hang_glider",
     "question": "Se ci accorgiamo che qualche tirante del deltaplano è sfilacciato o logoro:",
     "options": [
       "lo sostituiamo immediatamente prima di riandare in volo.",
@@ -7219,6 +7670,7 @@
     "id": 8013,
     "subjectId": 8,
     "subjectName": "Materiali",
+    "discipline": "hang_glider",
     "question": "Durante l'ultimo volo in deltaplano abbiamo effettuato un atterraggio pesante. Il cross bar ed un montante si sono piegati:",
     "options": [
       "riandiamo in volo avendo sostituito il montante e raddrizzato perfettamente il cross bar.",
@@ -7235,6 +7687,7 @@
     "id": 8014,
     "subjectId": 8,
     "subjectName": "Materiali",
+    "discipline": "hang_glider",
     "question": "Il materiale di cui sono rivestite le superfici di un deltaplano si deteriora particolarmente se esposto a lungo a:",
     "options": [
       "raggi infrarossi.",
@@ -7251,6 +7704,7 @@
     "id": 8015,
     "subjectId": 8,
     "subjectName": "Materiali",
+    "discipline": "hang_glider",
     "question": "Se si deve riporre il deltaplano per un lungo periodo dovremo aver cura di:",
     "options": [
       "farlo in apposita sacca quando siamo certi che è perfettamente asciutto, sistemandolo in luogo meno umido possibile, lontano dalla luce del sole e da fonti di calore.",
@@ -7267,6 +7721,7 @@
     "id": 8016,
     "subjectId": 8,
     "subjectName": "Materiali",
+    "discipline": "hang_glider",
     "question": "Se in corrispondenza di qualche elemento costituente il corredo di tiranteria o bulloneria del deltaplano si riscontra presenza di ruggine:",
     "options": [
       "è necessario prima di volare rimuoverla prontamente usando appositi prodotti antiruggine sul particolare interessato.",
@@ -7283,6 +7738,7 @@
     "id": 8017,
     "subjectId": 8,
     "subjectName": "Materiali",
+    "discipline": "all",
     "question": "Quale norma deve essere rispettata nella manutenzione del paracadute di soccorso?",
     "options": [
       "Mai aprirlo perché si potrebbe commettere un errore nel ripiegarlo.",
@@ -7299,6 +7755,7 @@
     "id": 8018,
     "subjectId": 8,
     "subjectName": "Materiali",
+    "discipline": "all",
     "question": "Riguardo al paracadute di soccorso è necessario accertare prima di ogni volo che:",
     "options": [
       "la maniglia di azionamento sia all'interno della sacca di lancio.",
@@ -7315,6 +7772,7 @@
     "id": 8019,
     "subjectId": 8,
     "subjectName": "Materiali",
+    "discipline": "all",
     "question": "Per quale motivo un paracadute di soccorso che non sia stato sottoposto a periodica ispezione non garantisce sufficiente affidabilità?",
     "options": [
       "Perché il materiale con cui è fabbricato si deteriora rapidamente se non gli si fa prendere aria ogni tanto.",
@@ -7331,6 +7789,7 @@
     "id": 8020,
     "subjectId": 8,
     "subjectName": "Materiali",
+    "discipline": "all",
     "question": "Il materiale e la tecnologia con cui sono fabbricati i paracadute di soccorso per il volo libero garantiscono totale sicurezza per aperture effettuate:",
     "options": [
       "a qualsiasi velocità di caduta.",
@@ -7347,6 +7806,7 @@
     "id": 9001,
     "subjectId": 9,
     "subjectName": "Sicurezza del Volo",
+    "discipline": "all",
     "question": "La sicurezza del volo in deltaplano e parapendio dipende moltissimo dal rapporto esistente tra esperienza del pilota e caratteristiche del mezzo utilizzato?",
     "options": [
       "Si.",
@@ -7363,6 +7823,7 @@
     "id": 9002,
     "subjectId": 9,
     "subjectName": "Sicurezza del Volo",
+    "discipline": "all",
     "question": "La sicurezza del volo in deltaplano e parapendio dipende tra l'altro anche dal rapporto tra l'esperienza del pilota e le condizioni meteo affrontate?",
     "options": [
       "Assolutamente no.",
@@ -7379,6 +7840,7 @@
     "id": 9003,
     "subjectId": 9,
     "subjectName": "Sicurezza del Volo",
+    "discipline": "all",
     "question": "Ci viene proposto l'acquisto di un'ala omologata alla quale sono state però apportate delle modifiche che ne migliorano le prestazioni. Qual è l'atteggiamento più conservativo da tenere sotto il profilo della sicurezza?",
     "options": [
       "Prendere in considerazione il mezzo ma solo dopo averlo personalmente provato al limite delle prestazioni.",
@@ -7395,6 +7857,7 @@
     "id": 9004,
     "subjectId": 9,
     "subjectName": "Sicurezza del Volo",
+    "discipline": "all",
     "question": "Quando va effettuata la revisione periodica dei mezzi?",
     "options": [
       "Quando si notano reazioni anomale o si sospettano variazioni nelle prestazioni del mezzo.",
@@ -7411,6 +7874,7 @@
     "id": 9005,
     "subjectId": 9,
     "subjectName": "Sicurezza del Volo",
+    "discipline": "all",
     "question": "Omettere o trascurare i controlli di sicurezza pre-volo:",
     "options": [
       "è senz'altro pericoloso.",
@@ -7427,6 +7891,7 @@
     "id": 9006,
     "subjectId": 9,
     "subjectName": "Sicurezza del Volo",
+    "discipline": "all",
     "question": "Se avete dei dubbi sulle condizioni meteo in rapporto alla vostra attrezzatura e/o esperienza, ZA DEL VOLO pur avendo sentito il parere di un pilota più esperto:",
     "options": [
       "è utile superare ogni indugio ed intraprendere il volo per migliorare le proprie capacità.",
@@ -7443,6 +7908,7 @@
     "id": 9007,
     "subjectId": 9,
     "subjectName": "Sicurezza del Volo",
+    "discipline": "all",
     "question": "Per quale motivo un pilota di modesta esperienza non dovrebbe volare con un'ala ad alte prestazioni anche se giudicata facile e sicura da piloti più esperti?",
     "options": [
       "Perché le ali ad alte prestazioni sono comunque insicure anche se qualcuno non lo ammette.",
@@ -7459,6 +7925,7 @@
     "id": 9008,
     "subjectId": 9,
     "subjectName": "Sicurezza del Volo",
+    "discipline": "all",
     "question": "Vi trovate al decollo di un volo che non conoscete. Le condizioni sono forti, ma tutti decollano con successo. Tra i seguenti atteggiamenti che potete tenere quale ritenete sia più conservativo sotto il profilo della sicurezza?",
     "options": [
       "Attendere che le condizioni inizino a ridursi e solo allora intraprendere il volo tenendo presenti i consigli di chi vi è parso più equilibrato ed esperto.",
@@ -7475,6 +7942,7 @@
     "id": 9009,
     "subjectId": 9,
     "subjectName": "Sicurezza del Volo",
+    "discipline": "all",
     "question": "Per quale motivo si ritiene pericoloso il decollo in discendenza o con vento in coda?",
     "options": [
       "Solo perché la pendenza della traiettoria di volo risulterà troppo elevata appena staccati da terra.",
@@ -7491,6 +7959,7 @@
     "id": 9010,
     "subjectId": 9,
     "subjectName": "Sicurezza del Volo",
+    "discipline": "all",
     "question": "Come deve essere valutato il decollo da un dirupo a scalino di circa 90° con deltaplano o parapendio?",
     "options": [
       "Molto pericoloso.",
@@ -7507,6 +7976,7 @@
     "id": 9011,
     "subjectId": 9,
     "subjectName": "Sicurezza del Volo",
+    "discipline": "all",
     "question": "La giornata è umida e le termiche generano velocemente nubi cumuliformi. Entrati in termica, è necessario prestare attenzione al fatto che:",
     "options": [
       "si può scatenare un temporale e potremmo essere colpiti da un fulmine.",
@@ -7523,6 +7993,7 @@
     "id": 9012,
     "subjectId": 9,
     "subjectName": "Sicurezza del Volo",
+    "discipline": "all",
     "question": "Quale maggior pericolo si corre volando in nube?",
     "options": [
       "Avere una collisione con altri apparecchi.",
@@ -7539,6 +8010,7 @@
     "id": 9013,
     "subjectId": 9,
     "subjectName": "Sicurezza del Volo",
+    "discipline": "all",
     "question": "È dimostrato che il wind shear è un fenomeno pericoloso per il volo in generale, ma in particolare per il Volo Libero. Che cosa s'intende per wind shear?",
     "options": [
       "Solo un improvviso aumento dell'intensità del vento nel tempo e/o nello spazio.",
@@ -7555,6 +8027,7 @@
     "id": 9014,
     "subjectId": 9,
     "subjectName": "Sicurezza del Volo",
+    "discipline": "all",
     "question": "Rispetto al suolo non avanziamo. Siamo alla presenza di un vento meteorologico contrario la cui velocità è pari alla nostra velocità all'aria. Se di colpo il vento cessasse l'ala:",
     "options": [
       "risulterebbe, anche se per un tempo brevissimo, senz'altro investita da un vento relativo nullo.",
@@ -7571,6 +8044,7 @@
     "id": 9015,
     "subjectId": 9,
     "subjectName": "Sicurezza del Volo",
+    "discipline": "all",
     "question": "Che cosa s'intende per configurazione inusuale di un deltaplano e di un parapendio?",
     "options": [
       "Una configurazione o una situazione di volo normale per l'ala ma alla quale il pilota non è abituato.",
@@ -7587,6 +8061,7 @@
     "id": 9016,
     "subjectId": 9,
     "subjectName": "Sicurezza del Volo",
+    "discipline": "all",
     "question": "Un'ala certificata offre le seguenti garanzie rispetto a un'ala non certificata:",
     "options": [
       "le reazioni dell'ala certificata sono sempre controllabili e non pericolose, quelle dell'ala non certificata sono pericolose.",
@@ -7603,6 +8078,7 @@
     "id": 9017,
     "subjectId": 9,
     "subjectName": "Sicurezza del Volo",
+    "discipline": "all",
     "question": "Ai fini del volo con deltaplano e parapendio è necessario tenere presenti le difficoltà e i rischi connessi ad attività svolta in una valle lunga e stretta perché:",
     "options": [
       "è sempre interessata da forti correnti discensionali.",
@@ -7619,6 +8095,7 @@
     "id": 9018,
     "subjectId": 9,
     "subjectName": "Sicurezza del Volo",
+    "discipline": "all",
     "question": "Se deltaplano e parapendio sono particolarmente soggetti agli effetti negativi del wind shear, come può essere giudicato un atterraggio effettuato sottovento a ostacoli rilevanti in condizione di vento sostenuto?",
     "options": [
       "Fattibile, ma con qualche difficoltà da piloti con poca esperienza.",
@@ -7635,6 +8112,7 @@
     "id": 9019,
     "subjectId": 9,
     "subjectName": "Sicurezza del Volo",
+    "discipline": "all",
     "question": "Se in atterraggio il vento è tanto forte da limitare notevolmente la penetrazione, quali soluzioni adottare in avvicinamento?",
     "options": [
       "Effettuare degli \"otto\" con la tecnica a \"granchio\" che ci dota comunque di una certa velocità al suolo permettendoci di affrontare in sicurezza situazioni di forte gradiente in prossimità del terreno.",
@@ -7651,6 +8129,7 @@
     "id": 9020,
     "subjectId": 9,
     "subjectName": "Sicurezza del Volo",
+    "discipline": "all",
     "question": "Il vento è aumentato tanto da impedirci di atterrare normalmente. Ci vediamo costretti a farlo in un bosco. Quale tecnica è bene adottare?",
     "options": [
       "Atterrare controvento sulla chioma degli alberi, proteggersi il busto e il capo con braccia e mani nella successiva caduta, appena arrestata quest'ultima afferrare saldamente il ramo più vicino.",
@@ -7667,6 +8146,7 @@
     "id": 9021,
     "subjectId": 9,
     "subjectName": "Sicurezza del Volo",
+    "discipline": "all",
     "question": "Vedendoci costretti a un atterraggio in acqua, quale precauzione è indispensabile adottare?",
     "options": [
       "Solo dopo il contatto con l'acqua sganciarsi e/o fuoriuscire dall'imbrago.",
@@ -7683,6 +8163,7 @@
     "id": 9022,
     "subjectId": 9,
     "subjectName": "Sicurezza del Volo",
+    "discipline": "all",
     "question": "Per quale motivo il pilotaggio in prossimità del suolo deve necessariamente essere più dolce e attento?",
     "options": [
       "Perché il recupero da configurazioni inusuali in cui ci si venga a trovare intenzionalmente o meno, comporta una perdita di quota che può essere fatale.",
@@ -7699,6 +8180,7 @@
     "id": 9023,
     "subjectId": 9,
     "subjectName": "Sicurezza del Volo",
+    "discipline": "paraglider",
     "question": "Quali conseguenze in volo si possono avere per non aver agganciato i cosciali della selletta del parapendio?",
     "options": [
       "Una posizione molto scomoda, ma il rischio è minimo se il pettorale è ben agganciato.",
@@ -7715,6 +8197,7 @@
     "id": 9024,
     "subjectId": 9,
     "subjectName": "Sicurezza del Volo",
+    "discipline": "paraglider",
     "question": "Se durante il decollo in parapendio si constata che l'ala non si è gonfiata correttamente è preferibile per motivi di sicurezza:",
     "options": [
       "accelerare la corsa agendo sui comandi per ottenere il corretto gonfiaggio prima dello stacco.",
@@ -7731,6 +8214,7 @@
     "id": 9025,
     "subjectId": 9,
     "subjectName": "Sicurezza del Volo",
+    "discipline": "all",
     "question": "Analizzare in anticipo previsioni meteorologiche specifiche per il volo aumenta la sicurezza?",
     "options": [
       "No perché la situazione meteorologica locale può essere valutata solo al momento.",
@@ -7747,6 +8231,7 @@
     "id": 9026,
     "subjectId": 9,
     "subjectName": "Sicurezza del Volo",
+    "discipline": "paraglider",
     "question": "Se si va in volo con una \"cravatta\", per non esserci accorti durante i controlli che uno o più cordini erano disposti sotto l'estradosso con l'ala stesa al suolo e per non aver controllato l'ala accuratamente dopo il gonfiaggio, che cosa dobbiamo attenderci?",
     "options": [
       "Nulla di significativo a parte un modesto degrado delle prestazioni.",
@@ -7763,6 +8248,7 @@
     "id": 9027,
     "subjectId": 9,
     "subjectName": "Sicurezza del Volo",
+    "discipline": "paraglider",
     "question": "Se durante un volo in parapendio si rompe il cordino di un freno, si è in una situazione di emergenza. Come ci si deve comportare?",
     "options": [
       "Pilotare con entrambi gli elevatori posteriori trazionandoli con dolcezza e limitatamente allo stretto indispensabile per arrivare in atterraggio.",
@@ -7779,6 +8265,7 @@
     "id": 9028,
     "subjectId": 9,
     "subjectName": "Sicurezza del Volo",
+    "discipline": "paraglider",
     "question": "E' vero che la certificazione europea del parapendio garantisce, entro certi limiti, un ottimo livello di sicurezza a patto che siano rispettati il rapporto tra esperienza del pilota e classe di appartenenza dell'ala volata, nonché tutte le norme relative al tipo ed alla regolazione della selletta riportate nella certificazione?",
     "options": [
       "No, è un'affermazione poco attendibile.",
@@ -7795,6 +8282,7 @@
     "id": 9029,
     "subjectId": 9,
     "subjectName": "Sicurezza del Volo",
+    "discipline": "all",
     "question": "E' corretto affermare dal punto di vista della sicurezza del volo che un'ala certificata in una classe basica garantisce il pilota anche se inesperto in caso di configurazione inusuale?",
     "options": [
       "Si, indipendentemente da altri fattori.",
@@ -7811,6 +8299,7 @@
     "id": 9030,
     "subjectId": 9,
     "subjectName": "Sicurezza del Volo",
+    "discipline": "all",
     "question": "Ai fini della sicurezza del volo, un pilota che si appresta a volare un'ala certificata in una classe non basica deve essere conscio che in caso di configurazione inusuale:",
     "options": [
       "necessita il suo intervento tempestivo e qualificato per tornare a condizioni di normalità senza finire in una grave sequenza di configurazioni inusuali.",
@@ -7827,6 +8316,7 @@
     "id": 9031,
     "subjectId": 9,
     "subjectName": "Sicurezza del Volo",
+    "discipline": "paraglider",
     "question": "Configurazioni inusuali del parapendio. Chiusura asimmetrica spontanea, tendenza dell'ala all'autorotazione. Il pilota dovrà in ogni caso prima ristabilire il controllo direzionale dell'ala e solo dopo averlo ristabilito intervenire con il freno dalla parte della chiusura per riaprire l'ala:",
     "options": [
       "errato. E' fondamentale la riapertura dell'ala che quindi va fatta prima.",
@@ -7843,6 +8333,7 @@
     "id": 9032,
     "subjectId": 9,
     "subjectName": "Sicurezza del Volo",
+    "discipline": "paraglider",
     "question": "Configurazioni inusuali del parapendio. Chiusura frontale del bordo d'attacco, tendenza dell'ala a passare bruscamente dietro al pilota. Il pilota dovrà prima di tutto rilasciare entrambi i freni per poi tenersi pronto a controllare l'abbattimento in avanti dell'ala:",
     "options": [
       "corretto, la riapertura dell'ala se si agisce rilasciando simmetricamente i freni generalmente non è problematica, ma lo possono essere i pendolamenti che ne conseguono.",
@@ -7859,6 +8350,7 @@
     "id": 9033,
     "subjectId": 9,
     "subjectName": "Sicurezza del Volo",
+    "discipline": "paraglider",
     "question": "Configurazioni inusuali del parapendio. La conseguenza di un'eccessiva trazione asimmetrica dei comandi dei freni è lo stallo asimmetrico che induce una brusca e violenta rotazione dell'ala attorno all'asse verticale, detta \"vite piatta negativa\". Per prevenire tale configurazione prima che si verifichi il pilota dovrà:",
     "options": [
       "affondare anche l'altro comando per poi rilasciarli entrambi verso l'alto dolcemente.",
@@ -7875,6 +8367,7 @@
     "id": 9034,
     "subjectId": 9,
     "subjectName": "Sicurezza del Volo",
+    "discipline": "paraglider",
     "question": "Configurazioni inusuali del parapendio. In che cosa consiste il post-stallo di un parapendio e che cosa può accadere se si verifica?",
     "options": [
       "È la situazione prodotta dal permanere in condizioni di stallo, ma non può avere alcuna conseguenza se si verifica.",
@@ -7891,6 +8384,7 @@
     "id": 9035,
     "subjectId": 9,
     "subjectName": "Sicurezza del Volo",
+    "discipline": "paraglider",
     "question": "Configurazioni inusuali del parapendio. All'uscita da uno stallo di \"B\" si constata di avere un tasso di caduta elevatissimo, una velocità di avanzamento quasi nulla con l'ala perfettamente gonfia sulla verticale. Che cosa può essere accaduto?",
     "options": [
       "Si è finiti in stallo paracadutale per aver probabilmente rilasciato le bretelle \"B\" troppo lentamente verso l'alto e/o perché si sta volando un'ala dal tessuto divenuto poroso.",
@@ -7907,6 +8401,7 @@
     "id": 9036,
     "subjectId": 9,
     "subjectName": "Sicurezza del Volo",
+    "discipline": "paraglider",
     "question": "Configurazioni inusuali del parapendio. Per ottenere al meglio l'uscita da uno stallo paracadutale il pilota dovrà, dopo aver rilasciato prontamente verso l'alto entrambi i freni, agire nell'ordine come segue:",
     "options": [
       "trazionare con decisione una sola delle bretelle anteriori oppure, se ciò non ha effetto, trazionare decisamente uno solo dei freni.",
@@ -7923,6 +8418,7 @@
     "id": 9037,
     "subjectId": 9,
     "subjectName": "Sicurezza del Volo",
+    "discipline": "hang_glider",
     "question": "Decollo in deltaplano con vento sostenuto. L'utilizzo di un assistente che tocchi il delta all'inizio della rincorsa è rischioso perché:",
     "options": [
       "l'assistente può essere trascinato giù dalla rampa o addirittura essere portato in volo.",
@@ -7939,6 +8435,7 @@
     "id": 9038,
     "subjectId": 9,
     "subjectName": "Sicurezza del Volo",
+    "discipline": "hang_glider",
     "question": "Il mancato o non corretto aggancio del pilota al deltaplano comporta:",
     "options": [
       "gravissime conseguenze sempre.",
@@ -7955,6 +8452,7 @@
     "id": 9039,
     "subjectId": 9,
     "subjectName": "Sicurezza del Volo",
+    "discipline": "hang_glider",
     "question": "Se per avaria strutturale il dispositivo antidrappo non dovesse entrare in funzione quando necessario, una volta innescata la caduta a drappo:",
     "options": [
       "è bene cercare prima di uscirne con l'uso dei comandi e del peso, non c'è fretta per l'uso del paracadute di soccorso.",
@@ -7971,6 +8469,7 @@
     "id": 9040,
     "subjectId": 9,
     "subjectName": "Sicurezza del Volo",
+    "discipline": "hang_glider",
     "question": "Le sollecitazioni che rendono pericoloso il looping eseguito con il deltaplano sono indotte:",
     "options": [
       "solo dalla velocità che è necessaria assumere prima di iniziare la manovra di cabrata.",
@@ -7987,6 +8486,7 @@
     "id": 9041,
     "subjectId": 9,
     "subjectName": "Sicurezza del Volo",
+    "discipline": "hang_glider",
     "question": "Che cosa s'intende per tumbling del deltaplano?",
     "options": [
       "Una brusca rotazione incontrollata attorno all'asse d'imbardata.",
@@ -8003,6 +8503,7 @@
     "id": 9042,
     "subjectId": 9,
     "subjectName": "Sicurezza del Volo",
+    "discipline": "hang_glider",
     "question": "Quali elementi, tra i seguenti, contribuiscono a provocare il tumbling del deltaplano?",
     "options": [
       "Un angolo d'incidenza troppo elevato associato a condizioni di turbolenza.",
@@ -8019,6 +8520,7 @@
     "id": 9043,
     "subjectId": 9,
     "subjectName": "Sicurezza del Volo",
+    "discipline": "all",
     "question": "E' vero che praticando il Volo Libero il pilota deve usare il paracadute di soccorso solo in ultima analisi e cioè quando non è possibile ripristinare altrimenti condizioni di volo nelle quali il mezzo risulti pilotabile sino a un atterraggio sicuro?",
     "options": [
       "No, questa è una credenza sbagliata perché il paracadute di soccorso va usato sempre e al più presto possibile quando l'ala assume una configurazione inusuale.",
@@ -8035,6 +8537,7 @@
     "id": 9044,
     "subjectId": 9,
     "subjectName": "Sicurezza del Volo",
+    "discipline": "all",
     "question": "Oltre al caso di malore del pilota, in quale di queste situazioni è utile l'apertura del paracadute di emergenza e come deve essere fatta?",
     "options": [
       "In forte turbolenza qualora risulti difficile il controllo del deltaplano o del parapendio, tirando con decisione la maniglia verso l'alto.",
@@ -8051,6 +8554,7 @@
     "id": 9045,
     "subjectId": 9,
     "subjectName": "Sicurezza del Volo",
+    "discipline": "all",
     "question": "Se è vero che il paracadute di soccorso, come emerge inconfutabilmente da dati statistici, funziona nella quasi totalità dei casi, per quale motivo è comunque raccomandato il suo uso solo in casi in cui esso costituisce l'ultima risorsa disponibile?",
     "options": [
       "Perché le statistiche non sono attendibili, e il suo funzionamento è aleatorio.",

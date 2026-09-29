@@ -153,19 +153,22 @@ Questa checklist fornisce le istruzioni operative per il **collaudo manuale end-
 Questa sezione raccoglie le nuove funzionalità e i miglioramenti di interfaccia richiesti e pianificati per le prossime iterazioni:
 
 ### 1. Filtro Domande Esclusive Deltaplano (Discipline Tagging con Protezione Quesiti Condivisi)
-- [ ] **Audit e Categorizzazione dei 504 Quiz AeCI**:
-  - Analisi semantica dettagliata dell'intero database per identificare con precisione:
-    - *Quesiti Esclusivi Deltaplano*: nozioni e meccaniche specifiche dell'ala rigida/flessibile (barra di controllo/trapezio/A-frame, pilotaggio pendolare per spostamento del baricentro, trave di chiglia, cavi di controventatura, tubo alare, ecc.).
-    - *Quesiti Esclusivi Parapendio*: nozioni e meccaniche specifiche dell'ala a cassoni (elevatori, maniglie e fascio freni, fascio funicolare, bocche d'aria, centine, chiusure d'ala asimmetriche/frontali).
-    - *Quesiti Comuni Condivisi (SSOT)*: aerodinamica generale (portanza, resistenza, polare, stallo, centro di pressione, angolo d'attacco), meteorologia completa (termiche, brezze, nubi, fronti, stabilità), normativa e spazi aerei (D.P.R. 133/2010, priorità, quote minime), fisiopatologia del volo (ipossia, cinetosi, ipotermia), primo soccorso, sicurezza del volo comune e strumentazione (variometro, altimetro, anemometro).
-- [ ] **Vincolo Tassativo di Salvaguardia**:
-  - Massima attenzione a **NON** escludere dal percorso di studio del parapendio domande che possono apparire tecniche ma sono in realtà di principio generale condiviso valide per entrambi i velivoli (es. freccia alare, svergolamento/twist, velocità di massima efficienza o minima discesa, effetto suolo).
-- [ ] **Tipizzazione & Aggiornamento Schema Dati**:
-  - Estensione dei tipi in `src/types/quiz.ts` (es. `discipline?: 'all' | 'hang_glider' | 'paraglider'`) e popolamento coerente in `src/data/questions.json` e `public/data/questions.json`.
-- [ ] **UI Controlli Filtro Disciplina**:
-  - Inserimento del selettore disciplina nelle schermate **Materie**, **Archivio** e nel launcher di simulazione **Esame**, consentendo all'allievo di filtrare: *Tutti i quiz*, *Solo Deltaplano + Condivisi*, o *Solo Parapendio + Condivisi*.
-- [ ] **Suite di Test Dedicata (Vitest)**:
-  - Test unitari per garantire l'integrità del catalogo (504 quiz sempre preservati), la validità dei filtri e l'assoluta assenza di falsi positivi/negativi sui quesiti condivisi.
+- [x] **Audit e Categorizzazione dei 504 Quiz AeCI**:
+  - [x] Analisi semantica dettagliata dell'intero database dei 504 quiz: identificati 30 quesiti esclusivi Deltaplano (barra di controllo/trapezio, pilotaggio pendolare per spostamento baricentro, trave di chiglia, cavi e tubi strutturali), 46 quesiti esclusivi Parapendio (freni, fascio funicolare, cassoni, centine, chiusure asimmetriche/frontali) e 428 quesiti Comuni Condivisi (aerodinamica generale, meteo completa, normativa D.P.R. 133/2010, primo soccorso, fisiopatologia, sicurezza comune e strumentazione).
+- [x] **Vincolo Tassativo di Salvaguardia**:
+  - [x] Preservati rigorosamente nei quesiti comuni tutti i principi trasversali (effetto suolo Q2147, precedenze reciproche Q1036, paracadute di soccorso Q8017-8020, velocità di efficienza e meteo). I 428 quesiti comuni non vengono mai esclusi né in modalità Parapendio né in modalità Deltaplano.
+- [x] **Tipizzazione & Aggiornamento Schema Dati**:
+  - [x] Estesi i tipi in `src/types/quiz.ts` (`Discipline = 'all' | 'hang_glider' | 'paraglider'`) e `src/types/database.ts` (`disciplinePreference` in `AppSettings`).
+  - [x] Aggiornati `src/data/questions.json` e `public/data/questions.json` con campo `discipline` tipizzato su tutti i 504 quiz (30 `hang_glider`, 46 `paraglider`, 428 `all`).
+  - [x] Creato modulo di utilità `src/utils/discipline.ts` con opzioni, funzioni di filtraggio e badge visivi.
+- [x] **UI Controlli Filtro Disciplina**:
+  - [x] Componente `src/components/DisciplineSelector.tsx` ergonomico a pillole avioniche con contatori dinamici.
+  - [x] Integrato selettore disciplina nel launcher di **Esame** (`ExamScreen.tsx`), nelle **Materie** (`TopicsScreen.tsx`), nell'**Archivio** (`ArchiveScreen.tsx`) e nelle **Impostazioni** (`SettingsModal.tsx` in "Aspetto & Studio").
+  - [x] Badge avionico discreto sulle card dei quiz (`QuestionCard.tsx` e `ArchiveItem`) per le domande esclusive.
+  - [x] `QuizContext.tsx`: ricalcolo reattivo di `filteredQuestions`, `subjectsAnalytics`, `totalSeen` e `readinessScore` in base alla disciplina attiva.
+- [x] **Suite di Test Dedicata (Vitest) & Collaudo Visivo CDP**:
+  - [x] Test unitari `src/data/questions.test.ts` (distribuzione 428/30/46) e `src/utils/discipline.test.ts` (6 test su filtri, quote esame e badge). Totale suite 16/16 passate (140/140 unit test).
+  - [x] Collaudo visivo headless CDP `scripts/test_discipline_filters.cjs` (`npm run test:visual:discipline`) su Mobile Portrait (390x844) e Desktop (1440x900) con 0 errori in console browser.
 
 ### 2. Blocco del Menu di Navigazione al Top (Sticky / Fixed Top Navigation Bar)
 - [x] **Riorganizzazione Strutturale di Navbar & Header**:

@@ -4,10 +4,13 @@ export interface QuizExplanation {
   trap: string;
 }
 
+export type Discipline = 'all' | 'hang_glider' | 'paraglider';
+
 export interface Question {
   id: number;
   subjectId: number;
   subjectName: string;
+  discipline: Discipline;
   question: string;
   options: [string, string, string];
   correctAnswer: 1 | 2 | 3;

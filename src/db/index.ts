@@ -27,6 +27,7 @@ export const DEFAULT_SETTINGS: AppSettings = {
   driveModeIntroPlayed: false,
   audioOfflinePromptDismissed: false,
   driveModeTutor: false,
+  disciplinePreference: 'all',
 };
 
 export class VdsQuizDatabase extends Dexie {
