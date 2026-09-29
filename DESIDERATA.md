@@ -153,6 +153,8 @@ Questo documento rappresenta la **bussola strategica e funzionale** del progetto
 | Layout Zero-Scroll a Margini Compatti | 🟡 In Roadmap (TODO) | Viewport bloccato a `100dvh` con padding ridotti (`p-3`), card compatta e leading stretto per visualizzare sempre domanda, opzioni e pulsanti senza scroll su mobile. |
 | Modalità Audio (Audiolibro Hands-Free) & Switch Universale | 🟡 In Roadmap (TODO) | Riconcettualizzazione da "Modalità Guida" a "Modalità Audio" con pulsante `AUDIO` accessibile in qualunque quiz per passare al volo all'ascolto senza perdere lo stato. |
 | Ricerca Rapida No-Keyboard nell'Archivio | 🟡 In Roadmap (TODO) | Tastierino materie `01`-`09` + `TUTTE`, filtri stato a 1 tocco, quick chips tematiche e pad salto per #ID senza invocare la tastiera dello smartphone. |
+| Macro-Target Tattili per Bici/Corsa (Modalità Audio) | 🟡 In Roadmap (TODO) | 3 macro-fasce a tutta larghezza con altezza minima 75-85px, feedback aptico e zero elementi affiancati per uso con vibrazioni da manubrio o corsa. |
+| Impostazione Dimensione Font (Font Scaling) | 🟡 In Roadmap (TODO) | Selezione rapida 3 scale carattere (`Compatto` 13px per piccoli schermi, `Normale` 15px standard, `Grande/Outdoor` 17-18px per manubrio a braccio teso). |
 
 ---
 
@@ -168,10 +170,10 @@ Questa roadmap sintetizza il piano di riorganizzazione per massimizzare l'usabil
    - Creazione del componente `HomeScreen.tsx` con 6 macro-pulsanti ad alto contrasto.
    - Eliminazione della top bar permanente a 6 voci nelle schermate interne.
    - Adozione di una mini-header (~40px) con pulsante `[← Home]`, titolo essenziale e toggle `AUDIO`.
-3. **TODO-03: Modalità Audio (Stile Audiolibro Hands-Free) & Switch Istantaneo Ovunque**:
+3. **TODO-03: Modalità Audio (Stile Audiolibro Hands-Free) & Macro-Target Bici/Corsa**:
    - Rinominare "Modalità Guida" in "Modalità Audio" con iconografia monocromatica a cuffie.
-   - Inserimento del tasto `AUDIO` nell'header di Tutor, Materie, Esame ed Errori.
-   - Transizione istantanea tra modalità visiva compatta e modalità audio full-screen mantenendo immutato il progresso (stessa domanda, stesse risposte, stesso timer).
+   - 3 macro-fasce risposta a tutta larghezza con altezza minima 75-85px, spaziatura protetta e feedback aptico per prevenire miss-clicks su manubrio o durante la corsa.
+   - Inserimento del tasto `AUDIO` nell'header di Tutor, Materie, Esame ed Errori per switch al volo senza perdere lo stato.
 4. **TODO-04: Layout Zero-Scroll e Ottimizzazione Spaziale**:
    - Riduzione dei margini (`p-3 sm:p-3.5`, `leading-snug`, min-height 44px per i pulsanti risposta).
    - Container flessibile a `100dvh` per garantire che l'intero quiz stia in un'unica schermata su mobile.
@@ -180,6 +182,10 @@ Questa roadmap sintetizza il piano di riorganizzazione per massimizzare l'usabil
    - Filtri di stato a tocco singolo (`Tutte`, `Non viste`, `Errate`, `Preferiti`, `Note`).
    - Quick chips per concetti frequenti (*Vento*, *Stallo*, *Efficienza*, *Precedenze*, *Spazio Aereo*, *Termica*, *Nubi*).
    - Pad numerico rapido per salto diretto al quiz per #ID.
+6. **TODO-06: Impostazione Dimensione Font (Font Scaling / Outdoor Comfort)**:
+   - 3 livelli di scala carattere selezionabili (`Compatto`, `Normale`, `Grande/Outdoor`).
+   - Persistenza in Dexie (`fontSizePreference: 'compact' | 'normal' | 'large'`).
+   - Adattamento fluido dei layout zero-scroll per preservare la visibilità completa dei testi anche a font maggiorato.
 
 ---
 

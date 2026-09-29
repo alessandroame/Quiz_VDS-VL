@@ -24,17 +24,21 @@ Questo documento registra in ordine cronologico tutte le lavorazioni svolte nel 
     * Scartata la top bar permanente a 6 segmenti (che consumava 50-60px verticali nei quiz) in favore di una schermata `HomeScreen` a 6 macro-pulsanti e mini-header con `[← Home]` nei quiz per massimizzare l'area di lettura.
   - **Layout Zero-Scroll a Margini Compatti**:
     * Progettato il layout vincolato a `100dvh` con padding ridotti (`p-3`), testo a leading compatto e pulsanti a 44px min-height per eliminare qualsiasi scroll su mobile (390x844).
-  - **Riconcettualizzazione "Modalità Audio" (Audiolibro Hands-Free)**:
+  - **Riconcettualizzazione "Modalità Audio" (Audiolibro Hands-Free) & Macro-Target Bici/Corsa**:
     * Trasformata la vecchia "Modalità Guida" in "Modalità Audio" con icona cuffie/altoparlante monocromatica.
     * Previsto switch istantaneo universale con tasto `AUDIO` nell'header di Tutor, Materie, Esame ed Errori senza perdita di stato o progresso.
+    * Progettati macro-target a tutta larghezza (altezza minima 75-85px), spaziatura protetta e feedback aptico per consentire risposte sicure anche con forti vibrazioni sul manubrio della bicicletta o durante la corsa a piedi.
+  - **Impostazione Dimensione Font (Font Scaling / Outdoor Comfort)**:
+    * Definita la gestione a 3 livelli discreti (`Compatto`, `Normale`, `Grande/Outdoor`) con persistenza in Dexie, per adattare la densità visiva tra piccoli schermi e supporti a distanza di braccio.
   - **Ricerca No-Keyboard nell'Archivio**:
     * Progettati pulsantiera rapida materie `01`-`09` + `TUTTE`, filtri stato a 1 tocco, quick chips tematiche e pad salto rapido per #ID.
   - **Documentazione & Matrice TODO**:
-    * Redatto l'artifact di piano `piano_riorganizzazione_ux_quiz_vds.md`.
-    * Aggiornato [DESIDERATA.md](file:///d:/Github/Quiz_VDS-VL/DESIDERATA.md) con la nuova matrice di stato e i 5 task TODO dettagliati.
+    * Redatto l'artifact di piano `piano_riorganizzazione_ux_quiz_vds.md` (V3).
+    * Aggiornato [DESIDERATA.md](file:///d:/Github/Quiz_VDS-VL/DESIDERATA.md) con la nuova matrice di stato e i 6 task TODO dettagliati.
 - **Scelte architetturali & Rationale**:
   - *Home Hub vs Persistent Tabs*: L'obiettivo principale dell'allievo durante il quiz è la lettura e la concentrazione. Una barra a 6 tab ruba spazio verticale costringendo a scorrere; il pattern Home Hub garantisce zero-scroll durante la prova e accesso a 1 tocco dalla home.
-  - *Audiobook Paradigm*: Riconoscere che l'ascolto hands-free è utile ovunque (non solo alla guida di un'auto) estende la modalità a un utilizzo quotidiano a mani libere.
+  - *Audiobook Paradigm & Fitts's Law*: Riconoscere che l'ascolto hands-free è utile ovunque (manubrio bici, corsa, camminata o letto) richiede macro-target enormi ad altissimo contrasto per azzerare miss-clicks senza distogliere lo sguardo dal percorso o dalla strada.
+  - *Font Scaling*: Permette la fruizione outdoor senza rompere il vincolo zero-scroll tramite layout responsive fluido.
 - **Impatto sul Desiderata**:
   - Allinea l'applicazione ai massimi standard di ergonomia minimale (stile Dieter Rams / avionica Garmin) senza fronzoli commerciali, focalizzandosi interamente sull'efficacia dell'apprendimento per il parapendio.
 
