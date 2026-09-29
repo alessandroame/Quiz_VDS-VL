@@ -94,4 +94,20 @@ describe('Suite 16: Discipline Filtering & Tagging Logic', () => {
     expect(defaultFiltered.length).toBe(474);
     expect(defaultFiltered.some(q => q.discipline === 'hang_glider')).toBe(false);
   });
+
+  it('DISC-08: stable paraglider pool has exactly 474 questions with zero hang_glider questions and meets all 9 subject quotas', () => {
+    const paragliderPool = allQuestions.filter(q => q.discipline !== 'hang_glider');
+    expect(paragliderPool.length).toBe(474);
+    expect(paragliderPool.every(q => q.discipline !== 'hang_glider')).toBe(true);
+
+    const counts: Record<number, number> = {};
+    for (const q of paragliderPool) {
+      counts[q.subjectId] = (counts[q.subjectId] || 0) + 1;
+    }
+
+    for (let sId = 1; sId <= 9; sId++) {
+      expect(counts[sId]).toBeGreaterThanOrEqual(OFFICIAL_EXAM_QUOTAS[sId]);
+      expect(counts[sId]).toBeGreaterThanOrEqual(MARATHON_EXAM_QUOTAS[sId]);
+    }
+  });
 });

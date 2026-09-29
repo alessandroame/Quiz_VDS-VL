@@ -3,7 +3,6 @@ import { useLiveQuery } from 'dexie-react-hooks';
 import questionsData from '../data/questions.json';
 import type { Question, Discipline } from '../types/quiz';
 import type { QuestionStat, ExamSession, AppSettings, InProgressSession } from '../types/database';
-import { filterQuestionsByDiscipline } from '../utils/discipline';
 import { voiceService } from '../services/voiceService';
 import { syncEngine, type SyncEngineState } from '../services/syncEngine';
 import {
@@ -61,7 +60,10 @@ interface QuizContextType {
 const QuizContext = createContext<QuizContextType | null>(null);
 
 export const QuizProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const questions: Question[] = questionsData as Question[];
+  // Fixed stable pool: 474 paraglider questions (428 common + 46 paraglider, pruning 30 exclusive hang-glider questions)
+  const questions: Question[] = useMemo(() => {
+    return (questionsData as Question[]).filter(q => q.discipline !== 'hang_glider');
+  }, []);
   const [isExamRunning, setIsExamRunning] = useState<boolean>(false);
   const [isDriveModeOpen, setIsDriveModeOpen] = useState<boolean>(false);
   const [driveSessionContext, setDriveSessionContext] = useState<DriveModeSessionContext | null>(null);
@@ -125,16 +127,14 @@ export const QuizProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return map;
   }, [statsList]);
 
-  // Gestione filtro disciplina (All / Parapendio / Deltaplano)
-  const disciplineFilter: Discipline = settings.disciplinePreference || 'paraglider';
+  // Backward-compatible discipline filter, permanently fixed to paraglider (474 questions)
+  const disciplineFilter: Discipline = 'paraglider';
 
   const setDisciplineFilter = async (discipline: Discipline) => {
     await updateSetting('disciplinePreference', discipline);
   };
 
-  const filteredQuestions = useMemo(() => {
-    return filterQuestionsByDiscipline(questions, disciplineFilter);
-  }, [questions, disciplineFilter]);
+  const filteredQuestions = questions;
 
   const filteredQuestionIdSet = useMemo(() => {
     return new Set(filteredQuestions.map(q => q.id));
