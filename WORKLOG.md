@@ -14,6 +14,33 @@ Questo documento registra in ordine cronologico tutte le lavorazioni svolte nel 
 - **Impatto sul Desiderata**: <Come questo intervento contribuisce al desiderata (cfr. DESIDERATA.md) e indicazioni per il prossimo agente>
 ```
 
+### [2026-09-29] - Protocollo Git Multi-Sessione: Git Worktree, Staging Chirurgico e Log Anti-Conflitto (.agents/worklog.d/)
+- **Cosa abbiamo fatto**:
+  - **Evoluzione Skill [git-pro/SKILL.md](file:///d:/Github/Quiz_VDS-VL/.agents/skills/git-pro/SKILL.md) (v2.0.0)**:
+    * Introdotta la regola dei commit atomici su singolo argomento: codice sorgente e relativi unit test DEVONO appartenere allo stesso commit (`green by definition`).
+    * Introdotta la regola dello **Staging Chirurgico Obbligatorio** con divieto categorico di `git add .`, `git add -A` e `git commit -a`. Imposto l'audit pre-commit `git diff --cached --stat`.
+    * Introdotto il protocollo per sessioni parallele tramite **Git Worktree** (`.worktrees/<topic>`), azzerando le collisioni di file system, i blocchi `.git/index.lock` e le interferenze tra test Vitest concorrenti.
+    * Definita la procedura di integrazione protetta su `main` tramite merge esplicito `--no-ff` (preservando i singoli commit atomici ed eliminando i rischi di `ff-only` o rebase distruttivi).
+  - **Pattern Registro Lavorazioni Anti-Conflitto (`.agents/worklog.d/`)**:
+    * Creata la cartella [.agents/worklog.d/](file:///d:/Github/Quiz_VDS-VL/.agents/worklog.d/) con documentazione e `.gitkeep` per raccogliere i log generati in parallelo da diversi agenti.
+    * Creato lo script [scripts/consolidate_worklog.cjs](file:///d:/Github/Quiz_VDS-VL/scripts/consolidate_worklog.cjs) per concatenare deterministicamente tutti i frammenti in cima a [WORKLOG.md](file:///d:/Github/Quiz_VDS-VL/WORKLOG.md) e ripulire la cartella al momento del merge, con zero conflitti di merge.
+    * Aggiunti gli script npm `"worklog:consolidate"` e `"worklog:consolidate:dry"` in [package.json](file:///d:/Github/Quiz_VDS-VL/package.json).
+  - **Allineamento Regole & Workflow**:
+    * Aggiornato [task_lifecycle.md](file:///d:/Github/Quiz_VDS-VL/.agents/workflows/task_lifecycle.md) per includere il pre-flight con worktree e lo staging chirurgico.
+    * Aggiornati [.agents/rules/constraints.md](file:///d:/Github/Quiz_VDS-VL/.agents/rules/constraints.md) e [.agents/AGENTS.md](file:///d:/Github/Quiz_VDS-VL/.agents/AGENTS.md) con la nuova direttiva 8 sullo staging selettivo e l'isolamento multi-agente.
+    * Aggiunta la cartella `.worktrees/` a [.gitignore](file:///d:/Github/Quiz_VDS-VL/.gitignore).
+  - **Testing & Quality Assurance**:
+    * Verificato `npm run worklog:consolidate:dry` ed eseguito test unitario del consolidatore.
+    * Eseguiti con successo 153/153 test Vitest (`npm run test:unit`) e verificata la build di produzione (`npm run build`).
+- **Scelte architetturali & Rationale**:
+  - *Git Worktree vs Shared Working Directory*: Condividere la stessa cartella tra agenti paralleli crea inevitabilmente collisioni su file aperti, inquinamento delle esecuzioni di test e lock dell'indice Git. I worktree offrono a costo zero directory fisiche separate collegate allo stesso repository locale.
+  - *Pattern Directory worklog.d vs File Unico*: Poiché ogni agente deve inserire un log in cima a WORKLOG.md (riga 17), due sessioni parallele provocherebbero un merge conflict sistematico. Scrivere file isolati in `worklog.d/` e consolidarli via script elimina alla radice qualsiasi conflitto di tracciamento.
+  - *Merge `--no-ff` vs `ff-only`*: Il merge non-fast-forward mantiene tutti i commit atomici intatti all'interno del ramo, crea un nodo chiaro per la sessione e rende il rollback immediato tramite `git revert -m 1 <hash>`.
+- **Impatto sul Desiderata**:
+  - Fornisce all'architettura multi-agente gli strumenti e i guardrail definitivi per scalare in parallelo senza produrre commit promiscui o corruzioni di codice.
+
+---
+
 ### [2026-09-29] - Piano di Riorganizzazione Ergonomica Cockpit V2, Home Hub & Roadmap TODO
 - **Cosa abbiamo fatto**:
   - **Definizione Architettura dei 6 Scenari Puri**:
