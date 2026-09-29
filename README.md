@@ -307,6 +307,9 @@ npm run test:visual:discipline
 
 # Collaudo visivo del flusso onboarding al primo avvio (CDP Mobile & Desktop)
 npm run test:visual:onboarding
+
+# Consolidamento frammenti di diario multi-agente (.agents/worklog.d/ -> WORKLOG.md)
+npm run worklog:consolidate
 ```
 
 ---
@@ -318,6 +321,7 @@ Questo progetto adotta un sistema di **governance della conoscenza inter-agente*
 - 🧭 **[DESIDERATA.md](file:///c:/github/Quiz_VDS-VL/DESIDERATA.md)**: La visione di prodotto, i requisiti core e la matrice di stato di tutte le funzionalità.
 - 🧠 **[MEMORY.md](file:///c:/github/Quiz_VDS-VL/MEMORY.md)**: La memoria tecnica permanente contenente vincoli tecnici stabili, regole d'esame AeCI e lezioni apprese.
 - 📓 **[WORKLOG.md](file:///c:/github/Quiz_VDS-VL/WORKLOG.md)**: Il registro cronologico di tutte le lavorazioni svolte e delle decisioni architetturali (ADR).
+- 📁 **[.agents/worklog.d/](file:///c:/github/Quiz_VDS-VL/.agents/worklog.d/)**: Frammenti di diario isolati generati da sessioni concorrenti in Git Worktree per azzerare i conflitti di merge.
 - 📜 **[AGENTS.md](file:///c:/github/Quiz_VDS-VL/.agents/AGENTS.md)**: Le direttive operative e i workflow obbligatori per gli agenti AI.
 
 > ⚠️ **Regola Operativa per le Modifiche Future**:  
