@@ -40,3 +40,6 @@ venv/
 
 # Antigravity temporary artifacts
 .antigravity/tmp/
+
+# Git Worktrees (local parallel workspaces)
+.worktrees/
