@@ -36,25 +36,15 @@ VOICE_CONFIGS = {
     }
 }
 
-def build_ssml(text: str, voice: str, rate: str, pitch: str) -> str:
-    escaped = text.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;").replace('"', "&quot;")
-    return (
-        f"<speak version='1.0' xmlns='http://www.w3.org/2001/10/synthesis' "
-        f"xmlns:mstts='https://www.w3.org/2001/mstts' xml:lang='it-IT'>"
-        f"<voice name='{voice}'>"
-        f"<prosody rate='{rate}' pitch='{pitch}'>"
-        f"<lang xml:lang='it-IT'>{escaped}</lang>"
-        f"</prosody></voice></speak>"
-    )
-
 async def generate_voice_intro(name: str, config: dict):
     dest = config["dest"]
     os.makedirs(os.path.dirname(dest), exist_ok=True)
     print(f"Generating drive intro for voice '{name}' ({config['voice']})...")
-    ssml = build_ssml(INTRO_TEXT, config["voice"], config["rate"], config["pitch"])
     comm = edge_tts.Communicate(
-        ssml,
-        config["voice"]
+        text=INTRO_TEXT,
+        voice=config["voice"],
+        rate=config["rate"],
+        pitch=config["pitch"]
     )
     await comm.save(dest)
     size = os.path.getsize(dest)

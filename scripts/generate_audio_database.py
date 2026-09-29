@@ -38,18 +38,6 @@ VOICE_CONFIGS = {
     }
 }
 
-def build_ssml(text: str, voice: str, rate: str, pitch: str) -> str:
-    """Wraps text in SSML with explicit xml:lang='it-IT' to guarantee 100% native Italian phonetics."""
-    escaped = text.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;").replace('"', "&quot;")
-    return (
-        f"<speak version='1.0' xmlns='http://www.w3.org/2001/10/synthesis' "
-        f"xmlns:mstts='https://www.w3.org/2001/mstts' xml:lang='it-IT'>"
-        f"<voice name='{voice}'>"
-        f"<prosody rate='{rate}' pitch='{pitch}'>"
-        f"<lang xml:lang='it-IT'>{escaped}</lang>"
-        f"</prosody></voice></speak>"
-    )
-
 def normalize_phonetics(text: str) -> str:
     if not text:
         return ""
@@ -126,7 +114,7 @@ def build_segments(q: dict, part_filter: str = "all") -> list:
         
     return segments
 
-async def generate_single(out_dir: str, filename: str, text: str, voice_cfg: dict, semaphore: asyncio.Semaphore, max_retries: int = 3, force: bool = False):
+async def generate_single(out_dir: str, filename: str, text: str, voice_cfg: dict, semaphore: asyncio.Semaphore, max_retries: int = 5, force: bool = False):
     dest = os.path.join(out_dir, filename)
     if not force and os.path.exists(dest) and os.path.getsize(dest) > 1000:
         return True # Already present and valid
@@ -142,8 +130,12 @@ async def generate_single(out_dir: str, filename: str, text: str, voice_cfg: dic
         tmp_dest = f"{dest}.{os.getpid()}_{id(asyncio.current_task())}.tmp"
         for attempt in range(max_retries):
             try:
-                ssml = build_ssml(text, voice_cfg["voice"], voice_cfg["rate"], voice_cfg["pitch"])
-                comm = edge_tts.Communicate(ssml, voice_cfg["voice"])
+                comm = edge_tts.Communicate(
+                    text=text,
+                    voice=voice_cfg["voice"],
+                    rate=voice_cfg["rate"],
+                    pitch=voice_cfg["pitch"]
+                )
                 await comm.save(tmp_dest)
                 if os.path.exists(tmp_dest) and os.path.getsize(tmp_dest) > 1000:
                     os.replace(tmp_dest, dest)
@@ -161,7 +153,7 @@ async def generate_single(out_dir: str, filename: str, text: str, voice_cfg: dic
                 if attempt == max_retries - 1:
                     print(f"\n[ERROR] Failed to generate {dest}: {e}", file=sys.stderr)
                     return False
-                await asyncio.sleep(1.5 * (attempt + 1))
+                await asyncio.sleep(2.0 * (attempt + 1))
 
 async def process_voice(voice_key: str, questions: list, concurrency: int, part_filter: str = "all", force: bool = False):
     cfg = VOICE_CONFIGS[voice_key]

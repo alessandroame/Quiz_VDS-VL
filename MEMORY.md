@@ -71,8 +71,8 @@ Questo file costituisce la **memoria tecnica permanente** del progetto. Raccogli
 
 ## 6. Motore Vocale Neurale (TTS Offline & Multi-Voce)
 - **Voci Disponibili**:
-  - `giuseppe`: Maschile, tono calmo cockpit (`it-IT-GiuseppeMultilingualNeural`, rate -5%, pitch -5Hz).
-  - `elsa`: Femminile, dizione cristallina e brillante (`it-IT-ElsaNeural`, rate +0%, pitch +0Hz).
+  - `giuseppe`: Maschile, tono calmo cockpit (`it-IT-DiegoNeural`, rate -4%, pitch -4Hz).
+  - `elsa`: Femminile, dizione cristallina e brillante (`it-IT-ElsaNeural`, rate -2%, pitch +0Hz).
 - **Archiviazione Segmenti Audio**:
   - `public/audio/{voice}/{qid}_{part}.mp3` dove `part` è `q` (domanda), `1`, `2`, `3` (opzioni) ed `e` (spiegazione didattica su errore).
   - 2.520 segmenti per ciascuna voce (504 quiz x 5 file), totale 5.040 segmenti audio.
