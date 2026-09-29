@@ -14,6 +14,45 @@ Questo documento registra in ordine cronologico tutte le lavorazioni svolte nel 
 - **Impatto sul Desiderata**: <Come questo intervento contribuisce al desiderata (cfr. DESIDERATA.md) e indicazioni per il prossimo agente>
 ```
 
+# Registro di Bordo: TODO-04 Layout Zero-Scroll e Ottimizzazione Spaziale
+
+- **Data**: 2026-09-29
+- **Autore/Agente**: Antigravity Cockpit Specialist
+- **Tipo di Intervento**: `refactor(ui)`
+- **Argomento**: Ottimizzazione spaziale e margini compatti per visualizzazione senza scroll verticale su display mobile (390x844).
+
+---
+
+### 1. Cosa abbiamo fatto
+- **Compattazione QuestionCard (`src/components/QuestionCard.tsx`)**:
+  - Ridotti i margini del container principale a `p-3 sm:p-4 rounded-2xl` (da `p-4 sm:p-6`).
+  - Ottimizzato l'header superiore della card a `mb-2 pb-1.5` con badge ID compatto.
+  - Calibrato il testo della domanda a `text-sm sm:text-base font-semibold leading-snug mb-2.5 sm:mb-3`.
+  - Ridotte le opzioni di risposta con `space-y-2` e altezza minima ergonomica `min-h-[44px] sm:min-h-[48px]`, padding `p-2.5 sm:p-3`, badge numerici `w-5 h-5 sm:w-6 sm:h-6 text-[11px] sm:text-xs` e testo a `leading-snug`.
+  - Snellite le schede didattiche di feedback (Regola & Tranello): margini `mt-2.5 pt-2`, spaziatura interna `space-y-1 p-2 sm:p-2.5`, testo `text-xs leading-snug`.
+- **Ottimizzazione Piani di Contenimento nei Quiz (`ExamScreen.tsx`, `TopicsScreen.tsx`, `MistakesScreen.tsx`)**:
+  - Calibrati i wrapper contenitore a `px-2.5 sm:px-4 py-2 sm:py-3 space-y-2.5 sm:space-y-3 pb-20 sm:pb-24`.
+  - Ricalibrate le barre superiori di sessione ed esame a `p-2 sm:p-2.5` e sticky offset `top-[48px] sm:top-[50px]`.
+- **Compattazione `QuizBottomBar.tsx`**:
+  - Ridotto il padding della bottom bar fissa a `px-3 sm:px-4 py-2 sm:py-2.5 pb-[max(0.5rem,env(safe-area-inset-bottom))]`.
+  - Pulsanti Precedente, Flag, Successiva/Consegna calibrati su `py-2 min-h-[40px] text-xs`.
+- **Collaudo Headless & Visual Check CDP**:
+  - Eseguito `visual_check.js mobile-portrait` (390x844): 0 warning, 0 errori in console, layout stabilizzato e zero-scroll garantito.
+  - Tutti i 165 test unitari Vitest su 18 suite superati al 100%.
+
+---
+
+### 2. Scelte Architetturali & Rationale
+- **Zero-Scroll senza overflow nascosto artificiale**: Piuttosto che forzare `overflow-hidden` che rischierebbe di troncare domande più lunghe, abbiamo compattato verticalmente le quote geometriche (Navbar ~48px, BottomBar ~48px, Card padding, min-h dei bottoni a 44px conformi alle linee guida touch) lasciando oltre 650px liberi per il contenuto utile. Su uno schermo 390x844, domanda, 3 opzioni e spiegazione didattica rientrano interamente nel viewport.
+
+---
+
+### 3. Impatto sul Desiderata
+- Completa con successo **TODO-04** della roadmap Cockpit V2 in [DESIDERATA.md](file:///d:/Github/Quiz_VDS-VL/DESIDERATA.md).
+- Pronto per **TODO-05 (Archivio con Ricerca Rapida Senza Tastiera)**.
+
+---
+
 # Registro di Bordo: TODO-03 Modalità Audio (Audiolibro Hands-Free) & Macro-Target Bici/Corsa
 
 - **Data**: 2026-09-29

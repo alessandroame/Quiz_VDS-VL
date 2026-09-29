@@ -150,7 +150,7 @@ Questo documento rappresenta la **bussola strategica e funzionale** del progetto
 | Perfezionamento Spiegazioni Didattiche (Regola & Tranello) | 🟢 Completato (504/504 Quiz - 100%) | Revisione semantica e didattica completata per tutti i 504 quiz AeCI (9 materie su 9). Ogni domanda dispone di Regola e Tranello specifici, univoci al 100% e certificati dal test DATA-09. Refusi OCR storici del PDF cartaceo eliminati da tutte le materie. Database audio neurale Giuseppe ed Elsa completamente allineato con manifest.json. |
 | Riorganizzazione Home Hub & Back Navigation | 🟢 Completato | Pattern a cruscotto Home con 6 macro-pulsanti tattili (`TUTOR`, `MATERIE`, `ESAME`, `ERRORI`, `CERCA`, `STATS`), banner sessione attiva e mini-header con `[← Home]` nei quiz per liberare oltre 50px verticali. |
 | Potatura Radicale Quiz Deltaplano | 🟢 Completato | Focus 100% su Parapendio (474 quiz), rimozione definitiva dei 30 quiz deltaplano e pulizia di tutti i selettori, modali e badge correlati. |
-| Layout Zero-Scroll a Margini Compatti | 🟡 In Roadmap (TODO) | Viewport bloccato a `100dvh` con padding ridotti (`p-3`), card compatta e leading stretto per visualizzare sempre domanda, opzioni e pulsanti senza scroll su mobile. |
+| Layout Zero-Scroll a Margini Compatti | 🟢 Completato | Viewport ottimizzato con padding compatti (`p-2.5 sm:p-4`), card ridotta (`p-3 sm:p-4`), bottoni risposta `min-h-[44px] sm:min-h-[48px]`, leading stretto (`leading-snug`) e clearance safe-area per visualizzare sempre domanda, opzioni e spiegazione senza scroll su smartphone 390x844. |
 | Modalità Audio (Audiolibro Hands-Free) & Switch Universale | 🟢 Completato | Riconcettualizzazione da "Modalità Guida" a "Modalità Audio" con pulsante `AUDIO` accessibile in qualunque quiz (Navbar e header di Tutor, Materie, Esame, Errori) per passare al volo all'ascolto senza perdere lo stato. |
 | Ricerca Rapida No-Keyboard nell'Archivio | 🟡 In Roadmap (TODO) | Tastierino materie `01`-`09` + `TUTTE`, filtri stato a 1 tocco, quick chips tematiche e pad salto per #ID senza invocare la tastiera dello smartphone. |
 | Macro-Target Tattili per Bici/Corsa (Modalità Audio) | 🟢 Completato | 3 macro-fasce a tutta larghezza con altezza minima 78-85px, badge numerici 44-56px, feedback aptico `navigator.vibrate` e zero elementi affiancati per uso con vibrazioni da manubrio o corsa. |
@@ -174,9 +174,10 @@ Questa roadmap sintetizza il piano di riorganizzazione per massimizzare l'usabil
    - Rinominare "Modalità Guida" in "Modalità Audio" con iconografia monocromatica a cuffie (`Headphones`).
    - 3 macro-fasce risposta a tutta larghezza con altezza minima 78-85px, spaziatura protetta e feedback aptico (`navigator.vibrate`) per prevenire miss-clicks su manubrio o durante la corsa.
    - Inserimento del tasto `AUDIO` nell'header di Tutor, Materie, Esame ed Errori e nella Navbar per switch al volo bidirezionale senza perdere lo stato.
-4. **TODO-04: Layout Zero-Scroll e Ottimizzazione Spaziale**:
-   - Riduzione dei margini (`p-3 sm:p-3.5`, `leading-snug`, min-height 44px per i pulsanti risposta).
-   - Container flessibile a `100dvh` per garantire che l'intero quiz stia in un'unica schermata su mobile.
+4. **TODO-04: Layout Zero-Scroll e Ottimizzazione Spaziale** `[COMPLETATO]`:
+   - Riduzione dei margini (`p-2.5 sm:p-4`, `leading-snug`, min-height 44px-48px per i pulsanti risposta).
+   - Card compressa (`p-3 sm:p-4`, font `text-sm sm:text-base font-semibold leading-snug`, badge opzioni `w-5 h-5 sm:w-6 sm:h-6`).
+   - Scheda didattica Regola/Tranello snellita (`space-y-1 text-xs leading-snug`) e QuizBottomBar compressa a min-h 40px con padding ridotti per azzerare lo scroll verticale sui dispositivi mobile standard 390x844.
 5. **TODO-05: Archivio con Ricerca Rapida Senza Tastiera**:
    - Barra rapida materie `01`..`09` + `TUTTE`.
    - Filtri di stato a tocco singolo (`Tutte`, `Non viste`, `Errate`, `Preferiti`, `Note`).
