@@ -14,6 +14,29 @@ Questo documento registra in ordine cronologico tutte le lavorazioni svolte nel 
 - **Impatto sul Desiderata**: <Come questo intervento contribuisce al desiderata (cfr. DESIDERATA.md) e indicazioni per il prossimo agente>
 ```
 
+### [2026-09-29] - TODO-01: Potatura Radicale del Deltaplano (Focus 100% Parapendio)
+- **Cosa abbiamo fatto**:
+  - **Fissaggio Pool Stabile a 474 Quiz (100% Parapendio)**:
+    * In [QuizContext.tsx](file:///d:/Github/Quiz_VDS-VL/src/context/QuizContext.tsx), isolato il pool stabile dell'applicazione a 474 quiz escludendo alla radice i 30 quiz esclusivi del deltaplano (`q.discipline !== 'hang_glider'`), preservando integri i 428 quiz condivisi e i 46 specifici per il parapendio.
+    * Impostato `filteredQuestions = questions` e consolidata la coerenza di tutte le schermate ([ExamScreen.tsx](file:///d:/Github/Quiz_VDS-VL/src/components/ExamScreen.tsx), [TopicsScreen.tsx](file:///d:/Github/Quiz_VDS-VL/src/components/TopicsScreen.tsx), [MistakesScreen.tsx](file:///d:/Github/Quiz_VDS-VL/src/components/MistakesScreen.tsx), [StatsScreen.tsx](file:///d:/Github/Quiz_VDS-VL/src/components/StatsScreen.tsx), [ArchiveScreen.tsx](file:///d:/Github/Quiz_VDS-VL/src/components/ArchiveScreen.tsx), [DriveModeScreen.tsx](file:///d:/Github/Quiz_VDS-VL/src/components/DriveModeScreen.tsx)).
+  - **Eliminazione Definitiva Selettore Disciplina**:
+    * Rimosso il componente obsoleto `DisciplineSelector.tsx` dal file system (`git rm`).
+    * Rimosso il selettore e la sezione "Disciplina Predefinita" dalla scheda Aspetto & Studio in [SettingsModal.tsx](file:///d:/Github/Quiz_VDS-VL/src/components/SettingsModal.tsx).
+    * Semplificato il badge di riepilogo `appearanceSummary` in [SettingsModal.tsx](file:///d:/Github/Quiz_VDS-VL/src/components/SettingsModal.tsx) rimuovendo la disciplina.
+  - **Rimozione Rumore Visivo: Badge Grafici "Deltaplano / Parapendio"**:
+    * Rimossi i badge grafici della disciplina da [QuestionCard.tsx](file:///d:/Github/Quiz_VDS-VL/src/components/QuestionCard.tsx) e [ArchiveScreen.tsx](file:///d:/Github/Quiz_VDS-VL/src/components/ArchiveScreen.tsx) per un'interfaccia sobria, priva di etichette ridondanti.
+    * Aggiornato il sottotitolo dell'Archivio con indicazione chiara del catalogo a 474 quiz.
+  - **Allineamento Suite di Test**:
+    * Aggiunto test unitario `DISC-08` in [discipline.test.ts](file:///d:/Github/Quiz_VDS-VL/src/utils/discipline.test.ts) che certifica matematicamente il pool a 474 quiz, l'assenza assoluta di quiz `hang_glider` e il soddisfacimento delle quote per tutte le 9 materie sia per l'esame standard (30 quiz) che maratona (60 quiz).
+    * Tutti i 154/154 test Vitest passanti e build di produzione verificata.
+- **Scelte architetturali & Rationale**:
+  - *Filtro a monte in QuizContext vs Eliminazione da questions.json*: Il dataset AeCI 2017 è per statuto immutabile (504 quiz con id da 1 a 504) e i file audio neurali (Giuseppe ed Elsa) sono mappati biunivocamente sugli ID ufficiali nel manifest. Filtrare a monte in `QuizContext` fissa il pool a 474 quiz per l'intera UI senza alterare l'integrità del catalogo statico né rischiare disallineamenti di cache audio o ID.
+  - *Eliminazione Selettori e Badge*: Poiché l'applicazione è focalizzata al 100% sulla preparazione per allievi piloti di parapendio, qualsiasi selettore o badge disciplina costituiva rumore cognitivo superfluo.
+- **Impatto sul Desiderata**:
+  - Completa con successo **TODO-01** della roadmap Cockpit V2 in [DESIDERATA.md](file:///d:/Github/Quiz_VDS-VL/DESIDERATA.md). Prossimo step: **TODO-02 (Architettura Home Hub & Back Navigation)**.
+
+---
+
 ### [2026-09-29] - Protocollo Git Multi-Sessione: Git Worktree, Staging Chirurgico e Log Anti-Conflitto (.agents/worklog.d/)
 - **Cosa abbiamo fatto**:
   - **Evoluzione Skill [git-pro/SKILL.md](file:///d:/Github/Quiz_VDS-VL/.agents/skills/git-pro/SKILL.md) (v2.0.0)**:
