@@ -131,14 +131,33 @@ async def generate_single(out_dir: str, filename: str, text: str, voice_cfg: dic
     if not force and os.path.exists(dest) and os.path.getsize(dest) > 1000:
         return True # Already present and valid
 
+    # Clean up empty or corrupted existing file
+    if os.path.exists(dest) and os.path.getsize(dest) <= 1000:
+        try:
+            os.remove(dest)
+        except OSError:
+            pass
+
     async with semaphore:
+        tmp_dest = f"{dest}.{os.getpid()}_{id(asyncio.current_task())}.tmp"
         for attempt in range(max_retries):
             try:
                 ssml = build_ssml(text, voice_cfg["voice"], voice_cfg["rate"], voice_cfg["pitch"])
                 comm = edge_tts.Communicate(ssml, voice_cfg["voice"])
-                await comm.save(dest)
-                return True
+                await comm.save(tmp_dest)
+                if os.path.exists(tmp_dest) and os.path.getsize(tmp_dest) > 1000:
+                    os.replace(tmp_dest, dest)
+                    return True
+                else:
+                    if os.path.exists(tmp_dest):
+                        os.remove(tmp_dest)
+                    raise IOError(f"Generated audio file is invalid or too small ({tmp_dest})")
             except Exception as e:
+                if os.path.exists(tmp_dest):
+                    try:
+                        os.remove(tmp_dest)
+                    except OSError:
+                        pass
                 if attempt == max_retries - 1:
                     print(f"\n[ERROR] Failed to generate {dest}: {e}", file=sys.stderr)
                     return False

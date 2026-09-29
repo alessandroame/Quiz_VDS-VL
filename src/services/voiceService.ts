@@ -468,9 +468,10 @@ export class VoiceService {
 
   /**
    * Resolves the best available Italian voice from window.speechSynthesis.
-   * Strictly prioritizes it-IT voices to prevent English phonetics on systems with non-Italian default voices.
+   * Matches the active voice persona (Elsa vs Giuseppe) while strictly guaranteeing
+   * an it-IT locale to prevent English phonetics on systems with non-Italian default voices.
    */
-  public getItalianSpeechVoice(): SpeechSynthesisVoice | null {
+  public getItalianSpeechVoice(preferredVoice?: 'giuseppe' | 'elsa'): SpeechSynthesisVoice | null {
     if (typeof window === 'undefined' || !('speechSynthesis' in window)) {
       return null;
     }
@@ -479,18 +480,43 @@ export class VoiceService {
       return null;
     }
 
-    // 1. Exact match for it-IT locale
-    const exactIt = voices.find(v => {
+    const target = preferredVoice || this.effectiveVoice || this.voiceName;
+
+    // Filter all Italian voices (it-IT, it_IT, it)
+    const itVoices = voices.filter(v => {
+      const code = (v.lang || '').toLowerCase().replace('_', '-');
+      return code.startsWith('it');
+    });
+
+    if (itVoices.length === 0) {
+      return null;
+    }
+
+    // 1. If preferred voice is Elsa, find an Italian voice named Elsa (e.g. "Microsoft Elsa Desktop") or female
+    if (target === 'elsa') {
+      const elsaVoice = itVoices.find(v => v.name.toLowerCase().includes('elsa'));
+      if (elsaVoice) return elsaVoice;
+
+      const femaleVoice = itVoices.find(v =>
+        /female|donna|alice|chiara|federica|elena|lucia/i.test(v.name)
+      );
+      if (femaleVoice) return femaleVoice;
+    } else {
+      // If preferred voice is Giuseppe, find male Italian voice (e.g. Cosimo, Diego, Giuseppe)
+      const maleVoice = itVoices.find(v =>
+        /male|uomo|cosimo|diego|giuseppe|giorgio/i.test(v.name)
+      );
+      if (maleVoice) return maleVoice;
+    }
+
+    // 2. Exact match for it-IT locale
+    const exactIt = itVoices.find(v => {
       const code = (v.lang || '').toLowerCase().replace('_', '-');
       return code === 'it-it';
     });
     if (exactIt) return exactIt;
 
-    // 2. Any Italian dialect or prefix
-    const anyIt = voices.find(v => (v.lang || '').toLowerCase().startsWith('it'));
-    if (anyIt) return anyIt;
-
-    return null;
+    return itVoices[0];
   }
 
   private playSpeechSynthesisFallback(): void {
@@ -502,8 +528,8 @@ export class VoiceService {
         const utterance = new SpeechSynthesisUtterance(text);
         utterance.lang = 'it-IT';
 
-        // Explicitly attach Italian voice to prevent English pronunciation
-        const itVoice = this.getItalianSpeechVoice();
+        // Explicitly attach Italian voice matching active persona (Elsa or Giuseppe)
+        const itVoice = this.getItalianSpeechVoice(this.effectiveVoice || this.voiceName);
         if (itVoice) {
           utterance.voice = itVoice;
         }

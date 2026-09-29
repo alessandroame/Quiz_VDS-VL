@@ -553,5 +553,26 @@ describe('VoiceService (src/services/voiceService.ts)', () => {
     const voice = service.getItalianSpeechVoice();
     expect(voice).toBeNull();
   });
+
+  it('VOICE-28: getItalianSpeechVoice prioritizes Elsa voice when preferredVoice is elsa', () => {
+    const mockVoices = [
+      { name: 'Microsoft Cosimo Desktop', lang: 'it-IT' },
+      { name: 'Microsoft Elsa Desktop', lang: 'it-IT' },
+      { name: 'Google US English', lang: 'en-US' }
+    ] as any[];
+
+    (globalThis as any).window = (globalThis as any).window || {};
+    (globalThis as any).window.speechSynthesis = {
+      getVoices: vi.fn().mockReturnValue(mockVoices)
+    };
+
+    const elsaVoice = service.getItalianSpeechVoice('elsa');
+    expect(elsaVoice).toBeDefined();
+    expect(elsaVoice?.name).toBe('Microsoft Elsa Desktop');
+
+    const giuseppeVoice = service.getItalianSpeechVoice('giuseppe');
+    expect(giuseppeVoice).toBeDefined();
+    expect(giuseppeVoice?.name).toBe('Microsoft Cosimo Desktop');
+  });
 });
 

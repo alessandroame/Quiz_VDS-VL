@@ -14,6 +14,100 @@ Questo documento registra in ordine cronologico tutte le lavorazioni svolte nel 
 - **Impatto sul Desiderata**: <Come questo intervento contribuisce al desiderata (cfr. DESIDERATA.md) e indicazioni per il prossimo agente>
 ```
 
+### [2026-09-29] - Completamento Totale del Catalogo (504/504 Quiz - 100%): Riscritte Spiegazioni Specifiche e Sincronizzato Ecosistema Audio Neurale
+- **Cosa abbiamo fatto**:
+  - **Completamento Integrale dei 504 Quiz Ministeriali AeCI (9 Materie su 9)**:
+    * Portata dal 14% al **100%** la copertura didattica specialistica su tutti i 504 quesiti ufficiali in [src/data/questions.json](file:///c:/github/Quiz_VDS-VL/src/data/questions.json) e [public/data/questions.json](file:///c:/github/Quiz_VDS-VL/public/data/questions.json).
+    * **Materia 1: Normativa e Legislazione (40 quiz: #1001-#1040)**: D.P.R. 133/2010, attestato VDS/VL, visita medica biennale, assicurazione RCT obbligatoria, spazi aerei (CTR, ATZ, parchi naturali, quote minime/massime), precedenze di volo e regolamento AeCI (tramite `scripts/enrich_p2_subjects.cjs`).
+    * **Materia 9: Sicurezza del Volo (45 quiz: #9001-#9045)**: Pre-volo, check-list, gestione emergenze, uso del paracadute di soccorso (lancio verso lo spazio libero, trazione fune d'apertura, disattivazione vela principale), meteo avversa e prevenzione collisioni (tramite `scripts/enrich_p2_subjects.cjs`).
+    * **Materia 7: Tecnica di Pilotaggio (79 quiz: #7001-#7079)**: Rincorsa progressiva, controllo allo zenit, decollo rovescio/fronte vela, circuiti a 'C' vs a 'otto', gradiente di vento e wind shear in atterraggio, virata coordinata col peso, gestione delle chiusure asimmetriche, stallo paracadutale e full stall, discese rapide (orecchie, spirale picchiata), hang check nel deltaplano, controllo barra e rollio, prova di stallo in quota e flare a terra (tramite `scripts/enrich_pilotaggio.cjs`).
+    * **Materia 5: Meteorologia e Aerologia (120 quiz: #5001-#5120)**: Struttura troposfera e tropopausa, umidità relativa/assoluta/specifica, dew point e calore latente di condensazione, gradiente termico verticale reale vs adiabatico secco (1°C/100m) e saturo (0.5°C/100m), criteri di stabilità/instabilità, genesi e distacco termiche (albedo, ostacoli), brezze di monte e di valle, sollevamento dinamico e onde orografiche (lenticolari e rotori), fronti caldi/freddi/occlusi, famiglie nubi e cumulonembi, calcoli adiabatici del Foehn (tramite `scripts/enrich_meteorologia.cjs`).
+    * **Materia 2: Aerodinamica (150 quiz: #2001-#2150)**: Teorema di Bernoulli e Venturi applicato all'ala, depressione dorsale su estradosso, scomposizione della risultante in Portanza e Resistenza, formula quadratica R e P, tipologie di resistenza (attrito, forma, indotta da vortici marginali e dipendenza inversa dall'allungamento), assetto vs incidenza, scomposizione peso (trazione vs peso apparente), fattore di carico in virata (2G = peso apparente doppio), centro di pressione reflex vs convenzionale, efficienza all'aria vs al suolo, polare di Lilienthal e odografa delle velocità, teoria di McCready (velocità in ascendenza, discendenza, vento contrario e a favore), stallo dinamico ad alta velocità, autostabilità pendolare e washout svergolamento, effetto suolo (tramite `scripts/enrich_aerodinamica.cjs`).
+  - **Bonifica Integrale Refusi OCR del PDF Ufficiale**:
+    * Ripuliti gli ultimi refusi storici presenti nelle opzioni e domande: `7005` (rimosso `"I PILOTAGGIO"`), `7079` (rimosso `"8 - MAT"`), `5006` (rimosso `"GIA E AEROLOGIA"`), `5120` (rimosso `"6 - STRU"`), `2007` (rimosso `"DINAMICA"`), `2150` (rimosso `"3 - PRONTO"`).
+  - **Sincronizzazione Completa Audio Neurale & Manifest**:
+    * Generati tutti i segmenti audio didattici per l'intero catalogo dei 504 quiz (`{qid}_e.mp3`) per entrambe le voci neurali Giuseppe ed Elsa.
+    * Reindicizzato l'intero database in [public/audio/manifest.json](file:///c:/github/Quiz_VDS-VL/public/audio/manifest.json): esattamente 2.521 file per Giuseppe (708.29 MB) e 2.521 file per Elsa (687.85 MB) con relativi hash MD5 per l'invalidazione della cache PWA offline.
+  - **Quality Assurance & Collaudo Vitest**:
+    * Aggiornato il test `DATA-09` in [src/data/questions.test.ts](file:///c:/github/Quiz_VDS-VL/src/data/questions.test.ts) a verificare il 100% di unicità e completezza per ciascuna delle 9 materie e su scala globale: certificati 504 record con 504 Regole uniche e 504 Tranelli unici.
+    * 152/152 unit test Vitest passati su 16 suite (`npm run test:unit`).
+    * Verificato con successo il build di produzione PWA (`npm run build`).
+- **Scelte architetturali & Rationale**:
+  - *Standardizzazione Didattica Universale*: L'intero database segue lo schema standardizzato 'Regola: [principio aeronautico/fisico/normativo]' e 'Tranello: [misconcezione o tranello d'esame]', massimizzando la densità informativa e la chiarezza concettuale.
+  - *Sincronizzazione Audio con Ripresa Automatica*: L'ecosistema di generazione audio sfrutta il caching differenziale basato sull'esistenza del file (`Force: false`), permettendo di assorbire eventuali disconnessioni socket senza rigenerare segmenti validi.
+- **Impatto sul Desiderata**:
+  - Requisito del Desiderata *'Perfezionamento Spiegazioni Didattiche (Regola & Tranello)'* completato al **100% (504/504 quiz)**, portando la PWA allo stato dell'arte didattico e funzionale.
+
+---
+
+### [2026-09-29] - Risoluzione Collisione Lock File Windows, Scrittura Atomica e Completamento 5.042 File Audio (Elsa & Giuseppe)
+- **Cosa abbiamo fatto**:
+  - **Risoluzione Errore `[Errno 22] Invalid argument` e File Corrotti a 0 Byte**:
+    * Diagnosticata la causa radice del fallimento mostrato nello screenshot dell'utente: un processo orfano in background (`scripts/generate_audio_database.py`, PID 8692) stava tentando di sovrascrivere simultaneamente gli stessi file audio su file system Windows NTFS, generando violazioni di condivisione (`open(..., 'wb')` collision) e lasciando occasionalmente file orfani da 0 byte.
+    * Terminato il processo duplicato (`Stop-Process -Id 8692 -Force`).
+  - **Blindatura Architetturale di [scripts/generate_audio_database.py](file:///c:/github/Quiz_VDS-VL/scripts/generate_audio_database.py)**:
+    * Introdotta la scrittura atomica dei file audio: la sintesi vocale Edge-TTS scrive ora su un file temporaneo dedicato (`{dest}.{pid}_{task_id}.tmp`), ne verifica la dimensione (> 1.000 byte) e solo in caso di esito positivo esegue la sostituzione atomica tramite `os.replace(tmp_dest, dest)`.
+    * Introdotto il cleanup automatico dei file temporanei o falliti in caso di eccezione per impedire per sempre la creazione di file vuoti da 0 byte.
+    * Aggiunta la rimozione preliminare automatica di eventuali file preesistenti con dimensione <= 1.000 byte prima della rigenerazione.
+  - **Completamento & Certificazione al 100% dell'Ecosistema Audio Neurale**:
+    * Rigenerati e verificati tutti i 5.042 file audio MP3 (2.520 segmenti + 1 intro di guida per ciascuna voce):
+      - **Giuseppe** (`it-IT-DiegoNeural`): 2.521 file validi (708.29 MB), taglia minima 236.880 byte, massima 539.712 byte.
+      - **Elsa** (`it-IT-ElsaNeural`): 2.521 file validi (687.85 MB), taglia minima 71.280 byte, massima 524.592 byte.
+      - **Integrità Totale**: 0 file mancanti, 0 file vuoti o sotto i 1.000 byte.
+    * Rigenerato il catalogo [public/audio/manifest.json](file:///c:/github/Quiz_VDS-VL/public/audio/manifest.json) con gli hash MD5 aggiornati per permettere il download e l'aggiornamento differenziale offline da parte della PWA.
+  - **Quality Assurance**:
+    * Verificati con successo **152/152 test unitari** Vitest su 16 suite (`npm run test:unit`).
+- **Scelte architetturali & Rationale**:
+  - *Scrittura Atomica su File Temporaneo con Rename*: Su Windows NTFS, una scrittura diretta `open(..., 'wb')` su file preesistenti può fallire con `[Errno 22]` se software di scansione (antivirus, indicizzatore, browser) o altri processi accedono al file. La sequenza `.tmp` -> `os.replace` garantisce che il file finale esista solo e soltanto quando è completo al 100% e privo di corruzioni.
+- **Impatto sul Desiderata**:
+  - Ecosistema audio neurale pienamente operativo per entrambe le voci ufficiali (Giuseppe maschile ed Elsa femminile) con pronuncia nativa italiana garantita su tutti i 504 quiz e 2.520 risposte/spiegazioni.
+
+---
+
+### [2026-09-29] - Fase 2 Piano Perfezionamento Didattico: Revisione Spiegazioni Quiz VDS-VL (Materie 4, 6, 3 - 50 Quiz)
+- **Cosa abbiamo fatto**:
+  - Estesa la riscrittura didattica specifica ai tre cluster tematici ad alta priorità (P1) per un totale di 50 quesiti ministeriali AeCI:
+    * **Materia 4: Fisiopatologia del Volo (10 quiz: 4001 - 4010)**: Pressione parziale alveolare, ipossia altitudinale vs ipotermia/ipotensione, aeroembolismo (legge di Henry a 7.000m+), tolleranza accelerazioni positive (+4G per >4s) vs negative (-Gz), illusioni sensoriali vestibolari nel volo in nube.
+    * **Materia 6: Strumenti (20 quiz: 6001 - 6020)**: Principio barometrico altimetro (capsula aneroide / piezo), tarature QNH/QFE e deriva pressoria all'atterraggio, variometro a pressione differenziale e avviso aspirazione sotto cumuli, anemometro (pressione dinamica vs statica, IAS vs GS), bussola magnetica (declinazione, interferenze da cellulari/radio), limiti strumenti base e GPS (impossibilità volo strumentale IFR in nube, volo all'indietro con forte vento contrario, trilaterazione satellitare 3D).
+    * **Materia 3: Pronto Soccorso (20 quiz: 3001 - 3020)**: Protocollo d'urgenza e NUE 112/118 senza muovere il traumatizzato spinale, trasporto esclusivo con mezzi abilitati, arresto emorragie massive con compressione o laccio emostatico a monte, gestione epistassi (capo inclinato in avanti), pervietà vie aeree (soffocamento/vomito), prevenzione shock termico da ipovolemia, immobilizzazione doccia per fratture d'arto senza riduzione manuale, drenaggio otorragia da trauma cranico (paziente sul fianco leso), distacco da alta tensione (distanza di sicurezza) vs bassa tensione (attrezzo isolante in legno), protocollo RICE per distorsioni, riconoscimento visivo spalla lussata ("a spallina"), Posizione Laterale di Sicurezza (PLS), e riscaldamento graduale passivo da assideramento.
+    * Applicate le modifiche in [src/data/questions.json](file:///c:/github/Quiz_VDS-VL/src/data/questions.json) e [public/data/questions.json](file:///c:/github/Quiz_VDS-VL/public/data/questions.json) tramite lo script [scripts/enrich_p1_subjects.cjs](file:///c:/github/Quiz_VDS-VL/scripts/enrich_p1_subjects.cjs).
+    * Ripuliti gli ulteriori refusi OCR storici del PDF cartaceo nelle opzioni di risposta (`4005` e `4010` rimossi residui intestazioni `"OGIA DEL VOLO"` e `"5 - METEOROLOG"`; `6006` e `6020` rimossi `"UMENTI"` e `"7 - TECNICA DI"`; `3005` e `3020` rimossi `"O SOCCORSO"` e `"4 - FISIOPATOLO"`).
+  - Sincronizzazione Ecosistema Audio Neurale:
+    * Rigenerati tutti i 100 segmenti audio didattici (`_e.mp3`) per le 50 domande su entrambe le voci Giuseppe ed Elsa con [scripts/generate_audio_database.py](file:///c:/github/Quiz_VDS-VL/scripts/generate_audio_database.py).
+    * Rigenerato il catalogo [public/audio/manifest.json](file:///c:/github/Quiz_VDS-VL/public/audio/manifest.json) con i nuovi hash MD5 per garantire l'allineamento automatico dei client offline.
+  - Quality Assurance & Collaudo Vitest:
+    * Esteso il test `DATA-09` in [src/data/questions.test.ts](file:///c:/github/Quiz_VDS-VL/src/data/questions.test.ts) a verificare il 100% di unicità e pertinenza delle spiegazioni per tutte le 4 materie completate (70 quiz: Materiali, Fisiopatologia, Strumenti, Pronto Soccorso).
+    * Superati con successo **152/152 test unitari** su 16 suite (`npm run test:unit`).
+- **Scelte architetturali & Rationale**:
+  - *Completamento cluster a blocchi omogenei (P1)*: Raggruppare materie specialistiche (medicina aeronautica, avionica di bordo, primo soccorso) permette un controllo terminologico rigoroso e previene discrepanze semantiche rispetto al D.P.R. 133/2010 e ai manuali AeCI.
+  - *Cura del testo per sintesi TTS*: Tutte le spiegazioni sono state calibrate per una cadenza naturale nelle voci neurali Giuseppe ed Elsa, evitando acronimi non normalizzati o punteggiatura anomala.
+- **Impatto sul Desiderata**:
+  - Porta a **70 quiz (14% del catalogo totale)** la copertura con spiegazioni didattiche specifiche, riducendo a 5 le materie ancora basate su template statico.
+
+---
+
+### [2026-09-29] - Fase 1 Piano Perfezionamento Didattico: Revisione Spiegazioni Quiz VDS-VL (Materia 8 - Materiali #8001-#8020)
+- **Cosa abbiamo fatto**:
+  - Audit di conformità semantica dell'intero catalogo dei 504 quiz: evidenziata la causa radice dell'anomalia (#8003 e tutti gli altri quiz condividevano solo 9 spiegazioni statiche duplicate per materia, ereditate come stub da `extract_quizzes.py`).
+  - Redatto il piano organico di perfezionamento didattico per l'intero catalogo dei 504 quiz nell'artifact dedicato [piano_perfezionamento_spiegazioni.md](file:///C:/Users/aame/.gemini/antigravity/brain/1bd4454b-cf08-4ceb-9620-e0ccceaed932/piano_perfezionamento_spiegazioni.md).
+  - Implementata ed eseguita con successo la **Fase 1 (Pilota: Materia 8 - Materiali, 20 quiz)**:
+    * Riscritte in modo specifico, rigoroso e conciso le 20 spiegazioni (*Regola*: principio fisico/strutturale esatto, max 180-200 car.; *Tranello*: trappola o bias dell'allievo, max 140-160 car.) per i quiz `8001 - 8020` in [src/data/questions.json](file:///c:/github/Quiz_VDS-VL/src/data/questions.json) e [public/data/questions.json](file:///c:/github/Quiz_VDS-VL/public/data/questions.json) tramite lo script [scripts/enrich_materiali.cjs](file:///c:/github/Quiz_VDS-VL/scripts/enrich_materiali.cjs).
+    * Risolto puntualmente il caso sollevato dall'utente per la domanda **#8003** (*Regola*: centro di pressione alare nel primo terzo del profilo e linee A anteriori che sopportano il 60-70% del peso pilota; *Tranello*: presunzione di carico uniforme o confusione con i comandi freno posteriori).
+    * Ripuliti due refusi OCR dell'edizione cartacea AeCI nelle opzioni di risposta (`8007` rimosso residuo testata `"TERIALI"`; `8020` rimosso residuo capitolo `"9 - SICUREZZ"`).
+  - Sincronizzazione Ecosistema Audio Neurale:
+    * Rigenerati selettivamente i 20 segmenti audio didattici delle spiegazioni per Giuseppe (`public/audio/giuseppe/{qid}_e.mp3`) ed Elsa (`public/audio/elsa/{qid}_e.mp3`) per le domande 8001-8020 con [scripts/generate_audio_database.py](file:///c:/github/Quiz_VDS-VL/scripts/generate_audio_database.py).
+    * Rigenerato il manifest differenziale [public/audio/manifest.json](file:///c:/github/Quiz_VDS-VL/public/audio/manifest.json) con i nuovi hash per garantire l'aggiornamento automatico nei client PWA offline.
+  - Quality Assurance & Collaudo E2E:
+    * Aggiunto in [src/data/questions.test.ts](file:///c:/github/Quiz_VDS-VL/src/data/questions.test.ts) il test `DATA-09` che certifica il 100% di unicità e la specificità didattica delle spiegazioni di Materiali.
+    * 152/152 unit test Vitest passati su 16 suite (`npm run test:unit`).
+    * Build di produzione PWA completato con successo (`npm run build`).
+    * Eseguito il collaudo visivo interattivo CDP con [scripts/test_question_8003.cjs](file:///c:/github/Quiz_VDS-VL/scripts/test_question_8003.cjs), validando semanticamente il testo renderizzato nel DOM, l'assenza assoluta di errori console (0 errori) e salvando lo screenshot di collaudo [public/test_question_8003_verified.png](file:///c:/github/Quiz_VDS-VL/public/test_question_8003_verified.png).
+- **Scelte architetturali & Rationale**:
+  - *Cockpit Brevity per Regola e Tranello*: Mantenere i testi densi ma concisi (sotto i 200 caratteri per la Regola e 160 per il Tranello) garantisce leggibilità perfetta a colpo d'occhio su smartphone senza richiedere scroll verticale dell'HUD, ed evita logorrea nei messaggi audio neurali in modalità alla guida.
+  - *Aggiornamento Audio Selettivo (`--part explanation`)*: Rigenerare unicamente i file `_e.mp3` evita di riscaricare e ricalcolare 4.000+ segmenti invariati di domande e opzioni, preservando la continuità della cache locale degli allievi piloti.
+- **Impatto sul Desiderata**:
+  - Corregge l'incongruenza della domanda #8003 e stabilisce il benchmark qualitativo per la revisione didattica sistematica dei restanti 8 cluster tematici del catalogo AeCI.
+
 ---
 
 ### [2026-09-29] - Meccanismo di Invalidazione & Aggiornamento Differenziale Audio Offline (Opzione A + Opzione 1) e Soppressione Prompt Guida Ridondante
@@ -44,22 +138,22 @@ Questo documento registra in ordine cronologico tutte le lavorazioni svolte nel 
 - **Cosa abbiamo fatto**:
   - **Web Speech API & Sintesi Vocale Browser ([src/services/voiceService.ts](file:///c:/github/Quiz_VDS-VL/src/services/voiceService.ts))**:
     * Identificata la causa radice dell'accento inglese nella sintesi vocale: impostare solo `utterance.lang = 'it-IT'` viene ignorato dai browser quando il sistema operativo o il browser ha lingua predefinita inglese (es. Windows/macOS/Chrome su EN-US), provocando la lettura del testo italiano tramite la voce di sistema inglese (fonetica anglofona).
-    * Implementato il metodo `getItalianSpeechVoice()` in `VoiceService` che scansiona programmaticamente `window.speechSynthesis.getVoices()` e seleziona prioritariamente una voce nativa `it-IT` / `it_*`.
-    * In `playSpeechSynthesisFallback()`, associata esplicitamente la voce italiana ad `utterance.voice`, garantendo che qualunque fallback vocale del browser pronunci sempre l'italiano corretto.
-    * Aggiunti unit test `VOICE-26` e `VOICE-27` in [src/services/voiceService.test.ts](file:///c:/github/Quiz_VDS-VL/src/services/voiceService.test.ts) (150/150 test unitari passati).
+    * Implementato il metodo `getItalianSpeechVoice(preferredVoice?: 'giuseppe' | 'elsa')` in `VoiceService` che scansiona programmaticamente `window.speechSynthesis.getVoices()`, seleziona prioritariamente una voce nativa `it-IT` e rispetta rigorosamente la persona attiva: se l'utente ha selezionato **Elsa**, cerca specificamente la voce italiana di Elsa (es. `Microsoft Elsa Desktop` su Windows SAPI5) o voci femminili italiane.
+    * In `playSpeechSynthesisFallback()`, associata esplicitamente la voce italiana coerente con il profilo attivo ad `utterance.voice`, garantendo che qualunque fallback vocale del browser pronunci sempre l'italiano corretto.
+    * Aggiunti unit test `VOICE-26`, `VOICE-27` e `VOICE-28` in [src/services/voiceService.test.ts](file:///c:/github/Quiz_VDS-VL/src/services/voiceService.test.ts) (151/151 test unitari passati).
   - **Blindatura Semantica del DOM HTML ([index.html](file:///c:/github/Quiz_VDS-VL/index.html), [QuestionCard.tsx](file:///c:/github/Quiz_VDS-VL/src/components/QuestionCard.tsx), [DriveModeScreen.tsx](file:///c:/github/Quiz_VDS-VL/src/components/DriveModeScreen.tsx))**:
     * In `index.html`: aggiunti `lang="it"` e `translate="no"` sia sul tag `<body>` che sul contenitore `#root`.
     * In `QuestionCard.tsx`: aggiunti `lang="it"` e `translate="no"` al testo della domanda (`<h3>`), a ciascun pulsante opzione di risposta (`#btn-option-X`), al contenitore del testo opzione e alla scheda della spiegazione didattica (Regola + Tranello), impedendo a screen reader o tool "Leggi ad alta voce" di usare motori fonetici stranieri.
     * In `DriveModeScreen.tsx`: aggiunti `lang="it"` e `translate="no"` al titolo domanda (`<h2>`), ai pulsanti giganti delle opzioni di guida (`#btn-drive-opt-X`), al testo opzione e alla scheda didattica `#drive-didactic-card`.
   - **Protezione Anti-Bleeding nella Pipeline Audio Neurale Edge-TTS ([scripts/generate_audio_database.py](file:///c:/github/Quiz_VDS-VL/scripts/generate_audio_database.py), [scripts/generate_drive_intro.py](file:///c:/github/Quiz_VDS-VL/scripts/generate_drive_intro.py))**:
     * Identificata la causa della possibile pronuncia con accento estero nei file generati: la voce `it-IT-GiuseppeMultilingualNeural` è un modello *multilingue* con rilevamento dinamico della lingua (LID), che su frasi brevi, numeri o acronimi tende a commutare sulla fonetica inglese.
-    * Integrata la voce maschile 100% nativa italiana **`it-IT-DiegoNeural`** (monolingue italiana pura, zero rischio di language bleed o commutazione di accento).
-    * Implementata la funzione `build_ssml()` con tag `<speak xml:lang='it-IT'><lang xml:lang='it-IT'>...` per blindare rigorosamente la lingua italiana ad ogni chiamata Edge-TTS.
+    * Anche per **Elsa** (`it-IT-ElsaNeural`), in assenza di SSML esplicito, le chiamate Edge-TTS possono ereditare `xml:lang="en-US"` e inciampare su acronimi aeronautici inglesi (*VFR, IFR, CTR, QNH, FL, VDS*) o anglismi (*trimmer, top landing*).
+    * Integrata la voce maschile 100% nativa italiana **`it-IT-DiegoNeural`** e blindate **entrambe le voci (Elsa e Giuseppe/Diego)** tramite la funzione `build_ssml()` con marcatura esplicita `<speak xml:lang='it-IT'><lang xml:lang='it-IT'>...` per azzerare ogni inflessione esterofona a monte.
 - **Scelte architetturali & Rationale**:
-  - *Difesa in Profondità a 3 Livelli (HTML, Web Speech API, Neurale)*: L'esperienza vocale dell'allievo pilota può passare dal lettore del browser, dalla Web Speech API o dai file audio pre-renderizzati. Proteggere contemporaneamente tutti e tre i canali elimina definitivamente qualsiasi possibilità di regressione all'accento inglese.
-  - *Native Monolingual Voice over Multilingual*: Le voci multilingue Azure/Edge-TTS tentano di indovinare la lingua. Per il catalogo d'esame ufficiale VDS-VL, modelli nativi puri come `it-IT-DiegoNeural` ed `it-IT-ElsaNeural` garantiscono assoluta costanza di dizione italiana da istruttore aeronautico.
+  - *Difesa in Profondità a 3 Livelli (HTML, Web Speech API, Neurale)*: L'esperienza vocale dell'allievo pilota può passare dal lettore del browser, dalla Web Speech API o dai file audio pre-renderizzati. Proteggere contemporaneamente tutti e tre i canali elimina definitivamente qualsiasi possibilità di regressione all'accento inglese sia per la voce maschile che per quella femminile.
+  - *Voice Persona Matching in Web Speech API*: Non basta forzare una voce italiana generica; se l'utente sceglie Elsa, la sintesi vocale di sistema deve agganciarsi alla voce femminile italiana (come `Microsoft Elsa Desktop`), preservando la continuità timbrica.
 - **Impatto sul Desiderata**:
-  - Risolto in modo permanente il difetto di lettura con accento inglese, blindando l'esperienza audio in studio e in Modalità alla Guida.
+  - Risolto in modo permanente il difetto di lettura con accento inglese sia per Elsa che per Giuseppe, blindando l'esperienza audio in studio e in Modalità alla Guida.
 
 ### [2026-09-29] - Modale Onboarding Scelta Disciplina al Primo Avvio (Parapendio / Deltaplano / Tutti)
 - **Cosa abbiamo fatto**:

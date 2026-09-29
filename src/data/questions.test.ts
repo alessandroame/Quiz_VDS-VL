@@ -106,4 +106,71 @@ describe('Suite 1: Integrità Dataset 504 Quiz AeCI (questions.json)', () => {
     expect(pgCount).toBe(46);
     expect(allCount + hgCount + pgCount).toBe(504);
   });
+
+  it('DATA-09: le spiegazioni di tutte le 9 materie (504 quiz) sono specifiche, uniche al 100% e conformi', () => {
+    // Subject 1: Normativa e Legislazione (40 quiz)
+    const normQuestions = questions.filter(q => q.subjectId === 1);
+    expect(normQuestions.length).toBe(40);
+    expect(new Set(normQuestions.map(q => q.explanation.rule)).size).toBe(40);
+    expect(new Set(normQuestions.map(q => q.explanation.trap)).size).toBe(40);
+
+    // Subject 2: Aerodinamica (150 quiz)
+    const aeroQuestions = questions.filter(q => q.subjectId === 2);
+    expect(aeroQuestions.length).toBe(150);
+    expect(new Set(aeroQuestions.map(q => q.explanation.rule)).size).toBe(150);
+    expect(new Set(aeroQuestions.map(q => q.explanation.trap)).size).toBe(150);
+
+    // Subject 3: Pronto Soccorso (20 quiz)
+    const soccorsoQuestions = questions.filter(q => q.subjectId === 3);
+    expect(soccorsoQuestions.length).toBe(20);
+    expect(new Set(soccorsoQuestions.map(q => q.explanation.rule)).size).toBe(20);
+    expect(new Set(soccorsoQuestions.map(q => q.explanation.trap)).size).toBe(20);
+
+    // Subject 4: Fisiopatologia (10 quiz)
+    const fisioQuestions = questions.filter(q => q.subjectId === 4);
+    expect(fisioQuestions.length).toBe(10);
+    expect(new Set(fisioQuestions.map(q => q.explanation.rule)).size).toBe(10);
+    expect(new Set(fisioQuestions.map(q => q.explanation.trap)).size).toBe(10);
+
+    // Subject 5: Meteorologia e Aerologia (120 quiz)
+    const meteoQuestions = questions.filter(q => q.subjectId === 5);
+    expect(meteoQuestions.length).toBe(120);
+    expect(new Set(meteoQuestions.map(q => q.explanation.rule)).size).toBe(120);
+    expect(new Set(meteoQuestions.map(q => q.explanation.trap)).size).toBe(120);
+
+    // Subject 6: Strumenti (20 quiz)
+    const strumentiQuestions = questions.filter(q => q.subjectId === 6);
+    expect(strumentiQuestions.length).toBe(20);
+    expect(new Set(strumentiQuestions.map(q => q.explanation.rule)).size).toBe(20);
+    expect(new Set(strumentiQuestions.map(q => q.explanation.trap)).size).toBe(20);
+
+    // Subject 7: Tecnica di Pilotaggio (79 quiz)
+    const pilotQuestions = questions.filter(q => q.subjectId === 7);
+    expect(pilotQuestions.length).toBe(79);
+    expect(new Set(pilotQuestions.map(q => q.explanation.rule)).size).toBe(79);
+    expect(new Set(pilotQuestions.map(q => q.explanation.trap)).size).toBe(79);
+
+    // Subject 8: Materiali (20 quiz)
+    const matQuestions = questions.filter(q => q.subjectId === 8);
+    expect(matQuestions.length).toBe(20);
+    expect(new Set(matQuestions.map(q => q.explanation.rule)).size).toBe(20);
+    expect(new Set(matQuestions.map(q => q.explanation.trap)).size).toBe(20);
+
+    // Subject 9: Sicurezza del Volo (45 quiz)
+    const sicQuestions = questions.filter(q => q.subjectId === 9);
+    expect(sicQuestions.length).toBe(45);
+    expect(new Set(sicQuestions.map(q => q.explanation.rule)).size).toBe(45);
+    expect(new Set(sicQuestions.map(q => q.explanation.trap)).size).toBe(45);
+
+    // Controllo globale: 504 spiegazioni uniche e distinte su tutto il catalogo
+    expect(new Set(questions.map(q => q.explanation.rule)).size).toBe(504);
+    expect(new Set(questions.map(q => q.explanation.trap)).size).toBe(504);
+
+    // Domanda chiave #8003 verificata
+    const q8003 = questions.find(q => q.id === 8003);
+    expect(q8003).toBeDefined();
+    expect(q8003?.explanation.rule).toContain('centro di pressione');
+    expect(q8003?.explanation.rule).toContain('60-70%');
+    expect(q8003?.explanation.trap).toContain('distribuzione uniforme');
+  });
 });

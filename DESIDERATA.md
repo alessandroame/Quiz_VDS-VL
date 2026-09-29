@@ -147,7 +147,7 @@ Questo documento rappresenta la **bussola strategica e funzionale** del progetto
 | Barra Navigazione Quiz Ancorata in Basso | 🟢 Completato | Componente `QuizBottomBar` ancorato in basso al viewport (`fixed bottom-0 z-30`) con Precedente, Successiva, flag rapido, Prossima Domanda Tutor e Consegna su `ExamScreen`, `TopicsScreen` e `MistakesScreen`. |
 | Modalità Tutor nella Modalità Guida | 🟢 Completato | Lettura vocale Regola+Tranello sincronizzata col Pilota Automatico, Scheda Didattica HUD zero-scroll 100dvh, toggle in Launcher/HUD/Settings/QuickMenu e comandi vocali. |
 | Risoluzione Interruzione Spiegazione Vocale | 🟢 Completato | Eliminato timeout prematuro 3.5s, sincronizzazione event-driven con audio ended + pausa di assimilazione (2.5s) e safety guard 4.5s. |
-| Invalidazione & Aggiornamento Differenziale Audio Offline | 🟢 Completato | Manifest JSON con hash MD5 (`manifest.json`), strategia Workbox `NetworkFirst`, download differenziale dei soli frammenti obsoleti in `AudioDownloadManager`, auto-check silenzioso su rete e soppressione prompt guida se voci già presenti in cache. |
+| Perfezionamento Spiegazioni Didattiche (Regola & Tranello) | 🟢 Completato (504/504 Quiz - 100%) | Revisione semantica e didattica completata per tutti i 504 quiz AeCI (9 materie su 9). Ogni domanda dispone di Regola e Tranello specifici, univoci al 100% e certificati dal test DATA-09. Refusi OCR storici del PDF cartaceo eliminati da tutte le materie. Database audio neurale Giuseppe ed Elsa completamente allineato con manifest.json. |
 
 
 

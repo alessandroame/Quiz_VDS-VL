@@ -33,9 +33,11 @@
 - Catalogo integrale e fedele dei **504 quiz ministeriali ufficiali** (edizione AeCI 2017) per l'attestato VDS/VL.
 - Suddivisione canonica nelle 9 materie d'esame.
 - Ciascuna domanda include 3 opzioni di risposta con un'unica soluzione corretta verificata sulle tabelle ministeriali.
-- **Spiegazioni Didattiche Essenziali**: ogni quesito è corredato da una spiegazione mirata articolata in:
-  - **Regola**: il principio fisico, aerodinamico o la norma di legge alla base della risposta corretta.
-  - **Tranello**: il bias cognitivo o l'ambiguità terminologica tipica della domanda.
+- **Spiegazioni Didattiche Essenziali (100% Bespoke su 504 Quiz)**: ogni singolo quesito del catalogo (504 su 504, 9 materie su 9) è corredato da una spiegazione tecnica specifica, univoca e scientificamente rigorosa articolata in:
+  - **Regola**: il principio fisico, aerodinamico o la norma di legge (D.P.R. 133/2010) alla base della risposta corretta.
+  - **Tranello**: il bias cognitivo, la misconcezione o l'ambiguità d'esame tipica del quesito.
+  - Tutti i refusi OCR storici del documento cartaceo ministeriale sono stati interamente bonificati.
+  - Ecosistema audio neurale offline (voci Giuseppe ed Elsa) allineato al 100% con 2.521 file audio indicizzati per voce.
 
 ### 2. Filtro Disciplina per Mezzo (Deltaplano / Parapendio / Teoria Comune)
 - **Categorizzazione Semantica Rigorosa (Audit AeCI)**:
