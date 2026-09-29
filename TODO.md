@@ -1,7 +1,7 @@
 # 📋 VDS-VL Quiz Master - Avanzamento Lavori (TODO)
 
 **Data Inizio**: 27/09/2026  
-**Stato Generale**: 🟡 **Fasi 0-6 Completate (100%), Fase 7 (Collaudo Manuale Completo E2E) Pronta per Esecuzione**
+**Stato Generale**: 🟡 **Fasi 0-6 Completate (100%), Fase 7 (Collaudo Manuale E2E) Pronta, Fase 8 (Nuove Funzionalità & Backlog) Pianificata**
 
 ---
 
@@ -145,4 +145,48 @@ Questa checklist fornisce le istruzioni operative per il **collaudo manuale end-
   - Cliccare su "Salva adesso": autenticarsi con il proprio account Google e verificare il salvataggio nella cartella privata `appDataFolder`.
   - Cliccare su "Unisci dati (Merge)": verificare il download e lo smart merge dei dati senza cancellazione o duplicazione dei progressi.
 - [ ] **Reset Dati**: Nelle Impostazioni (scheda Dati), cliccare "Cancella tutti i dati e ricomincia da zero". Verificare il prompt di conferma e l'azzeramento pulito del database IndexedDB.
+
+---
+
+## 🚀 Fase 8: Prossimi Obiettivi & Nuove Funzionalità (Backlog Attivo)
+
+Questa sezione raccoglie le nuove funzionalità e i miglioramenti di interfaccia richiesti e pianificati per le prossime iterazioni:
+
+### 1. Filtro Domande Esclusive Deltaplano (Discipline Tagging con Protezione Quesiti Condivisi)
+- [ ] **Audit e Categorizzazione dei 504 Quiz AeCI**:
+  - Analisi semantica dettagliata dell'intero database per identificare con precisione:
+    - *Quesiti Esclusivi Deltaplano*: nozioni e meccaniche specifiche dell'ala rigida/flessibile (barra di controllo/trapezio/A-frame, pilotaggio pendolare per spostamento del baricentro, trave di chiglia, cavi di controventatura, tubo alare, ecc.).
+    - *Quesiti Esclusivi Parapendio*: nozioni e meccaniche specifiche dell'ala a cassoni (elevatori, maniglie e fascio freni, fascio funicolare, bocche d'aria, centine, chiusure d'ala asimmetriche/frontali).
+    - *Quesiti Comuni Condivisi (SSOT)*: aerodinamica generale (portanza, resistenza, polare, stallo, centro di pressione, angolo d'attacco), meteorologia completa (termiche, brezze, nubi, fronti, stabilità), normativa e spazi aerei (D.P.R. 133/2010, priorità, quote minime), fisiopatologia del volo (ipossia, cinetosi, ipotermia), primo soccorso, sicurezza del volo comune e strumentazione (variometro, altimetro, anemometro).
+- [ ] **Vincolo Tassativo di Salvaguardia**:
+  - Massima attenzione a **NON** escludere dal percorso di studio del parapendio domande che possono apparire tecniche ma sono in realtà di principio generale condiviso valide per entrambi i velivoli (es. freccia alare, svergolamento/twist, velocità di massima efficienza o minima discesa, effetto suolo).
+- [ ] **Tipizzazione & Aggiornamento Schema Dati**:
+  - Estensione dei tipi in `src/types/quiz.ts` (es. `discipline?: 'all' | 'hang_glider' | 'paraglider'`) e popolamento coerente in `src/data/questions.json` e `public/data/questions.json`.
+- [ ] **UI Controlli Filtro Disciplina**:
+  - Inserimento del selettore disciplina nelle schermate **Materie**, **Archivio** e nel launcher di simulazione **Esame**, consentendo all'allievo di filtrare: *Tutti i quiz*, *Solo Deltaplano + Condivisi*, o *Solo Parapendio + Condivisi*.
+- [ ] **Suite di Test Dedicata (Vitest)**:
+  - Test unitari per garantire l'integrità del catalogo (504 quiz sempre preservati), la validità dei filtri e l'assoluta assenza di falsi positivi/negativi sui quesiti condivisi.
+
+### 2. Blocco del Menu di Navigazione al Top (Sticky / Fixed Top Navigation Bar)
+- [ ] **Riorganizzazione Strutturale di Navbar & Header**:
+  - Modifica di `src/components/Navbar.tsx`: fissare la barra di navigazione principale in alto (top sticky/fixed) integrando o affiancando i 5 tab di navigazione (**Esame**, **Materie**, **Errori**, **Archivio**, **Stats**) all'header superiore anziché confinarli nella bottom bar.
+  - Rimozione o riorganizzazione della bottom navigation bar fissa inferiore (`fixed bottom-0`), liberando altezza utile dello schermo per i contenuti dei quiz, le risposte a tocco rapido, il debriefing e le liste di archivio.
+- [ ] **Ottimizzazione Layout Globale (`src/App.tsx`)**:
+  - Ricalibrazione dei padding globali dell'applicazione (rimozione del `pb-20` / `pb-36` inferiore non più necessari) per un flusso visivo pulito ed ergonomico a tutta altezza.
+- [ ] **Test Visivo & Ergonomia Mobile/Desktop**:
+  - Verifica tramite CDP headless a 390x844 (mobile) e 1440x900 (desktop) per garantire stabilità visiva durante lo scorrimento, zero salti di layout e nessuna sovrapposizione con i banner informativi o download audio.
+
+### 3. Ristrutturazione Impostazioni con Accordion Compresso Singolo (Single-Open Accordion)
+- [ ] **Superamento del Pills/Segmented Menu Orizzontale**:
+  - Riprogettazione del componente `src/components/SettingsModal.tsx` (e alias `SettingsScreen`): sostituzione della barra orizzontale a schede/pillole (`tab-appearance`, `tab-voice`, `tab-drive`, `tab-cloud`, `tab-data`, `tab-about`).
+- [ ] **Implementazione Accordion Compresso a Sezione Singola (Mutually Exclusive)**:
+  - Layout verticale a pannelli ripiegabili compatti ad alta densità (header con icona tematica, titolo, anteprima sintetica dell'impostazione attiva e indicatore di espansione/chiusura).
+  - Regola ferrea di mutua esclusione: l'apertura di un pannello espande la sezione desiderata e chiude automaticamente qualsiasi altra sezione precedentemente aperta, mantenendo l'altezza complessiva contenuta e azzerando la confusione visiva.
+  - Possibilità di collassare completamente tutte le sezioni per una panoramica compatta a colpo d'occhio.
+- [ ] **Transizioni Fluide & Rispetto Palette Cockpit**:
+  - Micro-animazioni di espansione/chiusura ad alte prestazioni (zero layout shift, transizioni CSS fluide e leggere).
+  - Piena conformità sia per il tema Carbon Cockpit Dark (Zero-Blue) che per Hangar Light.
+- [ ] **Verifica Visiva Headless & Regression Test**:
+  - Aggiornamento degli script di test visivo delle impostazioni (`test_settings_fullscreen.js`, `test_settings_about.js`) e verifica di 0 errori in console.
+
 
