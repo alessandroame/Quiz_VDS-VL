@@ -86,13 +86,17 @@ Questo documento rappresenta la **bussola strategica e funzionale** del progetto
    - **Guida Contestuale & Feedback Vocale Reattivo**: icona microfono pulsante con onda radar durante la ricezione comandi, trascrizione in tempo reale nel banner HUD, conferme comando, diagnostica trasparente su frasi non riconosciute e Cheat Sheet rapido con pulsante '?'.
    - **Spiegazione Vocale di Benvenuto (Audio Briefing Run-Once)**: All'avvio della modalità alla guida, un audio neurale conciso illustra il funzionamento a mani libere (Wake Lock, lettura automatica quesiti, risposte touch e comandi vocali "Uno", "Due", "Tre", "Ripeti", "Aiuto"). Eseguito una sola volta in automatico (`driveModeIntroPlayed: true`), con possibilità di riascolto on-demand (Launcher, Cheat Sheet) o riattivazione all'avvio dalle Impostazioni.
 
-8. **Impostazioni Modulari per Argomenti (Zero-Scroll Settings)**:
-   - Modale impostazioni suddiviso rigorosamente a schede tematiche (Aspetto, Voce, Guida, Cloud/Backup, Dati & Reset, About con riferimenti normativi AeCI e D.P.R. 133/2010).
-   - Eliminazione totale dello scrolling verticale continuo su dispositivi mobili e desktop.
+8. **Impostazioni Modulari per Argomenti (Evoluzione verso Accordion Compresso a Sezione Singola)**:
+   - Schermata impostazioni fullscreen nativa articolata su 6 aree tematiche (Aspetto, Voce, Guida, Cloud/Backup, Dati & Reset, About con riferimenti normativi AeCI e D.P.R. 133/2010).
+   - Superamento dell'attuale menu orizzontale a pillole/tabs in favore di un layout ad **accordion verticale compresso**, con apertura esclusiva di **una sola sezione alla volta** (mutua esclusione) per eliminare scorrimenti orizzontali e massimizzare la compattezza su smartphone e desktop.
 
 9. **Identità Visiva, Iconografia & Tema Carbon Cockpit (Zero-Blue)**:
    - **Icona Ufficiale Aero Shield**: Logo PWA geometrico che unisce l'arco a cassoni del parapendio con l'ala triangolare a freccia 'V' del deltaplano (trave di chiglia e barra di controllo A-frame). Vettore SVG di precisione e icone PNG 192x192 e 512x512.
    - **Tema Scuro Carbon Cockpit**: Eliminazione totale di qualsiasi dominante fredda o blu dal dark mode. Superfici carbon/grafite (`zinc-950`, `zinc-900`, `zinc-800`) e caldi accenti strumentali **Aviation Amber** (`amber-500` / `amber-600`) per la massima fedeltà e comfort visivo avionico.
+
+10. **Ergonomia di Navigazione & Filtro Disciplina (Deltaplano / Parapendio)**:
+   - **Barra di Navigazione Bloccata al Top**: Fissaggio permanente del menu di navigazione in alto (top sticky/fixed bar) per liberare la parte inferiore del viewport da barre fisse, ottimizzando l'area utile di lettura dei quiz e delle opzioni di risposta.
+   - **Filtro Quiz Deltaplano con Salvaguardia Condivisi**: Possibilità di filtrare i quesiti specifici per il Deltaplano (barra di controllo/trapezio/A-frame, spostamento del baricentro, trave di chiglia, cavi e tubi strutturali) o per il Parapendio (freni, fascio funicolare, cassoni, centine). **Vincolo tassativo di progetto**: massima cautela nell'audit semantico per NON escludere mai dai piani di studio le nozioni trasversali condivise da entrambi i mezzi (aerodinamica generale, meteo, normativa D.P.R. 133/2010, primo soccorso, fisiopatologia, sicurezza comune e strumentazione).
 
 ---
 
@@ -133,6 +137,9 @@ Questo documento rappresenta la **bussola strategica e funzionale** del progetto
 | Indicatore Stato Offline & HUD Rete | 🟢 Completato | Pillola ambra in Navbar e HUD Guida, banner informativo e modale di briefing via createPortal con feedback di riconnessione ONLINE. |
 | Spiegazione Vocale Modalità Guida | 🟢 Completato | Audio briefing iniziale run-once con Edge-TTS (Giuseppe/Elsa), tasto Salta, persistenza Dexie, riascolto 1-click e riattivazione in Impostazioni. |
 | Protocollo Collaudo Manuale E2E | 🟢 Completato | Checklist completa a 9 aree operative in TODO.md per verifica pilota. |
+| Filtro Quiz Esclusivi Deltaplano | 📋 Pianificato (TODO) | Audit 504 quiz e tagging disciplina deltaplano/parapendio/comune con preservazione concetti condivisi. |
+| Blocco Menu di Navigazione al Top | 📋 Pianificato (TODO) | Barra di navigazione sticky/fixed al top, eliminando o alleggerendo la bottom nav su mobile. |
+| Impostazioni ad Accordion Compresso Singolo | 📋 Pianificato (TODO) | Sostituzione pills menu con accordion verticale mutuo-esclusivo (1 sola sezione aperta alla volta). |
 
 
 ---

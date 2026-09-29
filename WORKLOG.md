@@ -16,6 +16,19 @@ Questo documento registra in ordine cronologico tutte le lavorazioni svolte nel 
 
 ---
 
+### [2026-09-29] - Aggiornamento Backlog Operativo: Filtro Deltaplano, Menu al Top, Impostazioni ad Accordion
+- **Cosa abbiamo fatto**:
+  - Aggiunti e dettagliati i nuovi requisiti operativi richiesti dall'utente all'interno di [TODO.md](file:///d:/Github/Quiz_VDS-VL/TODO.md) (Fase 8: Nuove Funzionalità & Backlog Attivo) e [DESIDERATA.md](file:///d:/Github/Quiz_VDS-VL/DESIDERATA.md):
+    * **Filtro Domande Esclusive Deltaplano (Discipline Tagging con Protezione Quesiti Condivisi)**: pianificato l'audit semantico delle 504 domande per discriminare quesiti specifici del deltaplano (pilotaggio pendolare con barra di controllo/trapezio/A-frame, spostamento del baricentro, trave di chiglia, cavi e tubi strutturali) da quelli del parapendio (freni, elevatori, fascio funicolare, cassoni, centine). Fissato il vincolo tassativo di salvaguardia per preservare categoricamente tutte le domande di teoria comune (aerodinamica generale, meteo, normativa D.P.R. 133/2010, primo soccorso, fisiologia del volo e strumentazione).
+    * **Blocco Menu di Navigazione al Top (Sticky/Fixed Top Navigation)**: pianificata la riorganizzazione dell'ancoraggio della navigazione principale in alto, integrando i 5 tab di navigazione nell'header superiore ed eliminando o alleggerendo la bottom nav su smartphone, per recuperare spazio verticale prezioso e garantire coerenza ergonomica tra desktop e mobile.
+    * **Ristrutturazione Impostazioni con Accordion Compresso Singolo (Single-Open Accordion)**: pianificata la sostituzione del menu a schede/pillole orizzontale in [src/components/SettingsModal.tsx](file:///d:/Github/Quiz_VDS-VL/src/components/SettingsModal.tsx) con un layout ad accordion verticale a sezioni ripiegabili compatto, governato da una regola di mutua esclusione (l'apertura di un pannello chiude automaticamente il precedente, mantenendo aperta una sola sezione alla volta).
+- **Scelte architetturali & Rationale**:
+  - *Discipline Filtering Safety Rationale*: L'esame VDS/VL dell'Aero Club d'Italia è unificato per il Volo Libero. Escludere erroneamente quesiti generali dall'esercitazione di un allievo parapendista creerebbe lacune gravi su aerodinamica di base o meteo. L'audit deve essere chirurgico e conservativo (default `all`, marcatura `hang_glider` solo su elementi inequivocabili di ala rigida/trapezio).
+  - *Top Sticky Menu Ergonomics*: Su schermi smartphone allungati (19.5:9 o 20:9), la compresenza di header in alto e barra fissa in basso sottrae fino a 140px di altezza viewport ai quiz e alle opzioni. Fissare il menu in alto unifica i comandi primari e libera la visuale per le risposte e il feedback didattico immediato.
+  - *Single-Open Accordion vs Multi-Tab Pills*: Con 6 sezioni di configurazione ricche di opzioni e toggle, la barra orizzontale a pillole richiede scorrimenti orizzontali su schermi stretti e nasconde la panoramica delle categorie. L'accordion verticale compresso a sezione singola offre un'architettura visuale ordinata, densa e senza dispersione.
+- **Impatto sul Desiderata**:
+  - Allineata la roadmap di sviluppo con le priorità del pilota, garantendo continuità cognitiva per le prossime implementazioni.
+
 ### [2026-09-29] - Impostazione Voce di Default su Elsa (TTS Neurale Femminile)
 - **Cosa abbiamo fatto**:
   - Impostata la voce **Elsa** (`'elsa'`) come voce di default predefinita dell'applicazione:
