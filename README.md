@@ -272,14 +272,17 @@ npm run test:coverage
 # Collaudo visivo headless CDP (Chrome DevTools Protocol)
 npm run test:visual:all
 
+# Collaudo visivo navigazione esame, debriefing e zero-warning console
+npm run test:visual:review
+
+# Collaudo interattivo Modalità Audio (Launcher, radio quiz, risposta e chiusura)
+npm run test:visual:drive:flow
+
 # Collaudo specifico della Modalità Alla Guida (CDP Mobile 390x844)
 npm run test:visual:drive
 
-# Collaudo visivo del filtro disciplina Deltaplano / Parapendio (CDP Mobile & Desktop)
-npm run test:visual:discipline
-
-# Collaudo visivo del flusso onboarding al primo avvio (CDP Mobile & Desktop)
-npm run test:visual:onboarding
+# Collaudo visivo del navigatore compresso a singola riga (CDP Mobile & Desktop)
+npm run test:visual:nav
 
 # Consolidamento frammenti di diario multi-agente (.agents/worklog.d/ -> WORKLOG.md)
 npm run worklog:consolidate
