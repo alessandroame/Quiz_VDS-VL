@@ -168,13 +168,14 @@ Questa sezione raccoglie le nuove funzionalità e i miglioramenti di interfaccia
   - Test unitari per garantire l'integrità del catalogo (504 quiz sempre preservati), la validità dei filtri e l'assoluta assenza di falsi positivi/negativi sui quesiti condivisi.
 
 ### 2. Blocco del Menu di Navigazione al Top (Sticky / Fixed Top Navigation Bar)
-- [ ] **Riorganizzazione Strutturale di Navbar & Header**:
-  - Modifica di `src/components/Navbar.tsx`: fissare la barra di navigazione principale in alto (top sticky/fixed) integrando o affiancando i 5 tab di navigazione (**Esame**, **Materie**, **Errori**, **Archivio**, **Stats**) all'header superiore anziché confinarli nella bottom bar.
-  - Rimozione o riorganizzazione della bottom navigation bar fissa inferiore (`fixed bottom-0`), liberando altezza utile dello schermo per i contenuti dei quiz, le risposte a tocco rapido, il debriefing e le liste di archivio.
-- [ ] **Ottimizzazione Layout Globale (`src/App.tsx`)**:
-  - Ricalibrazione dei padding globali dell'applicazione (rimozione del `pb-20` / `pb-36` inferiore non più necessari) per un flusso visivo pulito ed ergonomico a tutta altezza.
-- [ ] **Test Visivo & Ergonomia Mobile/Desktop**:
-  - Verifica tramite CDP headless a 390x844 (mobile) e 1440x900 (desktop) per garantire stabilità visiva durante lo scorrimento, zero salti di layout e nessuna sovrapposizione con i banner informativi o download audio.
+- [x] **Riorganizzazione Strutturale di Navbar & Header**:
+  - [x] Modifica di `src/components/Navbar.tsx`: fissare la barra di navigazione principale in alto (permanently fixed top-0) integrando i 5 tab di navigazione (**Esame**, **Materie**, **Errori**, **Archivio**, **Stats**) all'header superiore anziché confinarli nella bottom bar.
+  - [x] Rimozione della bottom navigation bar fissa inferiore (`fixed bottom-0`), liberando altezza utile dello schermo per i contenuti dei quiz, le risposte a tocco rapido, il debriefing e le liste di archivio.
+  - [x] Rimozione del blocco preamble ridondante ("fuffa") in `src/components/ExamScreen.tsx`, portando le card di avvio esame subito in cima allo schermo.
+- [x] **Ottimizzazione Layout Globale (`src/App.tsx`)**:
+  - [x] Ricalibrazione dei padding globali dell'applicazione (`pt-[98px] sm:pt-[104px]` per clearance del fixed header e riduzione del `pb-20` a `pb-8`) per un flusso visivo pulito ed ergonomico a tutta altezza.
+- [x] **Test Visivo & Ergonomia Mobile/Desktop**:
+  - [x] Verifica tramite CDP headless a 390x844 (mobile) e 1440x900 (desktop) per garantire stabilità visiva durante lo scorrimento, zero salti di layout e nessuna sovrapposizione con i banner informativi o download audio.
 
 ### 3. Ristrutturazione Impostazioni con Accordion Compresso Singolo (Single-Open Accordion)
 - [ ] **Superamento del Pills/Segmented Menu Orizzontale**:
@@ -190,14 +191,55 @@ Questa sezione raccoglie le nuove funzionalità e i miglioramenti di interfaccia
   - Aggiornamento degli script di test visivo delle impostazioni (`test_settings_fullscreen.js`, `test_settings_about.js`) e verifica di 0 errori in console.
 
 ### 4. Visualizzazione Globale del Numero di Versione dell'Applicazione
-- [ ] **Integrazione del Numero di Versione nella UI**:
-  - Rendere il numero di versione dell'applicazione (es. `v1.0.0` o `v1.0.0 (build #...)`) visibile in modo discreto ma immediatamente accessibile all'utente.
-  - Collocazioni candidate per massima ergonomia visiva:
-    - Nell'header della **Navbar** accanto al badge "2017" o al logo (es. pillola sottile o tooltip con build hash).
-    - Nell'header fisso superiore della schermata **Impostazioni** (`SettingsModal`), visibile in cima a colpo d'occhio senza dover cercare nella sezione About.
-    - Nel footer o nelle informazioni di sistema per facilitare la diagnostica, il debug offline e le segnalazioni dell'allievo pilota.
-- [ ] **Utilizzo della Costante di Build Globale (`__APP_VERSION__`)**:
-  - Collegare la visualizzazione direttamente alla costante `__APP_VERSION__` definita in `vite.config.ts` (derivata dinamicamente da `package.json`) ed eventualmente arricchita con `__APP_BUILD_ID__` / commit hash, azzerando le stringhe di versione cablate manualmente (hardcoded).
+- [x] **Integrazione del Numero di Versione nella UI**:
+  - [x] Rendere il numero di versione dell'applicazione (es. `v1.0.0` o `v1.0.0 (build #...)`) visibile in modo discreto ma immediatamente accessibile all'utente.
+  - [x] Collocazione integrata nell'header della **Navbar** (`#app-version-badge`) accanto al badge "2017" con tooltip contenente `__APP_BUILD_ID__`.
+  - [x] Collocazione integrata nell'header fisso superiore della schermata **Impostazioni** (`SettingsModal`) e nella sezione **About**.
+- [x] **Utilizzo della Costante di Build Globale (`__APP_VERSION__`)**:
+  - [x] Collegata la visualizzazione direttamente alla costante `__APP_VERSION__` definita in `vite.config.ts` (derivata dinamicamente da `package.json`) e arricchita con `__APP_BUILD_ID__` / commit hash, azzerando le stringhe di versione cablate manualmente (hardcoded).
+
+### 5. Barra di Navigazione Quiz Ancorata in Basso (Sticky / Fixed Bottom Action Bar)
+- [ ] **Ancoraggio Permanente dei Controlli "Precedente" e "Successiva"**:
+  - Rendere i controlli di navigazione tra i quesiti (`Precedente` e `Successiva`, oltre al pulsante di completamento scheda/conclusione ripasso e al tasto rapido tutor "Prossima Domanda") **costantemente visibili e ancorati in basso** al viewport durante l'esecuzione del quiz:
+    - In modalità **Simulazione Esame** (sia Esame Ufficiale che Didattica Tutor in `src/components/ExamScreen.tsx`).
+    - Nello **Studio per Materie** (`src/components/TopicsScreen.tsx`).
+    - Nel ripasso del **Quaderno Errori** (`src/components/MistakesScreen.tsx`).
+  - Azzerare la necessità per l'allievo pilota di dover scorrere verso il fondo della schermata per avanzare o retrocedere quando il testo del quesito, le opzioni di risposta o le card didattiche espanse (Regola e Tranello) superano l'altezza visibile dello smartphone.
+- [ ] **Ergonomia Cockpit, Styling & Safe Area**:
+  - Posizionamento `fixed bottom-0 inset-x-0` (o `sticky bottom-0`) con elevazione coordinata (`z-30`), sfondo con effetto `backdrop-blur-md` e styling coerente con i temi avionici (`bg-zinc-950/90 border-t border-zinc-800` in Cockpit Dark; `bg-white/95 border-t border-slate-200` in Hangar Light).
+  - Pieno supporto ai margini di sicurezza inferiori per smartphone con gesture bar (`pb-safe` / `env(safe-area-inset-bottom)`).
+  - Target tattili ampi e comodi secondo la legge di Fitts per il tocco immediato con il pollice a una sola mano, con stati disabilitati chiari (`disabled:opacity-30`).
+- [ ] **Prevenzione Sovrapposizioni (Content Clearance)**:
+  - Calibrazione del padding inferiore sul container scorrevole dei contenuti (`pb-24` o `pb-28`) in `ExamScreen.tsx`, `TopicsScreen.tsx` e `MistakesScreen.tsx`, affinché l'ultima opzione di risposta, il feedback didattico o il link di abbandono simulazione non vengano mai nascosti o sovrapposti dalla barra ancorata.
+- [ ] **Sinergia con il Menu di Navigazione al Top**:
+  - Armonizzazione con la riorganizzazione della Navbar al top (Obiettivo 2 di Fase 8): quando i 5 tab di sezione generali sono posizionati stabilmente in alto, l'area inferiore del viewport è dedicata esclusivamente ai comandi operativi del quiz attivo.
+- [ ] **Collaudo Visivo Headless & Multi-Viewport**:
+  - Verifica tramite CDP headless a 390x844 (mobile portrait), 844x390 (mobile landscape) e 1440x900 (desktop) per garantire la fluidità di interazione, l'assenza di salti di layout e 0 errori in console.
+
+### 6. Modalità Tutor Didattica nella Modalità Alla Guida (Hands-Free Voice Tutor)
+- [ ] **Flusso Didattico Vocale Esteso**:
+  - In modalità standard, il Pilota Automatico legge domanda, opzioni e, dopo la risposta o lo scadere del timer, pronuncia la sola risposta corretta avanzando al quiz successivo.
+  - In **Modalità Guida Tutor**, il motore vocale neurale non si limita alla risposta corretta, ma **legge ad alta voce la spiegazione didattica essenziale completa**:
+    - 📘 **Regola**: principio fisico, aerodinamico o norma di legge alla base del quesito.
+    - ⚠️ **Tranello**: bias cognitivo o ambiguità lessicale da evitare.
+- [ ] **Sincronizzazione Intelligente del Pilota Automatico**:
+  - Nel ciclo automatico, il passaggio al quiz successivo attende tassativamente la **conclusione della lettura vocale della spiegazione didattica** (`onEnd`), lasciando una pausa di assimilazione calibrata (es. 3 secondi) prima di procedere.
+  - Nel ciclo manuale con comandi vocali, l'allievo può pronunciare *"Avanti"*, *"Prossima"* o toccare lo schermo per avanzare con i propri ritmi.
+- [ ] **Interfaccia HUD Cockpit a Zero-Scroll (Viewport 100dvh)**:
+  - Visualizzazione delle card didattiche compatte **Regola** e **Tranello** ad altissima leggibilità direttamente nell'area centrale dell'HUD durante la fase di debriefing della domanda, senza generare barre di scorrimento e rispettando il vincolo rigido `100dvh` della Modalità Guida.
+- [ ] **Controlli Dedicati & Comandi Vocali**:
+  - Toggle rapido **[Tutor ON/OFF]** collocato:
+    - Nel Launcher iniziale della Modalità Guida (`src/components/DriveModeScreen.tsx`);
+    - Nell'HUD superiore a 1 tocco durante la guida attiva;
+    - Nel Quick Speech Menu della Navbar e nelle Impostazioni (scheda Guida).
+  - Estensione del parser dei comandi vocali (`src/utils/voiceCommandParser.ts`):
+    - Comando *"Spiega"* o *"Regola"* per ascoltare la spiegazione on-demand anche con modalità tutor disattivata.
+    - Comandi *"Attiva Tutor"* / *"Disattiva Tutor"* per commutare al volo lo stato durante la guida.
+- [ ] **Suite di Test & Collaudo Visivo Headless**:
+  - Unit test in Vitest per il ciclo a stati della guida in modalità tutor e per il parsing dei nuovi comandi vocali.
+  - Collaudo visivo headless CDP su viewport Mobile Portrait (390x844) e Mobile Landscape (844x390) con assenza di overflow e 0 errori in console.
+
+
 
 
 

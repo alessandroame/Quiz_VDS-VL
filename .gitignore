@@ -23,6 +23,7 @@ Thumbs.db
 # Test screenshots and visual artifacts
 *.png
 !public/**/*.png
+public/audit_*.png
 
 # Logs and PIDs
 *.log

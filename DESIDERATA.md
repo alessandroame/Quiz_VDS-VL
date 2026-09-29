@@ -85,6 +85,7 @@ Questo documento rappresenta la **bussola strategica e funzionale** del progetto
    - **Menu Rapido Impostazioni Voce Integrato (Quick Speech Menu)**: Controllo vocale istantaneo a 1 tocco integrato in tutti gli stati della guida (Launcher, HUD superiore durante il quiz attivo e Debriefing), con styling nativo Cockpit Dark (Zero-Blue) antiriflesso.
    - **Guida Contestuale & Feedback Vocale Reattivo**: icona microfono pulsante con onda radar durante la ricezione comandi, trascrizione in tempo reale nel banner HUD, conferme comando, diagnostica trasparente su frasi non riconosciute e Cheat Sheet rapido con pulsante '?'.
    - **Spiegazione Vocale di Benvenuto (Audio Briefing Run-Once)**: All'avvio della modalità alla guida, un audio neurale conciso illustra il funzionamento a mani libere (Wake Lock, lettura automatica quesiti, risposte touch e comandi vocali "Uno", "Due", "Tre", "Ripeti", "Aiuto"). Eseguito una sola volta in automatico (`driveModeIntroPlayed: true`), con possibilità di riascolto on-demand (Launcher, Cheat Sheet) o riattivazione all'avvio dalle Impostazioni.
+   - **Modalità Tutor Didattica nella Modalità Guida**: Funzionalità hands-free avanzata per lo studio approfondito a mani libere durante la guida. Invece della sola risposta corretta, il motore vocale neurale pronuncia l'intera spiegazione didattica (**Regola** e **Tranello**), mentre l'HUD visualizza le card didattiche ad alto contrasto rispettando il layout zero-scroll a `100dvh`. Il Pilota Automatico sincronizza la prosecuzione attendendo la fine della voce, e sono disponibili comandi vocali dedicati (*"Spiega"*, *"Regola"*, *"Tutor"*).
 
 8. **Impostazioni Modulari per Argomenti (Evoluzione verso Accordion Compresso a Sezione Singola)**:
    - Schermata impostazioni fullscreen nativa articolata su 6 aree tematiche (Aspetto, Voce, Guida, Cloud/Backup, Dati & Reset, About con riferimenti normativi AeCI e D.P.R. 133/2010).
@@ -98,6 +99,7 @@ Questo documento rappresenta la **bussola strategica e funzionale** del progetto
    - **Barra di Navigazione Bloccata al Top**: Fissaggio permanente del menu di navigazione in alto (top sticky/fixed bar) per liberare la parte inferiore del viewport da barre fisse, ottimizzando l'area utile di lettura dei quiz e delle opzioni di risposta.
    - **Filtro Quiz Deltaplano con Salvaguardia Condivisi**: Possibilità di filtrare i quesiti specifici per il Deltaplano (barra di controllo/trapezio/A-frame, spostamento del baricentro, trave di chiglia, cavi e tubi strutturali) o per il Parapendio (freni, fascio funicolare, cassoni, centine). **Vincolo tassativo di progetto**: massima cautela nell'audit semantico per NON escludere mai dai piani di studio le nozioni trasversali condivise da entrambi i mezzi (aerodinamica generale, meteo, normativa D.P.R. 133/2010, primo soccorso, fisiopatologia, sicurezza comune e strumentazione).
    - **Visualizzazione Globale del Numero di Versione**: Integrazione chiara e discreta del badge di versione (es. `v1.0.0` dinamico tramite `__APP_VERSION__` da `vite.config.ts`) nella Navbar, nell'header delle Impostazioni o nel footer, rendendolo immediatamente individuabile dall'allievo per verifiche di aggiornamento PWA e reportistica.
+   - **Barra di Navigazione Quiz Ancorata in Basso**: Durante l'esecuzione del quiz (Esame Ufficiale, Tutor Didattico, Materie, Quaderno Errori), i comandi di avanzamento (*Precedente*, *Successiva*, *Concludi*) rimangono permanentemente ancorati sul fondo del viewport (`sticky` o `fixed bottom-0` con safe-area e backdrop blur). In questo modo l'allievo pilota può navigare e rispondere fluidamente con il pollice a una sola mano senza dover scorrere la pagina verso il basso in caso di domande lunghe o spiegazioni didattiche estese.
 
 ---
 
@@ -139,9 +141,11 @@ Questo documento rappresenta la **bussola strategica e funzionale** del progetto
 | Spiegazione Vocale Modalità Guida | 🟢 Completato | Audio briefing iniziale run-once con Edge-TTS (Giuseppe/Elsa), tasto Salta, persistenza Dexie, riascolto 1-click e riattivazione in Impostazioni. |
 | Protocollo Collaudo Manuale E2E | 🟢 Completato | Checklist completa a 9 aree operative in TODO.md per verifica pilota. |
 | Filtro Quiz Esclusivi Deltaplano | 📋 Pianificato (TODO) | Audit 504 quiz e tagging disciplina deltaplano/parapendio/comune con preservazione concetti condivisi. |
-| Blocco Menu di Navigazione al Top | 📋 Pianificato (TODO) | Barra di navigazione sticky/fixed al top, eliminando o alleggerendo la bottom nav su mobile. |
+| Blocco Menu di Navigazione al Top | 🟢 Completato | Barra di navigazione permanently fixed al top (`fixed top-0 left-0 right-0 z-40`), eliminata la bottom nav fissa e rimosso il preamble fuffa dalla schermata esame. |
 | Impostazioni ad Accordion Compresso Singolo | 📋 Pianificato (TODO) | Sostituzione pills menu con accordion verticale mutuo-esclusivo (1 sola sezione aperta alla volta). |
-| Visualizzazione Globale Versione App | 📋 Pianificato (TODO) | Badge di versione dinamico (__APP_VERSION__) visibile in Navbar/Impostazioni. |
+| Visualizzazione Globale Versione App | 🟢 Completato | Badge di versione dinamico (`__APP_VERSION__` e `__APP_BUILD_ID__`) visibile in Navbar e header Impostazioni. |
+| Barra Navigazione Quiz Ancorata in Basso | 📋 Pianificato (TODO) | Controlli "Precedente/Successiva" permanentemente visibili e ancorati in basso durante esame e studio. |
+| Modalità Tutor nella Modalità Guida | 📋 Pianificato (TODO) | Lettura vocale Regola+Tranello sincronizzata col Pilota Automatico e toggle dedicato. |
 
 
 ---

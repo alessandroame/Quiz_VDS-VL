@@ -115,8 +115,8 @@ function AppContent() {
 
   return (
     <div
-      className={`min-h-screen bg-zinc-950 text-zinc-100 dark:bg-zinc-950 dark:text-zinc-100 light:bg-slate-50 light:text-slate-900 transition-colors ${
-        isAudioDownloading ? 'pb-36' : 'pb-20'
+      className={`min-h-screen bg-zinc-950 text-zinc-100 dark:bg-zinc-950 dark:text-zinc-100 light:bg-slate-50 light:text-slate-900 transition-colors pt-[98px] sm:pt-[104px] ${
+        isAudioDownloading ? 'pb-28' : 'pb-8'
       }`}
     >
       <Navbar

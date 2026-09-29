@@ -66,8 +66,8 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab, openSet
 
   return (
     <>
-      {/* Top Header */}
-      <header className="sticky top-0 z-40 w-full border-b backdrop-blur bg-zinc-950/80 border-zinc-800 dark:bg-zinc-950/80 dark:border-zinc-800 light:bg-white/80 light:border-slate-200 light:text-slate-900 transition-colors">
+      {/* Top Header (Permanently fixed and anchored) */}
+      <header className="fixed top-0 left-0 right-0 z-40 w-full border-b backdrop-blur bg-zinc-950/95 border-zinc-800 dark:bg-zinc-950/95 dark:border-zinc-800 light:bg-white/95 light:border-slate-200 light:text-slate-900 transition-colors shadow-sm">
         <div className="max-w-4xl mx-auto px-3 sm:px-4 h-14 flex items-center justify-between gap-1 sm:gap-2">
           <div className="flex items-center gap-2 sm:gap-2.5 cursor-pointer min-w-0 flex-shrink" onClick={() => setActiveTab('exam')}>
             <img src="/favicon.svg" alt="VDS-VL" className="w-8 h-8 rounded-lg shadow-sm flex-shrink-0" />
@@ -75,12 +75,23 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab, openSet
               <div className="font-bold text-sm tracking-wide flex items-center gap-1.5 whitespace-nowrap">
                 <span className="flex-shrink-0">VDS-VL</span>
                 <span className="text-[10px] px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-400 font-mono flex-shrink-0">2017</span>
+                {/* Global dynamic version badge */}
+                <span
+                  id="app-version-badge"
+                  title={typeof __APP_BUILD_ID__ !== 'undefined' ? __APP_BUILD_ID__ : `v${typeof __APP_VERSION__ !== 'undefined' ? __APP_VERSION__ : '1.0.0'}`}
+                  className="text-[10px] px-1.5 py-0.5 rounded bg-zinc-800/80 text-zinc-400 border border-zinc-700/50 light:bg-slate-100 light:text-slate-600 light:border-slate-300 font-mono flex-shrink-0 cursor-default select-none"
+                >
+                  v{typeof __APP_VERSION__ !== 'undefined' ? __APP_VERSION__ : '1.0.0'}
+                </span>
                 {/* Indicatore Stato Offline adiacente al logo */}
                 <OfflineIndicator />
                 {isExamRunning && (
-                  <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-rose-500/20 text-rose-400 border border-rose-500/40 font-bold flex items-center gap-1 animate-pulse flex-shrink-0">
+                  <span
+                    title="Simulazione esame in corso"
+                    className="text-[10px] px-1.5 py-0.5 rounded-full bg-rose-500/20 text-rose-400 border border-rose-500/40 font-bold flex items-center gap-1 animate-pulse flex-shrink-0"
+                  >
                     <span className="w-1.5 h-1.5 rounded-full bg-rose-500 flex-shrink-0" />
-                    <span>IN ESAME</span>
+                    <span className="hidden sm:inline">IN ESAME</span>
                   </span>
                 )}
               </div>
@@ -152,51 +163,57 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab, openSet
             </button>
           </div>
         </div>
+
+        {/* Primary Navigation Tier (Integrated into Top Header) */}
+        <nav
+          id="main-nav"
+          aria-label="Navigazione principale"
+          className="w-full border-t border-zinc-800/80 dark:border-zinc-800/80 light:border-slate-200/80 bg-zinc-950/60 dark:bg-zinc-950/60 light:bg-slate-50/80 backdrop-blur-sm"
+        >
+          <div className="max-w-md sm:max-w-xl mx-auto px-1 sm:px-2">
+            <div className="grid grid-cols-5 gap-1 py-1">
+              {navItems.map(item => {
+                const Icon = item.icon;
+                const isActive = activeTab === item.id;
+                return (
+                  <button
+                    key={item.id}
+                    id={`nav-${item.id}`}
+                    onClick={() => setActiveTab(item.id)}
+                    className={`relative flex flex-col sm:flex-row items-center justify-center gap-0.5 sm:gap-1.5 py-1 sm:py-1.5 px-1 sm:px-2 rounded-lg text-[10px] sm:text-xs transition-all ${
+                      isActive
+                        ? 'text-amber-400 light:text-amber-600 font-semibold bg-amber-500/10 light:bg-amber-100/70 border border-amber-500/30 light:border-amber-400/50 shadow-xs'
+                        : 'text-zinc-400 light:text-slate-500 hover:text-zinc-200 light:hover:text-slate-900 hover:bg-zinc-900/60 light:hover:bg-slate-100 border border-transparent'
+                    }`}
+                  >
+                    <div className="relative flex items-center justify-center">
+                      <Icon className={`w-4 h-4 sm:w-4.5 sm:h-4.5 ${isActive ? 'stroke-[2.25]' : 'stroke-[1.75]'}`} />
+                      {item.badge !== undefined && (
+                        <span className="absolute -top-1.5 -right-2 px-1 min-w-3.5 text-[9px] font-bold rounded-full bg-rose-500 text-white text-center leading-tight">
+                          {item.badge}
+                        </span>
+                      )}
+                      {item.id === 'exam' && isExamRunning && (
+                        <span className="absolute -top-1 -right-1 flex h-2 w-2">
+                          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-rose-400 opacity-75" />
+                          <span className="relative inline-flex rounded-full h-2 w-2 bg-rose-500" />
+                        </span>
+                      )}
+                    </div>
+                    <span className="truncate tracking-tight">{item.label}</span>
+                    {isActive && (
+                      <div className="absolute -bottom-1 left-2 right-2 h-0.5 rounded-full bg-amber-500 light:bg-amber-600 sm:hidden" />
+                    )}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        </nav>
       </header>
 
       {/* Audio Download Bottom Banner */}
       <AudioDownloadBanner />
-
-      {/* Bottom Nav Bar (Mobile & Desktop) */}
-      <nav className="fixed bottom-0 left-0 right-0 z-30 border-t backdrop-blur bg-zinc-950/95 border-zinc-800 dark:bg-zinc-950/95 dark:border-zinc-800 light:bg-white/95 light:border-slate-200 transition-colors">
-        <div className="max-w-md mx-auto grid grid-cols-5 h-16 px-1">
-          {navItems.map(item => {
-            const Icon = item.icon;
-            const isActive = activeTab === item.id;
-            return (
-              <button
-                key={item.id}
-                id={`nav-${item.id}`}
-                onClick={() => setActiveTab(item.id)}
-                className={`relative flex flex-col items-center justify-center gap-1 py-1 transition-colors ${
-                  isActive
-                    ? 'text-amber-400 light:text-amber-600 font-semibold'
-                    : 'text-zinc-400 light:text-slate-500 hover:text-zinc-200 light:hover:text-slate-900'
-                }`}
-              >
-                <div className="relative">
-                  <Icon className={`w-5 h-5 ${isActive ? 'stroke-[2.5]' : 'stroke-[1.75]'}`} />
-                  {item.badge !== undefined && (
-                    <span className="absolute -top-1.5 -right-2.5 px-1 py-0.2 min-w-4 text-[10px] font-bold rounded-full bg-rose-500 text-white text-center">
-                      {item.badge}
-                    </span>
-                  )}
-                  {item.id === 'exam' && isExamRunning && (
-                    <span className="absolute -top-1 -right-1 flex h-2.5 w-2.5">
-                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-rose-400 opacity-75" />
-                      <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-rose-500" />
-                    </span>
-                  )}
-                </div>
-                <span className="text-[11px] tracking-tight">{item.label}</span>
-                {isActive && (
-                  <div className="absolute top-0 w-8 h-0.5 rounded-full bg-amber-500" />
-                )}
-              </button>
-            );
-          })}
-        </div>
-      </nav>
     </>
   );
 };

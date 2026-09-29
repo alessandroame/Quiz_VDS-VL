@@ -241,6 +241,13 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
             <h1 className="text-base font-bold text-zinc-100 light:text-slate-900 flex items-center gap-2">
               <SettingsIcon className="w-4 h-4 text-amber-500" />
               <span>Impostazioni</span>
+              <span
+                id="settings-version-badge"
+                title={typeof __APP_BUILD_ID__ !== 'undefined' ? __APP_BUILD_ID__ : undefined}
+                className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-zinc-800 text-zinc-400 border border-zinc-700/60 light:bg-slate-200 light:text-slate-600 light:border-slate-300 font-normal cursor-default select-none"
+              >
+                v{typeof __APP_VERSION__ !== 'undefined' ? __APP_VERSION__ : '1.0.0'}
+              </span>
             </h1>
           </div>
 
@@ -1007,7 +1014,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                         VDS-VL Quiz Master
                       </span>
                       <span className="px-1.5 py-0.5 rounded text-[10px] font-mono font-semibold bg-amber-500/20 text-amber-400 border border-amber-500/30 light:bg-amber-100 light:text-amber-800">
-                        v1.0.0
+                        v{typeof __APP_VERSION__ !== 'undefined' ? __APP_VERSION__ : '1.0.0'}
                       </span>
                     </div>
                     <p className="text-[11px] text-zinc-400 light:text-slate-600 mt-1 leading-relaxed">

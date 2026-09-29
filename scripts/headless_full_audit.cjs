@@ -95,6 +95,8 @@ async function run() {
     await send('Page.enable');
     await send('Runtime.enable');
     await send('DOM.enable');
+    await send('Page.navigate', { url: 'http://localhost:5173/' });
+    await sleep(2000);
 
     const snap = async (name, width = 390, height = 844, mobile = true) => {
       await send('Emulation.setDeviceMetricsOverride', {
@@ -178,6 +180,14 @@ async function run() {
     await evalJs(`document.querySelector('#btn-option-1')?.click()`);
     await sleep(500);
     await snap('04_exam_feedback_mobile', 390, 844);
+
+    // Scroll down to test fixed header anchoring
+    console.log('Testing scroll down with fixed header...');
+    await evalJs(`window.scrollTo(0, 450)`);
+    await sleep(400);
+    await snap('04_exam_scrolled_fixed_header_mobile', 390, 844);
+    await evalJs(`window.scrollTo(0, 0)`);
+    await sleep(200);
 
     // Flag question
     console.log('Toggling flag...');

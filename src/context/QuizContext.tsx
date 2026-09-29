@@ -76,10 +76,18 @@ export const QuizProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const sessions = useLiveQuery(() => db.sessions.orderBy('date').reverse().toArray(), []) || [];
   const settingsList = useLiveQuery(() => db.settings.toArray(), []) || [];
   const activeSessionEntry = useLiveQuery(() => db.settings.get('activeSession'), []);
+  const [isLocallyDismissed, setIsLocallyDismissed] = useState(false);
+
+  useEffect(() => {
+    if (!activeSessionEntry?.value) {
+      setIsLocallyDismissed(false);
+    }
+  }, [activeSessionEntry]);
 
   const activeSession = useMemo<InProgressSession | null>(() => {
+    if (isLocallyDismissed) return null;
     return (activeSessionEntry?.value as InProgressSession) || null;
-  }, [activeSessionEntry]);
+  }, [activeSessionEntry, isLocallyDismissed]);
 
   const [syncState, setSyncState] = useState<SyncEngineState>(syncEngine.getState());
 
@@ -168,11 +176,13 @@ export const QuizProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const persistActiveSession = async (session: InProgressSession) => {
+    setIsLocallyDismissed(false);
     await saveActiveSession(session);
     syncEngine.schedulePush();
   };
 
   const dismissActiveSession = async () => {
+    setIsLocallyDismissed(true);
     await clearActiveSession();
     syncEngine.schedulePush();
   };

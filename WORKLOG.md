@@ -16,6 +16,87 @@ Questo documento registra in ordine cronologico tutte le lavorazioni svolte nel 
 
 ---
 
+### [2026-09-29] - Risoluzione Race Condition Interruzione Esame al Primo Click (Single-Click Exam Abandon)
+- **Cosa abbiamo fatto**:
+  - **Analisi e Diagnosi Causa Radice (Double-Click Bug)**:
+    * Riscontrato che cliccando "Interrompi" nella modale di conferma abbandono esame, al primo tocco l'app sembrava tornare al quiz attivo, richiedendo un secondo tocco per uscire davvero alla schermata idle.
+    * La causa era una race condition tra lo stato locale sincrono di React (`setExamState('idle')`) e la cancellazione asincrona della sessione in IndexedDB tramite Dexie (`db.settings.delete('activeSession')`).
+    * In [src/components/ExamScreen.tsx](file:///c:/github/Quiz_VDS-VL/src/components/ExamScreen.tsx), l'`useEffect` di auto-resume ascoltava `examState === 'idle'` e `activeSession`. Quando lo stato passava a `'idle'`, `activeSession` era ancora presente in memoria (per ~20-50ms necessari a Dexie per completare la transazione DB e notificare la live query), innescando all'istante `setExamState('running')` (bounce-back). Solo al secondo click il record era già stato rimosso da Dexie e l'uscita avveniva correttamente.
+  - **Intervento a Doppio Livello di Protezione**:
+    1. *Context Layer ([src/context/QuizContext.tsx](file:///c:/github/Quiz_VDS-VL/src/context/QuizContext.tsx))*:
+       - Introdotto stato ottimistico `isLocallyDismissed`: impostato a `true` sincronicamente all'invocazione di `dismissActiveSession()`, azzera all'istante la computed `activeSession` restituendo `null` a tutti i consumatori senza attendere la risposta asincrona di Dexie.
+    2. *Component Screen Layer ([src/components/ExamScreen.tsx](file:///c:/github/Quiz_VDS-VL/src/components/ExamScreen.tsx))*:
+       - Aggiunto `isDismissedRef = useRef(false)` per bloccare espressamente l'`useEffect` di auto-resume (`if (isDismissedRef.current) return;`).
+       - Aggiornato il pulsante di conferma modale `#btn-confirm-abandon-exam`: attiva `isDismissedRef.current = true`, arresta la sintesi vocale (`voiceService.stop()`), chiude la modale, azzera le domande/risposte in memoria (`setExamQuestions([])`, `setAnswers({})`, `setFlags({})`, `setCurrentIndex(0)`), imposta `examState = 'idle'`, e attende `await dismissActiveSession()`.
+       - Rimosso l'`useEffect` che riazzerava prematuramente `isDismissedRef` quando `!activeSession`, resettandolo unicamente all'avvio esplicito di un nuovo esame (`startExam`).
+  - **Verifiche e Collaudo E2E Headless**:
+    * Sviluppato script di collaudo headless dedicato [scripts/test_exam_abandon_single_click.cjs](file:///c:/github/Quiz_VDS-VL/scripts/test_exam_abandon_single_click.cjs) con connessione Chrome CDP: avvio simulazione Tutor, risposta a un quesito, click su "Interrompi", click singolo su conferma abbandono.
+    * Verificato che dopo 600ms e dopo 2100ms (attesa per intercettare eventuali bounce-back da race condition) l'app rimane stabilmente in schermata idle.
+    * Verificato riavvio pulito di un nuovo esame e successivo abbandono.
+    * 131 test unitari Vitest superati al 100% (`npm run test:unit`).
+    * Build di produzione superata senza errori (`tsc && vite build`).
+- **Scelte architetturali & Rationale**:
+  - *Optimistic State + Ref Guarding*: La combinazione di aggiornamento ottimistico nel contesto e ref immutabile a livello di componente garantisce tolleranza a qualsiasi lentezza di I/O su storage asincrono (IndexedDB/Dexie), eliminando alla radice anomalie di rimbalzo UI senza ricorrere a timeout arbitrari.
+- **Impatto sul Desiderata**:
+  - Esperienza di navigazione affidabile, immediata e reattiva al singolo tocco, rispettando l'ergonomia avionica e la reattività richiesta dal progetto.
+
+---
+
+### [2026-09-29] - Blocco Menu al Top, Badge Versione Dinamico e Rimozione Preamble Ridondante (Task 2 & 4)
+- **Cosa abbiamo fatto**:
+  - **Menu di Navigazione Permanente al Top (Fixed Top Navigation)**:
+    * In [src/components/Navbar.tsx](file:///c:/github/Quiz_VDS-VL/src/components/Navbar.tsx): integrati i 5 tab di navigazione (**Esame**, **Materie**, **Errori**, **Archivio**, **Stats**) direttamente nella barra superiore come secondo livello (`#main-nav`), con layout reattivo a 5 colonne compatte su mobile e affiancate su desktop.
+    * Eliminata la barra di navigazione inferiore fissa (`fixed bottom-0`), liberando interamente la parte inferiore del viewport da elementi fissi.
+    * Impostata la barra superiore su `fixed top-0 left-0 right-0 z-40` per garantire che rimanga permanentemente ancorata al top dello schermo in qualunque momento, anche durante lo scorrimento di domande lunghe e opzioni.
+    * In [src/App.tsx](file:///c:/github/Quiz_VDS-VL/src/App.tsx): aggiunto `pt-[98px] sm:pt-[104px]` per garantire clearance perfetta sotto la barra fissa, e ridotto il padding inferiore globale da `pb-20` a `pb-8` (recuperando fino a 60px di altezza utile).
+    * In [src/components/AudioDownloadBanner.tsx](file:///c:/github/Quiz_VDS-VL/src/components/AudioDownloadBanner.tsx): riposizionato il banner di avanzamento download a filo inferiore (`bottom-3 sm:bottom-4`).
+    * In [src/index.css](file:///c:/github/Quiz_VDS-VL/src/index.css): sostituito `overflow-x: hidden` con `overflow-x: clip` su `html, body` per evitare anomalie nel calcolo dei container di scorrimento del browser.
+  - **Visualizzazione Globale del Numero di Versione Dinamico**:
+    * In [src/components/Navbar.tsx](file:///c:/github/Quiz_VDS-VL/src/components/Navbar.tsx): aggiunto il badge `#app-version-badge` (`v1.0.0`) adiacente all'anno 2017, collegato dinamicamente a `__APP_VERSION__` con tooltip esteso su hover contenente `__APP_BUILD_ID__` (commit hash e build time).
+    * In [src/components/SettingsModal.tsx](file:///c:/github/Quiz_VDS-VL/src/components/SettingsModal.tsx): aggiunto il badge `#settings-version-badge` nell'header della modale e aggiornato il riferimento nella scheda **About** da stringa fissa a valore dinamico.
+  - **Rimozione Preamble/Fuffa nella Schermata Esame**:
+    * In [src/components/ExamScreen.tsx](file:///c:/github/Quiz_VDS-VL/src/components/ExamScreen.tsx): rimosso integralmente il blocco introduttivo ridondante (icona fulmine, titolo "Simulazione Esame", le 3 caselle 30/max 3/90% e dicitura selezione domande), portando le card operative (**Simulazione Didattica Tutor** ed **Esame Ufficiale AeCI**) immediatamente in cima allo schermo (*Above the Fold*), pronte all'avvio con 1 tocco senza necessità di scorrimento.
+    * Rimosso l'import non utilizzato dell'icona `Zap`.
+    * Aggiornato l'offset sticky della barra timer/consegna esame a `sticky top-[102px] sm:top-[106px] z-20` per agganciarsi ordinatamente sotto la nuova navbar fissa durante l'esame.
+  - **Verifiche & Collaudo Headless CDP**:
+    * 131 test unitari e di regressione Vitest superati con successo (`npm run test:unit`).
+    * Build di produzione superata senza errori (`tsc && vite build`).
+    * Collaudo visivo headless automatizzato su 32 snapshot: verificato con test di scroll a 450px che la barra superiore (Logo, Versione, Alla Guida, Voce, Tema, Impostazioni e tab di navigazione) resta perfettamente inchiodata e visibile in cima al display.
+- **Scelte architetturali & Rationale**:
+  - *Fixed Viewport Anchoring vs Sticky*: `position: sticky` è suscettibile a interruzioni quando contesti genitori hanno proprietà di overflow o padding asimmetrici. `fixed top-0` ancora l'header all'effettivo viewport del browser con certezza assoluta (100% deterministico).
+  - *Above-the-Fold Direct Action*: L'allievo pilota che apre l'app per allenarsi deve trovare subito i pulsanti d'azione (Tutor ed Esame) a portata di pollice, senza dover saltare preamboli o caselle informative già presenti nella scheda About.
+- **Impatto sul Desiderata**:
+  - Esperienza visiva nitida, ergonomica, priva di ingombri inferiori e con controlli e versione sempre a portata di mano.
+
+---
+
+### [2026-09-29] - Integrazione Backlog: Modalità Tutor Didattica nella Modalità Alla Guida
+- **Cosa abbiamo fatto**:
+  - Censito e formalizzato nel backlog operativo [TODO.md](file:///c:/github/Quiz_VDS-VL/TODO.md) (Fase 8, Obiettivo 6) e nel documento di architettura funzionale [DESIDERATA.md](file:///c:/github/Quiz_VDS-VL/DESIDERATA.md) (Sezione 2.7 ed estensione Matrice di Stato) il nuovo requisito per la modalità didattica tutor a mani libere durante la guida:
+    * **Modalità Tutor Didattica nella Modalità Alla Guida (Hands-Free Voice Tutor)**: estensione della Modalità Guida per consentire non solo la verifica della risposta corretta, ma anche l'ascolto vocale integrale della spiegazione didattica essenziale (📘 **Regola** fisica o normativa e ⚠️ **Tranello** cognitivo/lessicale) sintetizzata dal motore neurale Edge-TTS.
+    * Sincronizzazione dell'avanzamento automatico: il Pilota Automatico attende la fine esatta della riproduzione vocale (`onEnd`) e rispetta una pausa di assimilazione prima di passare al quesito successivo; in modalità manuale, l'allievo può avanzare pronunciando *"Avanti"* o toccando lo schermo.
+    * Visualizzazione HUD zero-scroll: resa visiva delle card compatte Regola e Tranello nell'area centrale ad alto contrasto senza infrangere il vincolo rigido `100dvh` (zero scorrimento).
+    * Controlli & Comandi vocali dedicati: toggle rapido [Tutor ON/OFF] nel Launcher Guida, nell'HUD superiore e nel Quick Speech Menu; estensione del parser in [src/utils/voiceCommandParser.ts](file:///c:/github/Quiz_VDS-VL/src/utils/voiceCommandParser.ts) per i comandi *"Spiega"*, *"Regola"*, *"Attiva Tutor"* e *"Disattiva Tutor"*.
+- **Scelte architetturali & Rationale**:
+  - *Hands-Free Audio Pedagogy*: Durante la guida (in auto o su furgone verso il decollo), l'allievo pilota non può guardare lo schermo né leggere spiegazioni scritte. Ascoltare la motivazione teorica e il tranello subito dopo aver risposto (o sbagliato) trasforma la sessione radio da semplice verifica nozionistica a vero e proprio percorso di apprendimento attivo e profondo, sfruttando la memoria uditiva.
+- **Impatto sul Desiderata**:
+  - Allineati [TODO.md](file:///c:/github/Quiz_VDS-VL/TODO.md), [DESIDERATA.md](file:///c:/github/Quiz_VDS-VL/DESIDERATA.md) e la matrice di stato del progetto con le specifiche per l'implementazione del voice tutor in Modalità Guida.
+
+---
+
+### [2026-09-29] - Integrazione Backlog: Barra di Navigazione Quiz Ancorata in Basso (Precedente/Successivo)
+- **Cosa abbiamo fatto**:
+  - Censito e formalizzato nel backlog operativo [TODO.md](file:///c:/github/Quiz_VDS-VL/TODO.md) (Fase 8, Obiettivo 5) e nel documento di architettura funzionale [DESIDERATA.md](file:///c:/github/Quiz_VDS-VL/DESIDERATA.md) (Sezione 2.10 ed estensione Matrice di Stato) il nuovo requisito per l'ancoraggio permanente della navigazione durante i quiz:
+    * **Barra di Navigazione Quiz Ancorata in Basso (Sticky / Fixed Bottom Action Bar)**: durante lo svolgimento del quiz (in tutte le modalità attive: Simulazione Esame Ufficiale e Didattica Tutor in [src/components/ExamScreen.tsx](file:///c:/github/Quiz_VDS-VL/src/components/ExamScreen.tsx), Studio per Materie in [src/components/TopicsScreen.tsx](file:///c:/github/Quiz_VDS-VL/src/components/TopicsScreen.tsx) e ripasso Quaderno Errori in [src/components/MistakesScreen.tsx](file:///c:/github/Quiz_VDS-VL/src/components/MistakesScreen.tsx)), i controlli "Precedente" e "Successiva" (unitamente ai comandi di completamento/conclusione e al pulsante rapido tutor "Prossima Domanda") devono rimanere **sempre visibili e ancorati sul fondo del viewport**.
+    * Dettagliate le specifiche ergonomiche: posizionamento fisso/sticky con sfondo avionico e `backdrop-blur-md` (`bg-zinc-950/90 border-t border-zinc-800` in Dark Mode, `bg-white/95 border-t border-slate-200` in Light Mode), pieno supporto per le safe area inferiori dei dispositivi mobili (`pb-safe` / `env(safe-area-inset-bottom)`), ampi target tattili conformi alla legge di Fitts per il tocco immediato del pollice con una sola mano, e calibratura del padding inferiore di sicurezza sui container scorrevoli (`pb-24` / `pb-28`) per prevenire sovrapposizioni con l'ultima opzione di risposta o le card didattiche (Regola e Tranello).
+    * Sinergia architetturale con l'Obiettivo 2 di Fase 8 (Blocco Navbar al Top): quando i 5 tab di navigazione principali sono collocati in alto, la barra inferiore è dedicata esclusivamente e senza conflitti visivi ai comandi operativi del quiz in esecuzione.
+- **Scelte architetturali & Rationale**:
+  - *Thumb-Zone Navigation & Fitts's Law*: Quando le domande presentano spiegazioni didattiche ampie o testi articolati, i controlli di navigazione posizionati nel normale flusso a fine pagina costringono l'allievo pilota a ripetuti scorrimenti verticali su smartphone solo per premere "Successiva". L'ancoraggio inferiore permanente elimina questa frizione cognitiva e motoria, massimizzando la velocità e la concentrazione sia nelle sessioni di studio intensivo che nella prova d'esame ufficiale da 45 minuti.
+- **Impatto sul Desiderata**:
+  - Allineati [TODO.md](file:///c:/github/Quiz_VDS-VL/TODO.md), [DESIDERATA.md](file:///c:/github/Quiz_VDS-VL/DESIDERATA.md) e la governance di progetto per la pianificazione e implementazione della navigazione ancorata in basso.
+
+---
+
 ### [2026-09-29] - Collaudo Headless Multi-Viewport & Risoluzione Difetti (Session Dismiss, Debriefing Nav, Sync Guard)
 - **Cosa abbiamo fatto**:
   - Eseguito un giro di collaudo visivo e funzionale automatizzato headless CDP approfondito su 10 contesti operativi e 3 viewport chiave: Mobile Portrait (390x844), Mobile Landscape (844x390) e Desktop (1440x900) con script dedicato [scripts/headless_full_audit.cjs](file:///d:/Github/Quiz_VDS-VL/scripts/headless_full_audit.cjs):

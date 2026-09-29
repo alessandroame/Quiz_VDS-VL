@@ -8,7 +8,6 @@ import {
   ArrowRight,
   ArrowLeft,
   RotateCcw,
-  Zap,
   ListFilter,
   Car,
   BookOpen
@@ -53,6 +52,8 @@ export const ExamScreen: React.FC = () => {
 
   // Track question IDs whose answers have already been recorded to prevent duplicate writes
   const recordedQuestionIds = useRef<Set<number>>(new Set());
+  // Prevent auto-resume cycle after user explicitly abandons the session
+  const isDismissedRef = useRef(false);
 
   // Sincronizza lo stato globale dell'esame attivo (per bloccare navigazione accidentale)
   useEffect(() => {
@@ -81,6 +82,7 @@ export const ExamScreen: React.FC = () => {
 
   // Auto-resume active exam if present
   useEffect(() => {
+    if (isDismissedRef.current) return;
     if (examState === 'idle' && activeSession?.type === 'exam' && activeSession.questionIds?.length > 0) {
       const ordered = activeSession.questionIds
         .map(id => questions.find(q => q.id === id))
@@ -108,6 +110,7 @@ export const ExamScreen: React.FC = () => {
   }, [activeSession, examState, questions]);
 
   const startExam = (mode: ExamModeType = 'tutor') => {
+    isDismissedRef.current = false;
     const marathon = mode === 'marathon';
     setIsMarathon(marathon);
     setExamMode(mode);
@@ -314,42 +317,9 @@ export const ExamScreen: React.FC = () => {
   // --- Schermata IDLE: Avvio Esame ---
   if (examState === 'idle') {
     return (
-      <div className="max-w-2xl mx-auto px-4 py-8 space-y-6">
-        <div className="text-center space-y-2">
-          <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-amber-500/10 text-amber-400 mb-2">
-            <Zap className="w-8 h-8" />
-          </div>
-          <h1 className="text-2xl font-bold tracking-tight">Simulazione Esame</h1>
-          <p className="text-xs text-zinc-400 light:text-slate-600 max-w-sm mx-auto">
-            Regolamento Ufficiale AeCI (D.P.R. 133/2010): 30 quesiti proporzionali per le 9 materie, max 3 errori ammessi.
-          </p>
-        </div>
-
-        {/* Card Regole Ufficiali */}
-        <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-5 light:bg-white light:border-slate-200 shadow-sm space-y-3">
-          <div className="grid grid-cols-3 gap-3 text-center">
-            <div className="p-3 bg-zinc-950/60 light:bg-slate-50 rounded-lg border border-zinc-800/80 light:border-slate-200">
-              <div className="text-2xl font-black text-amber-400 light:text-amber-600">30</div>
-              <div className="text-[11px] text-zinc-400 light:text-slate-500 font-medium">Quesiti</div>
-            </div>
-            <div className="p-3 bg-zinc-950/60 light:bg-slate-50 rounded-lg border border-zinc-800/80 light:border-slate-200">
-              <div className="text-2xl font-black text-emerald-400 light:text-emerald-600">max 3</div>
-              <div className="text-[11px] text-zinc-400 light:text-slate-500 font-medium">Errori Ammessi</div>
-            </div>
-            <div className="p-3 bg-zinc-950/60 light:bg-slate-50 rounded-lg border border-zinc-800/80 light:border-slate-200">
-              <div className="text-2xl font-black text-amber-400 light:text-amber-600">90%</div>
-              <div className="text-[11px] text-zinc-400 light:text-slate-500 font-medium">Soglia Idoneo</div>
-            </div>
-          </div>
-
-          <div className="text-xs text-zinc-400 light:text-slate-500 pt-2 flex items-center justify-between border-t border-zinc-800 light:border-slate-100">
-            <span>Selezione domande:</span>
-            <span className="text-amber-400 light:text-amber-600 font-medium">Priorità a quelle non ancora viste</span>
-          </div>
-        </div>
-
+      <div className="max-w-2xl mx-auto px-4 py-4 space-y-4">
         {/* Selezione Modalità */}
-        <div className="space-y-4 pt-1">
+        <div className="space-y-4">
           {/* Opzione 1: Simulazione Didattica (Tutor) - In Evidenza per l'apprendimento */}
           <div className="p-5 bg-zinc-900 border-2 border-amber-500/50 hover:border-amber-500 rounded-2xl transition-all shadow-md light:bg-white light:border-amber-500/60 space-y-3">
             <div className="space-y-1">
@@ -557,7 +527,7 @@ export const ExamScreen: React.FC = () => {
   return (
     <div className="max-w-2xl mx-auto px-4 py-4 space-y-4">
       {/* Top Bar: Timer, Progresso, Consegna */}
-      <div className="flex items-center justify-between gap-2 p-3 bg-zinc-900 border border-zinc-800 rounded-xl dark:bg-zinc-900 light:bg-white light:border-slate-200 shadow-sm sticky top-14 z-30">
+      <div className="flex items-center justify-between gap-2 p-3 bg-zinc-900 border border-zinc-800 rounded-xl dark:bg-zinc-900 light:bg-white light:border-slate-200 shadow-sm sticky top-[102px] sm:top-[106px] z-20">
         <div className="flex items-center gap-2">
           {examMode === 'tutor' ? (
             <div className="flex items-center gap-1.5 font-mono font-bold text-sm px-2.5 py-1 rounded-lg bg-zinc-950 text-zinc-100 light:bg-slate-100 light:text-slate-800 border border-emerald-500/30">
@@ -844,12 +814,17 @@ export const ExamScreen: React.FC = () => {
               </button>
               <button
                 id="btn-confirm-abandon-exam"
-                onClick={() => {
+                onClick={async () => {
+                  isDismissedRef.current = true;
                   voiceService.stop();
                   setShowAbandonModal(false);
-                  setExamState('idle');
                   setIsExamRunning(false);
-                  dismissActiveSession();
+                  setExamQuestions([]);
+                  setAnswers({});
+                  setFlags({});
+                  setCurrentIndex(0);
+                  setExamState('idle');
+                  await dismissActiveSession();
                 }}
                 className="flex-1 py-2.5 rounded-xl border border-rose-500/60 text-rose-400 hover:bg-rose-500/10 light:text-rose-600 light:border-rose-300 text-xs font-medium transition-colors"
               >

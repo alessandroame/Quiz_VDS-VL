@@ -147,6 +147,10 @@
 - **Icona Ufficiale PWA (Aero Shield)**:
   - Icona geometrica originale per il Volo Libero che unisce l'arco a celle cassonate del parapendio e l'ala a freccia triangolare del deltaplano (con trave di chiglia centrale e barra di controllo A-frame) a formare uno scudo alare 'V'.
   - Disponibile in formato vettoriale ad altissima precisione ([favicon.svg](file:///d:/Github/Quiz_VDS-VL/public/favicon.svg)) e rasterizzata per il manifest PWA a 192x192 e 512x512 px.
+- **Barra di Navigazione Permanente al Top (Fixed Top Navigation)**:
+  - Header fisso (`fixed top-0 left-0 right-0 z-40`) che unisce i controlli rapidi (Alla Guida, Voce, Tema, Impostazioni) e i 5 tab di navigazione (**Esame**, **Materie**, **Errori**, **Archivio**, **Stats**) in cima al viewport, garantendo che i controlli rimangano permanentemente visibili e accessibili durante qualunque scorrimento.
+  - Rimozione della bottom bar fissa per liberare fino a 60px di altezza utile su smartphone per il testo dei quiz, le risposte e il feedback didattico immediato.
+  - **Badge di Versione Dinamico**: esposizione in tempo reale della versione dell'app (`v1.0.0`) e dell'ID di build con commit hash nella Navbar e nell'header delle Impostazioni.
 - **Schermata Impostazioni Fullscreen a Schede Tematiche**:
   - Esperienza nativa a tutto schermo che sostituisce i vecchi modali popup: layout a schermo intero sia su dispositivi mobili che desktop con header dedicato, pulsante Indietro ed `Esc` da tastiera.
   - Riorganizzazione modulare suddivisa in 6 argomenti dedicati: **🎨 Aspetto**, **🎙️ Voce**, **🚗 Guida**, **☁️ Backup**, **⚙️ Dati**, **ℹ️ About**.
