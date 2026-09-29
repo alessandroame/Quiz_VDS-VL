@@ -1,23 +1,23 @@
-# 🛩️ VDS-VL Quiz Master
+# 🛩️ VDS-VL Quiz Master (Cockpit V2)
 
 **VDS-VL Quiz Master** è una Progressive Web App (PWA) moderna, ad alte prestazioni e 100% offline-first, progettata con interfaccia ergonomica in stile avionico (*cockpit*).  
-È realizzata per gli allievi piloti di **Volo Libero (Parapendio e Deltaplano)** per la preparazione e la simulazione dell'esame teorico per il conseguimento dell'attestato VDS/VL (Volo da Diporto o Sportivo), in piena conformità ai programmi e alle tabelle ufficiali dell'**Aero Club d'Italia (AeCI)** e al **D.P.R. 133/2010**.
+È realizzata su misura per gli allievi piloti di **Parapendio (Volo Libero VDS/VL)** per la preparazione e la simulazione dell'esame teorico per il conseguimento dell'attestato VDS/VL, in piena conformità ai programmi ufficiali dell'**Aero Club d'Italia (AeCI)** e al **D.P.R. 133/2010**.
 
 ---
 
 ## 📑 Indice dei Contenuti
 
 - [Panoramica delle Funzionalità](#-panoramica-delle-funzionalità)
-  - [1. Database Ufficiale dei Quiz (504 quesiti AeCI)](#1-database-ufficiale-dei-quiz-504-quesiti-aeci)
-  - [2. Filtro Disciplina per Mezzo (Deltaplano / Parapendio / Teoria Comune)](#2-filtro-disciplina-per-mezzo-deltaplano--parapendio--teoria-comune)
-  - [3. Simulatore d'Esame Ufficiale AeCI](#3-simulatore-desame-ufficiale-aeci)
+  - [1. Database Ufficiale dei Quiz (474 quesiti Parapendio & Teoria Comune)](#1-database-ufficiale-dei-quiz-474-quesiti-parapendio--teoria-comune)
+  - [2. Architettura Home Hub & Back Navigation Cockpit V2](#2-architettura-home-hub--back-navigation-cockpit-v2)
+  - [3. Simulatore d'Esame Ufficiale AeCI & Tutor Didattico](#3-simulatore-desame-ufficiale-aeci--tutor-didattico)
   - [4. Studio Guidato per Materie](#4-studio-guidato-per-materie)
-  - [5. Quaderno Errori con Ripetizione Spaziata](#5-quaderno-errori-con-ripetizione-spaziata)
-  - [6. Archivio Completo, Ricerca & Note Personali](#6-archivio-completo-ricerca--note-personali)
+  - [5. Quaderno Errori con Ripetizione Spaziata (Box Leitner)](#5-quaderno-errori-con-ripetizione-spaziata-box-leitner)
+  - [6. Archivio con Ricerca Rapida Senza Tastiera (#ID Pad & Thematic Chips)](#6-archivio-con-ricerca-rapida-senza-tastiera-id-pad--thematic-chips)
   - [7. Statistiche Avanzate & Indice di Preparazione](#7-statistiche-avanzate--indice-di-preparazione)
-  - [8. Modalità Alla Guida (Truck & Cockpit Drive Mode)](#8-modalità-alla-guida-truck--cockpit-drive-mode)
+  - [8. Modalità Audio (Hands-Free Outdoor & Macro-Target Bici/Corsa)](#8-modalità-audio-hands-free-outdoor--macro-target-bicicorsa)
   - [9. Motore Vocale Neurale (TTS Multi-Voce Offline) & Audio Cockpit](#9-motore-vocale-neurale-tts-multi-voce-offline--audio-cockpit)
-  - [10. Ergonomia Cockpit, Temi & Scorciatoie da Tastiera](#10-ergonomia-cockpit-temi--scorciatoie-da-tastiera)
+  - [10. Ergonomia Cockpit, Layout Zero-Scroll & Dimensione Font](#10-ergonomia-cockpit-layout-zero-scroll--dimensione-font)
   - [11. Fair Coverage Randomizer](#11-fair-coverage-randomizer)
   - [12. Privacy, Offline-First & Sincronizzazione Dati](#12-privacy-offline-first--sincronizzazione-dati)
 - [Stack Tecnologico](#-stack-tecnologico)
@@ -29,29 +29,25 @@
 
 ## 🌟 Panoramica delle Funzionalità
 
-### 1. Database Ufficiale dei Quiz (504 quesiti AeCI)
-- Catalogo integrale e fedele dei **504 quiz ministeriali ufficiali** (edizione AeCI 2017) per l'attestato VDS/VL.
-- Suddivisione canonica nelle 9 materie d'esame.
+### 1. Database Ufficiale dei Quiz (474 quesiti Parapendio & Teoria Comune)
+- Catalogo stabile e certificato di **474 quiz ufficiali AeCI**: 428 quesiti di teoria comune a tutti gli allievi piloti VDS/VL + 46 quesiti specifici per il parapendio (fascio funicolare, elevatori, centine, chiusure asimmetriche e manovre specifiche).
+- **Potatura Radicale del Deltaplano (Focus 100% Parapendio)**: eliminati alla radice i 30 quesiti esclusivi dell'ala pendolare (barra di controllo, trapezio, trave di chiglia) e tutti i selettori/badge superflui, garantendo un'applicazione essenziale e priva di distrazioni.
+- Suddivisione canonica nelle 9 materie d'esame ufficiali AeCI.
 - Ciascuna domanda include 3 opzioni di risposta con un'unica soluzione corretta verificata sulle tabelle ministeriali.
-- **Spiegazioni Didattiche Essenziali (100% Bespoke su 504 Quiz)**: ogni singolo quesito del catalogo (504 su 504, 9 materie su 9) è corredato da una spiegazione tecnica specifica, univoca e scientificamente rigorosa articolata in:
+- **Spiegazioni Didattiche Essenziali (100% Bespoke su 474 Quiz)**: ogni quesito è corredato da una spiegazione tecnica specifica, univoca e scientificamente rigorosa articolata in:
   - **Regola**: il principio fisico, aerodinamico o la norma di legge (D.P.R. 133/2010) alla base della risposta corretta.
-  - **Tranello**: il bias cognitivo, la misconcezione o l'ambiguità d'esame tipica del quesito.
-  - Tutti i refusi OCR storici del documento cartaceo ministeriale sono stati interamente bonificati.
-  - Ecosistema audio neurale offline (voci Giuseppe ed Elsa) allineato al 100% con 2.521 file audio indicizzati per voce.
+  - **Tranello**: il bias cognitivo, la misconcezione o l'ambiguità tipica del quesito ministeriale.
+- Ecosistema audio neurale offline (voci Giuseppe ed Elsa) sincronizzato con file MP3 dedicati per domanda, opzioni e spiegazione didattica.
 
-### 2. Filtro Disciplina per Mezzo (Deltaplano / Parapendio / Teoria Comune)
-- **Categorizzazione Semantica Rigorosa (Audit AeCI)**:
-  - 🪂 **Parapendio (474 quiz)**: include i 428 quesiti di teoria comune + 46 quesiti esclusivi per il mezzo ad ala flessibile a cassoni (comandi freni, fascio funicolare, elevatori, centine, chiusure asimmetriche e frontali).
-  - 📐 **Deltaplano (458 quiz)**: include i 428 quesiti di teoria comune + 30 quesiti esclusivi per l'ala pendolare (barra di controllo/trapezio A-frame, trave di chiglia, cavi e tubi strutturali, spostamento baricentro del pilota).
-  - 🌐 **Tutti i Quiz (504 quesiti)**: catalogo unificato completo per chi desidera una preparazione multidisciplinare a 360°.
-- **Salvaguardia Assoluta dei Quesiti Condivisi (Zero False Exclusion)**:
-  - Tutti i 428 quesiti di aerodinamica generale, meteorologia, normativa e spazi aerei (D.P.R. 133/2010), fisiopatologia, primo soccorso, sicurezza comune e strumentazione (variometro, altimetro, anemometro) rimangono tassativamente inclusi in entrambi i profili.
-- **Configurazione Cockpit Immediata & Zero Distrazioni**:
-  - **Parapendio Predefinito (474 quiz)**: l'applicazione si avvia all'istante configurata per il parapendio (428 comuni + 46 specifici), senza alcun popup di onboarding o interruzione all'apertura.
-  - **Schermate Operative Essenziali**: i selettori rapidi ridondanti sono stati rimossi dalle schermate principali (**Esame**, **Materie** e **Archivio**) per garantire un'esperienza di studio pulita e focalizzata.
-  - Badge visivo discreto su ciascun quesito esclusivo (`Deltaplano` o `Parapendio`).
-  - Integrazione con il *Fair Coverage Randomizer* per estrarre le 30 domande d'esame rispettando le 9 quote ministeriali AeCI all'interno della disciplina scelta.
-  - **Gestione Centralizzata nelle Impostazioni**: è possibile commutare la disciplina attiva in qualsiasi momento da *Impostazioni -> Aspetto & Studio*, passando a **Deltaplano** (458 quiz) o a **Tutti i Quiz** (504 quiz).
+### 2. Architettura Home Hub & Back Navigation Cockpit V2
+- **Cruscotto Iniziale ad Alto Contrasto (Home Hub)**:
+  - 6 macro-pulsanti tattili dedicati ai flussi principali: `TUTOR` (apprendimento guidato), `MATERIE` (studio 01-09), `ESAME` (prova ufficiale AeCI), `ERRORI` (quaderno Leitner), `CERCA` (archivio completo) e `STATS` (telemetria e radar).
+  - Indicatori sintetici in tempo reale (quiz visti, accuratezza, errori attivi, indice di prontezza esame).
+  - **Banner Ripresa Rapida**: rilevamento automatico di qualsiasi sessione di studio o esame interrotta, con ripresa istantanea a 1 tocco (`Riprendi Sessione`).
+- **Mini-Header Compatto nei Quiz (~48px)**:
+  - Nelle schermate interne di simulazione ed esercitazione, la barra secondaria a schede viene completamente rimossa per recuperare oltre 50px di spazio verticale utile.
+  - Sostituita da una mini-header minimalista con pulsante `[← Home]`, indicatore del contesto e pulsante rapido `AUDIO` per lo switch hands-free.
+  - **Salvaguardia Abbandono Esame**: modale di conferma per prevenire perdite involontarie di progresso se l'allievo preme `[← Home]` durante una prova d'esame in corso.
 
 ### 3. Simulatore d'Esame & Simulazione Didattica (Tutor)
 - **Due Modalità di Simulazione Dedicate**:
@@ -92,11 +88,13 @@
 - Algoritmo di **Spaced Repetition (Box Leitner)**: un quesito esce dal quaderno degli errori solo dopo **2 risposte corrette consecutive** (`consecutiveCorrect >= 2`).
 - Monitoraggio delle domande ancora da consolidare e avanzamento progressivo verso l'azzeramento degli errori.
 
-### 6. Archivio Completo, Ricerca & Note Personali
-- Consultazione istantanea di tutti i 504 quiz con numerazione ufficiale.
-- **Ricerca Full-Text**: filtro in tempo reale nel testo della domanda, nelle opzioni e nelle spiegazioni.
-- **Preferiti (Segnalibri)**: memorizzazione delle domande più importanti o dubbie per un ripasso dedicato.
-- **Note Personali (CRUD Completo)**: possibilità di aggiungere, consultare, modificare ed eliminare annotazioni personali su ciascun quesito, con pill di visualizzazione rapida sia nell'Archivio che nelle schede di quiz.
+### 6. Archivio con Ricerca Rapida Senza Tastiera (#ID Pad & Thematic Chips)
+- Consultazione istantanea dei 474 quiz del catalogo con numerazione ufficiale AeCI.
+- **Barra Rapida Materie (01..09 + TUTTE)**: selettore rapido a scorrimento orizzontale a singolo tocco, senza dropdown o menu di sistema, per isolare istantaneamente una materia.
+- **Filtri di Stato a Tocco Singolo**: segmented pills con badge dei conteggi in tempo reale per `Tutte`, `Non viste`, `Errate`, `Preferiti` e `Note`.
+- **7 Thematic Quick Chips**: filtri a tocco immediato per concetti frequenti del volo libero (*Vento*, *Stallo*, *Efficienza*, *Precedenze*, *Spazio Aereo*, *Termica*, *Nubi*) con abbinamento semantico automatico sulle radici delle parole.
+- **Pad Numerico Rapido #ID**: tastierino 4x3 a scomparsa (tasti 0-9, Backspace `⌫`, `VAI ⏎`) con feedback aptico per digitare direttamente l'identificativo ministeriale (#1001-#9045) e saltare al quiz desiderato con auto-espansione e smooth scroll, senza mai attivare la tastiera virtuale dello smartphone.
+- **Note Personali & Preferiti**: memorizzazione locale in Dexie IndexedDB con gestione note (aggiunta, modifica, eliminazione) e badge visivo.
 
 ### 7. Statistiche Avanzate & Indice di Preparazione
 - **Indice di Preparazione Esame**: percentuale calcolata sull'accuratezza globale e sulla copertura delle materie.
@@ -104,47 +102,21 @@
 - **Registro Storico Sessioni**: cronologia delle simulazioni svolte con esito (`IDONEO` / `NON IDONEO`), punteggio e tempo impiegato.
 - **Top 10 Domande Più Ostiche**: graduatoria dei quesiti che hanno registrato il maggior numero di risposte errate.
 
-### 8. Modalità Alla Guida (Truck & Cockpit Drive Mode)
-- Pensata per lo studio e il ripasso sicuro durante i viaggi su veicolo o camion, con smartphone o tablet agganciato al cruscotto.
+### 8. Modalità Audio (Hands-Free Outdoor & Macro-Target Bici/Corsa)
+- Pensata per lo studio in movimento a mani libere (in auto, furgone navetta, sui rulli in bici o durante la corsa all'aperto) con smartphone a braccio o su manubrio.
+- **Riconcettualizzazione Visiva & Switch Universale**: iconografia a cuffie (`Headphones`) e pulsante rapido `AUDIO` accessibile in qualunque quiz (Navbar e mini-header di Tutor, Materie, Esame, Errori) per passare all'ascolto senza perdere l'indice della domanda o le risposte date.
+- **Macro-Target Tattili Outdoor per Bici & Corsa**:
+  - 3 macro-fasce a tutta larghezza con altezza minima garantita `min-h-[78px] sm:min-h-[85px]`.
+  - Badge numerici giganti (44-56px) con contrasto estremo e caratteri maggiorati (`text-base sm:text-xl`).
+  - Spaziatura protetta e zero elementi affiancati per eliminare il rischio di miss-clicks dovuti alle vibrazioni del manubrio o al movimento.
+- **Feedback Aptico di Bordo (`navigator.vibrate`)**: pattern di vibrazione tattile differenziati per tap, esito corretto, errore, cambio domanda e contrassegno bandierina.
 - **Layout Ergonomico a Schermo Intero**: viewport bloccato a `100dvh` con **zero scrolling**.
-- **Macro-Fasce Tattili Giganti**: tre pulsanti di risposta ad altissima area di tocco e contrasto estremo (Fitts's Law).
 - **Screen Wake Lock**: schermo mantenuto costantemente acceso, prevenendo spegnimenti e standby accidentali.
 - **Pilota Automatico ("Radio Quiz")**: modalità hands-free a tempo. L'app legge in sequenza la domanda e le opzioni, attende un intervallo configurabile (3-8s) e svela automaticamente la risposta esatta e la regola, passando da sola al quiz successivo.
-- **Comandi Vocali Hands-Free in Italiano**: interazione completa a voce tramite Web Speech Recognition con comandi dedicati:
-  - `"Uno"`, `"Due"`, `"Tre"` per selezionare la risposta.
-  - `"Avanti"`, `"Indietro"` per navigare.
-  - `"Ripeti"`, `"Ascolta"` per riascoltare domanda e opzioni.
-  - `"Bandiera"` per contrassegnare il quesito da rivedere.
-  - `"Pausa"`, `"Riprendi"` per controllare la sessione.
-  - `"Aiuto"`, `"Guida"`, `"Comandi"` per aprire la guida a voce in qualsiasi istante.
-- **Supporto Bivalente del Tema Colore (Cockpit Dark & Hangar Light)**:
-  - La Modalità Alla Guida, il Quick Speech Menu e la Guida Comandi Vocali rispettano pienamente il tema attivo dell'applicazione.
-  - In modalità notturna offre lo stile **Cockpit Dark antiriflesso** ottimizzato per zero riverberi sul parabrezza; in modalità diurna si adatta all'**Hangar Light** per la massima leggibilità sotto la luce diretta del sole.
-- **Menu Rapido Impostazioni Voce Integrato (Quick Speech Menu)**:
-  - Accesso istantaneo a 1 tocco alle impostazioni vocali sia nella schermata iniziale (Launcher), sia nella Top Bar HUD durante il quiz attivo a schermo intero e nella schermata di Debriefing finale.
-  - Permette di cambiare al volo l'istruttore (👨‍✈️ Giuseppe / 👩‍✈️ Elsa), la velocità di lettura (0.9x, 1.0x, 1.15x, 1.25x), attivare o disattivare la lettura vocale e abilitare/disabilitare la lettura automatica e gli effetti sonori.
-- **Guida Contestuale Comandi Vocali & Feedback Visivo Reattivo**:
-  - **Icona Microfono Pulsante & Radar Wave**: sia nell'header superiore sia nel banner inferiore, l'icona del microfono pulsa visibilmente (`animate-pulse`) circondata da un'onda radar radiale (`animate-ping`) e da un bagliore avionico verde smeraldo non appena viene rilevata voce o un comando in arrivo.
-  - **HUD Live Dinamico con Trascrizione in Tempo Reale**:
-    * Durante la dizione: visualizza istantaneamente *"In ricezione: '[parole pronunciate]' "* grazie all'analisi `interimResults`.
-    * A comando riconosciuto: conferma *"Comando: '[Azione]' ✓"* per 2.5 secondi.
-    * In caso di frase non abbinata: notifica trasparente *"Sentito: '[testo]' (non riconosciuto)"*, eliminando qualsiasi dubbio sull'effettivo funzionamento del microfono.
-    * In caso di permessi negati: visualizza l'avviso diagnostico chiaro per abilitare il microfono nelle impostazioni del browser.
-  - **Cheat Sheet a 1 Tocco**: pulsante `?` sempre accessibile nella schermata di guida, nel Quick Speech Menu e nella scheda Impostazioni (🚗 Guida) con la tabella ordinata dei comandi e i consigli per l'uso in auto e casco/auricolare Bluetooth.
-- **Spiegazione Vocale di Benvenuto (Spoken Audio Briefing & Run-Once Guard)**:
-  - **Briefing Vocale Cockpit**: spiegazione parlata chiara e sintetica all'apertura della Modalità Alla Guida che illustra lo schermo sempre attivo (Wake Lock), l'ascolto hands-free, le 3 macro-zone di tocco e i comandi vocali essenziali.
-  - **Esecuzione Singola (Run-Once)**: persistenza su Dexie IndexedDB (`driveModeIntroPlayed: true`). Completato o saltato il briefing, non viene mai più rieseguito automaticamente per non disturbare la routine di studio.
-  - **Banner Cockpit con Tasto Salta**: visualizzazione di un banner con indicatore di riproduzione audio animato e pulsante `[⏭ Salta]` per passare subito al primo quesito senza interruzioni.
-  - **Riascolto On-Demand a 1 Tocco**: pulsante dedicato `[🔊 Spiegazione Vocale]` nel Launcher della Guida e pulsante d'ascolto diretto nella scheda Comandi Vocali (`VoiceCommandsModal`).
-  - **Gestione e Riattivazione nelle Impostazioni (🚗 Guida)**: card dedicata per riascoltare subito il briefing o riabilitare la riproduzione automatica al prossimo avvio della guida.
-  - **Audio Neurale Offline & Fallback**: file MP3 dedicati per entrambe le voci (`giuseppe/drive_intro.mp3` ed `elsa/drive_intro.mp3`) con fallback trasparente su Web Speech API.
-- **Modalità Tutor Didattica Hands-Free (Voice Tutor Synchronized Engine)**:
-  - **Spiegazione Didattica Integrale a Voce**: Invece di limitarsi a indicare la sola risposta esatta, il Tutor pronuncia ad alta voce l'intera scheda didattica (la **Regola** fisica o normativa e il **Tranello** da evitare) dopo ogni risposta selezionata o dopo lo scadere del timer di risposta.
-  - **Sincronizzazione Event-Driven col Pilota Automatico**: L'avanzamento automatico al quiz successivo attende tassativamente la conclusione naturale dell'audio (`ended`), lasciando una pausa di assimilazione temporizzata a 2.5 secondi (con indicatore live `Prossima in Xs` nell'HUD), eliminando qualsiasi interruzione prematura della dizione.
-  - **Interfaccia HUD Cockpit a Zero-Scroll (`100dvh`)**: Quando la domanda viene rivelata, le 3 macro-opzioni si compattano ergonomicamente a fascia sottile per fare spazio alla Scheda Didattica `#drive-didactic-card` con pulsante `Riascolta`, mantenendo il layout rigorosamente bloccato all'altezza dello schermo senza barre di scorrimento né layout shift.
-  - **Accessibilità a 1 Tocco & Comandi Vocali Dedicati**:
-    * Toggle rapido `[Tutor ON/OFF]` nel Launcher iniziale (`#btn-drive-toggle-tutor-launcher`), nella Top Bar HUD a quiz attivo (`#btn-drive-tutor-toggle`), nel Quick Speech Menu della Navbar e nelle Impostazioni (🚗 Guida).
-    * Nuovi comandi vocali in italiano: *"Spiega"*, *"Regola"*, *"Tranello"*, *"Perché"* per ascoltare la spiegazione on-demand; *"Attiva Tutor"*, *"Disattiva Tutor"*, *"Tutor"* per commutare la modalità al volo mentre si guida.
+- **Comandi Vocali Hands-Free in Italiano**: interazione completa a voce tramite Web Speech Recognition con comandi dedicati (`"Uno"`, `"Due"`, `"Tre"`, `"Avanti"`, `"Indietro"`, `"Ripeti"`, `"Bandiera"`, `"Pausa"`, `"Spiega"`, `"Tutor"`).
+- **Supporto Bivalente del Tema Colore (Cockpit Dark & Hangar Light)**: ottimizzato per zero riverberi notturni sul parabrezza e massima leggibilità sotto la luce diretta del sole.
+- **Menu Rapido Impostazioni Voce Integrato (Quick Speech Menu)**: accesso a 1 tocco alle impostazioni vocali (Giuseppe / Elsa, velocità 0.9x-1.25x, lettura automatica ed effetti sonori).
+- **Briefing Vocale Cockpit di Benvenuto**: spiegazione parlata chiara e sintetica all'apertura con salvataggio run-once in IndexedDB (`driveModeIntroPlayed: true`).
 
 ### 9. Motore Vocale Neurale (TTS Multi-Voce Offline) & Audio Cockpit
 - **Oltre 5.000 Segmenti Audio Neurale Pre-Generati**: catalogo audio completo memorizzato localmente e funzionante al 100% offline.
@@ -152,36 +124,30 @@
   - 👨‍✈️ **Giuseppe**: timbro baritonale calmo, impostato come un istruttore di volo in cockpit (`rate -5%`, `pitch -5Hz`).
   - 👩‍✈️ **Elsa**: dizione cristallina, brillante ed energica.
 - **Gestione Offline del Parlato & Download in Background (`audioDownloadManager`)**:
-  - **Prompt Non Invasivo al Primo Avvio della Guida**: dialog dedicato quando si accede per la prima volta alla Modalità Guida, con scelta a 1 tocco: *Scarica Voce Attiva* (consigliato, ~150 MB per 2.520 quesiti), *Scarica Entrambe* (~300 MB) o *Non ora*.
-  - **Download Non Bloccante**: il download dei file audio avviene in background via CacheStorage (`vds-audio-giuseppe` e `vds-audio-elsa`) con un pool concorrente a 8 connessioni senza freeze della UI o blocchi della navigazione.
-  - **Banner di Avanzamento in Basso**: barra di progressione dedicata agganciata in basso sopra la barra di navigazione (`AudioDownloadBanner`), con percentuale, conteggio file, barra di progresso in tempo reale e pulsante Annulla, che preserva la pulizia e l'allineamento dell'header su qualsiasi dimensione di schermo ed evita ogni tipo di overflow orizzontale su smartphone.
-  - **Gestione Granulare nelle Impostazioni (🎙️ Voce)**: due card indipendenti per Giuseppe ed Elsa con monitoraggio dello spazio occupato, barra di progresso, pulsante Scarica/Elimina cache e opzione di ripristino del prompt iniziale.
-  - **Fallback Intelligente Offline**: se la voce selezionata non è stata scaricata e ci si trova offline, l'app usa automaticamente la voce scaricata disponibile con notifica informativa cockpit, senza interruzioni.
-  - **PWA Service Worker & iOS Safari**: regole Workbox con `rangeRequests: true` per garantire compatibilità con lo streaming audio parziale di Safari su iOS.
-  - **Invalidazione & Aggiornamento Differenziale Audio Offline (Hash Manifest & Background Sync)**:
-    * **Manifest Indicizzato ad Alta Efficienza (`manifest.json`)**: file leggero (~118 KB) generato automaticamente in fase di build (`build:audio:manifest`) che mappa tutti i 5.040 frammenti audio di Giuseppe ed Elsa con il rispettivo hash MD5 a 8 caratteri.
-    * **Strategia PWA NetworkFirst**: il manifest viene servito con strategia `NetworkFirst` (con timeout rapido a 3s), assicurando che non appena l'utente è online venga rilevata qualsiasi discrepanza tra i file sul server e quelli memorizzati nella cache locale.
-    * **Download Differenziale Atomico (Zero Spreco Dati)**: in presenza di correzioni o aggiornamenti su singoli file audio, l'app scarica esclusivamente i file modificati invece di riscaricare l'intero archivio da 150 MB, iniettandoli direttamente in `CacheStorage` con query cache-busting per bypassare la regola `CacheFirst`.
-    * **Sincronizzazione Automatica Online all'Avvio**: all'apertura dell'applicazione, se è presente connettività di rete, un controllo non bloccante in background rileva e sincronizza silenziosamente le modifiche puntuali (fino a 25 file per volta).
-    * **Pannello di Controllo & Feedback in Impostazioni (🎙️ Voce)**: badge live che segnalano i file modificati per ciascuna voce, pulsante dedicato *"Verifica ora"* con data e ora dell'ultimo controllo, pulsanti *"Aggiorna (N)"* con barra percentuale di avanzamento e toggle per attivare o disattivare l'auto-sync online.
-    * **Soppressione Intelligente del Prompt in Modalità Guida**: l'avviso di scaricamento offline non viene mostrato se la voce attiva o un'altra voce completa è già presente nella cache del dispositivo.
-- **Normalizzazione Fonetica Aeronautica (`aviationPhonetics.ts`)**: espansione e pronuncia accurata secondo lo standard aeronautico ICAO di sigle e acronimi (`D.P.R. 133/2010`, `VDS/VL`, `AeCI`, `hPa`, `QNH`, `QFE`, `FL`, `km/h`, `kt`, `m/s`).
-- **Ascolto Modulare**: pulsanti per ascolto atomico della singola domanda (tasto `Q`), delle singole opzioni (`Alt+1`, `Alt+2`, `Alt+3`), o dell'intera sequenza con evidenziazione del testo sincronizzata.
-- **Controlli Parlato Interattivi Universali (Play, Pausa, Riprendi, Da Capo)**: Il controllo audio opera ora come pillola cockpit multimediale interattiva estesa a **ogni elemento vocale** (sequenza completa, testo domanda, singole opzioni 1, 2, 3 e spiegazione didattica):
-  - **Play / Pausa su ogni parlato**: Cliccando sull'audio di qualsiasi frammento (domanda, opzione singola o spiegazione) la riproduzione si avvia o va in pausa preservando il millisecondo esatto di lettura, senza ripartire da capo.
-  - **Riprendi in continuità**: Riprende la riproduzione dal secondo esatto di sospensione. Se si mette in pausa una risposta durante l'ascolto della sequenza automatica, la sequenza viene preservata e prosegue fluidamente alle opzioni successive.
-  - **Riavvio da capo su ogni parlato**: Pulsante `[↺]` (o scorciatoie da tastiera dedicate) per far ripartire istantaneamente quel frammento (o l'intera domanda) dall'inizio sia mentre la voce sta parlando sia in stato di pausa.
-  - **Stop e Chiusura rapida**: Clic su `[⏹]` (o tasto `Esc`) per azzerare l'audio e ripristinare lo stato iniziale.
-- **Quick Speech Menu (1-Clic in Header & Modalità Guida)**: menu rapido sempre visibile nella barra di navigazione superiore e **integrato in tutti gli stati della Modalità Guida** (Launcher di partenza, Top Bar HUD durante il quiz attivo a schermo intero e schermata di Debriefing), per commutare istantaneamente con un singolo tocco la voce (👨‍✈️ Giuseppe / 👩‍✈️ Elsa), la velocità di riproduzione (0.9x - 1.25x), la lettura automatica e gli effetti sonori con stile Cockpit Dark antiriflesso, senza interrompere la guida né abbandonare la sessione di quiz.
-- **MediaSession API**: controllo della riproduzione vocale (Play/Pausa/Stop) dai pulsanti fisici o touch degli auricolari Bluetooth anche a schermo spento.
-- **Feedback Sonori Cockpit (Web Audio API)**: click meccanici, segnali di conferma, buzzer di errore e alert timer generati via oscillatori nativi senza pesanti file esterni.
+  - Download non bloccante via CacheStorage con pool concorrente a 8 connessioni.
+  - Banner di avanzamento compatto in basso (`AudioDownloadBanner`).
+  - Gestione granulare nelle Impostazioni (🎙️ Voce) con verifica aggiornamenti differenziali basati su hash MD5 (`manifest.json`).
+  - Fallback intelligente offline se la voce attiva non è presente nella cache locale.
+- **Normalizzazione Fonetica Aeronautica ICAO**: pronuncia fedele delle sigle e unità di misura (`aviationPhonetics.ts`).
+- **Controlli Parlato Interattivi Universali (Play, Pausa, Riprendi, Da Capo)**: controlli dedicati su ogni frammento (domanda, singole opzioni 1, 2, 3 e spiegazione didattica).
 
-### 10. Ergonomia Cockpit, Iconografia Aero Shield & Temi
-- **Icona Ufficiale PWA (Aero Shield)**:
-  - Icona geometrica originale per il Volo Libero che unisce l'arco a celle cassonate del parapendio e l'ala a freccia triangolare del deltaplano (con trave di chiglia centrale e barra di controllo A-frame) a formare uno scudo alare 'V'.
-  - Disponibile in formato vettoriale ad altissima precisione ([favicon.svg](file:///d:/Github/Quiz_VDS-VL/public/favicon.svg)) e rasterizzata per il manifest PWA a 192x192 e 512x512 px.
-- **Barra di Navigazione Permanente al Top (Fixed Top Navigation)**:
-  - Header fisso (`fixed top-0 left-0 right-0 z-40`) che unisce i controlli rapidi (Alla Guida, Voce, Tema, Impostazioni) e i 5 tab di navigazione (**Esame**, **Materie**, **Errori**, **Archivio**, **Stats**) in cima al viewport, garantendo che i controlli rimangano permanentemente visibili e accessibili durante qualunque scorrimento.
+### 10. Ergonomia Cockpit, Layout Zero-Scroll & Dimensione Font
+- **Layout Zero-Scroll a Margini Compatti**:
+  - Quote dimensionali calibrate (mini-header ~48px, bottom bar ~48px, card padding `p-2.5 sm:p-4`, pulsanti risposta `min-h-[44px] sm:min-h-[48px]`, line height `leading-snug`).
+  - Garantisce che testo della domanda, 3 opzioni di risposta e scheda didattica Regola/Tranello coesistano su una singola schermata senza scorrimento verticale sui display mobile standard (390x844).
+- **Dimensione Font (Font Scaling a 3 Livelli)**:
+  - 3 scale carattere ergonomiche selezionabili in *Impostazioni -> Aspetto & Tema*:
+    * **Compatto (14px)**: per massimizzare la compattezza sui display piccoli e azzerare ogni scroll.
+    * **Normale (16px)**: dimensione standard per una lettura rilassata e bilanciata.
+    * **Grande / Outdoor (18px)**: corpo maggiorato per l'uso all'aperto, a braccio teso o con smartphone su manubrio.
+  - Persistenza in Dexie IndexedDB (`fontSizePreference: 'compact' | 'normal' | 'large'`).
+  - Applicazione fluida e reattiva tramite unità `rem` alla radice (`html[data-font-size]`), preservando l'armonia delle spaziature e prevenendo ogni distorsione grafica.
+- **Barra Navigazione Quiz Ancorata in Basso (`QuizBottomBar`)**:
+  - Comandi `Precedente`, `⚑ Segna`, `Prossima Domanda` e `Consegna` costantemente visibili in basso a portata di pollice con supporto safe-area.
+- **Schermata Impostazioni Fullscreen ad Accordion Compresso Singolo**:
+  - 6 argomenti verticali ad apertura esclusiva (Aspetto, Voce, Guida, Backup, Dati, About) con badge live riassuntivi.
+- **Temi Cockpit Dark & Hangar Light, Palette ad Alto Contrasto e Scorciatoie da Tastiera**:
+  - Zero dominante blu (tonalità neutre `zinc` + accento ambra avionico), icone Aero Shield, e scorciatoie fisiche complete (`1`, `2`, `3`, `F`, `Spazio`, `Q`, `Esc`).
   - Rimozione della bottom bar fissa per liberare fino a 60px di altezza utile su smartphone per il testo dei quiz, le risposte e il feedback didattico immediato.
   - **Badge di Versione Dinamico**: esposizione in tempo reale della versione dell'app (`v1.0.0`) e dell'ID di build con commit hash nella Navbar e nell'header delle Impostazioni.
 - **Barra di Navigazione Quiz Ancorata in Basso (Sticky / Fixed Bottom Action Bar)**:
@@ -215,7 +181,7 @@
 
 ### 11. Fair Coverage Randomizer
 - Algoritmo a bucket ponderati sviluppato per superare il noto problema statistico del *collezionista di figurine* (*Coupon Collector's Problem*).
-- Priorità assoluta ai quesiti mai estratti (`times_seen == 0`), garantendo la copertura equa di tutti i 504 quiz prima di riproporre domande già incontrate.
+- Priorità assoluta ai quesiti mai estratti (`times_seen == 0`), garantendo la copertura equa di tutti i 474 quiz prima di riproporre domande già incontrate.
 
 ### 12. Privacy, Offline-First, Auto-Sync & Smart Merge
 - **100% Client-Side & Zero Profilazione**: nessun database proprietario centrale, nessun cookie pubblicitario o tracciamento.
@@ -227,8 +193,8 @@
 - **Resilienza Offline con Invio Differito**: studio fluido anche in decollo o in viaggio senza connettività; al rientro della rete (`online`), l'engine sincronizza silenziosamente le modifiche con Google Drive.
 - **Indicatore Offline Avionico (Cockpit Offline HUD & Briefing)**:
   - Rilevamento in tempo reale della connettività tramite `NetworkStatus` e `useOnlineStatus`.
-  - Pillola avionica ambra `[⚡ OFFLINE]` sempre visibile nell'header e nell'HUD della Modalità Alla Guida quando si è senza connessione.
-  - Banner informativo dismissibile con rassicurazione didattica: tutti i 504 quiz, risposte, esami e note sono 100% disponibili in locale su IndexedDB.
+  - Pillola avionica ambra `[⚡ OFFLINE]` sempre visibile nell'header e nell'HUD della Modalità Audio quando si è senza connessione.
+  - Banner informativo dismissibile con rassicurazione didattica: tutti i 474 quiz, risposte, esami e note sono 100% disponibili in locale su IndexedDB.
   - Modale di briefing a 1 tocco che spiega nel dettaglio la persistenza autonoma e la sincronizzazione in coda.
   - Transizione e badge di riconnessione verde `[ONLINE]` (3.5s) al ripristino della copertura.
 - **Indicatore di Stato Cockpit in Header**: icona discreta nella barra superiore per visualizzare all'istante lo stato della sincronizzazione (verde = sincronizzato, animato = in corso, ambra = necessita accesso, grigio = offline).
