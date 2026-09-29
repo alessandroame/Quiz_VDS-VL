@@ -14,6 +14,47 @@ Questo documento registra in ordine cronologico tutte le lavorazioni svolte nel 
 - **Impatto sul Desiderata**: <Come questo intervento contribuisce al desiderata (cfr. DESIDERATA.md) e indicazioni per il prossimo agente>
 ```
 
+# Worklog Fragment: Navigatore Quiz Comprimibile a Singola Riga
+
+- **Data**: 2026-09-29
+- **Autore**: Antigravity Cockpit Specialist
+- **Tipo di Intervento**: `feat(exam)`
+- **Argomento**: Navigatore dei quesiti comprimibile con vista compressa a riga singola senza scroll (tacche a tutta larghezza su mobile, con numeri su desktop).
+
+---
+
+### 1. Cosa abbiamo fatto
+- **Componente Modulare Estratto (`src/components/QuestionNavigator.tsx`)**:
+  - Estratta la logica e il rendering del navigatore dei quesiti (30 bolle/tacche) da `ExamScreen.tsx`, rispettando il principio di singola responsabilità (SRP).
+  - Implementata la modalità **Espansa**: griglia ergonomica a 3 righe da 10 bolle da 28x28px (`w-7 h-7`), con visualizzazione degli stati di risposta (smeraldo/rosso in modalità Tutor, ambra in Esame Ufficiale, anello per domande con bandierina `⚑`).
+  - Implementata la modalità **Compressa a Singola Riga**: tutti i 30 quiz sono disposti orizzontalmente su **un'unica riga** (`w-full flex justify-between gap-0.5 sm:gap-1`) senza alcun bisogno di scroll:
+    - *Su Smartphone (<640px)*: 30 tacche avioniche colorate a tutta larghezza con altezza `h-6`, evidenziazione della domanda attiva tramite scala, ring ambra e micro-dot centrale, con il contatore testuale (`15 / 30`) e le bandierine sempre visibili nella testata.
+    - *Su Desktop (>=640px)*: ogni segmento dispone di spazio sufficiente per mostrare i numeri `1`..`30` in font mono bold.
+  - **Header con Toggle a 1 Tocco**: barra di testata con contatore, flag summary e pulsante `Comprimi`/`Espandi` con icone `ChevronUp`/`ChevronDown`. L'intera barra di testata è interattiva e accessibile da tastiera (`Enter` / `Space`).
+  - **Persistenza della Preferenza**: memorizzazione dello stato compresso/espanso in `localStorage` (`vds_exam_nav_compressed`), preservando la scelta dell'allievo tra una sessione e l'altra.
+- **Suite di Test Unitari Vitest (`src/components/QuestionNavigator.test.ts`)**:
+  - Creata suite con 7 test unitari approfonditi che certificano il rendering in modalità espansa, compressa, l'idratazione da `localStorage`, la colorazione cromatico-didattica (Tutor vs Ufficiale), l'indicatore attivo e gli attributi ARIA per l'accessibilità (`aria-expanded`, `aria-current`, `aria-label`).
+- **Integrazione in `ExamScreen.tsx`**:
+  - Sostituito il blocco inline monolitico con il componente modulare `<QuestionNavigator ... />`.
+- **Script di Collaudo Visivo Headless CDP (`scripts/test_navigator_visual.cjs`)**:
+  - Registrato script in `package.json` (`npm run test:visual:nav`) che collauda via Chrome DevTools Protocol l'avvio della simulazione, lo screenshot espanso, il toggle su compresso, la navigazione diretta cliccando sulla tacca Q15 e il rendering desktop a 1440x900.
+  - Verificato con `view_file` che in modalità compressa su mobile 390x844 si risparmiano oltre 70px verticali, consentendo la visualizzazione completa senza scroll (*Zero-Scroll*) di domanda, opzioni, feedback didattico e spiegazione Regola/Tranello.
+
+---
+
+### 2. Scelte Architetturali & Rationale
+- **Tacche a Tutta Larghezza vs Striscia a Scorrimento**: Su specifica scelta dell'utente (Opzione 1), tutti i 30 quiz sono visualizzati contemporaneamente su un'unica riga senza dover scorrere orizzontalmente. Questo garantisce all'allievo pilota una panoramica immediata dello stato di avanzamento e dei punti deboli (come un orizzonte artificiale o un indicatore a barra avionico).
+- **Separazione SRP & Manutenibilità**: `ExamScreen.tsx` è stato alleggerito eliminando codice duplicato di visualizzazione delle bolle e isolando lo stato di compressione nel componente figlio.
+- **Accessibilità & Zero Regressioni**: Mantenuti invariati gli identificatori `id="bubble-q-${idx + 1}"` e aggiunti attributi ARIA semantici per screen reader e tastiere.
+
+---
+
+### 3. Impatto sul Desiderata
+- Raggiunto pienamente l'obiettivo di layout *Zero-Scroll* sui dispositivi mobile compatti (390x844) durante la simulazione didattica, liberando oltre 70px di altezza.
+- Aggiornata la matrice di stato in [DESIDERATA.md](file:///d:/Github/Quiz_VDS-VL/DESIDERATA.md) e la documentazione in [README.md](file:///d:/Github/Quiz_VDS-VL/README.md).
+
+---
+
 # Worklog Fragment: Transizione a minimal-ui-ux ed Ergonomia di Studio
 
 - **Data**: 2026-09-29

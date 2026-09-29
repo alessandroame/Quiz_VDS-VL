@@ -77,7 +77,11 @@
 - **Valutazione Ufficiale AeCI**:
   - **IDONEO**: massimo **3 errori** ammessi (minimo 27/30).
   - **NON IDONEO**: 4 o più errori.
-- **Griglia di Navigazione a 30 Slot**: panoramica a colpo d'occhio delle domande risposte, da completare e contrassegnate con bandierina (`⚑ Rivedi`).
+- **Navigatore Quesiti Comprimibile a Singola Riga**:
+  - Modalità **Espansa**: griglia ergonomica a 3 righe da 10 bolle (28px) con feedback cromatico di stato e indicatore flag `⚑`.
+  - Modalità **Compressa a Singola Riga**: tutti i 30 quiz sono disposti orizzontalmente su **una sola riga** senza bisogno di scroll (tacche avioniche colorate a tutta larghezza con indicatore domanda attiva su smartphone, e numeri visibili su desktop).
+  - Recupera oltre 70px verticali per favorire il layout *Zero-Scroll* con visualizzazione contemporanea di domanda, opzioni e spiegazione Regola/Tranello su smartphone compatti (390x844).
+  - Persistenza automatica della preferenza compresso/espanso dell'allievo in memoria locale (`localStorage`).
 - **Debriefing Finale**: esito immediato, tempo di esecuzione, riepilogo grafico ed elenco analitico delle risposte errate con accesso diretto alle spiegazioni.
 - **Navigation Guard (Protezione Sessione)**: avviso di sicurezza e blocco in caso di tentata navigazione verso altre schede o ricaricamento pagina (`beforeunload`), evitando la perdita accidentale della simulazione in corso.
 

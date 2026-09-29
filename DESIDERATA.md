@@ -156,6 +156,7 @@ Questo documento rappresenta la **bussola strategica e funzionale** del progetto
 | Macro-Target Tattili per Bici/Corsa (Modalità Audio) | 🟢 Completato | 3 macro-fasce a tutta larghezza con altezza minima 78-85px, badge numerici 44-56px, feedback aptico `navigator.vibrate` e zero elementi affiancati per uso con vibrazioni da manubrio o corsa. |
 | Impostazione Dimensione Font (Font Scaling) | 🟢 Completato | 3 scale carattere ergonomiche (`Compatto` 14px per smartphone compatti e zero-scroll, `Normale` 16px bilanciato, `Grande/Outdoor` 18px per manubrio a braccio teso o guanti), persistenza in Dexie (`fontSizePreference: 'compact' | 'normal' | 'large'`) e applicazione fluida via CSS rem root senza distorsioni di layout. |
 | Sincronizzazione Tasto Indietro Hardware (Back Coordinator) | 🟢 Completato | Gestione unificata `popstate` e gestures Android/iOS: il tasto indietro del telefono esegue sempre l'azione del tasto grafico visibile (chiusura submodali, annullamento guardia esame, chiusura Audio/Impostazioni, ritorno a Home). |
+| Navigatore Quiz Comprimibile a Singola Riga | 🟢 Completato | Componente modulare `QuestionNavigator` con vista espansa a 3 righe (30 bolle) e modalità compressa a singola riga (30 tacche avioniche colorate a tutta larghezza su mobile, con numeri su desktop), persistenza preferenza in `localStorage` e risparmio di oltre 70px verticali per layout zero-scroll. |
 
 ---
 

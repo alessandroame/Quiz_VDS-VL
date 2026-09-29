@@ -18,6 +18,7 @@ import { generateExamQuestions } from '../utils/fairRandomizer';
 import { evaluateExam } from '../services/examEvaluator';
 import { formatTime } from '../utils/timer';
 import { QuestionCard } from './QuestionCard';
+import { QuestionNavigator } from './QuestionNavigator';
 import { voiceService } from '../services/voiceService';
 import { QuizBottomBar } from './QuizBottomBar';
 import { backNavigation } from '../utils/backNavigation';
@@ -795,46 +796,15 @@ export const ExamScreen: React.FC<ExamScreenProps> = ({
         </div>
       </div>
 
-      {/* Griglia Navigatore Domande (30 bolle) */}
-      <div className="p-3 bg-zinc-900/60 border border-zinc-800 rounded-xl light:bg-white light:border-slate-200">
-        <div className="flex flex-wrap gap-1.5 justify-center">
-          {examQuestions.map((q, idx) => {
-            const isAnswered = answers[q.id] !== undefined;
-            const isFlagged = flags[q.id] === true;
-            const isCurrent = currentIndex === idx;
-
-            let bubbleStyle = 'border-zinc-800 bg-zinc-950 text-zinc-400 light:border-slate-200 light:bg-slate-50 light:text-slate-600';
-            if (isAnswered) {
-              if (examMode === 'tutor') {
-                const isCorrect = answers[q.id] === q.correctAnswer;
-                bubbleStyle = isCorrect
-                  ? 'border-emerald-500 bg-emerald-500/25 text-emerald-300 font-bold border'
-                  : 'border-rose-500 bg-rose-500/25 text-rose-300 font-bold border';
-              } else {
-                bubbleStyle = 'border-amber-500 bg-amber-500 text-zinc-950 font-bold shadow-sm';
-              }
-            }
-            if (isFlagged) {
-              bubbleStyle += ' ring-1 ring-amber-400';
-            }
-            if (isCurrent) {
-              bubbleStyle += ' ring-2 ring-amber-400 ring-offset-2 ring-offset-zinc-950 light:ring-offset-white';
-            }
-
-            return (
-              <button
-                key={q.id}
-                id={`bubble-q-${idx + 1}`}
-                onClick={() => changeIndex(idx)}
-                className={`w-7 h-7 rounded-lg border text-xs flex items-center justify-center transition-all ${bubbleStyle}`}
-                title={`Quesito #${q.id}${isAnswered && examMode === 'tutor' ? (answers[q.id] === q.correctAnswer ? ' (Esatta)' : ' (Errata)') : ''}`}
-              >
-                {idx + 1}
-              </button>
-            );
-          })}
-        </div>
-      </div>
+      {/* Navigatore Domande (comprimibile a riga singola o espanso a 3 righe) */}
+      <QuestionNavigator
+        questions={examQuestions}
+        currentIndex={currentIndex}
+        answers={answers}
+        flags={flags}
+        examMode={examMode}
+        onSelectIndex={changeIndex}
+      />
 
       {/* Card Domanda Corrente */}
       {currentQuestion && (

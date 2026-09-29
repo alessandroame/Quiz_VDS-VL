@@ -20,6 +20,7 @@
     "test:visual:mic": "node scripts/test_mic_pulsing.cjs",
     "test:visual:discipline": "node scripts/test_discipline_filters.cjs",
     "test:visual:onboarding": "node scripts/test_discipline_onboarding.cjs",
+    "test:visual:nav": "node scripts/test_navigator_visual.cjs",
     "build:audio:manifest": "python scripts/generate_audio_manifest.py",
     "worklog:consolidate": "node scripts/consolidate_worklog.cjs",
     "worklog:consolidate:dry": "node scripts/consolidate_worklog.cjs --dry-run"
