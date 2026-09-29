@@ -14,6 +14,24 @@ Questo documento registra in ordine cronologico tutte le lavorazioni svolte nel 
 - **Impatto sul Desiderata**: <Come questo intervento contribuisce al desiderata (cfr. DESIDERATA.md) e indicazioni per il prossimo agente>
 ```
 
+### [2026-09-29] - Audit Tecnico Completo del Codice Sorgente e Analisi Architetturale PWA
+- **Cosa abbiamo fatto**:
+  - Eseguito un audit tecnico completo a 360 gradi sull'intera codebase di **VDS-VL Quiz Master**:
+    * **Analisi Statica & Type Safety**: Confermato `tsc --noEmit` a 0 errori con configurazione TypeScript `strict: true`.
+    * **Suite di Test & Coverage**: Eseguiti tutti i 152 test unitari Vitest su 16 suite (100% superati). Mappata la copertura v8 globale (Statements 60.93%, Branches 56.21%, Functions 60.85%, Lines 62.38%), rilevando 96.9% su `utils/`, 85.7% su `db/`, ma 0% su `hooks/` e `components/`.
+    * **Bundle & Precache PWA**: Identificato inquinamento critico nella cartella `public/` con 25 file di test/screenshot (~3.5 MB) precachati indebitamente nel Service Worker (`sw.js` precacha 5.18 MB). Rilevato bundle `index-*.js` a 897 kB dovuto all'import statico di `questions.json` (443 kB) e splash screen `index.html` da 86 kB a causa di JPEG base64 incorporato.
+    * **Architettura Componenti**: Rilevata elevata complessità e monoliticità in `DriveModeScreen.tsx` (1.903 righe), `SettingsModal.tsx` (1.540 righe), `ExamScreen.tsx` (866 righe) e `QuestionCard.tsx` (690 righe).
+    * **Ergonomia & Tastiera**: Evidenziata la mancanza degli shortcut numerici `1`, `2`, `3` per le risposte nelle sezioni `TopicsScreen.tsx` e `MistakesScreen.tsx` (attualmente presenti solo in `ExamScreen.tsx`).
+    * **Conformità Standard**: Rilevata violazione diffusa della Regola 7 (`English Only for Code & Git`) dovuta alla presenza di commenti, log e suite di test scritti in lingua italiana all'interno di `src/`.
+    * **Accessibilità & Sicurezza**: Verificata l'assenza totale di vulnerabilità XSS/`innerHTML`/`eval`, e annotata la necessità di `aria-label` espliciti sui bottoni privi di testo in `Navbar.tsx` e `QuestionCard.tsx`.
+  - Redatto il rapporto completo di audit tecnico nell'artifact dedicato `audit_tecnico_completo.md`.
+- **Scelte architetturali & Rationale**:
+  - *Prioritizzazione per Livelli di Severità (P1 -> P4)*: Separare i problemi a impatto immediato per gli utenti finali (come i 3.5 MB di screenshot nel Service Worker mobile) dal debito tecnico interno (modularità componenti e traduzione commenti) consente una pianificazione ordinata senza fermare l'evoluzione del prodotto.
+- **Impatto sul Desiderata**:
+  - Fornisce un quadro di trasparenza totale sulla salute del software, identificando con precisione le ottimizzazioni necessarie per garantire massime performance e manutenibilità a lungo termine.
+
+---
+
 ### [2026-09-29] - Supporto Completo Tema Chiaro (Hangar Light) in Modalità Alla Guida e Modali Vocali
 - **Cosa abbiamo fatto**:
   - **Adeguamento Tema Chiaro in `DriveModeScreen.tsx`**:
