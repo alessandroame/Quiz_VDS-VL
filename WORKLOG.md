@@ -14,6 +14,48 @@ Questo documento registra in ordine cronologico tutte le lavorazioni svolte nel 
 - **Impatto sul Desiderata**: <Come questo intervento contribuisce al desiderata (cfr. DESIDERATA.md) e indicazioni per il prossimo agente>
 ```
 
+# Registro di Bordo: TODO-03 Modalità Audio (Audiolibro Hands-Free) & Macro-Target Bici/Corsa
+
+- **Data**: 2026-09-29
+- **Autore/Agente**: Antigravity Cockpit Specialist
+- **Tipo di Intervento**: `feat(audio)`
+- **Argomento**: Riconcettualizzazione in Modalità Audio, macro-target da 78-85px con feedback aptico per bici/corsa, e switch universale bidirezionale senza perdita di stato.
+
+---
+
+### 1. Cosa abbiamo fatto
+- **Riconcettualizzazione Visiva & Iconografica (Modalità Audio)**:
+  - Sostituito in tutta l'applicazione (Launcher, HUD, Navbar, Impostazioni, modali) il termine "Modalità Guida" / "Alla Guida" con "Modalità Audio" / "AUDIO".
+  - Sostituita l'icona dell'automobile (`Car`) con l'iconografia monocromatica a cuffie avioniche (`Headphones`).
+- **Macro-Target Outdoor per Bici & Corsa (`DriveModeScreen.tsx`)**:
+  - Implementate 3 macro-fasce a tutta larghezza con altezza minima garantita `min-h-[78px] sm:min-h-[85px]`.
+  - Badge numerici di grandi dimensioni (`w-11 h-11 sm:w-14 sm:h-14`, font `text-xl sm:text-2xl font-black`) con contrasto elevato.
+  - Testo delle opzioni a corpo maggiorato (`text-base sm:text-xl font-semibold leading-snug`).
+  - Spaziatura protetta (`gap-2.5 sm:gap-3.5`) e zero elementi affiancati per eliminare il rischio di miss-clicks dovuti alle vibrazioni del manubrio in bicicletta o durante la corsa.
+- **Utility & Test Feedback Aptico (`src/utils/haptics.ts`, `src/utils/haptics.test.ts`)**:
+  - Creata utility `triggerHapticFeedback` con pattern vibrazionali specifici: `tap` (20ms), `success` ([25, 60, 40]ms), `error` ([50, 80, 50, 80, 50]ms) e `warning` ([35, 50, 35]ms).
+  - Integrato il feedback aptico su risposta data, esito corretto/errato, cambio domanda e contrassegno bandierina.
+  - Aggiunta Suite 18 con 6 test unitari passanti al 100%.
+- **Switch Universale Bidirezionale Senza Perdita di Stato (`QuizContext.tsx`)**:
+  - Introdotti `activeAudioSessionContext` e `registerAudioSessionContext` nel contesto applicativo.
+  - `ExamScreen`, `TopicsScreen` e `MistakesScreen` registrano reattivamente la propria sessione in corso.
+  - Il pulsante `AUDIO` nella Navbar (mini-header) e i pulsanti dedicati nei rispettivi header consentono di passare istantaneamente alla Modalità Audio mantenendo l'esatto quesito attivo, tutte le risposte date e le bandierine.
+  - In `DriveModeScreen`: se la sessione proviene da una schermata attiva (`sessionContext`), il tasto in alto visualizza `[← Torna al Quiz]` e richiama `executeClose()`, consentendo di riprendere la visualizzazione normale sullo schermo senza prompt di interruzione né perdita di dati.
+
+---
+
+### 2. Scelte Architetturali & Rationale
+- **Continuità di Stato Tra Modalità**: Evitata la duplicazione di codice tramite registrazione reattiva dell'interfaccia `DriveModeSessionContext`, garantendo che l'utente possa alternare tra ascolto a mani libere (jogging, bici, auto) e studio visivo su schermo in qualsiasi momento.
+- **Resilienza alle Vibrazioni (Fitts's Law)**: Il vincolo `min-h-[78px] sm:min-h-[85px]` con font generoso e layout a 1 colonna a tutta larghezza trasforma la schermata in un controller tattile robusto per l'uso all'aperto a braccio teso o su supporto.
+
+---
+
+### 3. Impatto sul Desiderata
+- Completa al 100% il punto 3 della Roadmap Cockpit V2 (**TODO-03** in [DESIDERATA.md](file:///d:/Github/Quiz_VDS-VL/DESIDERATA.md)).
+- Prepara il terreno per **TODO-04** (Layout Zero-Scroll e Ottimizzazione Spaziale sui quiz standard).
+
+---
+
 # Registro di Bordo: TODO-02 Architettura Home Hub & Back Navigation
 
 - **Data**: 2026-09-29

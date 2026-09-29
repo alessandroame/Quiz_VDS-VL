@@ -151,9 +151,9 @@ Questo documento rappresenta la **bussola strategica e funzionale** del progetto
 | Riorganizzazione Home Hub & Back Navigation | 🟢 Completato | Pattern a cruscotto Home con 6 macro-pulsanti tattili (`TUTOR`, `MATERIE`, `ESAME`, `ERRORI`, `CERCA`, `STATS`), banner sessione attiva e mini-header con `[← Home]` nei quiz per liberare oltre 50px verticali. |
 | Potatura Radicale Quiz Deltaplano | 🟢 Completato | Focus 100% su Parapendio (474 quiz), rimozione definitiva dei 30 quiz deltaplano e pulizia di tutti i selettori, modali e badge correlati. |
 | Layout Zero-Scroll a Margini Compatti | 🟡 In Roadmap (TODO) | Viewport bloccato a `100dvh` con padding ridotti (`p-3`), card compatta e leading stretto per visualizzare sempre domanda, opzioni e pulsanti senza scroll su mobile. |
-| Modalità Audio (Audiolibro Hands-Free) & Switch Universale | 🟡 In Roadmap (TODO) | Riconcettualizzazione da "Modalità Guida" a "Modalità Audio" con pulsante `AUDIO` accessibile in qualunque quiz per passare al volo all'ascolto senza perdere lo stato. |
+| Modalità Audio (Audiolibro Hands-Free) & Switch Universale | 🟢 Completato | Riconcettualizzazione da "Modalità Guida" a "Modalità Audio" con pulsante `AUDIO` accessibile in qualunque quiz (Navbar e header di Tutor, Materie, Esame, Errori) per passare al volo all'ascolto senza perdere lo stato. |
 | Ricerca Rapida No-Keyboard nell'Archivio | 🟡 In Roadmap (TODO) | Tastierino materie `01`-`09` + `TUTTE`, filtri stato a 1 tocco, quick chips tematiche e pad salto per #ID senza invocare la tastiera dello smartphone. |
-| Macro-Target Tattili per Bici/Corsa (Modalità Audio) | 🟡 In Roadmap (TODO) | 3 macro-fasce a tutta larghezza con altezza minima 75-85px, feedback aptico e zero elementi affiancati per uso con vibrazioni da manubrio o corsa. |
+| Macro-Target Tattili per Bici/Corsa (Modalità Audio) | 🟢 Completato | 3 macro-fasce a tutta larghezza con altezza minima 78-85px, badge numerici 44-56px, feedback aptico `navigator.vibrate` e zero elementi affiancati per uso con vibrazioni da manubrio o corsa. |
 | Impostazione Dimensione Font (Font Scaling) | 🟡 In Roadmap (TODO) | Selezione rapida 3 scale carattere (`Compatto` 13px per piccoli schermi, `Normale` 15px standard, `Grande/Outdoor` 17-18px per manubrio a braccio teso). |
 
 ---
@@ -170,10 +170,10 @@ Questa roadmap sintetizza il piano di riorganizzazione per massimizzare l'usabil
    - Creazione del componente `HomeScreen.tsx` con 6 macro-pulsanti ad alto contrasto.
    - Eliminazione della top bar permanente a 6 voci nelle schermate interne.
    - Adozione di una mini-header (~48px) con pulsante `[← Home]`, titolo essenziale e toggle `AUDIO`.
-3. **TODO-03: Modalità Audio (Stile Audiolibro Hands-Free) & Macro-Target Bici/Corsa**:
-   - Rinominare "Modalità Guida" in "Modalità Audio" con iconografia monocromatica a cuffie.
-   - 3 macro-fasce risposta a tutta larghezza con altezza minima 75-85px, spaziatura protetta e feedback aptico per prevenire miss-clicks su manubrio o durante la corsa.
-   - Inserimento del tasto `AUDIO` nell'header di Tutor, Materie, Esame ed Errori per switch al volo senza perdere lo stato.
+3. **TODO-03: Modalità Audio (Stile Audiolibro Hands-Free) & Macro-Target Bici/Corsa** `[COMPLETATO]`:
+   - Rinominare "Modalità Guida" in "Modalità Audio" con iconografia monocromatica a cuffie (`Headphones`).
+   - 3 macro-fasce risposta a tutta larghezza con altezza minima 78-85px, spaziatura protetta e feedback aptico (`navigator.vibrate`) per prevenire miss-clicks su manubrio o durante la corsa.
+   - Inserimento del tasto `AUDIO` nell'header di Tutor, Materie, Esame ed Errori e nella Navbar per switch al volo bidirezionale senza perdere lo stato.
 4. **TODO-04: Layout Zero-Scroll e Ottimizzazione Spaziale**:
    - Riduzione dei margini (`p-3 sm:p-3.5`, `leading-snug`, min-height 44px per i pulsanti risposta).
    - Container flessibile a `100dvh` per garantire che l'intero quiz stia in un'unica schermata su mobile.
