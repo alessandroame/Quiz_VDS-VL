@@ -152,7 +152,7 @@ Questo documento rappresenta la **bussola strategica e funzionale** del progetto
 | Potatura Radicale Quiz Deltaplano | 🟢 Completato | Focus 100% su Parapendio (474 quiz), rimozione definitiva dei 30 quiz deltaplano e pulizia di tutti i selettori, modali e badge correlati. |
 | Layout Zero-Scroll a Margini Compatti | 🟢 Completato | Viewport ottimizzato con padding compatti (`p-2.5 sm:p-4`), card ridotta (`p-3 sm:p-4`), bottoni risposta `min-h-[44px] sm:min-h-[48px]`, leading stretto (`leading-snug`) e clearance safe-area per visualizzare sempre domanda, opzioni e spiegazione senza scroll su smartphone 390x844. |
 | Modalità Audio (Audiolibro Hands-Free) & Switch Universale | 🟢 Completato | Riconcettualizzazione da "Modalità Guida" a "Modalità Audio" con pulsante `AUDIO` accessibile in qualunque quiz (Navbar e header di Tutor, Materie, Esame, Errori) per passare al volo all'ascolto senza perdere lo stato. |
-| Ricerca Rapida No-Keyboard nell'Archivio | 🟡 In Roadmap (TODO) | Tastierino materie `01`-`09` + `TUTTE`, filtri stato a 1 tocco, quick chips tematiche e pad salto per #ID senza invocare la tastiera dello smartphone. |
+| Ricerca Rapida No-Keyboard nell'Archivio | 🟢 Completato | Tastierino materie `01`-`09` + `TUTTE`, filtri stato a 1 tocco (`Tutte`, `Non viste`, `Errate`, `Preferiti`, `Note`) con conteggi live, 7 quick chips tematiche e pad numerico rapido `#ID` per salto istantaneo senza invocare la tastiera dello smartphone. |
 | Macro-Target Tattili per Bici/Corsa (Modalità Audio) | 🟢 Completato | 3 macro-fasce a tutta larghezza con altezza minima 78-85px, badge numerici 44-56px, feedback aptico `navigator.vibrate` e zero elementi affiancati per uso con vibrazioni da manubrio o corsa. |
 | Impostazione Dimensione Font (Font Scaling) | 🟡 In Roadmap (TODO) | Selezione rapida 3 scale carattere (`Compatto` 13px per piccoli schermi, `Normale` 15px standard, `Grande/Outdoor` 17-18px per manubrio a braccio teso). |
 
@@ -178,11 +178,11 @@ Questa roadmap sintetizza il piano di riorganizzazione per massimizzare l'usabil
    - Riduzione dei margini (`p-2.5 sm:p-4`, `leading-snug`, min-height 44px-48px per i pulsanti risposta).
    - Card compressa (`p-3 sm:p-4`, font `text-sm sm:text-base font-semibold leading-snug`, badge opzioni `w-5 h-5 sm:w-6 sm:h-6`).
    - Scheda didattica Regola/Tranello snellita (`space-y-1 text-xs leading-snug`) e QuizBottomBar compressa a min-h 40px con padding ridotti per azzerare lo scroll verticale sui dispositivi mobile standard 390x844.
-5. **TODO-05: Archivio con Ricerca Rapida Senza Tastiera**:
-   - Barra rapida materie `01`..`09` + `TUTTE`.
-   - Filtri di stato a tocco singolo (`Tutte`, `Non viste`, `Errate`, `Preferiti`, `Note`).
+5. **TODO-05: Archivio con Ricerca Rapida Senza Tastiera** `[COMPLETATO]`:
+   - Barra rapida materie `01`..`09` + `TUTTE` con switch immediato a singolo tocco.
+   - Filtri di stato a tocco singolo (`Tutte`, `Non viste`, `Errate`, `Preferiti`, `Note`) con badge dei conteggi in tempo reale.
    - Quick chips per concetti frequenti (*Vento*, *Stallo*, *Efficienza*, *Precedenze*, *Spazio Aereo*, *Termica*, *Nubi*).
-   - Pad numerico rapido per salto diretto al quiz per #ID.
+   - Pad numerico rapido `#ID` per salto diretto ed espansione automatica del quiz senza aprire la tastiera virtuale dello smartphone.
 6. **TODO-06: Impostazione Dimensione Font (Font Scaling / Outdoor Comfort)**:
    - 3 livelli di scala carattere selezionabili (`Compatto`, `Normale`, `Grande/Outdoor`).
    - Persistenza in Dexie (`fontSizePreference: 'compact' | 'normal' | 'large'`).

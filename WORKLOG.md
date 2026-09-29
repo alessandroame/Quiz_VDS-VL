@@ -14,6 +14,51 @@ Questo documento registra in ordine cronologico tutte le lavorazioni svolte nel 
 - **Impatto sul Desiderata**: <Come questo intervento contribuisce al desiderata (cfr. DESIDERATA.md) e indicazioni per il prossimo agente>
 ```
 
+# Registro di Bordo: TODO-05 Archivio con Ricerca Rapida Senza Tastiera
+
+- **Data**: 2026-09-29
+- **Autore/Agente**: Antigravity Cockpit Specialist
+- **Tipo di Intervento**: `feat(archive)`
+- **Argomento**: Barra rapida materie 01-09, filtri di stato a tocco singolo con badge live, 7 quick chips tematiche e pad numerico rapido #ID no-keyboard.
+
+---
+
+### 1. Cosa abbiamo fatto
+- **Modulo Puro Filtri Archivio (`src/utils/archiveFilters.ts`)**:
+  - Implementata logica deterministica di filtraggio e ricerca per l'Archivio con disaccoppiamento totale da React.
+  - Funzione `getArchiveStatusCounts`: calcolo reattivo in tempo reale dei contatori per ciascuna categoria (`all`, `unseen`, `incorrect`, `bookmarked`, `with_notes`), contestualizzati alla materia eventualmente selezionata.
+  - Funzione `filterArchiveQuestions`: supporto combinato per ricerca testuale/ID, filtro materia, filtri stato e filtri tematici.
+  - Funzione `findQuestionById` e `formatSubjectCode` (`01`..`09`).
+  - Definizione standard delle 7 chips concettuali (`ARCHIVE_CONCEPT_CHIPS`): *Vento*, *Stallo*, *Efficienza*, *Precedenze*, *Spazio Aereo*, *Termica*, *Nubi* con mapping a keyword e radici semantiche per massimizzare la copertura sui 474 quiz deltaplano/parapendio.
+- **Suite di Test Vitest (`src/utils/archiveFilters.test.ts`)**:
+  - Creata Suite 19 con 11 test unitari passanti al 100% (copertura calcolo conteggi, filtri singoli e combinati, ricerca ID con e senza prefisso `#`, chips tematiche).
+- **Rinnovamento Cockpit di `ArchiveScreen.tsx`**:
+  - **Barra Rapida Materie (`01`..`09` + `TUTTE`)**: Barra a scorrimento orizzontale priva di dropdown OS nativo; passaggio istantaneo tra le materie con 1 tocco e indicazione chiara del nome esteso nel tooltip.
+  - **Filtri di Stato a Tocco Singolo**: Segmented pills ad alto contrasto per `Tutte`, `Non viste`, `Errate`, `Preferiti` e `Note`, ciascuna dotata di badge numerico del conteggio live.
+  - **Thematic Quick Chips**: 7 pulsanti pill per filtrare istantaneamente concetti cardine del volo libero senza digitare una sola lettera.
+  - **Pad Numerico Rapido #ID**: Tastierino numerico 4x3 incorporato a scomparsa (tasti 0-9, Backspace `⌫`, Invio `VAI ⏎`, pulizia rapida) con feedback aptico, digitazione live dell'ID (es. `#1024`), auto-espansione e smooth scroll immediato verso la card bersaglio, senza mai attivare la tastiera su schermo dello smartphone.
+  - **Pulsante di Reset Globale**: Consente di azzerare istantaneamente qualsiasi combinazione di filtri attivi.
+- **Disambiguazione Icone Header (`VoiceQuickMenu.tsx`)**:
+  - Sostituita l'icona `Headphones` del pulsante rapido parlato con `Volume2` per evitare la duplicazione grafica con l'icona cuffie della "Modalità Audio" nel mini-header.
+- **Collaudo Visivo CDP Headless**:
+  - Eseguito test su mobile 390x844 aprendo la schermata Archivio e attivando il tastierino numerico.
+  - Verificato screenshot: 0 errori in console, 0 warning, layout compatto ad alto contrasto perfettamente integrato.
+  - Tutti i 176 test unitari Vitest superati con successo.
+
+---
+
+### 2. Scelte Architetturali & Rationale
+- **Esperienza Outdoor/Mobile "Zero-Virtual-Keyboard"**: L'apertura della tastiera virtuale di Android/iOS su mobile occupa oltre il 50% dell'altezza dello schermo, nascondendo i risultati e introducendo lag. L'introduzione del pad numerico 4x3 dedicato e delle quick chips permette all'allievo di consultare qualsiasi domanda o argomento con la sola pressione del pollice in meno di 2 secondi.
+- **Pure Functional Core**: Tutta la logica di conteggio e filtraggio risiede in `src/utils/archiveFilters.ts`, rendendola facilmente testabile e riutilizzabile.
+
+---
+
+### 3. Impatto sul Desiderata
+- Completa con successo **TODO-05** della roadmap Cockpit V2 in [DESIDERATA.md](file:///d:/Github/Quiz_VDS-VL/DESIDERATA.md).
+- Ultimo step della roadmap: **TODO-06 (Impostazione Dimensione Font / Font Scaling)**.
+
+---
+
 # Registro di Bordo: TODO-04 Layout Zero-Scroll e Ottimizzazione Spaziale
 
 - **Data**: 2026-09-29
