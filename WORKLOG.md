@@ -14,6 +14,21 @@ Questo documento registra in ordine cronologico tutte le lavorazioni svolte nel 
 - **Impatto sul Desiderata**: <Come questo intervento contribuisce al desiderata (cfr. DESIDERATA.md) e indicazioni per il prossimo agente>
 ```
 
+---
+
+### [2026-09-29] - Audit Tecnico Approfondito e Piano di Hardening (Fase 9)
+- **Cosa abbiamo fatto**:
+  - Eseguito un audit tecnico esaustivo del codice sorgente su 22 suite di test, build Vite, gestione dello stato (Dexie SSOT + React 19 Context), architettura audio PWA (`voiceService`, `audioDownloadManager`), e usabilità delle schermate (`ExamScreen`, `DriveModeScreen`, `ArchiveScreen`, `SettingsModal`).
+  - Identificate 6 aree di intervento prioritizzate (P1: ricorsione autoplay in `QuestionCard.tsx` e collaudi E2E interattivi; P2: over-subscription di 474 listener in `ArchiveScreen.tsx` e code-splitting dinamico con `React.lazy` per abbattere il bundle da 931 kB a < 400 kB; P3: scomposizione del monolite `DriveModeScreen.tsx` da 1.941 righe e de-duplicazione dati `questions.json`).
+  - Formalizzato il piano operativo dettagliato inserendolo nella **Fase 9** di [TODO.md](file:///d:/Github/Quiz_VDS-VL/TODO.md).
+- **Scelte architetturali & Rationale**:
+  - Prioritizzazione rigida (P1-P3) orientata alla salvaguardia dell'esperienza utente su smartphone e all'azzeramento di regressioni e warning console runtime.
+  - Suddivisione del debito tecnico tra stabilità reattiva (hook e cleanup) e performance di rete/memoria (code-splitting e de-sottoscrizione).
+- **Impatto sul Desiderata**:
+  - Tracciamento trasparente e strutturato delle ottimizzazioni necessarie per garantire che l'app rimanga scattante, leggera e affidabile per gli allievi piloti anche su dispositivi a basse risorse e in pieno uso offline.
+
+---
+
 # Worklog Fragment: Risoluzione Render Loop QuizContext e Integrità VoiceService
 
 - **Data**: 2026-09-29
