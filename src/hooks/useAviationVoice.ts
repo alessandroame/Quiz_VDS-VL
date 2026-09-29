@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { voiceService } from '../services/voiceService';
 import type { AudioPart, VoicePlaybackState } from '../types/audio';
 
@@ -10,9 +10,68 @@ export function useAviationVoice(questionId?: number) {
   }, []);
 
   const isThisQuestionActive = questionId !== undefined && state.currentQuestionId === questionId;
-  const isPartPlaying = (part: AudioPart) => isThisQuestionActive && state.activePart === part && state.isPlaying;
-  const isPartPaused = (part: AudioPart) => isThisQuestionActive && state.activePart === part && state.isPaused;
-  const isPartActive = (part: AudioPart) => isThisQuestionActive && state.activePart === part && (state.isPlaying || state.isPaused);
+  const isPartPlaying = useCallback(
+    (part: AudioPart) => isThisQuestionActive && state.activePart === part && state.isPlaying,
+    [isThisQuestionActive, state.activePart, state.isPlaying]
+  );
+  const isPartPaused = useCallback(
+    (part: AudioPart) => isThisQuestionActive && state.activePart === part && state.isPaused,
+    [isThisQuestionActive, state.activePart, state.isPaused]
+  );
+  const isPartActive = useCallback(
+    (part: AudioPart) => isThisQuestionActive && state.activePart === part && (state.isPlaying || state.isPaused),
+    [isThisQuestionActive, state.activePart, state.isPlaying, state.isPaused]
+  );
+
+  const togglePlayPause = useCallback(() => {
+    if (questionId) voiceService.togglePlayPause(questionId);
+  }, [questionId]);
+
+  const restartFullSequence = useCallback(() => {
+    if (questionId) voiceService.restartFullSequence(questionId);
+  }, [questionId]);
+
+  const restartCurrentOrSequence = useCallback(() => {
+    if (questionId) voiceService.restartCurrentOrSequence(questionId);
+  }, [questionId]);
+
+  const playFullSequence = useCallback(() => {
+    if (questionId) voiceService.playFullSequence(questionId);
+  }, [questionId]);
+
+  const playQuestion = useCallback(() => {
+    if (questionId) voiceService.playSinglePart(questionId, 'question');
+  }, [questionId]);
+
+  const restartQuestion = useCallback(() => {
+    if (questionId) voiceService.restartSinglePart(questionId, 'question');
+  }, [questionId]);
+
+  const playOption = useCallback((index: 1 | 2 | 3) => {
+    if (!questionId) return;
+    const partMap: Record<1 | 2 | 3, AudioPart> = { 1: 'opt1', 2: 'opt2', 3: 'opt3' };
+    voiceService.playSinglePart(questionId, partMap[index]);
+  }, [questionId]);
+
+  const restartOption = useCallback((index: 1 | 2 | 3) => {
+    if (!questionId) return;
+    const partMap: Record<1 | 2 | 3, AudioPart> = { 1: 'opt1', 2: 'opt2', 3: 'opt3' };
+    voiceService.restartSinglePart(questionId, partMap[index]);
+  }, [questionId]);
+
+  const playExplanation = useCallback(() => {
+    if (questionId) voiceService.playSinglePart(questionId, 'explanation');
+  }, [questionId]);
+
+  const restartExplanation = useCallback(() => {
+    if (questionId) voiceService.restartSinglePart(questionId, 'explanation');
+  }, [questionId]);
+
+  const pause = useCallback(() => voiceService.pause(), []);
+  const resume = useCallback(() => voiceService.resume(), []);
+  const stop = useCallback(() => voiceService.stop(), []);
+  const playDriveIntro = useCallback(() => voiceService.playDriveIntro(), []);
+  const stopDriveIntro = useCallback(() => voiceService.stopDriveIntro(), []);
 
   return {
     ...state,
@@ -20,44 +79,20 @@ export function useAviationVoice(questionId?: number) {
     isPartPlaying,
     isPartPaused,
     isPartActive,
-    togglePlayPause: () => {
-      if (questionId) voiceService.togglePlayPause(questionId);
-    },
-    restartFullSequence: () => {
-      if (questionId) voiceService.restartFullSequence(questionId);
-    },
-    restartCurrentOrSequence: () => {
-      if (questionId) voiceService.restartCurrentOrSequence(questionId);
-    },
-    playFullSequence: () => {
-      if (questionId) voiceService.playFullSequence(questionId);
-    },
-    playQuestion: () => {
-      if (questionId) voiceService.playSinglePart(questionId, 'question');
-    },
-    restartQuestion: () => {
-      if (questionId) voiceService.restartSinglePart(questionId, 'question');
-    },
-    playOption: (index: 1 | 2 | 3) => {
-      if (!questionId) return;
-      const partMap: Record<1 | 2 | 3, AudioPart> = { 1: 'opt1', 2: 'opt2', 3: 'opt3' };
-      voiceService.playSinglePart(questionId, partMap[index]);
-    },
-    restartOption: (index: 1 | 2 | 3) => {
-      if (!questionId) return;
-      const partMap: Record<1 | 2 | 3, AudioPart> = { 1: 'opt1', 2: 'opt2', 3: 'opt3' };
-      voiceService.restartSinglePart(questionId, partMap[index]);
-    },
-    playExplanation: () => {
-      if (questionId) voiceService.playSinglePart(questionId, 'explanation');
-    },
-    restartExplanation: () => {
-      if (questionId) voiceService.restartSinglePart(questionId, 'explanation');
-    },
-    pause: () => voiceService.pause(),
-    resume: () => voiceService.resume(),
-    stop: () => voiceService.stop(),
-    playDriveIntro: () => voiceService.playDriveIntro(),
-    stopDriveIntro: () => voiceService.stopDriveIntro()
+    togglePlayPause,
+    restartFullSequence,
+    restartCurrentOrSequence,
+    playFullSequence,
+    playQuestion,
+    restartQuestion,
+    playOption,
+    restartOption,
+    playExplanation,
+    restartExplanation,
+    pause,
+    resume,
+    stop,
+    playDriveIntro,
+    stopDriveIntro
   };
 }

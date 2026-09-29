@@ -14,6 +14,51 @@ Questo documento registra in ordine cronologico tutte le lavorazioni svolte nel 
 - **Impatto sul Desiderata**: <Come questo intervento contribuisce al desiderata (cfr. DESIDERATA.md) e indicazioni per il prossimo agente>
 ```
 
+# Worklog Fragment: Risoluzione Render Loop QuizContext e Integrità VoiceService
+
+- **Data**: 2026-09-29
+- **Autore**: Antigravity Cockpit Specialist
+- **Tipo di Intervento**: `fix(voice)` & `fix(exam)`
+- **Argomento**: Risoluzione del loop infinito `Maximum update depth exceeded` in `QuizContext.tsx:75`, prevenzione dell'avviso errato "Simulazione in Corso" al rientro da Debriefing esame, e stabilizzazione del ciclo di vita audio di `voiceService`.
+
+---
+
+### 1. Cosa abbiamo fatto
+- **Stabilizzazione Contesto Audio (`src/context/QuizContext.tsx`)**:
+  - Convertito lo stato `activeAudioSessionContext` da `useState` a `useRef` (`activeAudioSessionContextRef`).
+  - Memoizzato con `useCallback` i metodi `registerAudioSessionContext`, `openDriveMode` e `closeDriveMode`.
+  - Azzerato l'effetto a cascata che provocava il re-render di `QuizProvider` a ogni registrazione o cambio di tempo/progresso dei quesiti, eliminando la causa radice del crash React `Maximum update depth exceeded (57x)`.
+- **Risoluzione Warning Improprio "Simulazione in Corso" (`src/components/ExamScreen.tsx`)**:
+  - Resettato in modo esplicito e sincrono `setIsExamRunning(false)` all'inizio di `handleSubmitExam` prima delle chiamate asincrone a Dexie, e nell'evento click del pulsante `btn-return-home` nella schermata di Debriefing (`NON IDONEO` / `IDONEO`).
+  - Rimosso l'aggiornamento a frequenza 1s (`elapsedSeconds` / `secondsRemaining`) dalle dipendenze di registrazione dell'audio context in `ExamScreen.tsx`.
+  - Garantito che tornando alla Home dal debriefing di fine esame non compaia più la modale di avviso abbandono esame.
+- **Armonizzazione Ciclo di Vita Audio (`src/services/voiceService.ts`)**:
+  - Esecuzione asincrona e coalescente delle notifiche ai listener (`this.notify()`) tramite `queueMicrotask`, eliminando l'errore React `Cannot update a component ('QuestionCard') while rendering a different component ('DriveModeScreen')`.
+  - Early-exit in `voiceService.stop()` se il servizio è già in stato di stop/idle, evitando 29 chiamate a catena di `pause()` e notifiche ridondanti all'unmount dei quesiti.
+  - Gestione silenziosa (senza warning in console né cascata a `stop()`) degli errori standard di ciclo di vita HTML5 audio `AbortError` e `NotAllowedError` in `playSinglePart`, `restartSinglePart`, `resume`, `stepSequence` e `playDriveIntro`.
+- **Memoizzazione Hook Audio (`src/hooks/useAviationVoice.ts`)**:
+  - Incapsulati tutti i metodi restituiti (`togglePlayPause`, `restartFullSequence`, `restartCurrentOrSequence`, `playFullSequence`, `playQuestion`, `restartQuestion`, `playOption`, `restartOption`, `playExplanation`, `restartExplanation`, `pause`, `resume`, `stop`, `playDriveIntro`, `stopDriveIntro`) e i selettori booleani con `useCallback`.
+- **Ottimizzazione Cleanup Schede Quesito (`src/components/QuestionCard.tsx`)**:
+  - Nel cleanup di `useEffect`, limitata la chiamata a `stop()` esclusivamente se la domanda corrente è effettivamente quella attiva in riproduzione (`isThisQuestionActive`), eliminando le 29 interruzioni concorrenti durante la revisione post-esame.
+- **Suite di Test Unitari & Collaudo Visivo CDP**:
+  - Introdotti i test unitari `VOICE-29` (idle stop no-op), `VOICE-30` (silenzioso su `AbortError`), e `VOICE-31` (notifica asincrona via microtask) in `src/services/voiceService.test.ts`. Totale 201 test unitari superati con successo.
+  - Creato script di collaudo headless `scripts/test_review_navigation_and_voice.cjs` che certifica via Chrome DevTools Protocol (CDP) il completamento della simulazione, il rendering del debriefing, il ritorno alla Home a zero modali e 0 errori in console.
+
+---
+
+### 2. Scelte Architetturali & Rationale
+- **`useRef` per Audio Context vs `useState`**: `activeAudioSessionContext` funge da ponte per catturare lo stato della sessione attiva (domande, indice, risposte) solo nel momento in cui l'utente apre la Modalità Guida (`openDriveMode`). Mantenere questo dato in `useRef` garantisce la lettura sincrona e puntuale senza forzare re-render dell'intero albero di componenti ad ogni risposta o ticchettio di timer.
+- **Disaccoppiamento Notifiche via `queueMicrotask`**: In React 19, invocare `setState` di un componente durante il render o il commit di un altro componente scatena violazioni architetturali rigide. L'uso di `queueMicrotask` preserva la purezza del render e accoda l'aggiornamento dei subscriber vocali al completamento del microtask.
+- **Gestione Standard `AbortError`**: Quando un elemento audio HTML5 avvia `play()` e riceve una successiva chiamata di `pause()` o un nuovo caricamento `.src`, il browser rifiuta nativamente la promise con `AbortError`. Trattarlo come eccezione applicativa inquinava la console con warning fittizi; l'intercettazione pulita allinea il motore alle best practice W3C/MDN.
+
+---
+
+### 3. Impatto sul Desiderata
+- Azzerati completamente i blocchi di rendering e i warning visibili in console durante la sessione di esame e debriefing.
+- Esperienza utente fluida e priva di falsi allarmi nell'abbandono o nella conclusione delle prove d'esame.
+
+---
+
 # Worklog Fragment: Navigatore Quiz Comprimibile a Singola Riga
 
 - **Data**: 2026-09-29

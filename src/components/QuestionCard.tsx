@@ -64,9 +64,11 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({
       playFullSequence();
     }
     return () => {
-      stop();
+      if (isThisQuestionActive) {
+        stop();
+      }
     };
-  }, [question.id]);
+  }, [question.id, isThisQuestionActive, playFullSequence, stop, settings.ttsEnabled, settings.ttsAutoPlayQuestion]);
 
   // Speech keyboard shortcuts (V: Play/Pause sequence, R or Shift+V: Restart sequence, Q: Question toggle, Shift+Q: Restart question, Alt+1/2/3: Option toggle, Alt+Shift+1/2/3: Restart option, E: Explanation toggle, Shift+E: Restart explanation, Esc: Stop)
   useEffect(() => {

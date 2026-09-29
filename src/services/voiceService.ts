@@ -21,6 +21,7 @@ export class VoiceService {
   private effectiveVoice: 'giuseppe' | 'elsa' | null = null;
   private isDriveIntroPlaying: boolean = false;
   private sequenceTimeout: any = null;
+  private isNotificationPending: boolean = false;
 
   constructor() {
     if (typeof Audio !== 'undefined') {
@@ -100,8 +101,32 @@ export class VoiceService {
   }
 
   private notify() {
-    const state = this.getState();
-    this.listeners.forEach(fn => fn(state));
+    if (this.isNotificationPending) return;
+    this.isNotificationPending = true;
+
+    if (typeof queueMicrotask === 'function') {
+      queueMicrotask(() => {
+        this.isNotificationPending = false;
+        const state = this.getState();
+        this.listeners.forEach(fn => {
+          try {
+            fn(state);
+          } catch (err) {
+            console.error('Error notifying voice listener:', err);
+          }
+        });
+      });
+    } else {
+      this.isNotificationPending = false;
+      const state = this.getState();
+      this.listeners.forEach(fn => {
+        try {
+          fn(state);
+        } catch (err) {
+          console.error('Error notifying voice listener:', err);
+        }
+      });
+    }
   }
 
   public getState(): VoicePlaybackState {
@@ -210,7 +235,8 @@ export class VoiceService {
       await this.audio.play();
       this.updateMediaSession(questionId, part.toUpperCase());
       this.notify();
-    } catch (err) {
+    } catch (err: any) {
+      if (err?.name === 'AbortError' || err?.name === 'NotAllowedError') return;
       console.warn(`Could not play fragment ${part} for question #${questionId}:`, err);
       this.stop();
     }
@@ -235,7 +261,8 @@ export class VoiceService {
         await this.audio.play();
         this.updateMediaSession(questionId, part.toUpperCase());
         this.notify();
-      } catch (err) {
+      } catch (err: any) {
+        if (err?.name === 'AbortError' || err?.name === 'NotAllowedError') return;
         console.warn(`Error restarting fragment ${part} for question #${questionId}:`, err);
         this.stop();
       }
@@ -255,7 +282,8 @@ export class VoiceService {
       await this.audio.play();
       this.updateMediaSession(questionId, part.toUpperCase());
       this.notify();
-    } catch (err) {
+    } catch (err: any) {
+      if (err?.name === 'AbortError' || err?.name === 'NotAllowedError') return;
       console.warn(`Could not restart fragment ${part} for question #${questionId}:`, err);
       this.stop();
     }
@@ -326,7 +354,8 @@ export class VoiceService {
           navigator.mediaSession.playbackState = 'playing';
         }
         this.notify();
-      } catch (err) {
+      } catch (err: any) {
+        if (err?.name === 'AbortError' || err?.name === 'NotAllowedError') return;
         console.warn('Error during voice resume:', err);
         this.stop();
       }
@@ -393,7 +422,8 @@ export class VoiceService {
       await this.audio.play();
       this.updateMediaSession(this.currentQuestionId, part.toUpperCase());
       this.notify();
-    } catch (err) {
+    } catch (err: any) {
+      if (err?.name === 'AbortError' || err?.name === 'NotAllowedError') return;
       console.warn(`Error during voice sequence step ${part}:`, err);
       this.stop();
     }
@@ -454,7 +484,8 @@ export class VoiceService {
         navigator.mediaSession.playbackState = 'playing';
       }
       this.notify();
-    } catch (err) {
+    } catch (err: any) {
+      if (err?.name === 'AbortError' || err?.name === 'NotAllowedError') return;
       console.warn('Could not play drive intro audio file, checking speechSynthesis fallback:', err);
       this.playSpeechSynthesisFallback();
     }
@@ -561,6 +592,17 @@ export class VoiceService {
   }
 
   public stop(): void {
+    const isAlreadyIdle =
+      this.currentQuestionId === null &&
+      !this.isDriveIntroPlaying &&
+      !this.isSequencePlaying &&
+      !this.isPaused &&
+      (!this.audio || this.audio.paused);
+
+    if (isAlreadyIdle) {
+      return;
+    }
+
     this.clearSequence();
     if (this.isDriveIntroPlaying && typeof window !== 'undefined' && 'speechSynthesis' in window) {
       try {

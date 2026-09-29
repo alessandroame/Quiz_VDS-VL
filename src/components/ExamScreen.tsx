@@ -305,6 +305,7 @@ export const ExamScreen: React.FC<ExamScreenProps> = ({
 
   const handleSubmitExam = useCallback(async () => {
     setShowSubmitModal(false);
+    setIsExamRunning(false);
     const durationSeconds = examMode === 'tutor'
       ? Math.max(1, elapsedSeconds)
       : Math.max(1, Math.round((Date.now() - startTime) / 1000));
@@ -341,7 +342,7 @@ export const ExamScreen: React.FC<ExamScreenProps> = ({
         // Ignore
       }
     }
-  }, [answers, examQuestions, flags, isMarathon, examMode, elapsedSeconds, recordAnswer, saveExam, startTime, dismissActiveSession]);
+  }, [answers, examQuestions, flags, isMarathon, examMode, elapsedSeconds, recordAnswer, saveExam, startTime, dismissActiveSession, setIsExamRunning]);
 
   // Registra la sessione audio attiva per consentire lo switch universale (Navbar o shortcut) senza perdere lo stato
   useEffect(() => {
@@ -374,8 +375,6 @@ export const ExamScreen: React.FC<ExamScreenProps> = ({
     answers,
     flags,
     examMode,
-    elapsedSeconds,
-    secondsRemaining,
     handleSubmitExam,
     registerAudioSessionContext
   ]);
@@ -668,6 +667,7 @@ export const ExamScreen: React.FC<ExamScreenProps> = ({
           <button
             id="btn-return-home"
             onClick={() => {
+              setIsExamRunning(false);
               if (onNavigateHome) {
                 onNavigateHome();
               } else {

@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useMemo, useEffect, useState } from 'react';
+import React, { createContext, useContext, useMemo, useEffect, useState, useRef, useCallback } from 'react';
 import { useLiveQuery } from 'dexie-react-hooks';
 import questionsData from '../data/questions.json';
 import type { Question, Discipline } from '../types/quiz';
@@ -69,22 +69,22 @@ export const QuizProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [isExamRunning, setIsExamRunning] = useState<boolean>(false);
   const [isDriveModeOpen, setIsDriveModeOpen] = useState<boolean>(false);
   const [driveSessionContext, setDriveSessionContext] = useState<DriveModeSessionContext | null>(null);
-  const [activeAudioSessionContext, setActiveAudioSessionContext] = useState<DriveModeSessionContext | null>(null);
+  const activeAudioSessionContextRef = useRef<DriveModeSessionContext | null>(null);
 
-  const registerAudioSessionContext = (context: DriveModeSessionContext | null) => {
-    setActiveAudioSessionContext(context);
-  };
+  const registerAudioSessionContext = useCallback((context: DriveModeSessionContext | null) => {
+    activeAudioSessionContextRef.current = context;
+  }, []);
 
-  const openDriveMode = (context?: DriveModeSessionContext) => {
-    const targetContext = context ?? activeAudioSessionContext;
+  const openDriveMode = useCallback((context?: DriveModeSessionContext) => {
+    const targetContext = context ?? activeAudioSessionContextRef.current;
     setDriveSessionContext(targetContext || null);
     setIsDriveModeOpen(true);
-  };
+  }, []);
 
-  const closeDriveMode = () => {
+  const closeDriveMode = useCallback(() => {
     setIsDriveModeOpen(false);
     setDriveSessionContext(null);
-  };
+  }, []);
 
   // Reattività istantanea con Dexie live queries
   const statsList = useLiveQuery(() => db.stats.toArray(), []) || [];
@@ -234,7 +234,7 @@ export const QuizProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setIsExamRunning,
         isDriveModeOpen,
         driveSessionContext,
-        activeAudioSessionContext,
+        activeAudioSessionContext: activeAudioSessionContextRef.current,
         registerAudioSessionContext,
         openDriveMode,
         closeDriveMode,

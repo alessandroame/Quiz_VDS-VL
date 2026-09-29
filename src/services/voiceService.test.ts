@@ -574,5 +574,44 @@ describe('VoiceService (src/services/voiceService.ts)', () => {
     expect(giuseppeVoice).toBeDefined();
     expect(giuseppeVoice?.name).toBe('Microsoft Cosimo Desktop');
   });
+
+  it('VOICE-29: stop() is a no-op when already idle', () => {
+    const pauseSpy = vi.spyOn(mockAudio, 'pause');
+    const listener = vi.fn();
+    service.subscribe(listener);
+    listener.mockClear();
+
+    // Call stop while already idle
+    service.stop();
+
+    expect(pauseSpy).not.toHaveBeenCalled();
+    expect(listener).not.toHaveBeenCalled();
+  });
+
+  it('VOICE-30: AbortError on play() is silently handled without warnings or cascaded stop', async () => {
+    const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    const abortErr = new Error('The play() request was interrupted by a call to pause().');
+    abortErr.name = 'AbortError';
+
+    vi.spyOn(mockAudio, 'play').mockRejectedValueOnce(abortErr);
+
+    await expect(service.playSinglePart(10, 'question')).resolves.toBeUndefined();
+    expect(warnSpy).not.toHaveBeenCalled();
+  });
+
+  it('VOICE-31: subscriber listener receives asynchronous notification via microtask', async () => {
+    const listener = vi.fn();
+    service.subscribe(listener);
+    listener.mockClear();
+
+    await service.playSinglePart(1, 'question');
+    // Wait for microtask tick
+    await Promise.resolve();
+
+    expect(listener).toHaveBeenCalled();
+    const lastState = listener.mock.calls[listener.mock.calls.length - 1][0];
+    expect(lastState.currentQuestionId).toBe(1);
+    expect(lastState.activePart).toBe('question');
+  });
 });
 
