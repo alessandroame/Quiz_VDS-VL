@@ -14,6 +14,51 @@ Questo documento registra in ordine cronologico tutte le lavorazioni svolte nel 
 - **Impatto sul Desiderata**: <Come questo intervento contribuisce al desiderata (cfr. DESIDERATA.md) e indicazioni per il prossimo agente>
 ```
 
+### [2026-09-29] - Supporto Completo Tema Chiaro (Hangar Light) in Modalità Alla Guida e Modali Vocali
+- **Cosa abbiamo fatto**:
+  - **Adeguamento Tema Chiaro in `DriveModeScreen.tsx`**:
+    * Sostituito lo sfondo rigido `bg-black text-zinc-100` con il variant responsive `bg-black text-zinc-100 light:bg-slate-50 light:text-slate-900`.
+    * Aggiornati tutti i componenti interni dello Stato 1 (Launcher): testata, pulsanti rapidi ("Pilota Automatico", "Comandi Vocali", "Modalità Tutor Didattica"), banner di briefing vocale, pulsanti di lancio (Esame Ufficiale AeCI, Radio Quiz Continuo, Ripasso Quaderno Errori, Maratona Intensiva) e barra inferiore con indicatori di sicurezza.
+    * Aggiornati tutti i componenti dello Stato 2 (Quiz in Esecuzione): HUD bar superiore, pulsanti audio/controllo, card domanda ministeriale con numerazione e materia (#5044 Meteorologia), macro-pulsanti opzione 1/2/3 touch-friendly, barra comandi vocali e card didattica di feedback Regola & Tranello.
+    * Aggiornati tutti i componenti dello Stato 3 (Debriefing e Risultati): card risultato finale (Idoneo/Non Idoneo), riepilogo conteggi e pulsanti di riavvio.
+    * Aggiornato il modale di conferma abbandono esame (`showAbandonExamModal`).
+    * Rimosso il prop `forceDark` dalle 3 istanze di `<VoiceQuickMenu />` consentendogli di ereditare naturalmente il tema dell'applicazione.
+  - **Adeguamento Tema Chiaro in `VoiceCommandsModal.tsx`**:
+    * Aggiornato il contenitore modale, l'header, le card esplicative dei gruppi di comandi vocali ("Rispondi al Quiz", "Scorri Domande", "Riascolta Audio", ecc.), il box dei consigli per la guida e il footer con classi `light:`.
+  - **Collaudo Headless via CDP (Zero-Dependency CDP Visual Check)**:
+    * Eseguito test di conformità cromatica e acquisizione screenshot headless a 390x844 (mobile portrait) con [scripts/test_drive_theme.cjs](file:///c:/github/Quiz_VDS-VL/scripts/test_drive_theme.cjs).
+    * Verificato `backgroundColor: rgb(248, 250, 252)` e `color: rgb(15, 23, 42)` per il contenitore radice e `rgb(255, 251, 235)` per l'area domanda.
+    * Confermato 0 errori runtime in console browser, 152/152 test Vitest superati e build di produzione verificata con successo.
+- **Scelte architetturali & Rationale**:
+  - *Allineamento con Tailwind Plugin Variant*: L'applicazione utilizza il variant Tailwind `:is(.light &)` gestito da `ThemeContext.tsx` tramite l'attributo di classe `light` sull'elemento radice `<html>`. L'aggiunta mirata di utility `light:` garantisce piena coerenza visiva sia nel tema scuro "Cockpit Dark" che in quello chiaro "Hangar Light" ad alto contrasto per uso diurno/all'aperto, senza rompere la palette notturna.
+- **Impatto sul Desiderata**:
+  - Garantisce agli allievi piloti la massima leggibilità e accessibilità ergonomica durante l'uso in auto o all'aperto sotto luce diretta del sole in accordo con le direttive del design system avionico.
+
+---
+
+### [2026-09-29] - Risoluzione Pronuncia XML nei File Audio (Edge-TTS Parameter Fix) e Rigenerazione Completa
+- **Cosa abbiamo fatto**:
+  - **Diagnosi Radice del Problema**:
+    * Risolto il bug segnalato per cui i file vocali sintetizzati pronunciavano stringhe XML (*"minore speak version uno punto zero..."*) prima della frase effettiva.
+    * La causa risiedeva nell'involucro `build_ssml()` in `scripts/generate_audio_database.py` e `scripts/generate_drive_intro.py`: la libreria Python `edge-tts` effettua automaticamente l'escape HTML/XML di qualsiasi stringa passata (`escape(text)` converte `<` e `>` in `&lt;` e `&gt;`) prima di incapsularla nel proprio template SSML.
+    * Di conseguenza, i tag XML venivano inviati ai server TTS Microsoft come testo letterale da leggere ad alta voce.
+  - **Correzione Script di Sintesi Vocale**:
+    * Rimossa la funzione `build_ssml()` da [scripts/generate_audio_database.py](file:///c:/github/Quiz_VDS-VL/scripts/generate_audio_database.py) e [scripts/generate_drive_intro.py](file:///c:/github/Quiz_VDS-VL/scripts/generate_drive_intro.py).
+    * Ripristinato il passaggio diretto e nativo dei parametri `text`, `voice`, `rate` e `pitch` alla classe `edge_tts.Communicate()`.
+    * Incrementato il numero di retry a 5 con backoff esponenziale per garantire resilienza totale nei download ad alto volume.
+  - **Verifica e Validazione della Sintesi Pulita**:
+    * Rigenerati i briefing di guida [drive_intro.mp3](file:///c:/github/Quiz_VDS-VL/public/audio/giuseppe/drive_intro.mp3): taglia ridotta da ~380 KB a 170 KB (Giuseppe) e 144 KB (Elsa), con dizione naturale immediata priva di intestazioni XML.
+    * Validata la generazione pulita sui quesiti campione 1001-1006: taglia dei frammenti audio ridotta da ~260 KB a 20-60 KB.
+  - **Lancio Pipeline di Rigenerazione Integrale**:
+    * Creato lo script orchestratore [scripts/regenerate_all_audio.py](file:///c:/github/Quiz_VDS-VL/scripts/regenerate_all_audio.py).
+    * Avviata in background la rigenerazione di tutti i 5.040 segmenti audio e l'aggiornamento automatico del manifest [public/audio/manifest.json](file:///c:/github/Quiz_VDS-VL/public/audio/manifest.json).
+- **Scelte architetturali & Rationale**:
+  - *Parametri Nativi edge-tts*: Le voci `it-IT-DiegoNeural` ed `it-IT-ElsaNeural` sono intrinsecamente native italiane; non richiedono tag SSML manuali poiché `edge-tts` gestisce già rate e pitch a livello di protocollo.
+- **Impatto sul Desiderata**:
+  - Risolve l'anomalia vocale restituendo un'esperienza audio fluida, rapida e professionale in Modalità Guida e nelle sessioni di ascolto didattico.
+
+---
+
 ### [2026-09-29] - Completamento Totale del Catalogo (504/504 Quiz - 100%): Riscritte Spiegazioni Specifiche e Sincronizzato Ecosistema Audio Neurale
 - **Cosa abbiamo fatto**:
   - **Completamento Integrale dei 504 Quiz Ministeriali AeCI (9 Materie su 9)**:

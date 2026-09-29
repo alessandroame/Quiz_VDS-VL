@@ -117,10 +117,12 @@
   - `"Bandiera"` per contrassegnare il quesito da rivedere.
   - `"Pausa"`, `"Riprendi"` per controllare la sessione.
   - `"Aiuto"`, `"Guida"`, `"Comandi"` per aprire la guida a voce in qualsiasi istante.
+- **Supporto Bivalente del Tema Colore (Cockpit Dark & Hangar Light)**:
+  - La Modalità Alla Guida, il Quick Speech Menu e la Guida Comandi Vocali rispettano pienamente il tema attivo dell'applicazione.
+  - In modalità notturna offre lo stile **Cockpit Dark antiriflesso** ottimizzato per zero riverberi sul parabrezza; in modalità diurna si adatta all'**Hangar Light** per la massima leggibilità sotto la luce diretta del sole.
 - **Menu Rapido Impostazioni Voce Integrato (Quick Speech Menu)**:
   - Accesso istantaneo a 1 tocco alle impostazioni vocali sia nella schermata iniziale (Launcher), sia nella Top Bar HUD durante il quiz attivo a schermo intero e nella schermata di Debriefing finale.
   - Permette di cambiare al volo l'istruttore (👨‍✈️ Giuseppe / 👩‍✈️ Elsa), la velocità di lettura (0.9x, 1.0x, 1.15x, 1.25x), attivare o disattivare la lettura vocale e abilitare/disabilitare la lettura automatica e gli effetti sonori.
-  - Design nativo in stile **Cockpit Dark antiriflesso** (`forceDark`), ottimizzato per zero riverberi durante la guida serale o notturna sul parabrezza.
 - **Guida Contestuale Comandi Vocali & Feedback Visivo Reattivo**:
   - **Icona Microfono Pulsante & Radar Wave**: sia nell'header superiore sia nel banner inferiore, l'icona del microfono pulsa visibilmente (`animate-pulse`) circondata da un'onda radar radiale (`animate-ping`) e da un bagliore avionico verde smeraldo non appena viene rilevata voce o un comando in arrivo.
   - **HUD Live Dinamico con Trascrizione in Tempo Reale**:
