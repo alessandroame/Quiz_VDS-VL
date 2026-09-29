@@ -2,8 +2,17 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import App from './App';
 import './index.css';
+import { audioDownloadManager } from './services/audioDownloadManager';
 
-// vite-plugin-pwa handles Service Worker registration automatically via registerSW.js
+// In development mode, unregister any stale service workers to prevent cache interception
+if (import.meta.env.DEV && typeof window !== 'undefined' && 'serviceWorker' in navigator) {
+  navigator.serviceWorker.getRegistrations().then(registrations => {
+    for (const registration of registrations) {
+      registration.unregister();
+      console.log('[ServiceWorker] Unregistered stale service worker in DEV mode:', registration);
+    }
+  });
+}
 
 // Log build info to browser console for verification and cache invalidation diagnosis
 const buildInfo = {
@@ -16,6 +25,7 @@ const buildInfo = {
 
 if (typeof window !== 'undefined') {
   window.__APP_BUILD_INFO__ = buildInfo;
+  (window as any).audioDownloadManager = audioDownloadManager;
 }
 
 console.log(

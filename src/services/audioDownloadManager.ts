@@ -96,6 +96,10 @@ export class AudioDownloadManager {
     };
   }
 
+  public isAnyDownloading(): boolean {
+    return Object.values(this.statuses).some(s => s.isDownloading);
+  }
+
   public subscribe(listener: DownloadEventListener): () => void {
     this.listeners.add(listener);
     listener(this.getAllStatuses());

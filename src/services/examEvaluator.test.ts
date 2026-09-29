@@ -270,4 +270,37 @@ describe('Suite 3: Motore di Valutazione Esame AeCI (src/services/examEvaluator.
     expect(isPassingScore(6, true)).toBe(true);
     expect(isPassingScore(7, true)).toBe(false);
   });
+
+  it('EVAL-11: should correctly propagate examMode for tutor, official and marathon sessions', () => {
+    const tutorSession = evaluateExam({
+      questions: sample30,
+      answers: {},
+      durationSeconds: 500,
+      examMode: 'tutor'
+    });
+    expect(tutorSession.examMode).toBe('tutor');
+
+    const officialSession = evaluateExam({
+      questions: sample30,
+      answers: {},
+      durationSeconds: 500,
+      examMode: 'official'
+    });
+    expect(officialSession.examMode).toBe('official');
+
+    const defaultSession = evaluateExam({
+      questions: sample30,
+      answers: {},
+      durationSeconds: 500
+    });
+    expect(defaultSession.examMode).toBe('official');
+
+    const marathonSession = evaluateExam({
+      questions: sample60,
+      answers: {},
+      durationSeconds: 500,
+      isMarathon: true
+    });
+    expect(marathonSession.examMode).toBe('marathon');
+  });
 });

@@ -12,6 +12,7 @@ import { DriveModeScreen } from './components/DriveModeScreen';
 import { OfflineBanner } from './components/OfflineIndicator';
 import { Download, AlertTriangle, Play, ArrowRight, X } from 'lucide-react';
 import { voiceService } from './services/voiceService';
+import { audioDownloadManager } from './services/audioDownloadManager';
 
 function AppContent() {
   const {
@@ -27,6 +28,17 @@ function AppContent() {
   const [pendingTab, setPendingTab] = useState<NavTab | null>(null);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
+  const [isAudioDownloading, setIsAudioDownloading] = useState(
+    audioDownloadManager.isAnyDownloading()
+  );
+
+  // Monitora download audio in background per padding layout
+  useEffect(() => {
+    return audioDownloadManager.subscribe(statuses => {
+      const isDownloading = Object.values(statuses).some(s => s.isDownloading);
+      setIsAudioDownloading(isDownloading);
+    });
+  }, []);
 
   // Protezione prima della chiusura/ricaricamento pagina se c'è un esame attivo
   useEffect(() => {
@@ -102,7 +114,11 @@ function AppContent() {
   };
 
   return (
-    <div className="min-h-screen bg-zinc-950 text-zinc-100 dark:bg-zinc-950 dark:text-zinc-100 light:bg-slate-50 light:text-slate-900 transition-colors pb-20">
+    <div
+      className={`min-h-screen bg-zinc-950 text-zinc-100 dark:bg-zinc-950 dark:text-zinc-100 light:bg-slate-50 light:text-slate-900 transition-colors ${
+        isAudioDownloading ? 'pb-36' : 'pb-20'
+      }`}
+    >
       <Navbar
         activeTab={activeTab}
         setActiveTab={handleSelectTab}
@@ -178,7 +194,7 @@ function AppContent() {
         {activeTab === 'stats' && <StatsScreen />}
       </main>
 
-      {/* Modal Impostazioni */}
+      {/* Schermata Impostazioni Fullscreen */}
       <SettingsModal
         isOpen={isSettingsOpen}
         onClose={() => setIsSettingsOpen(false)}

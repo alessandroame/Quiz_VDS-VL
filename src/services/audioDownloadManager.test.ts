@@ -95,4 +95,18 @@ describe('AudioDownloadManager (src/services/audioDownloadManager.ts)', () => {
     manager.cancelDownload('giuseppe');
     expect(manager.getStatus('giuseppe').isDownloading).toBe(false);
   });
+
+  it('ADM-08: isAnyDownloading detects active downloads across voices', () => {
+    expect(manager.isAnyDownloading()).toBe(false);
+
+    (manager as any).statuses.elsa.isDownloading = true;
+    expect(manager.isAnyDownloading()).toBe(true);
+
+    (manager as any).statuses.elsa.isDownloading = false;
+    (manager as any).statuses.giuseppe.isDownloading = true;
+    expect(manager.isAnyDownloading()).toBe(true);
+
+    (manager as any).statuses.giuseppe.isDownloading = false;
+    expect(manager.isAnyDownloading()).toBe(false);
+  });
 });

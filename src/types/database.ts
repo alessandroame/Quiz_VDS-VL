@@ -18,6 +18,8 @@ export interface ExamQuestionSnapshot {
   wasFlagged: boolean;
 }
 
+export type ExamModeType = 'official' | 'tutor' | 'marathon';
+
 export interface ExamSession {
   id?: number;
   date: number; // timestamp
@@ -25,8 +27,9 @@ export interface ExamSession {
   totalQuestions: number;
   correctAnswers: number;
   wrongAnswers: number;
-  isPassed: boolean; // wrongAnswers <= 3 (o <= 6 per maratona 60)
+  isPassed: boolean; // wrongAnswers <= 3 (or <= 6 for marathon 60)
   isMarathon: boolean;
+  examMode?: ExamModeType;
   subjectBreakdown: Record<number, { total: number; correct: number; wrong: number }>;
   snapshots: ExamQuestionSnapshot[];
 }
@@ -66,6 +69,7 @@ export interface InProgressSession {
   secondsRemaining?: number;
   startTime?: number;
   isMarathon?: boolean;
+  examMode?: ExamModeType;
   updatedAt: number;
 }
 

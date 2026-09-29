@@ -18,7 +18,7 @@ import { useTheme } from '../context/ThemeContext';
 import { useQuiz } from '../context/QuizContext';
 import { VoiceQuickMenu } from './VoiceQuickMenu';
 import { OfflineIndicator } from './OfflineIndicator';
-import { AudioDownloadProgressHUD } from './AudioDownloadProgressHUD';
+import { AudioDownloadBanner } from './AudioDownloadBanner';
 
 export type NavTab = 'exam' | 'topics' | 'mistakes' | 'archive' | 'stats';
 
@@ -68,10 +68,10 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab, openSet
     <>
       {/* Top Header */}
       <header className="sticky top-0 z-40 w-full border-b backdrop-blur bg-zinc-950/80 border-zinc-800 dark:bg-zinc-950/80 dark:border-zinc-800 light:bg-white/80 light:border-slate-200 light:text-slate-900 transition-colors">
-        <div className="max-w-4xl mx-auto px-4 h-14 flex items-center justify-between">
-          <div className="flex items-center gap-2.5 cursor-pointer" onClick={() => setActiveTab('exam')}>
+        <div className="max-w-4xl mx-auto px-3 sm:px-4 h-14 flex items-center justify-between gap-1 sm:gap-2 overflow-hidden">
+          <div className="flex items-center gap-2 sm:gap-2.5 cursor-pointer min-w-0 flex-shrink" onClick={() => setActiveTab('exam')}>
             <img src="/favicon.svg" alt="VDS-VL" className="w-8 h-8 rounded-lg shadow-sm flex-shrink-0" />
-            <div>
+            <div className="min-w-0">
               <div className="font-bold text-sm tracking-wide flex items-center gap-1.5 whitespace-nowrap">
                 <span className="flex-shrink-0">VDS-VL</span>
                 <span className="text-[10px] px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-400 font-mono flex-shrink-0">2017</span>
@@ -84,16 +84,13 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab, openSet
                   </span>
                 )}
               </div>
-              <div className="text-[11px] text-zinc-400 light:text-slate-500">
+              <div className="text-[11px] text-zinc-400 light:text-slate-500 truncate">
                 Preparazione: <strong className="text-amber-400 light:text-amber-600">{readinessScore}%</strong>
               </div>
             </div>
           </div>
 
-          <div className="flex items-center gap-1.5">
-            {/* Indicatore Download Audio Background */}
-            <AudioDownloadProgressHUD />
-
+          <div className="flex items-center gap-1 sm:gap-1.5 flex-shrink-0">
             {/* Modalità Alla Guida */}
             <button
               id="btn-drive-mode"
@@ -146,6 +143,7 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab, openSet
             {/* Settings button */}
             <button
               id="btn-settings"
+              aria-label="Impostazioni"
               onClick={openSettings}
               title="Impostazioni"
               className="p-2 rounded-lg text-zinc-400 hover:text-zinc-200 light:text-slate-600 light:hover:text-slate-900 hover:bg-zinc-800/60 light:hover:bg-slate-100 transition-colors"
@@ -155,6 +153,9 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab, openSet
           </div>
         </div>
       </header>
+
+      {/* Audio Download Bottom Banner */}
+      <AudioDownloadBanner />
 
       {/* Bottom Nav Bar (Mobile & Desktop) */}
       <nav className="fixed bottom-0 left-0 right-0 z-40 border-t backdrop-blur bg-zinc-950/95 border-zinc-800 dark:bg-zinc-950/95 dark:border-zinc-800 light:bg-white/95 light:border-slate-200 transition-colors">

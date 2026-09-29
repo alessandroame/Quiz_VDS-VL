@@ -1,5 +1,5 @@
 import type { Question } from '../types/quiz';
-import type { ExamSession, ExamQuestionSnapshot } from '../types/database';
+import type { ExamSession, ExamQuestionSnapshot, ExamModeType } from '../types/database';
 
 export const MAX_ALLOWED_ERRORS_STANDARD = 3;
 export const MAX_ALLOWED_ERRORS_MARATHON = 6;
@@ -10,6 +10,7 @@ export interface EvaluateExamParams {
   flags?: Record<number, boolean>;
   durationSeconds: number;
   isMarathon?: boolean;
+  examMode?: ExamModeType;
 }
 
 /**
@@ -31,7 +32,8 @@ export function evaluateExam({
   answers,
   flags = {},
   durationSeconds,
-  isMarathon = false
+  isMarathon = false,
+  examMode = isMarathon ? 'marathon' : 'official'
 }: EvaluateExamParams): ExamSession {
   let correctCount = 0;
   let wrongCount = 0;
@@ -77,6 +79,7 @@ export function evaluateExam({
     wrongAnswers: wrongCount,
     isPassed,
     isMarathon,
+    examMode,
     subjectBreakdown: subjectMap,
     snapshots
   };

@@ -21,7 +21,11 @@ import {
   RotateCcw,
   Info,
   Award,
-  ShieldCheck
+  ShieldCheck,
+  Settings as SettingsIcon,
+  ArrowLeft,
+  Maximize2,
+  Minimize2
 } from 'lucide-react';
 import { useTheme } from '../context/ThemeContext';
 import { useQuiz } from '../context/QuizContext';
@@ -74,6 +78,54 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
       audioDownloadManager.checkAllStatuses().catch(console.error);
     }
     return unsub;
+  }, [isOpen]);
+
+  const [isFullscreen, setIsFullscreen] = useState(
+    typeof document !== 'undefined' ? Boolean(document.fullscreenElement) : false
+  );
+
+  useEffect(() => {
+    const handleFsChange = () => {
+      setIsFullscreen(Boolean(document.fullscreenElement));
+    };
+    document.addEventListener('fullscreenchange', handleFsChange);
+    return () => document.removeEventListener('fullscreenchange', handleFsChange);
+  }, []);
+
+  const toggleBrowserFullscreen = async () => {
+    try {
+      if (!document.fullscreenElement) {
+        if (document.documentElement.requestFullscreen) {
+          await document.documentElement.requestFullscreen();
+        }
+      } else {
+        if (document.exitFullscreen) {
+          await document.exitFullscreen();
+        }
+      }
+    } catch (err) {
+      console.warn('Fullscreen toggle failed:', err);
+    }
+  };
+
+  useEffect(() => {
+    if (!isOpen) return;
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        onClose();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isOpen, onClose]);
+
+  useEffect(() => {
+    if (!isOpen) return;
+    const prevOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    return () => {
+      document.body.style.overflow = prevOverflow;
+    };
   }, [isOpen]);
 
   if (!isOpen) return null;
@@ -165,25 +217,48 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
   ];
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/75 p-4 animate-in fade-in">
-      <div className="bg-zinc-900 border border-zinc-800 rounded-2xl p-4 sm:p-5 max-w-md w-full max-h-[92vh] flex flex-col shadow-2xl dark:bg-zinc-900 dark:border-zinc-800 light:bg-white light:border-slate-200">
-        
-        {/* Header */}
-        <div className="flex items-center justify-between pb-3 border-b border-zinc-800 light:border-slate-100 flex-shrink-0">
-          <h2 className="text-base font-bold text-zinc-100 light:text-slate-900 flex items-center gap-2">
-            <span>Impostazioni</span>
-          </h2>
+    <div
+      role="dialog"
+      aria-modal="true"
+      aria-label="Impostazioni"
+      className="fixed inset-0 z-50 flex flex-col h-[100dvh] w-screen bg-zinc-950 text-zinc-100 dark:bg-zinc-950 dark:text-zinc-100 light:bg-slate-50 light:text-slate-900 overflow-hidden font-sans animate-in fade-in duration-150"
+    >
+      {/* Top Header */}
+      <header className="sticky top-0 z-20 w-full border-b backdrop-blur bg-zinc-950/90 border-zinc-800 dark:bg-zinc-950/90 dark:border-zinc-800 light:bg-white/90 light:border-slate-200 transition-colors flex-shrink-0">
+        <div className="max-w-2xl mx-auto px-4 h-14 flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <button
+              id="btn-close-settings"
+              onClick={onClose}
+              className="p-2 -ml-2 rounded-xl text-zinc-400 hover:text-zinc-100 hover:bg-zinc-800/60 light:text-slate-600 light:hover:text-slate-900 light:hover:bg-slate-100 transition-colors flex items-center gap-1.5 active:scale-95"
+              title="Torna indietro"
+              aria-label="Torna indietro"
+            >
+              <ArrowLeft className="w-5 h-5" />
+              <span className="text-xs font-semibold hidden sm:inline">Indietro</span>
+            </button>
+            <div className="h-4 w-px bg-zinc-800 light:bg-slate-200 mx-1 hidden sm:block" />
+            <h1 className="text-base font-bold text-zinc-100 light:text-slate-900 flex items-center gap-2">
+              <SettingsIcon className="w-4 h-4 text-amber-500" />
+              <span>Impostazioni</span>
+            </h1>
+          </div>
+
           <button
-            id="btn-close-settings"
+            id="btn-close-settings-x"
             onClick={onClose}
-            className="p-1.5 rounded-lg text-zinc-400 hover:text-zinc-200 light:text-slate-600 light:hover:text-slate-900"
+            className="p-2 -mr-2 rounded-xl text-zinc-400 hover:text-zinc-100 hover:bg-zinc-800/60 light:text-slate-600 light:hover:text-slate-900 light:hover:bg-slate-100 transition-colors active:scale-95"
+            title="Chiudi"
+            aria-label="Chiudi impostazioni"
           >
-            <X className="w-4 h-4" />
+            <X className="w-5 h-5" />
           </button>
         </div>
+      </header>
 
-        {/* Tab Navigation (Segmented Topic Selector) */}
-        <div className="flex items-center gap-1 py-2.5 border-b border-zinc-800/80 light:border-slate-100 overflow-x-auto no-scrollbar flex-shrink-0">
+      {/* Tab Navigation (Segmented Topic Selector) */}
+      <div className="sticky top-14 z-10 w-full border-b border-zinc-800/80 bg-zinc-950/95 dark:bg-zinc-950/95 light:bg-slate-100/95 light:border-slate-200 backdrop-blur flex-shrink-0">
+        <div className="max-w-2xl mx-auto px-4 py-2 flex items-center gap-1.5 overflow-x-auto no-scrollbar">
           {tabs.map(tab => {
             const Icon = tab.icon;
             const isActive = activeTab === tab.id;
@@ -195,10 +270,10 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                 }}
                 id={`tab-${tab.id}`}
                 onClick={() => setActiveTab(tab.id)}
-                className={`flex-1 py-1.5 px-1.5 sm:px-2 rounded-xl text-xs font-semibold flex items-center justify-center gap-1 sm:gap-1.5 transition-all whitespace-nowrap min-w-fit sm:min-w-0 ${
+                className={`py-2 px-3 rounded-xl text-xs font-semibold flex items-center justify-center gap-1.5 transition-all whitespace-nowrap min-w-fit flex-1 sm:flex-initial ${
                   isActive
                     ? 'bg-amber-500/20 text-amber-400 border border-amber-500/40 light:bg-amber-50 light:border-amber-500 light:text-amber-700 shadow-sm'
-                    : 'text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800/40 light:text-slate-600 light:hover:bg-slate-100'
+                    : 'text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800/40 light:text-slate-600 light:hover:bg-slate-200/60'
                 }`}
               >
                 <Icon className="w-3.5 h-3.5" />
@@ -207,9 +282,11 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
             );
           })}
         </div>
+      </div>
 
-        {/* Tab Body (Categorized & Zero-Scroll) */}
-        <div className="pt-3 pb-1 overflow-y-auto flex-1 space-y-4">
+      {/* Tab Body (Full-height Scrollable Area) */}
+      <main className="flex-1 overflow-y-auto overscroll-contain">
+        <div className="max-w-2xl mx-auto px-4 py-5 space-y-5 pb-24">
           
           {/* TAB 1: ASPETTO & TEMA */}
           {activeTab === 'appearance' && (
@@ -266,6 +343,47 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                   />
                 </div>
               </div>
+
+              {/* Opzione Schermo Intero Browser */}
+              {typeof document !== 'undefined' && Boolean(document.fullscreenEnabled) && (
+                <div className="space-y-2 pt-2 border-t border-zinc-800/80 light:border-slate-100">
+                  <label className="text-xs font-bold text-zinc-400 uppercase tracking-wider block">
+                    Schermo Intero
+                  </label>
+                  <div className="flex items-center justify-between p-3 rounded-xl border border-zinc-800 bg-zinc-950/60 light:bg-slate-50 light:border-slate-200">
+                    <div>
+                      <span className="text-zinc-300 light:text-slate-700 font-medium block text-xs">
+                        Modalità a Schermo Intero (Fullscreen)
+                      </span>
+                      <span className="text-[11px] text-zinc-500 block">
+                        Massimizza l'applicazione nascondendo le barre del browser
+                      </span>
+                    </div>
+                    <button
+                      type="button"
+                      id="btn-toggle-fullscreen"
+                      onClick={toggleBrowserFullscreen}
+                      className={`px-3 py-1.5 rounded-lg border text-xs font-semibold flex items-center gap-1.5 transition-colors ${
+                        isFullscreen
+                          ? 'border-amber-500 bg-amber-500/20 text-amber-400 light:border-amber-600 light:bg-amber-50 light:text-amber-700'
+                          : 'border-zinc-700 bg-zinc-800 hover:bg-zinc-700 text-zinc-300 light:border-slate-300 light:bg-slate-200 light:text-slate-700'
+                      }`}
+                    >
+                      {isFullscreen ? (
+                        <>
+                          <Minimize2 className="w-3.5 h-3.5" />
+                          <span>Disattiva</span>
+                        </>
+                      ) : (
+                        <>
+                          <Maximize2 className="w-3.5 h-3.5" />
+                          <span>Attiva</span>
+                        </>
+                      )}
+                    </button>
+                  </div>
+                </div>
+              )}
             </div>
           )}
 
@@ -980,8 +1098,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
           )}
 
         </div>
-
-      </div>
+      </main>
 
       {/* Modale Guida Comandi Vocali (Cheat Sheet) */}
       <VoiceCommandsModal
@@ -991,3 +1108,5 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
     </div>
   );
 };
+
+export const SettingsScreen = SettingsModal;

@@ -93,7 +93,7 @@ export const VoiceCommandsModal: React.FC<VoiceCommandsModalProps> = ({
 
   return (
     <div
-      className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4 select-none animate-in fade-in duration-200"
+      className="fixed inset-0 z-[70] bg-black/80 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4 select-none animate-in fade-in duration-200"
       onClick={onClose}
       role="dialog"
       aria-modal="true"
