@@ -20,6 +20,7 @@ import { formatTime } from '../utils/timer';
 import { QuestionCard } from './QuestionCard';
 import { voiceService } from '../services/voiceService';
 import { QuizBottomBar } from './QuizBottomBar';
+import { backNavigation } from '../utils/backNavigation';
 
 interface ExamScreenProps {
   initialMode?: ExamModeType;
@@ -86,6 +87,23 @@ export const ExamScreen: React.FC<ExamScreenProps> = ({ initialMode = 'tutor', o
     window.addEventListener('keydown', handleModalKey);
     return () => window.removeEventListener('keydown', handleModalKey);
   }, [showAbandonModal, showSubmitModal]);
+
+  // Registra le modali di conferma con il coordinatore back navigation
+  useEffect(() => {
+    if (!showSubmitModal) return;
+    const unregister = backNavigation.registerSubModal('exam-submit-modal', () => {
+      setShowSubmitModal(false);
+    });
+    return () => unregister();
+  }, [showSubmitModal]);
+
+  useEffect(() => {
+    if (!showAbandonModal) return;
+    const unregister = backNavigation.registerSubModal('exam-abandon-modal', () => {
+      setShowAbandonModal(false);
+    });
+    return () => unregister();
+  }, [showAbandonModal]);
 
   // Auto-resume active exam if present
   useEffect(() => {

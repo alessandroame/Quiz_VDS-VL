@@ -43,6 +43,7 @@ import { AudioDownloadBanner } from './AudioDownloadBanner';
 import { VoiceQuickMenu } from './VoiceQuickMenu';
 import { audioDownloadManager } from '../services/audioDownloadManager';
 import { voiceService } from '../services/voiceService';
+import { backNavigation } from '../utils/backNavigation';
 
 export interface DriveModeSessionContext {
   questions: Question[];
@@ -146,6 +147,23 @@ export const DriveModeScreen: React.FC<DriveModeScreenProps> = ({
   const [unrecognizedSpeech, setUnrecognizedSpeech] = useState<string | null>(null);
   const recognizedLabelTimerRef = useRef<any>(null);
   const unrecognizedTimerRef = useRef<any>(null);
+
+  // Registra sub-modali interne con il coordinatore back navigation
+  useEffect(() => {
+    if (!showAbandonExamModal) return;
+    const unregister = backNavigation.registerSubModal('drive-abandon-modal', () => {
+      setShowAbandonExamModal(false);
+    });
+    return () => unregister();
+  }, [showAbandonExamModal]);
+
+  useEffect(() => {
+    if (!showOfflinePrompt) return;
+    const unregister = backNavigation.registerSubModal('drive-offline-prompt', () => {
+      setShowOfflinePrompt(false);
+    });
+    return () => unregister();
+  }, [showOfflinePrompt]);
 
   // Trigger prompt audio offline al primo avvio della Guida solo se NESSUNA voce è già scaricata offline
   useEffect(() => {

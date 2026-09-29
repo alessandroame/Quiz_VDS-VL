@@ -14,6 +14,8 @@ import {
   Sparkles
 } from 'lucide-react';
 
+import { backNavigation } from '../utils/backNavigation';
+
 interface VoiceCommandsModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -36,6 +38,8 @@ export const VoiceCommandsModal: React.FC<VoiceCommandsModalProps> = ({
   useEffect(() => {
     if (!isOpen) return;
 
+    const unregister = backNavigation.registerSubModal('voice-commands-modal', onClose);
+
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
         onClose();
@@ -43,7 +47,10 @@ export const VoiceCommandsModal: React.FC<VoiceCommandsModalProps> = ({
     };
 
     window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
+    return () => {
+      unregister();
+      window.removeEventListener('keydown', handleKeyDown);
+    };
   }, [isOpen, onClose]);
 
   if (!isOpen) return null;

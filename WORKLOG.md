@@ -14,6 +14,54 @@ Questo documento registra in ordine cronologico tutte le lavorazioni svolte nel 
 - **Impatto sul Desiderata**: <Come questo intervento contribuisce al desiderata (cfr. DESIDERATA.md) e indicazioni per il prossimo agente>
 ```
 
+# Registro di Bordo: Sincronizzazione Tasto Indietro Hardware/Gestures (Back Navigation Coordinator)
+
+- **Data**: 2026-09-29
+- **Autore/Agente**: Antigravity Cockpit Specialist
+- **Tipo di Intervento**: `feat(navigation)`
+- **Argomento**: Sincronizzazione hardware/gesture back button (Android / iOS / popstate) con il tasto grafico a schermo secondo gerarchia LIFO a livelli.
+
+---
+
+### 1. Cosa abbiamo fatto
+- **Modulo Puro Back Navigation Coordinator (`src/utils/backNavigation.ts`)**:
+  - Implementato `BackNavigationService` con tracciamento della profondità (`historyDepth`) e registry per submodali LIFO (`registerSubModal`).
+  - Funzione pura `executeBackAction(ctx)` che risolve determinata la priorità dell'azione indietro:
+    1. Sub-modali interne attive (es. tastierino #ID Archivio, Help comandi vocali, modali conferma);
+    2. Modale guardia abbandono esame (`pendingTab`);
+    3. Modalità Audio fullscreen (`isDriveModeOpen`);
+    4. Schermata Impostazioni fullscreen (`isSettingsOpen`);
+    5. Schermate interne quiz/sezioni (`activeTab !== 'home'`): intercettazione esame in corso o ritorno a Home;
+    6. Home Hub (`activeTab === 'home'`): nessun intercetto (consente l'uscita nativa dal browser/PWA).
+  - Funzione `triggerGraphicBack(ctx)` che sincronizza i click fisici sui pulsanti grafici con `window.history.back()`.
+- **Suite di Test Vitest (`src/utils/backNavigation.test.ts`)**:
+  - Creata Suite 21 con 8 test unitari passanti al 100% coprendo tutti i livelli gerarchici, la guardia esame, la chiusura submodali e il fallback se la profondità è zero.
+- **Integrazione Reattiva in `src/App.tsx`**:
+  - Agganciato listener `popstate` globale con inizializzazione di `history.replaceState({ appDepth: 0 }, '')`.
+  - Impiegato `navigationContextRef` aggiornato a ogni render per azzerare qualsiasi stale closure nel listener asincrono.
+  - Sincronizzati `handleSelectTab`, `confirmAbandonAndNavigate`, `cancelNavigation`, `handleOpenSettings`, `handleCloseSettings` e `handleCloseDriveMode`.
+- **Aggancio Submodali nei Componenti UI**:
+  - `VoiceCommandsModal.tsx`: registrazione automatica con `backNavigation` alla comparsa e rimozione alla chiusura.
+  - `ExamScreen.tsx`: registrazione submodali per `showSubmitModal` e `showAbandonModal`.
+  - `ArchiveScreen.tsx`: registrazione del tastierino numerico #ID (`isKeypadOpen`).
+  - `DriveModeScreen.tsx`: registrazione di `showAbandonExamModal` e `showOfflinePrompt`.
+
+---
+
+### 2. Scelte Architetturali & Rationale
+- **Single Source of Truth per l'Indietro**: Sia il tocco sul pulsante grafico visibile a schermo (`[← Home]`, `[←]`, `[X]`, `Rimani nell'Esame`) sia il tasto Indietro/gesture dello smartphone eseguono lo stesso percorso atomico sincronizzato con `window.history.back()`, azzerando qualsiasi desincronizzazione dello stack.
+- **Guardia Anti-Abbandono Esame Integrata**: Se un allievo pilota usa il gesto swipe indietro mentre sostiene l'esame ufficiale, l'esame non viene interrotto accidentalmente: il coordinator ripristina la voce di cronologia e apre il dialogo di conferma. Un secondo gesto indietro chiude il dialogo e mantiene il pilota nella prova.
+- **Conformità Regola 2 Utente**: All'interno delle sessioni quiz di Studio Materie, il tasto indietro non torna all'elenco materie ma ritorna direttamente a Home (come confermato dall'utente).
+
+---
+
+### 3. Impatto sul Desiderata
+- Rende l'esperienza PWA su smartphone Android e iOS indistinguibile da un'app nativa.
+- Risolve definitivamente il rischio di chiusura accidentale della PWA durante le sessioni di studio.
+- Tutti i 190 test Vitest su 21 suite superati con successo.
+
+---
+
 # Registro di Bordo: TODO-06 Impostazione Dimensione Font (Font Scaling / Outdoor Comfort)
 
 - **Data**: 2026-09-29

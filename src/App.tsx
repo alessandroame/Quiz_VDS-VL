@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { ThemeProvider } from './context/ThemeContext';
 import { QuizProvider, useQuiz } from './context/QuizContext';
 import { Navbar, type NavTab } from './components/Navbar';
@@ -16,6 +16,11 @@ import { Download, AlertTriangle, Play, ArrowRight, X } from 'lucide-react';
 import { voiceService } from './services/voiceService';
 import { audioDownloadManager } from './services/audioDownloadManager';
 import { applyFontSizePreference } from './utils/fontSize';
+import {
+  backNavigation,
+  executeBackAction,
+  type BackNavigationContext
+} from './utils/backNavigation';
 
 function AppContent() {
   const {
@@ -36,6 +41,81 @@ function AppContent() {
   const [isAudioDownloading, setIsAudioDownloading] = useState(
     audioDownloadManager.isAnyDownloading()
   );
+
+  // Synchronous ref to prevent stale closures in popstate event listener
+  const navigationContextRef = useRef<BackNavigationContext>({
+    activeTab,
+    isExamRunning,
+    isSettingsOpen,
+    isDriveModeOpen,
+    pendingTab,
+    onCloseSettings: () => setIsSettingsOpen(false),
+    onCloseDriveMode: () => closeDriveMode(),
+    onCancelPendingTab: () => setPendingTab(null),
+    onNavigateHome: () => {
+      voiceService.stop();
+      setActiveTab('home');
+    },
+    onInterceptExamLeave: () => {
+      if (typeof window !== 'undefined' && window.history) {
+        backNavigation.incrementDepth();
+        window.history.pushState({ appDepth: backNavigation.getDepth(), tab: 'exam' }, '');
+      }
+      setPendingTab('home');
+    }
+  });
+
+  // Keep navigationContextRef updated on every render
+  useEffect(() => {
+    navigationContextRef.current = {
+      activeTab,
+      isExamRunning,
+      isSettingsOpen,
+      isDriveModeOpen,
+      pendingTab,
+      onCloseSettings: () => setIsSettingsOpen(false),
+      onCloseDriveMode: () => closeDriveMode(),
+      onCancelPendingTab: () => setPendingTab(null),
+      onNavigateHome: () => {
+        voiceService.stop();
+        setActiveTab('home');
+      },
+      onInterceptExamLeave: () => {
+        if (typeof window !== 'undefined' && window.history) {
+          backNavigation.incrementDepth();
+          window.history.pushState({ appDepth: backNavigation.getDepth(), tab: 'exam' }, '');
+        }
+        setPendingTab('home');
+      }
+    };
+  });
+
+  // Popstate event listener for phone hardware back button & Android/iOS back gestures
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+
+    window.history.replaceState({ appDepth: 0 }, '');
+
+    const handlePopState = () => {
+      backNavigation.decrementDepth();
+      executeBackAction(navigationContextRef.current);
+    };
+
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, []);
+
+  // Monitor DriveMode opening to push history entry
+  const prevDriveModeOpenRef = useRef(isDriveModeOpen);
+  useEffect(() => {
+    if (!prevDriveModeOpenRef.current && isDriveModeOpen) {
+      if (typeof window !== 'undefined' && window.history) {
+        backNavigation.incrementDepth();
+        window.history.pushState({ appDepth: backNavigation.getDepth(), modal: 'drive' }, '');
+      }
+    }
+    prevDriveModeOpenRef.current = isDriveModeOpen;
+  }, [isDriveModeOpen]);
 
   // Monitora download audio in background per padding layout
   useEffect(() => {
@@ -92,14 +172,54 @@ function AppContent() {
     }
   };
 
+  const handleOpenSettings = () => {
+    setIsSettingsOpen(true);
+    if (typeof window !== 'undefined' && window.history) {
+      backNavigation.incrementDepth();
+      window.history.pushState({ appDepth: backNavigation.getDepth(), modal: 'settings' }, '');
+    }
+  };
+
+  const handleCloseSettings = () => {
+    if (typeof window !== 'undefined' && window.history && backNavigation.getDepth() > 0) {
+      window.history.back();
+    } else {
+      setIsSettingsOpen(false);
+    }
+  };
+
+  const handleCloseDriveMode = () => {
+    if (typeof window !== 'undefined' && window.history && backNavigation.getDepth() > 0) {
+      window.history.back();
+    } else {
+      closeDriveMode();
+    }
+  };
+
   // Intercetta la navigazione se c'è un esame attivo per evitare perdita di progresso
   const handleSelectTab = (tab: NavTab) => {
     if (tab === activeTab) return;
     if (isExamRunning) {
       setPendingTab(tab);
+      if (typeof window !== 'undefined' && window.history) {
+        backNavigation.incrementDepth();
+        window.history.pushState({ appDepth: backNavigation.getDepth(), modal: 'pendingTab' }, '');
+      }
       return;
     }
     voiceService.stop();
+
+    if (tab !== 'home' && activeTab === 'home') {
+      if (typeof window !== 'undefined' && window.history) {
+        backNavigation.incrementDepth();
+        window.history.pushState({ appDepth: backNavigation.getDepth(), tab }, '');
+      }
+    } else if (tab === 'home' && activeTab !== 'home') {
+      if (typeof window !== 'undefined' && window.history && backNavigation.getDepth() > 0) {
+        window.history.back();
+        return;
+      }
+    }
     setActiveTab(tab);
   };
 
@@ -110,11 +230,19 @@ function AppContent() {
       dismissActiveSession();
       setActiveTab(pendingTab);
       setPendingTab(null);
+      backNavigation.resetDepth();
+      if (typeof window !== 'undefined' && window.history) {
+        window.history.replaceState({ appDepth: 0 }, '');
+      }
     }
   };
 
   const cancelNavigation = () => {
-    setPendingTab(null);
+    if (typeof window !== 'undefined' && window.history && backNavigation.getDepth() > 0) {
+      window.history.back();
+    } else {
+      setPendingTab(null);
+    }
   };
 
   const handleResumeActiveSession = () => {
@@ -139,7 +267,7 @@ function AppContent() {
       <Navbar
         activeTab={activeTab}
         setActiveTab={handleSelectTab}
-        openSettings={() => setIsSettingsOpen(true)}
+        openSettings={handleOpenSettings}
       />
 
       {/* Avviso Notifica Stato Offline */}
@@ -216,13 +344,13 @@ function AppContent() {
       {/* Schermata Impostazioni Fullscreen */}
       <SettingsModal
         isOpen={isSettingsOpen}
-        onClose={() => setIsSettingsOpen(false)}
+        onClose={handleCloseSettings}
       />
 
       {/* Modalità Audio Fullscreen */}
       <DriveModeScreen
         isOpen={isDriveModeOpen}
-        onClose={closeDriveMode}
+        onClose={handleCloseDriveMode}
         sessionContext={driveSessionContext || undefined}
       />
 

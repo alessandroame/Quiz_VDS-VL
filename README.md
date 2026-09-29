@@ -48,6 +48,9 @@
   - Nelle schermate interne di simulazione ed esercitazione, la barra secondaria a schede viene completamente rimossa per recuperare oltre 50px di spazio verticale utile.
   - Sostituita da una mini-header minimalista con pulsante `[← Home]`, indicatore del contesto e pulsante rapido `AUDIO` per lo switch hands-free.
   - **Salvaguardia Abbandono Esame**: modale di conferma per prevenire perdite involontarie di progresso se l'allievo preme `[← Home]` durante una prova d'esame in corso.
+- **Sincronizzazione Tasto Indietro Smartphone (Hardware & Gestures Back Coordinator)**:
+  - Il tasto fisico o le gesture di swipe indietro di Android e iOS eseguono sempre l'esatta azione del pulsante grafico visibile a schermo (chiusura del tastierino rapido nell'Archivio, chiusura dei fogli comandi, annullamento della modale di guardia esame, chiusura della Modalità Audio o Impostazioni e ritorno al cruscotto Home).
+  - All'interno dei quiz di studio materie, il comando indietro riporta direttamente al cruscotto Home garantendo linearità d'uso e azzerando le chiusure accidentali della PWA.
 
 ### 3. Simulatore d'Esame & Simulazione Didattica (Tutor)
 - **Due Modalità di Simulazione Dedicate**:

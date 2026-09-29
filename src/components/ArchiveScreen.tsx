@@ -31,6 +31,7 @@ import {
   type ArchiveStatusFilter
 } from '../utils/archiveFilters';
 import { triggerHapticFeedback } from '../utils/haptics';
+import { backNavigation } from '../utils/backNavigation';
 import type { Question } from '../types/quiz';
 
 interface ArchiveItemProps {
@@ -461,6 +462,15 @@ export const ArchiveScreen: React.FC = () => {
   const [isKeypadOpen, setIsKeypadOpen] = useState(false);
   const [numericBuffer, setNumericBuffer] = useState('');
   const [expandedId, setExpandedId] = useState<number | null>(null);
+
+  // Register #ID keypad as submodal so hardware back button closes it
+  useEffect(() => {
+    if (!isKeypadOpen) return;
+    const unregister = backNavigation.registerSubModal('archive-keypad', () => {
+      setIsKeypadOpen(false);
+    });
+    return () => unregister();
+  }, [isKeypadOpen]);
 
   // Compute status counts dynamically based on current subject scope
   const statusCounts = useMemo(() => {

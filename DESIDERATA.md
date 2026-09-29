@@ -155,6 +155,7 @@ Questo documento rappresenta la **bussola strategica e funzionale** del progetto
 | Ricerca Rapida No-Keyboard nell'Archivio | 🟢 Completato | Tastierino materie `01`-`09` + `TUTTE`, filtri stato a 1 tocco (`Tutte`, `Non viste`, `Errate`, `Preferiti`, `Note`) con conteggi live, 7 quick chips tematiche e pad numerico rapido `#ID` per salto istantaneo senza invocare la tastiera dello smartphone. |
 | Macro-Target Tattili per Bici/Corsa (Modalità Audio) | 🟢 Completato | 3 macro-fasce a tutta larghezza con altezza minima 78-85px, badge numerici 44-56px, feedback aptico `navigator.vibrate` e zero elementi affiancati per uso con vibrazioni da manubrio o corsa. |
 | Impostazione Dimensione Font (Font Scaling) | 🟢 Completato | 3 scale carattere ergonomiche (`Compatto` 14px per smartphone compatti e zero-scroll, `Normale` 16px bilanciato, `Grande/Outdoor` 18px per manubrio a braccio teso o guanti), persistenza in Dexie (`fontSizePreference: 'compact' | 'normal' | 'large'`) e applicazione fluida via CSS rem root senza distorsioni di layout. |
+| Sincronizzazione Tasto Indietro Hardware (Back Coordinator) | 🟢 Completato | Gestione unificata `popstate` e gestures Android/iOS: il tasto indietro del telefono esegue sempre l'azione del tasto grafico visibile (chiusura submodali, annullamento guardia esame, chiusura Audio/Impostazioni, ritorno a Home). |
 
 ---
 
