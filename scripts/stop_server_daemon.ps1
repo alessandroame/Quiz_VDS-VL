@@ -1,7 +1,7 @@
 # Helper script to stop the persistent background web server daemon
 
 $ErrorActionPreference = 'SilentlyContinue'
-$rootDir = "d:\Github\Quiz_VDS-VL"
+$rootDir = (Resolve-Path "$PSScriptRoot\..").Path
 $pidFile = Join-Path $rootDir "server.pid"
 
 Write-Host "Stopping persistent web server daemon and freeing port 5173..." -ForegroundColor Yellow

@@ -2,7 +2,7 @@
 # Keeps Vite running continuously in the background until system reboot or explicit termination
 
 $ErrorActionPreference = 'SilentlyContinue'
-$rootDir = "d:\Github\Quiz_VDS-VL"
+$rootDir = (Resolve-Path "$PSScriptRoot\..").Path
 Set-Location -Path $rootDir
 
 $logFile = Join-Path $rootDir "server.log"
