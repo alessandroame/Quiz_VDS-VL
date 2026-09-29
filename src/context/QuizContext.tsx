@@ -34,6 +34,8 @@ interface QuizContextType {
   setIsExamRunning: (running: boolean) => void;
   isDriveModeOpen: boolean;
   driveSessionContext: DriveModeSessionContext | null;
+  activeAudioSessionContext: DriveModeSessionContext | null;
+  registerAudioSessionContext: (context: DriveModeSessionContext | null) => void;
   openDriveMode: (context?: DriveModeSessionContext) => void;
   closeDriveMode: () => void;
   updateSetting: <K extends keyof AppSettings>(key: K, value: AppSettings[K]) => Promise<void>;
@@ -67,9 +69,15 @@ export const QuizProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [isExamRunning, setIsExamRunning] = useState<boolean>(false);
   const [isDriveModeOpen, setIsDriveModeOpen] = useState<boolean>(false);
   const [driveSessionContext, setDriveSessionContext] = useState<DriveModeSessionContext | null>(null);
+  const [activeAudioSessionContext, setActiveAudioSessionContext] = useState<DriveModeSessionContext | null>(null);
+
+  const registerAudioSessionContext = (context: DriveModeSessionContext | null) => {
+    setActiveAudioSessionContext(context);
+  };
 
   const openDriveMode = (context?: DriveModeSessionContext) => {
-    setDriveSessionContext(context || null);
+    const targetContext = context ?? activeAudioSessionContext;
+    setDriveSessionContext(targetContext || null);
     setIsDriveModeOpen(true);
   };
 
@@ -226,6 +234,8 @@ export const QuizProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setIsExamRunning,
         isDriveModeOpen,
         driveSessionContext,
+        activeAudioSessionContext,
+        registerAudioSessionContext,
         openDriveMode,
         closeDriveMode,
         updateSetting,

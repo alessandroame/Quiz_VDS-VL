@@ -186,7 +186,7 @@ export const VoiceCommandsModal: React.FC<VoiceCommandsModalProps> = ({
                 </div>
                 <div>
                   <div className="text-xs font-bold text-white light:text-slate-900">Spiegazione Vocale di Benvenuto</div>
-                  <div className="text-[11px] text-zinc-400 light:text-slate-500">Riascolta l'introduzione su come funziona la guida</div>
+                  <div className="text-[11px] text-zinc-400 light:text-slate-500">Riascolta l'introduzione alla Modalità Audio</div>
                 </div>
               </div>
               <button
@@ -207,17 +207,17 @@ export const VoiceCommandsModal: React.FC<VoiceCommandsModalProps> = ({
           <div className="mt-3 p-3 rounded-xl bg-amber-950/30 border border-amber-800/40 light:bg-amber-50 light:border-amber-200 space-y-1.5">
             <div className="flex items-center gap-1.5 text-xs font-bold text-amber-300 light:text-amber-900">
               <Headphones className="w-4 h-4 text-amber-400" />
-              <span>Consigli per la guida</span>
+              <span>Consigli per l'ascolto (Auto / Bici / Corsa)</span>
             </div>
             <ul className="text-[11px] text-amber-200/80 light:text-amber-800 space-y-1 pl-5 list-disc">
               <li>
-                Compatibile con <strong>vivavoce Bluetooth auto</strong>, auricolari e caschi.
+                Compatibile con <strong>auricolari</strong>, vivavoce Bluetooth auto e caschi con interfono.
               </li>
               <li>
                 Parla con tono chiaro e naturale dopo che l'assistente vocale ha terminato di leggere.
               </li>
               <li>
-                In caso di forte rumore nell'abitacolo, puoi comunque premere i macro-pulsanti sul display.
+                Con vibrazioni da manubrio o corsa, tocca direttamente le 3 macro-fasce a tutta larghezza.
               </li>
             </ul>
           </div>

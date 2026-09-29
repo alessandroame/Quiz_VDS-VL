@@ -11,7 +11,6 @@ import {
   Download,
   Upload,
   Trash2,
-  Car,
   Palette,
   Database,
   Check,
@@ -989,7 +988,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                           onClick={() => updateSetting('audioOfflinePromptDismissed', false)}
                           className="text-amber-400 hover:underline shrink-0 text-left"
                         >
-                          Ripristina avviso Guida
+                          Ripristina intro Audio
                         </button>
                       )}
                     </div>
@@ -1019,13 +1018,13 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
             </div>
           </AccordionCard>
 
-          {/* SEZIONE 3: ALLA GUIDA */}
+          {/* SEZIONE 3: MODALITÀ AUDIO */}
           <AccordionCard
             id="drive"
-            label="Modalità Guida"
-            description="Radio quiz a catena, comandi vocali hands-free e timer risposta"
+            label="Modalità Audio"
+            description="Radio quiz continuo, comandi vocali hands-free e macro-target outdoor"
             summary={driveSummary}
-            icon={Car}
+            icon={Headphones}
             isExpanded={openSection === 'drive'}
             onToggle={() => toggleSection('drive')}
             cardRef={el => {
@@ -1034,7 +1033,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
           >
             <div className="space-y-3">
               <p className="text-[11px] text-zinc-400 light:text-slate-500 leading-relaxed">
-                Pulsanti giganti e audio automatico per ripassare in macchina o con le mani occupate in totale sicurezza.
+                Macro-pulsanti per bici/corsa e audio automatico per ripassare senza guardare lo schermo in totale sicurezza.
               </p>
 
               <div className="space-y-2 text-xs">
@@ -1158,7 +1157,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                       <span className="text-[11px] text-zinc-500">
                         {settings.driveModeIntroPlayed
                           ? 'Completata (non si ripeterà all\'avvio)'
-                          : "Verrà riprodotta all'apertura della guida"}
+                          : "Verrà riprodotta all'apertura della modalità audio"}
                       </span>
                     </div>
                     <span className={`text-[10px] font-bold px-2 py-0.5 rounded-md ${
@@ -1190,7 +1189,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                           ? 'bg-amber-500/20 border-amber-500 text-amber-300'
                           : 'bg-zinc-800/80 border-zinc-700 hover:border-amber-500/50 text-zinc-300 light:bg-slate-200 light:border-slate-300 light:text-slate-700'
                       }`}
-                      title="Riattiva la spiegazione vocale al prossimo avvio della modalità guida"
+                      title="Riattiva la spiegazione vocale al prossimo avvio della modalità audio"
                     >
                       <RotateCcw className="w-3.5 h-3.5" />
                       <span>{settings.driveModeIntroPlayed ? "Riattiva all'avvio" : "Già attiva all'avvio"}</span>

@@ -8,7 +8,7 @@ import {
   ArrowRight,
   RotateCcw,
   ListFilter,
-  Car,
+  Headphones,
   BookOpen
 } from 'lucide-react';
 import type { Question } from '../types/quiz';
@@ -36,6 +36,7 @@ export const ExamScreen: React.FC<ExamScreenProps> = ({ initialMode = 'tutor', o
     settings,
     setIsExamRunning,
     openDriveMode,
+    registerAudioSessionContext,
     activeSession,
     persistActiveSession,
     dismissActiveSession
@@ -310,6 +311,43 @@ export const ExamScreen: React.FC<ExamScreenProps> = ({ initialMode = 'tutor', o
       }
     }
   }, [answers, examQuestions, flags, isMarathon, examMode, elapsedSeconds, recordAnswer, saveExam, startTime, dismissActiveSession]);
+
+  // Registra la sessione audio attiva per consentire lo switch universale (Navbar o shortcut) senza perdere lo stato
+  useEffect(() => {
+    if (examState !== 'running' || examQuestions.length === 0) {
+      registerAudioSessionContext(null);
+      return;
+    }
+
+    registerAudioSessionContext({
+      questions: examQuestions,
+      currentIndex,
+      answers,
+      flags,
+      onAnswer: (qid, ans) => handleSelectAnswer(ans, qid),
+      onToggleFlag: (qid) => handleToggleFlag(qid),
+      onNavigateIndex: (idx) => setCurrentIndex(idx),
+      isExam: true,
+      secondsRemaining: examMode === 'tutor' ? elapsedSeconds : secondsRemaining,
+      onSubmitExam: handleSubmitExam,
+      title: examMode === 'tutor' ? 'Simulazione Didattica' : 'Esame Ufficiale'
+    });
+
+    return () => {
+      registerAudioSessionContext(null);
+    };
+  }, [
+    examState,
+    examQuestions,
+    currentIndex,
+    answers,
+    flags,
+    examMode,
+    elapsedSeconds,
+    secondsRemaining,
+    handleSubmitExam,
+    registerAudioSessionContext
+  ]);
 
   const tutorCorrectCount = Object.entries(answers).filter(([qid, ans]) => {
     const q = examQuestions.find(item => item.id === Number(qid));
@@ -606,11 +644,11 @@ export const ExamScreen: React.FC<ExamScreenProps> = ({ initialMode = 'tutor', o
                 title: examMode === 'tutor' ? 'Simulazione Didattica' : 'Esame Ufficiale'
               });
             }}
-            className="px-2.5 py-1.5 rounded-lg border border-amber-500/40 bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 light:bg-amber-100 light:text-amber-800 text-xs font-bold transition-colors flex items-center gap-1.5"
-            title="Passa alla Modalità Alla Guida per questa sessione"
+            className="px-2.5 py-1.5 rounded-lg border border-amber-500/40 bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 light:bg-amber-100 light:text-amber-800 text-xs font-bold transition-all flex items-center gap-1.5 shadow-sm active:scale-95"
+            title="Passa alla Modalità Audio per questa sessione"
           >
-            <Car className="w-3.5 h-3.5" />
-            <span className="hidden sm:inline">Alla Guida</span>
+            <Headphones className="w-3.5 h-3.5" />
+            <span className="hidden sm:inline">AUDIO</span>
           </button>
 
           <button

@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import {
-  Car,
+  Headphones,
   X,
   Volume2,
   Flag,
@@ -31,6 +31,7 @@ import { generateExamQuestions } from '../utils/fairRandomizer';
 import { evaluateExam } from '../services/examEvaluator';
 import { formatTime } from '../utils/timer';
 import { soundFX } from '../utils/audio';
+import { triggerHapticFeedback } from '../utils/haptics';
 import { useAviationVoice } from '../hooks/useAviationVoice';
 import { useWakeLock } from '../hooks/useWakeLock';
 import { useDriveVoiceCommands } from '../hooks/useDriveVoiceCommands';
@@ -379,6 +380,7 @@ export const DriveModeScreen: React.FC<DriveModeScreenProps> = ({
     isWaitingForExplanationEndRef.current = false;
 
     if (currentIndex < totalCount - 1) {
+      triggerHapticFeedback('tap');
       const nextIdx = currentIndex + 1;
       setCurrentIndex(nextIdx);
       if (sessionContext) sessionContext.onNavigateIndex(nextIdx);
@@ -405,6 +407,7 @@ export const DriveModeScreen: React.FC<DriveModeScreenProps> = ({
     isWaitingForExplanationEndRef.current = false;
 
     if (currentIndex > 0) {
+      triggerHapticFeedback('tap');
       const prevIdx = currentIndex - 1;
       setCurrentIndex(prevIdx);
       if (sessionContext) sessionContext.onNavigateIndex(prevIdx);
@@ -489,6 +492,8 @@ export const DriveModeScreen: React.FC<DriveModeScreenProps> = ({
     // Se l'esame è già terminato o la domanda è già rivelata
     if (answers[currentQ.id] !== undefined && (!isExamSession || isTutorEnabled)) return;
 
+    triggerHapticFeedback('tap');
+
     stopVoice();
     if (countdownTimerRef.current) {
       clearInterval(countdownTimerRef.current);
@@ -497,6 +502,7 @@ export const DriveModeScreen: React.FC<DriveModeScreenProps> = ({
     setWaitingCountdown(null);
 
     const isCorrect = ans === currentQ.correctAnswer;
+    triggerHapticFeedback(isCorrect ? 'success' : 'error');
 
     // Aggiorna stato locale e notifica context padre se esistente
     setAnswers(prev => ({ ...prev, [currentQ.id]: ans }));
@@ -540,6 +546,7 @@ export const DriveModeScreen: React.FC<DriveModeScreenProps> = ({
 
   const handleToggleFlag = () => {
     if (!currentQ) return;
+    triggerHapticFeedback('warning');
     const nextVal = !flags[currentQ.id];
     setFlags(prev => ({ ...prev, [currentQ.id]: nextVal }));
     if (sessionContext) sessionContext.onToggleFlag(currentQ.id);
@@ -909,15 +916,15 @@ export const DriveModeScreen: React.FC<DriveModeScreenProps> = ({
           <div className="flex items-center justify-between pb-3 border-b border-zinc-800 light:border-slate-200">
             <div className="flex items-center gap-2.5">
               <div className="w-10 h-10 rounded-xl bg-amber-500/20 text-amber-400 light:bg-amber-100 light:text-amber-700 flex items-center justify-center">
-                <Car className="w-6 h-6" />
+                <Headphones className="w-6 h-6" />
               </div>
               <div>
                 <h1 className="text-xl font-black tracking-tight text-white light:text-slate-900 flex items-center gap-2">
-                  <span>Modalità Alla Guida</span>
+                  <span>Modalità Audio</span>
                   <OfflineHUDTag />
                 </h1>
                 <p className="text-xs text-zinc-400 light:text-slate-500 font-medium">
-                  Pulsanti giganti • Rispondi a voce • Nessun bisogno di scorrere
+                  Stile audiolibro • Macro-target bici/corsa • Zero-scroll
                 </p>
               </div>
             </div>
@@ -932,7 +939,7 @@ export const DriveModeScreen: React.FC<DriveModeScreenProps> = ({
                 id="btn-drive-exit"
                 onClick={handleClose}
                 className="p-2.5 rounded-xl bg-zinc-900 border border-zinc-800 text-zinc-400 hover:text-white light:bg-white light:border-slate-200 light:text-slate-600 light:hover:text-slate-900 light:shadow-sm"
-                title="Esci dalla modalità guida"
+                title="Esci dalla Modalità Audio"
               >
                 <X className="w-6 h-6" />
               </button>
@@ -1168,19 +1175,31 @@ export const DriveModeScreen: React.FC<DriveModeScreenProps> = ({
 
           {/* Top Bar HUD */}
           <div className="flex items-center justify-between gap-2 pb-2 border-b border-zinc-800/90 light:border-slate-200 text-xs">
-            <button
-              id="btn-drive-exit"
-              onClick={handleClose}
-              className={`px-3 py-1.5 rounded-xl border font-bold flex items-center gap-1 transition-colors flex-shrink-0 ${
-                (isExamSession || sessionContext?.isExam)
-                  ? 'bg-rose-500/10 border-rose-500/40 text-rose-400 hover:bg-rose-500/20 light:bg-rose-50 light:border-rose-300 light:text-rose-700'
-                  : 'bg-zinc-900 border-zinc-800 text-zinc-300 hover:text-white light:bg-white light:border-slate-200 light:text-slate-700 light:hover:text-slate-900 light:shadow-sm'
-              }`}
-              title={(isExamSession || sessionContext?.isExam) ? 'Interrompi la simulazione d\'esame' : 'Esci dalla modalità guida'}
-            >
-              <X className="w-4 h-4" />
-              <span>{(isExamSession || sessionContext?.isExam) ? 'Interrompi' : 'Esci'}</span>
-            </button>
+            {sessionContext ? (
+              <button
+                id="btn-drive-exit"
+                onClick={executeClose}
+                className="px-3 py-1.5 rounded-xl border border-zinc-700 bg-zinc-900 text-zinc-200 hover:text-white hover:border-zinc-500 light:bg-white light:border-slate-300 light:text-slate-800 font-bold flex items-center gap-1.5 transition-all flex-shrink-0 shadow-sm active:scale-95"
+                title="Torna alla visualizzazione normale del quiz sullo schermo"
+              >
+                <ArrowLeft className="w-4 h-4" />
+                <span>Torna al Quiz</span>
+              </button>
+            ) : (
+              <button
+                id="btn-drive-exit"
+                onClick={handleClose}
+                className={`px-3 py-1.5 rounded-xl border font-bold flex items-center gap-1 transition-colors flex-shrink-0 ${
+                  isExamSession
+                    ? 'bg-rose-500/10 border-rose-500/40 text-rose-400 hover:bg-rose-500/20 light:bg-rose-50 light:border-rose-300 light:text-rose-700'
+                    : 'bg-zinc-900 border-zinc-800 text-zinc-300 hover:text-white light:bg-white light:border-slate-200 light:text-slate-700 light:hover:text-slate-900 light:shadow-sm'
+                }`}
+                title={isExamSession ? 'Interrompi la simulazione d\'esame' : 'Esci dalla Modalità Audio'}
+              >
+                <X className="w-4 h-4" />
+                <span>{isExamSession ? 'Interrompi' : 'Esci'}</span>
+              </button>
+            )}
 
             <div className="flex items-center gap-2 font-mono flex-shrink-0">
               <span className="font-black text-sm text-amber-400 light:text-amber-600">
@@ -1538,13 +1557,13 @@ export const DriveModeScreen: React.FC<DriveModeScreenProps> = ({
           )}
 
           {/* 3 Macro-Fasce di Risposta & Card Didattica (Regola + Tranello) */}
-          <div className="flex-1 flex flex-col gap-2 my-1 sm:my-2 min-h-0">
+          <div className="flex-1 flex flex-col gap-2.5 sm:gap-3.5 my-1 sm:my-2 min-h-0">
             {(() => {
               const isCurrentRevealed = revealedQuestionId === currentQ.id || ((!isExamSession || isTutorEnabled) && answers[currentQ.id] !== undefined);
 
               return (
                 <>
-                  <div className={`flex flex-col gap-2 sm:gap-2.5 ${isCurrentRevealed ? 'flex-none' : 'flex-1'} min-h-0`}>
+                  <div className={`flex flex-col gap-2.5 sm:gap-3.5 ${isCurrentRevealed ? 'flex-none' : 'flex-1'} min-h-0`}>
                     {currentQ.options.map((opt, idx) => {
                       const optNum = (idx + 1) as 1 | 2 | 3;
                       const isSelected = answers[currentQ.id] === optNum;
@@ -1577,14 +1596,14 @@ export const DriveModeScreen: React.FC<DriveModeScreenProps> = ({
                           className={`${
                             isCurrentRevealed
                               ? 'w-full rounded-xl border p-2 sm:p-2.5 flex items-center gap-2.5 sm:gap-3 text-left transition-all'
-                              : 'flex-1 w-full rounded-2xl border-2 p-3 sm:p-4 flex items-center gap-3 sm:gap-4 text-left transition-all'
+                              : 'flex-1 w-full min-h-[78px] sm:min-h-[85px] rounded-2xl border-2 p-3.5 sm:p-4 flex items-center gap-3.5 sm:gap-5 text-left transition-all shadow-md active:scale-[0.98]'
                           } ${style}`}
                         >
                           <div
                             className={`${
                               isCurrentRevealed
                                 ? 'w-7 h-7 sm:w-8 sm:h-8 rounded-lg font-black text-xs sm:text-sm'
-                                : 'w-10 h-10 sm:w-12 sm:h-12 rounded-xl font-black text-lg sm:text-2xl'
+                                : 'w-11 h-11 sm:w-14 sm:h-14 rounded-xl font-black text-xl sm:text-2xl ring-2 ring-black/20'
                             } flex items-center justify-center flex-shrink-0 ${
                               isCurrentRevealed && isCorrectAnswer
                                 ? 'bg-emerald-500 text-white'
@@ -1603,7 +1622,7 @@ export const DriveModeScreen: React.FC<DriveModeScreenProps> = ({
                             className={`flex-1 ${
                               isCurrentRevealed
                                 ? 'text-xs sm:text-sm font-medium leading-tight line-clamp-2'
-                                : 'text-sm sm:text-lg font-semibold leading-snug line-clamp-3'
+                                : 'text-base sm:text-xl font-semibold leading-snug'
                             }`}
                           >
                             {opt}
@@ -1819,7 +1838,7 @@ export const DriveModeScreen: React.FC<DriveModeScreenProps> = ({
               onClick={handleClose}
               className="w-full py-4 rounded-2xl bg-zinc-900 border border-zinc-800 text-zinc-300 hover:text-white light:bg-white light:border-slate-200 light:text-slate-700 light:hover:text-slate-900 light:shadow-sm font-bold text-base flex items-center justify-center gap-2"
             >
-              <span>Chiudi Modalità Guida</span>
+              <span>Chiudi Modalità Audio</span>
             </button>
           </div>
         </div>

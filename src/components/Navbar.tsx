@@ -179,11 +179,11 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab, openSet
             <button
               id="btn-drive-mode"
               onClick={() => openDriveMode()}
-              title="Modalità Audio (Pulsanti giganti & Hands-free)"
+              title="Modalità Audio (Macro-target bici/corsa & Hands-free)"
               className="px-2.5 py-1.5 rounded-lg bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 light:bg-amber-100 light:text-amber-800 border border-amber-500/30 flex items-center gap-1.5 text-xs font-bold transition-all active:scale-95 shadow-sm"
             >
               <Headphones className="w-4 h-4 text-amber-400 light:text-amber-700" />
-              <span className="hidden sm:inline">Modalità Audio</span>
+              <span>AUDIO</span>
             </button>
 
             {/* Quick Voice / Speech Menu */}

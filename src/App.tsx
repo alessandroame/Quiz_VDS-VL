@@ -211,7 +211,7 @@ function AppContent() {
         onClose={() => setIsSettingsOpen(false)}
       />
 
-      {/* Modalità Alla Guida Fullscreen */}
+      {/* Modalità Audio Fullscreen */}
       <DriveModeScreen
         isOpen={isDriveModeOpen}
         onClose={closeDriveMode}

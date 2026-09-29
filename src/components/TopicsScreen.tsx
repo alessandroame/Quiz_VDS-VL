@@ -3,7 +3,7 @@ import {
   ArrowRight,
   ArrowLeft,
   CheckCircle2,
-  Car
+  Headphones
 } from 'lucide-react';
 import type { Question } from '../types/quiz';
 import { useQuiz } from '../context/QuizContext';
@@ -19,6 +19,7 @@ export const TopicsScreen: React.FC = () => {
     subjectsAnalytics,
     settings,
     openDriveMode,
+    registerAudioSessionContext,
     activeSession,
     persistActiveSession,
     dismissActiveSession
@@ -127,10 +128,35 @@ export const TopicsScreen: React.FC = () => {
     }
   };
 
+  const currentSubjectMeta = subjectsAnalytics.find(s => s.id === activeSubjectId);
+
+  // Registra la sessione audio attiva per lo switch universale
+  React.useEffect(() => {
+    if (activeSubjectId === null || sessionQuestions.length === 0) {
+      registerAudioSessionContext(null);
+      return;
+    }
+
+    registerAudioSessionContext({
+      questions: sessionQuestions,
+      currentIndex,
+      answers: sessionAnswers,
+      flags: {},
+      onAnswer: (qid: number, ans: 1 | 2 | 3) => handleAnswer(ans, qid),
+      onToggleFlag: () => {},
+      onNavigateIndex: (idx: number) => changeIndex(idx),
+      isExam: false,
+      title: currentSubjectMeta?.name || 'Materia'
+    });
+
+    return () => {
+      registerAudioSessionContext(null);
+    };
+  }, [activeSubjectId, sessionQuestions, currentIndex, sessionAnswers, currentSubjectMeta, registerAudioSessionContext]);
+
   // --- Vista Sessione Quiz per Materia ---
   if (activeSubjectId !== null && currentQ) {
     const answeredCount = Object.keys(sessionAnswers).length;
-    const currentSubjectMeta = subjectsAnalytics.find(s => s.id === activeSubjectId);
 
     return (
       <div className="max-w-2xl mx-auto px-4 py-4 space-y-4 pb-28 sm:pb-32">
@@ -166,11 +192,11 @@ export const TopicsScreen: React.FC = () => {
                   title: currentSubjectMeta?.name || 'Materia'
                 });
               }}
-              className="px-2 py-1 rounded-lg border border-amber-500/40 bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 light:bg-amber-100 light:text-amber-800 text-[11px] font-bold transition-colors flex items-center gap-1"
-              title="Passa alla Modalità Alla Guida"
+              className="px-2.5 py-1.5 rounded-lg border border-amber-500/40 bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 light:bg-amber-100 light:text-amber-800 text-xs font-bold transition-all flex items-center gap-1.5 shadow-sm active:scale-95"
+              title="Passa alla Modalità Audio"
             >
-              <Car className="w-3.5 h-3.5" />
-              <span>Alla Guida</span>
+              <Headphones className="w-3.5 h-3.5" />
+              <span>AUDIO</span>
             </button>
 
             <div className="text-xs font-mono text-amber-400 light:text-amber-600 font-semibold">
