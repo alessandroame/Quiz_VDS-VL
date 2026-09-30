@@ -118,8 +118,11 @@
   - Spaziatura protetta e zero elementi affiancati per eliminare il rischio di miss-clicks dovuti alle vibrazioni del manubrio o al movimento.
 - **Feedback Aptico di Bordo (`navigator.vibrate`)**: pattern di vibrazione tattile differenziati per tap, esito corretto, errore, cambio domanda e contrassegno bandierina.
 - **Layout Ergonomico a Schermo Intero**: viewport bloccato a `100dvh` con **zero scrolling**.
-- **Screen Wake Lock**: schermo mantenuto costantemente acceso, prevenendo spegnimenti e standby accidentali.
 - **Pilota Automatico ("Radio Quiz")**: modalità hands-free a tempo. L'app legge in sequenza la domanda e le opzioni, attende un intervallo configurabile (3-8s) e svela automaticamente la risposta esatta e la regola, passando da sola al quiz successivo.
+- **Tutor Didattico Hands-Free (Regola & Tranello a Voce)**:
+  - Accesso diretto con pulsante rapido **"Tutor Didattico (30 Quiz)"** nel Launcher o commutazione istantanea dalla schermata Tutor tramite il tasto `AUDIO`.
+  - Lettura integrale della spiegazione didattica vocale ad ogni risposta con sincronizzazione anti-troncamento dell'autopilota (attesa fine del file audio + pausa di assimilazione di 2.5s prima di avanzare).
+  - Cronometro didattico incrementale (count-up senza limiti di tempo) e card didattica ad alto contrasto.
 - **Comandi Vocali Hands-Free in Italiano**: interazione completa a voce tramite Web Speech Recognition con comandi dedicati (`"Uno"`, `"Due"`, `"Tre"`, `"Avanti"`, `"Indietro"`, `"Ripeti"`, `"Bandiera"`, `"Pausa"`, `"Spiega"`, `"Tutor"`).
 - **Gestione Microfono Anti-Eco (Selettore Altoparlante / Cuffie)**:
   - 🔊 **Modalità Altoparlante (Default - Senza cuffie)**: il microfono è temporaneamente disattivato mentre l'altoparlante legge la domanda, le opzioni o le spiegazioni, e si attiva automaticamente **solo a fine parlato** (durante il countdown di risposta) o **mentre l'audio è in pausa**. Grazie a un buffer acustico di 250ms, elimina alla radice qualsiasi interferenza o falso comando innescato dalla voce dello smartphone.
