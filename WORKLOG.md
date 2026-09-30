@@ -14,6 +14,24 @@ Questo documento registra in ordine cronologico tutte le lavorazioni svolte nel 
 - **Impatto sul Desiderata**: <Come questo intervento contribuisce al desiderata (cfr. DESIDERATA.md) e indicazioni per il prossimo agente>
 ```
 
+### [2026-09-30] - Risoluzione e Allineamento Completo Modalità Tutor in Modalità Audio
+- **Cosa abbiamo fatto**:
+  1. Estesa l'interfaccia `DriveModeSessionContext` con il flag `isTutor?: boolean` in `src/components/DriveModeScreen.tsx`.
+  2. Sincronizzato `ExamScreen.tsx` per trasmettere fedelmente `isTutor: examMode === 'tutor'` sia nel pulsante `[AUDIO]` che nel coordinatore audio universale `registerAudioSessionContext`.
+  3. In `DriveModeScreen.tsx`, idratato lo stato didattico prioritario: la Modalità Audio ora attiva immediatamente il feedback cromatico, la card didattica (Regola + Tranello) e la lettura neurale vocale quando avviata da una sessione Tutor.
+  4. Sincronizzato il timer d'esame in Modalità Audio: count-up incrementale per il Tutor Didattico (senza limiti di tempo né chiusura automatica), countdown per l'Esame Ufficiale AeCI.
+  5. Risolta la race condition dell'autopilota: le spiegazioni vocali (sia in Tutor mode che su errore con `ttsAutoExplainOnMistake` o comando vocale "Spiega") non vengono più troncate dopo 3.5s, ma vengono ascoltate per intero attendendo la fine naturale dell'audio e una pausa di assimilazione di 2.5s.
+  6. Aggiunto il pulsante rapido "Tutor Didattico (30 Quiz)" nel launcher di `DriveLauncher.tsx` con timer e badge didattico verde smeraldo in `DriveActiveHUD.tsx`.
+  7. Creata suite di test unitari dedicata in `src/components/drive/DriveTutorMode.test.ts` (3 test passati al 100%).
+- **Scelte architetturali & Rationale**:
+  - Evitato l'uso di timer arbitrari o flag disconnessi: `sessionContext.isTutor` funge da SSOT chiaro per determinare la natura didattica della sessione.
+  - Conservata la conformità AeCI dell'Esame Ufficiale (30 quiz alla cieca senza spiegazioni) distinguendolo nettamente dalla Simulazione Didattica con spiegazioni vocali istantanee.
+- **Impatto sul Desiderata**:
+  - Allineamento completo a `DESIDERATA.md` (Punto 7: "Modalità Tutor Didattica nella Modalità Guida").
+  - Test unitari totali: 23 file, 208/208 test passati con successo. Build di produzione verificata con successo (`tsc && vite build`).
+
+---
+
 # Worklog 2026-09-30: Gestione Microfono Anti-Eco & Gating Audio Vocale in Modalità Audio (Altoparlante vs Cuffie) 🛩️
 
 ## Cosa Abbiamo Fatto
