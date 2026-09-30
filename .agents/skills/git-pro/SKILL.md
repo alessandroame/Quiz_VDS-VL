@@ -165,3 +165,29 @@ git add <file-modificato>
 git commit --amend --no-edit
 ```
 **Regola di Sicurezza**: Mai fare amend o riscrivere la storia su commit già pubblicati (`pushed`) o su rami condivisi (`main`).
+
+---
+
+## 7. Protocollo Avanzamento Versione (SemVer & Release)
+
+Per consentire sia lo sviluppo rapido in locale sia la verifica immediata su smartphone che l'ultima versione PWA sia stata recepita, si adotta un sistema a doppio livello:
+
+### A. Livello Commit (Locale & CI - Automatico a Zero Modifiche File)
+- Ad ogni singolo commit Git, il contatore sequenziale `commitCount` (`git rev-list --count HEAD`) e lo short hash `commitHash` (`git rev-parse --short HEAD`) vengono calcolati al volo da `vite.config.ts`.
+- Non è necessario (ed è sconsigliato) modificare `package.json` su ogni micro-commit atomico: questo evita merge conflict su branch paralleli e mantiene pulita la cronologia.
+- Quando si prova l'app in locale (`npm run dev` o smartphone connesso alla rete locale), il contatore e l'hash identificano con precisione matematica il commit esatto in esecuzione.
+
+### B. Livello Push / Integrazione (SemVer Ufficiale)
+- Prima di eseguire il `push` su `origin/main` o alla conclusione di una lavorazione / traguardo:
+  1. Avanzare la versione in `package.json`:
+     - **`patch`** (es. `1.1.0` -> `1.1.1`): bug fix, rifiniture UI, correzioni dati quiz o audio, test.
+     - **`minor`** (es. `1.1.0` -> `1.2.0`): nuove funzionalità, nuove schermate o flussi operativi completi.
+     - **`major`** (es. `1.0.0` -> `2.0.0`): cambi architetturali radicali o rotture di compatibilità.
+  2. Creare il commit dedicato:
+     ```bash
+     git add package.json package-lock.json
+     git commit -m "chore(release): bump version to X.Y.Z"
+     ```
+  3. Eseguire la verifica di build (`npm run build`) e test (`npm run test:unit`).
+  4. L'integrazione su GitHub Pages compilerà con `fetch-depth: 0`, allineando il contatore di build e garantendo che la PWA offra la nuova versione con possibilità di forzare il refresh direttamente dal badge touch della UI.
+

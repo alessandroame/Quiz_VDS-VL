@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   Settings as SettingsIcon,
   Sun,
@@ -15,6 +15,8 @@ import { useQuiz } from '../context/QuizContext';
 import { VoiceQuickMenu } from './VoiceQuickMenu';
 import { OfflineIndicator } from './OfflineIndicator';
 import { AudioDownloadBanner } from './AudioDownloadBanner';
+import { BuildInfoModal } from './BuildInfoModal';
+import { getBuildInfo } from '../utils/buildInfo';
 
 import { getHeaderTitle, type NavTab } from '../utils/navigation';
 
@@ -29,6 +31,8 @@ interface NavbarProps {
 export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab, openSettings }) => {
   const { theme, cycleTheme } = useTheme();
   const { readinessScore, isExamRunning, activeSession, openDriveMode, settings, syncState } = useQuiz();
+  const [isBuildInfoOpen, setIsBuildInfoOpen] = useState(false);
+  const buildInfo = getBuildInfo();
 
   const getSyncTooltip = () => {
     switch (syncState.status) {
@@ -98,7 +102,7 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab, openSet
                 id="btn-mini-audio"
                 onClick={() => openDriveMode()}
                 title="Passa all'ascolto hands-free (Modalità Audio)"
-                className="px-2 py-1 sm:px-2.5 sm:py-1.5 rounded-lg bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 light:bg-amber-100 light:text-amber-800 border border-amber-500/30 flex items-center gap-1 text-xs font-bold transition-all active:scale-95 shadow-sm"
+                className="p-1.5 sm:px-2.5 sm:py-1.5 rounded-lg bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 light:bg-amber-100 light:text-amber-800 border border-amber-500/30 flex items-center gap-1 text-xs font-bold transition-all active:scale-95 shadow-sm"
               >
                 <Headphones className="w-3.5 h-3.5 text-amber-400 light:text-amber-700" />
                 <span className="hidden sm:inline">Audio</span>
@@ -107,12 +111,12 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab, openSet
               {/* Quick Speech Menu */}
               <VoiceQuickMenu />
 
-              {/* Theme quick toggle */}
+              {/* Theme quick toggle (desktop only during exam/study) */}
               <button
                 id="btn-mini-theme-toggle"
                 onClick={cycleTheme}
                 title={`Tema: ${theme}`}
-                className="p-1.5 rounded-lg text-zinc-400 hover:text-zinc-200 light:text-slate-600 light:hover:text-slate-900 hover:bg-zinc-800/60 light:hover:bg-slate-100 transition-colors"
+                className="hidden sm:flex p-1.5 rounded-lg text-zinc-400 hover:text-zinc-200 light:text-slate-600 light:hover:text-slate-900 hover:bg-zinc-800/60 light:hover:bg-slate-100 transition-colors"
               >
                 {theme === 'dark' && <Moon className="w-4 h-4" />}
                 {theme === 'light' && <Sun className="w-4 h-4 text-amber-500" />}
@@ -135,39 +139,53 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab, openSet
 
         {/* Audio Download Bottom Banner */}
         <AudioDownloadBanner elevated={isExamRunning || Boolean(activeSession)} />
+
+        {/* Modal Dettagli Versione e Build */}
+        <BuildInfoModal isOpen={isBuildInfoOpen} onClose={() => setIsBuildInfoOpen(false)} />
       </>
     );
   }
 
-  // HEADER COMPLETO PER HOME HUB (Singola barra da 56px, eliminata barra a 5 tab)
+  // HEADER COMPLETO PER HOME HUB (Singola barra da 56px, zero clutter)
   return (
     <>
       <header className="fixed top-0 left-0 right-0 z-40 w-full h-14 border-b backdrop-blur bg-zinc-950/95 border-zinc-800 dark:bg-zinc-950/95 dark:border-zinc-800 light:bg-white/95 light:border-slate-200 light:text-slate-900 transition-colors shadow-sm">
         <div className="max-w-4xl mx-auto px-3 sm:px-4 h-full flex items-center justify-between gap-1 sm:gap-2">
           {/* Logo & Brand */}
           <div
-            className="flex items-center gap-2 sm:gap-2.5 cursor-pointer min-w-0 flex-shrink"
+            className="flex items-center gap-2 sm:gap-2.5 cursor-pointer min-w-0"
             onClick={() => setActiveTab('home')}
           >
-            <img src="/favicon.svg" alt="VDS-VL" className="w-8 h-8 rounded-lg shadow-sm flex-shrink-0" />
+            <img src="/favicon.svg" alt="VDS-VL" className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg shadow-sm flex-shrink-0" />
             <div className="min-w-0">
-              <div className="font-bold text-sm tracking-wide flex items-center gap-1.5 whitespace-nowrap">
+              <div className="font-bold text-sm tracking-wide flex items-center gap-1.5">
                 <span className="flex-shrink-0">VDS-VL</span>
-                <span className="text-[10px] px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-400 font-mono flex-shrink-0">
+                <span className="text-[10px] px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-400 font-mono hidden sm:inline-flex flex-shrink-0">
                   2017
                 </span>
-                {/* Global dynamic version badge */}
-                <span
+                {/* Global dynamic version badge - touch-friendly and visible on mobile & desktop */}
+                <button
                   id="app-version-badge"
-                  title={typeof __APP_BUILD_ID__ !== 'undefined' ? __APP_BUILD_ID__ : `v${typeof __APP_VERSION__ !== 'undefined' ? __APP_VERSION__ : '1.0.0'}`}
-                  className="text-[10px] px-1.5 py-0.5 rounded bg-zinc-800/80 text-zinc-400 border border-zinc-700/50 light:bg-slate-100 light:text-slate-600 light:border-slate-300 font-mono flex-shrink-0 cursor-default select-none"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setIsBuildInfoOpen(true);
+                  }}
+                  title={buildInfo.buildId}
+                  aria-label={`Versione ${buildInfo.version} build ${buildInfo.buildNumber}`}
+                  className="text-[10px] px-1.5 py-0.5 rounded bg-zinc-800/80 hover:bg-zinc-700 text-zinc-300 hover:text-white border border-zinc-700/60 light:bg-slate-100 light:hover:bg-slate-200 light:text-slate-700 light:hover:text-slate-900 light:border-slate-300 font-mono hidden sm:inline-flex items-center flex-shrink-0 cursor-pointer select-none active:scale-95 transition-all shadow-sm"
                 >
-                  v{typeof __APP_VERSION__ !== 'undefined' ? __APP_VERSION__ : '1.0.0'}
-                </span>
+                  v{buildInfo.version}
+                  {buildInfo.buildNumber && buildInfo.buildNumber !== '0' && (
+                    <span className="hidden sm:inline text-zinc-500 light:text-slate-400 font-normal">
+                      {' '}#{buildInfo.buildNumber}
+                    </span>
+                  )}
+                </button>
                 {/* Indicatore Stato Offline */}
                 <OfflineIndicator />
               </div>
-              <div className="text-[11px] text-zinc-400 light:text-slate-500 truncate">
+              {/* Secondary telemetry subtitle - hidden on mobile to avoid overlap */}
+              <div className="text-[11px] text-zinc-400 light:text-slate-500 truncate hidden sm:block">
                 Preparazione: <strong className="text-amber-400 light:text-amber-600">{readinessScore}%</strong>
               </div>
             </div>
@@ -179,11 +197,11 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab, openSet
             <button
               id="btn-drive-mode"
               onClick={() => openDriveMode()}
-              title="Modalità Audio (Macro-target bici/corsa & Hands-free)"
-              className="px-2.5 py-1.5 rounded-lg bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 light:bg-amber-100 light:text-amber-800 border border-amber-500/30 flex items-center gap-1.5 text-xs font-bold transition-all active:scale-95 shadow-sm"
+              title="Modalità Audio (Macro-target & Hands-free)"
+              className="p-1.5 sm:px-2.5 sm:py-1.5 rounded-lg bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 light:bg-amber-100 light:text-amber-800 border border-amber-500/30 flex items-center gap-1.5 text-xs font-bold transition-all active:scale-95 shadow-sm"
             >
               <Headphones className="w-4 h-4 text-amber-400 light:text-amber-700" />
-              <span>AUDIO</span>
+              <span className="hidden sm:inline">Audio</span>
             </button>
 
             {/* Quick Voice / Speech Menu */}
@@ -195,7 +213,7 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab, openSet
                 id="btn-cloud-sync"
                 onClick={openSettings}
                 title={getSyncTooltip()}
-                className="p-2 rounded-lg text-zinc-400 hover:text-zinc-200 light:text-slate-600 light:hover:text-slate-900 hover:bg-zinc-800/60 light:hover:bg-slate-100 transition-colors"
+                className="p-1.5 sm:p-2 rounded-lg text-zinc-400 hover:text-zinc-200 light:text-slate-600 light:hover:text-slate-900 hover:bg-zinc-800/60 light:hover:bg-slate-100 transition-colors"
               >
                 {syncState.status === 'syncing' ? (
                   <RefreshCw className="w-4 h-4 text-amber-400 animate-spin" />
@@ -217,7 +235,7 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab, openSet
               id="btn-theme-toggle"
               onClick={cycleTheme}
               title={`Tema: ${theme}`}
-              className="p-2 rounded-lg text-zinc-400 hover:text-zinc-200 light:text-slate-600 light:hover:text-slate-900 hover:bg-zinc-800/60 light:hover:bg-slate-100 transition-colors"
+              className="p-1.5 sm:p-2 rounded-lg text-zinc-400 hover:text-zinc-200 light:text-slate-600 light:hover:text-slate-900 hover:bg-zinc-800/60 light:hover:bg-slate-100 transition-colors"
             >
               {theme === 'dark' && <Moon className="w-4 h-4" />}
               {theme === 'light' && <Sun className="w-4 h-4 text-amber-500" />}
@@ -230,7 +248,7 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab, openSet
               aria-label="Impostazioni"
               onClick={openSettings}
               title="Impostazioni"
-              className="p-2 rounded-lg text-zinc-400 hover:text-zinc-200 light:text-slate-600 light:hover:text-slate-900 hover:bg-zinc-800/60 light:hover:bg-slate-100 transition-colors"
+              className="p-1.5 sm:p-2 rounded-lg text-zinc-400 hover:text-zinc-200 light:text-slate-600 light:hover:text-slate-900 hover:bg-zinc-800/60 light:hover:bg-slate-100 transition-colors"
             >
               <SettingsIcon className="w-4 h-4" />
             </button>
@@ -240,6 +258,9 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab, openSet
 
       {/* Audio Download Bottom Banner */}
       <AudioDownloadBanner elevated={isExamRunning || Boolean(activeSession)} />
+
+      {/* Modal Dettagli Versione e Build */}
+      <BuildInfoModal isOpen={isBuildInfoOpen} onClose={() => setIsBuildInfoOpen(false)} />
     </>
   );
 };

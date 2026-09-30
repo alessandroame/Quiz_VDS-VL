@@ -110,3 +110,16 @@ Questo file costituisce la **memoria tecnica permanente** del progetto. Raccogli
 - **Prove Tangibili**: Mostrare esiti di test (`npm run test:unit`, `tsc`) prima di rassicurazioni discorsive.
 - **Interventi Atomici**: Micro-step focalizzati (1 problema alla volta) per diff leggibili in 15 secondi.
 
+---
+
+## 8. Versionamento e Tracciabilità Build (SemVer & PWA Mobile)
+- **Doppio Livello di Avanzamento Versione**:
+  * **Per-Commit (Automatico per Dev Locale)**: Ogni commit Git incrementa automaticamente il contatore `__APP_BUILD_NUMBER__` (`git rev-list --count HEAD`) e aggiorna lo short hash `__APP_COMMIT_HASH__` (`git rev-parse --short HEAD`) tramite `vite.config.ts`. Nessun bisogno di toccare `package.json` ad ogni commit atomico (evita merge conflict e inflazione artificiale dei tag).
+  * **Per-Push / Traguardo (SemVer in `package.json`)**: Alla chiusura di una lavorazione e prima del `git push` su `main`, avanzare la versione semantica in `package.json` (`patch` per fix/refactoring, `minor` per feature/schermate) con commit dedicato `chore(release): bump version to X.Y.Z`.
+- **Verificabilità Mobile & PWA Cache-Busting**:
+  * Il badge `#app-version-badge` è sempre visibile e cliccabile/tappabile anche su smartphone (non nascosto con `hidden sm:inline-flex`).
+  * Il tocco apre `BuildInfoModal` con dettagli completi (Versione, Build #, Commit, Data compilazione) e pulsante "Forza Aggiornamento PWA" che ripulisce le cache dell'app shell (preservando i file audio pesanti `vds-audio-*`) e ricarica istantaneamente l'app.
+- **GitHub Actions Full History**:
+  * In `.github/workflows/deploy.yml`, il checkout usa `fetch-depth: 0` affinché `git rev-list --count HEAD` corrisponda esattamente alla cronologia reale locale anche in produzione su GitHub Pages.
+
+

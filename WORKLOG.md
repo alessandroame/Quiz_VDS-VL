@@ -14,6 +14,27 @@ Questo documento registra in ordine cronologico tutte le lavorazioni svolte nel 
 - **Impatto sul Desiderata**: <Come questo intervento contribuisce al desiderata (cfr. DESIDERATA.md) e indicazioni per il prossimo agente>
 ```
 
+### [2026-09-30] - Istruzione Agente per Avanzamento Versione, Tracciamento Build e Verificabilità Mobile PWA
+
+- **Cosa abbiamo fatto**:
+  * Definita e formalizzata la **Direttiva Cardine 9** in [.agents/AGENTS.md](file:///d:/Github/Quiz_VDS-VL/.agents/AGENTS.md), la **Sezione 7** in [.agents/skills/git-pro/SKILL.md](file:///d:/Github/Quiz_VDS-VL/.agents/skills/git-pro/SKILL.md), la **Sezione 5** in [.agents/rules/constraints.md](file:///d:/Github/Quiz_VDS-VL/.agents/rules/constraints.md) e la **Sezione 8** in [MEMORY.md](file:///d:/Github/Quiz_VDS-VL/MEMORY.md).
+  * Risolto alla radice il problema dell'invisibilità della versione su smartphone: rimosso il selettore `hidden sm:inline-flex` da [src/components/Navbar.tsx](file:///d:/Github/Quiz_VDS-VL/src/components/Navbar.tsx) che nascondeva completamente `#app-version-badge` sui telefoni (`< 640px`).
+  * Trasformato `#app-version-badge` sia nella Navbar principale che in [src/components/SettingsModal.tsx](file:///d:/Github/Quiz_VDS-VL/src/components/SettingsModal.tsx) in un pulsante tattile interattivo conforme alle linee guida di ergonomia touch (min 44px / active feedback).
+  * Creato il modulo utility [src/utils/buildInfo.ts](file:///d:/Github/Quiz_VDS-VL/src/utils/buildInfo.ts) con relativa suite di test [src/utils/buildInfo.test.ts](file:///d:/Github/Quiz_VDS-VL/src/utils/buildInfo.test.ts) (4/4 test passanti), che espone `getBuildInfo()`, `formatBuildDate()` e la funzione `forceReloadPWA()`.
+  * Creato il componente [src/components/BuildInfoModal.tsx](file:///d:/Github/Quiz_VDS-VL/src/components/BuildInfoModal.tsx): modale touch-friendly per smartphone e desktop che visualizza versione semantica, numero progressivo build, commit hash Git, data/ora esatta di compilazione e stato PWA, con pulsanti dedicati "Forza Aggiornamento PWA" e "Copia Dettagli".
+  * Aggiunto nella scheda "Info e Riconoscimenti" di [src/components/SettingsModal.tsx](file:///d:/Github/Quiz_VDS-VL/src/components/SettingsModal.tsx) il blocco "Release & Dettagli Build" con riepilogo completo e tasto rapido di refresh PWA.
+  * Aggiornato il workflow GitHub Actions [.github/workflows/deploy.yml](file:///d:/Github/Quiz_VDS-VL/.github/workflows/deploy.yml) con `with: fetch-depth: 0` nello step di checkout, eliminando l'appiattimento a `1` del contatore build dovuto allo shallow clone.
+  * Avanzata la versione di [package.json](file:///d:/Github/Quiz_VDS-VL/package.json) da `1.0.0` a `1.1.0`.
+
+- **Scelte architetturali & Rationale**:
+  * *Valutazione Push vs Commit*: Ad ogni singolo commit Git, il contatore sequenziale `commitCount` (`git rev-list --count HEAD`) e l'hash sintetico `commitHash` (`git rev-parse --short HEAD`) vengono calcolati e iniettati a tempo di build da `vite.config.ts`. Questo garantisce che ogni commit locale abbia identità univoca immediata (es. `#124 • 65053c6`) senza dover modificare file su disco a ogni micro-commit atomico (evitando conflitti Git in sessioni parallele/worktree). Al momento del `push` su `origin/main` o a traguardi funzionali, l'agente avanza invece la versione semantica ufficiale in `package.json` (`chore(release): bump version to X.Y.Z`).
+  * *PWA Cache-Busting Selettivo*: La procedura `forceReloadPWA` invalida le cache dei file statici e bundle dell'app shell ma preserva selettivamente le cache audio (`vds-audio-*`), proteggendo centinaia di megabyte di download già eseguiti dall'allievo pilota pur assicurando il caricamento dell'ultimissimo codice.
+
+- **Impatto sul Desiderata**:
+  * Aggiornata la specifica della visualizzazione di versione: da puro tooltip desktop a badge touch universale mobile/desktop con modal diagnostico e auto-ripristino cache.
+
+---
+
 ### [2026-09-30] - Risoluzione e Allineamento Completo Modalità Tutor in Modalità Audio
 - **Cosa abbiamo fatto**:
   1. Estesa l'interfaccia `DriveModeSessionContext` con il flag `isTutor?: boolean` in `src/components/DriveModeScreen.tsx`.

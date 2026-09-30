@@ -34,5 +34,16 @@
 - **Allineamento Continuo del README.md**: Ogni volta che vengono introdotte nuove funzionalità o modificate quelle esistenti, aggiornare tempestivamente il [README.md](file:///c:/github/Quiz_VDS-VL/README.md) per mantenere la documentazione utente allineata allo stato del software.
 - **Divieto di Amnesia e Inizio al Buio**: Nessun agente può avviare modifiche senza consultare prima la triade di conoscenza ([DESIDERATA.md](file:///c:/github/Quiz_VDS-VL/DESIDERATA.md), [MEMORY.md](file:///c:/github/Quiz_VDS-VL/MEMORY.md), [WORKLOG.md](file:///c:/github/Quiz_VDS-VL/WORKLOG.md)), né può chiudere un task senza aver documentato il lavoro svolto per chi subentrerà.
 
+## 5. Versionamento e Tracciabilità di Build (SemVer & Mobile Verifiability)
+- **Doppio Canale Build vs Release**:
+  - **Locale & Commit**: Ad ogni commit, Git (`git rev-list --count HEAD` e `git rev-parse --short HEAD`) fornisce identificazione univoca automatica e progressiva (`__APP_BUILD_NUMBER__`, `__APP_COMMIT_HASH__`). Non modificare `package.json` nei micro-commit atomici.
+  - **Push & Milestone**: Prima del push o completamento di milestone, avanzare la versione semantica in `package.json` (`patch` o `minor`) e generare il commit convenzionale `chore(release): bump version to X.Y.Z`.
+- **Accessibilità Mobile Obbligatoria**:
+  - Il badge `#app-version-badge` deve restare visibile (`inline-flex`) anche su smartphone a 390px.
+  - Il badge deve essere interattivo (apertura del modal diagnostico `BuildInfoModal` con dettagli build e tasto per forzare l'aggiornamento e la pulizia cache della PWA).
+- **Integrità CI / GitHub Pages**:
+  - `.github/workflows/deploy.yml` deve utilizzare sempre `fetch-depth: 0` per garantire che il contatore delle build non venga appiattito a 1 su GitHub Pages.
+
+
 
 

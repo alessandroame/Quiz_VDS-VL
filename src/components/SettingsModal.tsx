@@ -26,7 +26,8 @@ import {
   Maximize2,
   Minimize2,
   ChevronDown,
-  RefreshCw
+  RefreshCw,
+  Tag
 } from 'lucide-react';
 import { useTheme } from '../context/ThemeContext';
 import { useQuiz } from '../context/QuizContext';
@@ -36,6 +37,8 @@ import { exportDatabaseBackup, importDatabaseBackup, db } from '../db';
 import type { ThemeMode } from '../types/database';
 import { FONT_SIZE_OPTIONS, getFontSizeLabel } from '../utils/fontSize';
 import { VoiceCommandsModal } from './VoiceCommandsModal';
+import { BuildInfoModal } from './BuildInfoModal';
+import { getBuildInfo, formatBuildDate, forceReloadPWA } from '../utils/buildInfo';
 import {
   audioDownloadManager,
   VoiceName,
@@ -245,6 +248,14 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
   const [isFullscreen, setIsFullscreen] = useState(
     typeof document !== 'undefined' ? Boolean(document.fullscreenElement) : false
   );
+  const [isBuildInfoOpen, setIsBuildInfoOpen] = useState(false);
+  const [isRefreshingPwa, setIsRefreshingPwa] = useState(false);
+  const buildInfo = getBuildInfo();
+
+  const handleForcePwaRefresh = async () => {
+    setIsRefreshingPwa(true);
+    await forceReloadPWA();
+  };
 
   useEffect(() => {
     const handleFsChange = () => {
@@ -392,7 +403,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
 
   const dataSummary = '504 Quiz • Dexie SSOT';
 
-  const aboutSummary = `v${typeof __APP_VERSION__ !== 'undefined' ? __APP_VERSION__ : '1.0.0'} • AeCI`;
+  const aboutSummary = `v${buildInfo.version} • #${buildInfo.buildNumber}`;
 
   return (
     <div
@@ -419,13 +430,20 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
             <h1 className="text-base font-bold text-zinc-100 light:text-slate-900 flex items-center gap-2">
               <SettingsIcon className="w-4 h-4 text-amber-500" />
               <span>Impostazioni</span>
-              <span
+              <button
                 id="settings-version-badge"
-                title={typeof __APP_BUILD_ID__ !== 'undefined' ? __APP_BUILD_ID__ : undefined}
-                className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-zinc-800 text-zinc-400 border border-zinc-700/60 light:bg-slate-200 light:text-slate-600 light:border-slate-300 font-normal cursor-default select-none"
+                onClick={() => setIsBuildInfoOpen(true)}
+                title={buildInfo.buildId}
+                aria-label="Dettagli versione e build"
+                className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-zinc-800 hover:bg-zinc-700 text-zinc-300 hover:text-white border border-zinc-700/60 light:bg-slate-200 light:hover:bg-slate-300 light:text-slate-700 light:border-slate-300 font-normal cursor-pointer select-none active:scale-95 transition-all shadow-sm"
               >
-                v{typeof __APP_VERSION__ !== 'undefined' ? __APP_VERSION__ : '1.0.0'}
-              </span>
+                v{buildInfo.version}
+                {buildInfo.buildNumber && buildInfo.buildNumber !== '0' && (
+                  <span className="text-zinc-500 light:text-slate-400 font-normal">
+                    {' '}#{buildInfo.buildNumber}
+                  </span>
+                )}
+              </button>
             </h1>
           </div>
 
@@ -1497,7 +1515,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                         VDS-VL Quiz Master
                       </span>
                       <span className="px-1.5 py-0.5 rounded text-[10px] font-mono font-semibold bg-amber-500/20 text-amber-400 border border-amber-500/30 light:bg-amber-100 light:text-amber-800">
-                        v{typeof __APP_VERSION__ !== 'undefined' ? __APP_VERSION__ : '1.0.0'}
+                        v{buildInfo.version}
                       </span>
                     </div>
                     <p className="text-[11px] text-zinc-400 light:text-slate-600 mt-1 leading-relaxed">
@@ -1505,6 +1523,41 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                     </p>
                   </div>
                 </div>
+              </div>
+
+              {/* Identificativo Release & PWA */}
+              <div className="p-3 rounded-xl border border-zinc-800 bg-zinc-950/60 light:bg-slate-50 light:border-slate-200 space-y-2.5 text-xs">
+                <div className="flex items-center justify-between border-b border-zinc-800/80 light:border-slate-200 pb-2">
+                  <span className="font-bold text-zinc-200 light:text-slate-800 flex items-center gap-1.5 text-xs">
+                    <Tag className="w-3.5 h-3.5 text-amber-400" />
+                    <span>Release & Dettagli Build</span>
+                  </span>
+                  <span className="font-mono text-[10px] px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-400 border border-amber-500/30 font-bold">
+                    v{buildInfo.version}
+                  </span>
+                </div>
+                <div className="grid grid-cols-2 gap-2 text-[11px]">
+                  <div className="p-2 rounded-lg bg-zinc-900/80 border border-zinc-800/80 light:bg-white light:border-slate-200">
+                    <span className="text-[10px] text-zinc-500 block">Numero Build</span>
+                    <span className="font-mono font-bold text-amber-400 light:text-amber-700">#{buildInfo.buildNumber}</span>
+                  </div>
+                  <div className="p-2 rounded-lg bg-zinc-900/80 border border-zinc-800/80 light:bg-white light:border-slate-200">
+                    <span className="text-[10px] text-zinc-500 block">Commit Git</span>
+                    <span className="font-mono font-bold text-sky-400 light:text-sky-700">{buildInfo.commitHash}</span>
+                  </div>
+                  <div className="col-span-2 p-2 rounded-lg bg-zinc-900/80 border border-zinc-800/80 light:bg-white light:border-slate-200">
+                    <span className="text-[10px] text-zinc-500 block">Data/Ora Compilazione</span>
+                    <span className="font-mono text-zinc-300 light:text-slate-700">{formatBuildDate(buildInfo.buildTime)}</span>
+                  </div>
+                </div>
+                <button
+                  onClick={handleForcePwaRefresh}
+                  disabled={isRefreshingPwa}
+                  className="w-full py-2 px-3 rounded-lg bg-zinc-800/90 hover:bg-zinc-800 active:scale-98 text-zinc-200 hover:text-white border border-zinc-700/60 light:bg-white light:hover:bg-slate-100 light:text-slate-800 light:border-slate-300 font-bold text-[11px] flex items-center justify-center gap-1.5 transition-all shadow-sm cursor-pointer"
+                >
+                  <RefreshCw className={`w-3.5 h-3.5 ${isRefreshingPwa ? 'animate-spin' : ''}`} />
+                  <span>{isRefreshingPwa ? 'Aggiornamento in corso...' : 'Forza Aggiornamento PWA'}</span>
+                </button>
               </div>
 
               {/* Riferimenti Normativi AeCI & D.P.R. 133/2010 */}
@@ -1594,6 +1647,12 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
       <VoiceCommandsModal
         isOpen={isVoiceGuideOpen}
         onClose={() => setIsVoiceGuideOpen(false)}
+      />
+
+      {/* Modale Dettagli Versione e Build */}
+      <BuildInfoModal
+        isOpen={isBuildInfoOpen}
+        onClose={() => setIsBuildInfoOpen(false)}
       />
     </div>
   );
