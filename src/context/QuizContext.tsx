@@ -82,6 +82,7 @@ export const QuizProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, []);
 
   const closeDriveMode = useCallback(() => {
+    voiceService.stop();
     setIsDriveModeOpen(false);
     setDriveSessionContext(null);
   }, []);
@@ -214,6 +215,7 @@ export const QuizProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const dismissActiveSession = async () => {
+    voiceService.stop();
     setIsLocallyDismissed(true);
     await clearActiveSession();
     syncEngine.schedulePush();

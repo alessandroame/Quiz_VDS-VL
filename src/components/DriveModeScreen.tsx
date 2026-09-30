@@ -44,6 +44,7 @@ interface DriveModeScreenProps {
 
 const VOICE_HINTS = [
   'Dì "Uno", "Due" o "Tre" per scegliere la risposta',
+  'Dì "Ripeti domanda" o "Ripeti due" per riascoltare singoli elementi',
   'Dì "Spiega" o "Regola" per ascoltare la spiegazione didattica',
   'Dì "Attiva Tutor" o "Disattiva Tutor" per la modalità didattica',
   'Dì "Ripeti" per riascoltare l\'elemento attivo',
@@ -238,6 +239,8 @@ export const DriveModeScreen: React.FC<DriveModeScreenProps> = ({
     togglePlayPause,
     restartCurrentOrSequence,
     playFullSequence,
+    playQuestion,
+    playOption,
     playExplanation,
     playDriveIntro,
     stopDriveIntro,
@@ -245,6 +248,8 @@ export const DriveModeScreen: React.FC<DriveModeScreenProps> = ({
     pause: pauseVoice,
     resume: resumeVoice
   } = useAviationVoice(currentQ?.id);
+
+  const isExplanationPlaying = isPartPlaying('explanation');
 
   // Auto-trigger della spiegazione vocale alla partenza solo se non ancora ascoltata
   const hasTriggeredInitialIntroRef = useRef<boolean>(false);
@@ -331,22 +336,6 @@ export const DriveModeScreen: React.FC<DriveModeScreenProps> = ({
     }
   }, [isOpen, internalMode, currentQ?.id, isAutopilotEnabled, isIntroActive]);
 
-  // Gestione termine sequenza audio vocale -> avvio countdown attesa risposta
-  const prevSequencePlayingRef = useRef<boolean>(false);
-
-  useEffect(() => {
-    if (!isOpen || internalMode !== 'running' || !isAutopilotEnabled || !currentQ) return;
-
-    // Rileva quando la sequenza vocale finisce di leggere le opzioni
-    if (prevSequencePlayingRef.current && !isSequencePlaying && isThisQuestionActive) {
-      // Se l'utente non ha ancora risposto a questa domanda
-      if (!answers[currentQ.id] && revealedQuestionId !== currentQ.id) {
-        startWaitingCountdown();
-      }
-    }
-    prevSequencePlayingRef.current = isSequencePlaying;
-  }, [isSequencePlaying, isThisQuestionActive, isAutopilotEnabled, currentQ?.id, answers, revealedQuestionId]);
-
   // Avvia il countdown di attesa risposta (default 5s)
   const startWaitingCountdown = useCallback(() => {
     if (!currentQ) return;
@@ -367,6 +356,64 @@ export const DriveModeScreen: React.FC<DriveModeScreenProps> = ({
       });
     }, 1000);
   }, [currentQ, settings.driveModeAutoAdvanceSeconds]);
+
+  // Gestione termine sequenza audio vocale o singolo frammento -> avvio countdown attesa risposta
+  const prevSequencePlayingRef = useRef<boolean>(false);
+  const prevPlayingRef = useRef<boolean>(false);
+
+  useEffect(() => {
+    if (!isOpen || internalMode !== 'running' || !isAutopilotEnabled || !currentQ) return;
+
+    const wasPlayingSnippet = prevPlayingRef.current && !isPlaying;
+    const wasSequenceSnippet = prevSequencePlayingRef.current && !isSequencePlaying;
+
+    // Rileva quando la sequenza o il singolo frammento vocale finisce di suonare
+    if (
+      (wasSequenceSnippet || wasPlayingSnippet) &&
+      isThisQuestionActive &&
+      !isDriveIntroPlaying &&
+      !isExplanationPlaying
+    ) {
+      // Se l'utente non ha ancora risposto a questa domanda
+      if (!answers[currentQ.id] && revealedQuestionId !== currentQ.id) {
+        startWaitingCountdown();
+      }
+    }
+    prevSequencePlayingRef.current = isSequencePlaying;
+    prevPlayingRef.current = isPlaying;
+  }, [
+    isSequencePlaying,
+    isPlaying,
+    isThisQuestionActive,
+    isAutopilotEnabled,
+    isDriveIntroPlaying,
+    isExplanationPlaying,
+    currentQ?.id,
+    answers,
+    revealedQuestionId,
+    startWaitingCountdown
+  ]);
+
+  // Riascolto selettivo di sola domanda o singola opzione
+  const handlePlayQuestion = useCallback(() => {
+    if (countdownTimerRef.current) {
+      clearInterval(countdownTimerRef.current);
+      countdownTimerRef.current = null;
+    }
+    setWaitingCountdown(null);
+    triggerHapticFeedback('tap');
+    playQuestion();
+  }, [playQuestion]);
+
+  const handlePlayOption = useCallback((option: 1 | 2 | 3) => {
+    if (countdownTimerRef.current) {
+      clearInterval(countdownTimerRef.current);
+      countdownTimerRef.current = null;
+    }
+    setWaitingCountdown(null);
+    triggerHapticFeedback('tap');
+    playOption(option);
+  }, [playOption]);
 
   // Navigazione tra le domande
   const handleNextQuestion = useCallback(() => {
@@ -420,7 +467,6 @@ export const DriveModeScreen: React.FC<DriveModeScreenProps> = ({
   }, [stopVoice, currentIndex, sessionContext]);
 
   // Gestione audio spiegazione & pausa di assimilazione in Modalità Tutor
-  const isExplanationPlaying = isPartPlaying('explanation');
   const prevExplanationPlayingRef = useRef<boolean>(false);
 
   const startAssimilationPause = useCallback((seconds: number = 2.5) => {
@@ -572,6 +618,10 @@ export const DriveModeScreen: React.FC<DriveModeScreenProps> = ({
       opt1: 'Opzione 1 ("Uno")',
       opt2: 'Opzione 2 ("Due")',
       opt3: 'Opzione 3 ("Tre")',
+      repeat_question: 'Ripeti Domanda',
+      repeat_opt1: 'Ripeti Opzione 1',
+      repeat_opt2: 'Ripeti Opzione 2',
+      repeat_opt3: 'Ripeti Opzione 3',
       next: 'Successiva ("Avanti")',
       prev: 'Precedente ("Indietro")',
       repeat: 'Ripeti Audio',
@@ -592,7 +642,19 @@ export const DriveModeScreen: React.FC<DriveModeScreenProps> = ({
       setLastRecognizedLabel(null);
     }, 2500);
 
-    if (cmd === 'opt1') {
+    if (cmd === 'repeat_question') {
+      showToast('🗣️ "Ripeti Domanda"');
+      handlePlayQuestion();
+    } else if (cmd === 'repeat_opt1') {
+      showToast('🗣️ "Ripeti Uno"');
+      handlePlayOption(1);
+    } else if (cmd === 'repeat_opt2') {
+      showToast('🗣️ "Ripeti Due"');
+      handlePlayOption(2);
+    } else if (cmd === 'repeat_opt3') {
+      showToast('🗣️ "Ripeti Tre"');
+      handlePlayOption(3);
+    } else if (cmd === 'opt1') {
       showToast('🗣️ "Uno"');
       handleSelectAnswer(1);
     } else if (cmd === 'opt2') {
@@ -674,7 +736,7 @@ export const DriveModeScreen: React.FC<DriveModeScreenProps> = ({
       setIsAutopilotEnabled(false);
       pauseVoice();
     }
-  }, [currentQ, handleSelectAnswer, handleNextQuestion, handlePrevQuestion, playFullSequence, restartCurrentOrSequence, handleToggleFlag, pauseVoice, stopVoice, resumeVoice, isPaused, playExplanation, updateSetting]);
+  }, [currentQ, handleSelectAnswer, handleNextQuestion, handlePrevQuestion, handlePlayQuestion, handlePlayOption, playFullSequence, restartCurrentOrSequence, handleToggleFlag, pauseVoice, stopVoice, resumeVoice, isPaused, playExplanation, updateSetting]);
 
   // Audio output preference: 'speaker' (mic only after speech/paused) or 'headphones' (continuous listening)
   const audioOutputMode = settings.driveModeAudioOutput || 'speaker';
@@ -734,11 +796,13 @@ export const DriveModeScreen: React.FC<DriveModeScreenProps> = ({
     }
   }, [voiceLastTranscript]);
 
-  // Clean up feedback timers
+  // Clean up feedback timers and stop voice on unmount
   useEffect(() => {
     return () => {
       if (recognizedLabelTimerRef.current) clearTimeout(recognizedLabelTimerRef.current);
       if (unrecognizedTimerRef.current) clearTimeout(unrecognizedTimerRef.current);
+      voiceService.stop();
+      voiceService.stopDriveIntro();
     };
   }, []);
 
@@ -790,13 +854,38 @@ export const DriveModeScreen: React.FC<DriveModeScreenProps> = ({
         return;
       }
 
-      if (e.key === '1') handleSelectAnswer(1);
-      else if (e.key === '2') handleSelectAnswer(2);
-      else if (e.key === '3') handleSelectAnswer(3);
+      if (e.key === '1') {
+        if (e.altKey) {
+          e.preventDefault();
+          handlePlayOption(1);
+        } else {
+          handleSelectAnswer(1);
+        }
+      }
+      else if (e.key === '2') {
+        if (e.altKey) {
+          e.preventDefault();
+          handlePlayOption(2);
+        } else {
+          handleSelectAnswer(2);
+        }
+      }
+      else if (e.key === '3') {
+        if (e.altKey) {
+          e.preventDefault();
+          handlePlayOption(3);
+        } else {
+          handleSelectAnswer(3);
+        }
+      }
       else if (e.key === 'ArrowRight' || e.key === ' ') handleNextQuestion();
       else if (e.key === 'ArrowLeft') handlePrevQuestion();
       else if (e.key.toLowerCase() === 'f') handleToggleFlag();
-      else if (e.key.toLowerCase() === 'r' || e.key.toLowerCase() === 'q') {
+      else if (e.key.toLowerCase() === 'q' && !e.altKey && !e.ctrlKey && !e.metaKey) {
+        e.preventDefault();
+        handlePlayQuestion();
+      }
+      else if (e.key.toLowerCase() === 'r') {
         if (countdownTimerRef.current) {
           clearInterval(countdownTimerRef.current);
           countdownTimerRef.current = null;
@@ -829,7 +918,7 @@ export const DriveModeScreen: React.FC<DriveModeScreenProps> = ({
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [isOpen, internalMode, currentQ, currentIndex, totalCount, isAutopilotEnabled, isPlaying, isPaused, showAbandonExamModal, restartCurrentOrSequence, togglePlayPause, pauseVoice, stopVoice, resumeVoice]);
+  }, [isOpen, internalMode, currentQ, currentIndex, totalCount, isAutopilotEnabled, isPlaying, isPaused, showAbandonExamModal, isVoiceGuideOpen, showOfflinePrompt, isVoiceMenuOpen, handlePlayQuestion, handlePlayOption, restartCurrentOrSequence, togglePlayPause, pauseVoice, stopVoice, resumeVoice]);
 
   // Gestione Swipe Touch a schermo intero
   const handleTouchStart = (e: React.TouchEvent) => {
@@ -931,6 +1020,8 @@ export const DriveModeScreen: React.FC<DriveModeScreenProps> = ({
   };
 
   const handleClose = () => {
+    stopVoice();
+    stopDriveIntro();
     if (internalMode === 'running' && (isExamSession || sessionContext?.isExam)) {
       setShowAbandonExamModal(true);
       return;
@@ -1066,6 +1157,8 @@ export const DriveModeScreen: React.FC<DriveModeScreenProps> = ({
           onRestartCurrentOrSequence={restartCurrentOrSequence}
           onStopVoice={stopVoice}
           onPlayExplanation={handleReplayExplanation}
+          onPlayQuestion={handlePlayQuestion}
+          onPlayOption={handlePlayOption}
           waitingCountdown={waitingCountdown}
           assimilationCountdown={assimilationCountdown}
           voiceInterimTranscript={voiceInterimTranscript}

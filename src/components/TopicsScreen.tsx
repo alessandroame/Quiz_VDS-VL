@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   ArrowRight,
   ArrowLeft,
@@ -8,6 +8,7 @@ import type { Question } from '../types/quiz';
 import { useQuiz } from '../context/QuizContext';
 import { QuestionCard } from './QuestionCard';
 import { QuizBottomBar } from './QuizBottomBar';
+import { voiceService } from '../services/voiceService';
 
 export const TopicsScreen: React.FC = () => {
   const {
@@ -27,6 +28,13 @@ export const TopicsScreen: React.FC = () => {
   const [sessionQuestions, setSessionQuestions] = useState<Question[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [sessionAnswers, setSessionAnswers] = useState<Record<number, 1 | 2 | 3>>({});
+
+  // Stop any voice playback on component unmount
+  useEffect(() => {
+    return () => {
+      voiceService.stop();
+    };
+  }, []);
 
   // Auto-resume topic session from activeSession if available
   React.useEffect(() => {
@@ -84,6 +92,36 @@ export const TopicsScreen: React.FC = () => {
   };
 
   const currentQ = sessionQuestions[currentIndex];
+  const autoAdvanceTimerRef = React.useRef<any>(null);
+
+  React.useEffect(() => {
+    return () => {
+      if (autoAdvanceTimerRef.current) {
+        clearTimeout(autoAdvanceTimerRef.current);
+        autoAdvanceTimerRef.current = null;
+      }
+    };
+  }, [currentIndex]);
+
+  const changeIndex = (newIndex: number) => {
+    if (autoAdvanceTimerRef.current) {
+      clearTimeout(autoAdvanceTimerRef.current);
+      autoAdvanceTimerRef.current = null;
+    }
+    setCurrentIndex(newIndex);
+    if (activeSubjectId !== null) {
+      const currentSubjectMeta = subjectsAnalytics.find(s => s.id === activeSubjectId);
+      persistActiveSession({
+        type: 'topic',
+        subjectId: activeSubjectId,
+        subjectName: currentSubjectMeta?.name,
+        questionIds: sessionQuestions.map(q => q.id),
+        currentIndex: newIndex,
+        answers: sessionAnswers,
+        updatedAt: Date.now()
+      });
+    }
+  };
 
   const handleAnswer = async (ans: 1 | 2 | 3, qid?: number) => {
     const targetQid = qid ?? currentQ?.id;
@@ -108,21 +146,18 @@ export const TopicsScreen: React.FC = () => {
         updatedAt: Date.now()
       });
     }
-  };
 
-  const changeIndex = (newIndex: number) => {
-    setCurrentIndex(newIndex);
-    if (activeSubjectId !== null) {
-      const currentSubjectMeta = subjectsAnalytics.find(s => s.id === activeSubjectId);
-      persistActiveSession({
-        type: 'topic',
-        subjectId: activeSubjectId,
-        subjectName: currentSubjectMeta?.name,
-        questionIds: sessionQuestions.map(q => q.id),
-        currentIndex: newIndex,
-        answers: sessionAnswers,
-        updatedAt: Date.now()
-      });
+    // Auto-advance on correct answer if enabled in settings
+    if (
+      isCorrect &&
+      settings.autoAdvanceOnCorrect !== false &&
+      currentIndex < sessionQuestions.length - 1 &&
+      targetQid === currentQ?.id
+    ) {
+      if (autoAdvanceTimerRef.current) clearTimeout(autoAdvanceTimerRef.current);
+      autoAdvanceTimerRef.current = setTimeout(() => {
+        changeIndex(currentIndex + 1);
+      }, 900);
     }
   };
 
@@ -162,6 +197,11 @@ export const TopicsScreen: React.FC = () => {
         <div className="flex items-center justify-between p-2 sm:p-2.5 bg-zinc-900 border border-zinc-800 rounded-xl light:bg-white light:border-slate-200">
           <button
             onClick={() => {
+              voiceService.stop();
+              if (autoAdvanceTimerRef.current) {
+                clearTimeout(autoAdvanceTimerRef.current);
+                autoAdvanceTimerRef.current = null;
+              }
               setActiveSubjectId(null);
               dismissActiveSession();
             }}
@@ -212,6 +252,11 @@ export const TopicsScreen: React.FC = () => {
                   variant: 'emerald',
                   icon: <CheckCircle2 className="w-4 h-4" />,
                   onClick: () => {
+                    voiceService.stop();
+                    if (autoAdvanceTimerRef.current) {
+                      clearTimeout(autoAdvanceTimerRef.current);
+                      autoAdvanceTimerRef.current = null;
+                    }
                     setActiveSubjectId(null);
                     dismissActiveSession();
                   }

@@ -62,6 +62,13 @@ export const ExamScreen: React.FC<ExamScreenProps> = ({
   const [showAbandonModal, setShowAbandonModal] = useState(false);
   const [completedSession, setCompletedSession] = useState<ExamSession | null>(null);
 
+  // Stop any voice playback on component unmount
+  useEffect(() => {
+    return () => {
+      voiceService.stop();
+    };
+  }, []);
+
   // Sync examMode with initialMode prop when in idle state
   useEffect(() => {
     if (examState === 'idle') {
@@ -208,7 +215,24 @@ export const ExamScreen: React.FC<ExamScreenProps> = ({
   const answeredCount = Object.keys(answers).length;
   const flaggedCount = Object.values(flags).filter(Boolean).length;
 
+  // Auto-advance timer ref for smooth transition on correct answers in tutor mode
+  const autoAdvanceTimerRef = useRef<any>(null);
+
+  // Clear auto-advance timer on question change or unmount
+  useEffect(() => {
+    return () => {
+      if (autoAdvanceTimerRef.current) {
+        clearTimeout(autoAdvanceTimerRef.current);
+        autoAdvanceTimerRef.current = null;
+      }
+    };
+  }, [currentIndex]);
+
   const changeIndex = (newIndex: number) => {
+    if (autoAdvanceTimerRef.current) {
+      clearTimeout(autoAdvanceTimerRef.current);
+      autoAdvanceTimerRef.current = null;
+    }
     setCurrentIndex(newIndex);
     if (examState === 'running') {
       persistActiveSession({
@@ -245,6 +269,19 @@ export const ExamScreen: React.FC<ExamScreenProps> = ({
         const isCorrect = ans === targetQ.correctAnswer;
         await recordAnswer(targetId, isCorrect);
         recordedQuestionIds.current.add(targetId);
+
+        // Auto-advance on correct answer if enabled in settings
+        if (
+          isCorrect &&
+          settings.autoAdvanceOnCorrect !== false &&
+          currentIndex < totalCount - 1 &&
+          targetId === currentQuestion?.id
+        ) {
+          if (autoAdvanceTimerRef.current) clearTimeout(autoAdvanceTimerRef.current);
+          autoAdvanceTimerRef.current = setTimeout(() => {
+            changeIndex(currentIndex + 1);
+          }, 900);
+        }
       }
     }
 
@@ -302,6 +339,11 @@ export const ExamScreen: React.FC<ExamScreenProps> = ({
   }, [examState, currentIndex, currentQuestion, totalCount, answers, flags]);
 
   const handleSubmitExam = useCallback(async () => {
+    if (autoAdvanceTimerRef.current) {
+      clearTimeout(autoAdvanceTimerRef.current);
+      autoAdvanceTimerRef.current = null;
+    }
+    voiceService.stop();
     setShowSubmitModal(false);
     setIsExamRunning(false);
     const durationSeconds = examMode === 'tutor'
@@ -644,6 +686,7 @@ export const ExamScreen: React.FC<ExamScreenProps> = ({
           <button
             id="btn-return-home"
             onClick={() => {
+              voiceService.stop();
               setIsExamRunning(false);
               if (onNavigateHome) {
                 onNavigateHome();
@@ -731,7 +774,10 @@ export const ExamScreen: React.FC<ExamScreenProps> = ({
         <div className="flex items-center gap-1.5 sm:gap-2">
           <button
             id="btn-abandon-exam"
-            onClick={() => setShowAbandonModal(true)}
+            onClick={() => {
+              voiceService.stop();
+              setShowAbandonModal(true);
+            }}
             className="p-1.5 sm:px-2.5 sm:py-1.5 rounded-lg border border-rose-500/40 hover:border-rose-500 bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 hover:text-rose-300 light:border-rose-200 light:bg-rose-50 light:text-rose-700 light:hover:bg-rose-100 text-xs font-semibold transition-colors flex items-center gap-1"
             title="Interrompi la simulazione"
           >
@@ -741,7 +787,10 @@ export const ExamScreen: React.FC<ExamScreenProps> = ({
 
           <button
             id="btn-submit-exam-top"
-            onClick={() => setShowSubmitModal(true)}
+            onClick={() => {
+              voiceService.stop();
+              setShowSubmitModal(true);
+            }}
             className="px-2.5 py-1.5 sm:px-3.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs shadow-sm transition-all"
           >
             {examMode === 'tutor' ? 'Concludi' : 'Consegna'}
@@ -809,7 +858,10 @@ export const ExamScreen: React.FC<ExamScreenProps> = ({
                     label: `Completa Simulazione (${answeredCount}/${totalCount})`,
                     variant: 'emerald',
                     icon: <CheckCircle2 className="w-4 h-4" />,
-                    onClick: () => setShowSubmitModal(true)
+                    onClick: () => {
+                      voiceService.stop();
+                      setShowSubmitModal(true);
+                    }
                   })
             : (currentIndex === totalCount - 1
                 ? {
@@ -817,7 +869,10 @@ export const ExamScreen: React.FC<ExamScreenProps> = ({
                     label: `Consegna (${answeredCount}/${totalCount})`,
                     variant: 'emerald',
                     icon: <CheckCircle2 className="w-4 h-4" />,
-                    onClick: () => setShowSubmitModal(true)
+                    onClick: () => {
+                      voiceService.stop();
+                      setShowSubmitModal(true);
+                    }
                   }
                 : undefined)
         }
@@ -913,6 +968,10 @@ export const ExamScreen: React.FC<ExamScreenProps> = ({
               <button
                 id="btn-confirm-abandon-exam"
                 onClick={async () => {
+                  if (autoAdvanceTimerRef.current) {
+                    clearTimeout(autoAdvanceTimerRef.current);
+                    autoAdvanceTimerRef.current = null;
+                  }
                   isDismissedRef.current = true;
                   voiceService.stop();
                   setShowAbandonModal(false);

@@ -22,6 +22,7 @@ import {
 } from 'lucide-react';
 import { useQuiz } from '../context/QuizContext';
 import { useAviationVoice } from '../hooks/useAviationVoice';
+import { voiceService } from '../services/voiceService';
 import {
   formatSubjectCode,
   findQuestionById,
@@ -475,6 +476,13 @@ export const ArchiveScreen: React.FC = () => {
 
   const INITIAL_PAGE_SIZE = 50;
   const [visibleCount, setVisibleCount] = useState<number>(INITIAL_PAGE_SIZE);
+
+  // Stop any ongoing voice playback on unmount
+  useEffect(() => {
+    return () => {
+      voiceService.stop();
+    };
+  }, []);
 
   // Reset visibleCount when filters change
   useEffect(() => {

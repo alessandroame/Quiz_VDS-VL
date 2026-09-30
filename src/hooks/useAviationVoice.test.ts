@@ -172,4 +172,34 @@ describe('useAviationVoice Hook', () => {
 
     unmount();
   });
+
+  it('should call voiceService.stop() on unmount if this question was actively playing in voiceService', () => {
+    const stopSpy = vi.spyOn(voiceService, 'stop').mockImplementation(() => {});
+    vi.spyOn(voiceService, 'getState').mockReturnValue({
+      ...defaultState,
+      isPlaying: true,
+      currentQuestionId: 303,
+      activePart: 'question'
+    });
+
+    const { unmount } = renderHook(() => useAviationVoice(303));
+    expect(stopSpy).not.toHaveBeenCalled();
+
+    unmount();
+    expect(stopSpy).toHaveBeenCalledTimes(1);
+  });
+
+  it('should NOT call voiceService.stop() on unmount if a different question was playing', () => {
+    const stopSpy = vi.spyOn(voiceService, 'stop').mockImplementation(() => {});
+    vi.spyOn(voiceService, 'getState').mockReturnValue({
+      ...defaultState,
+      isPlaying: true,
+      currentQuestionId: 999,
+      activePart: 'question'
+    });
+
+    const { unmount } = renderHook(() => useAviationVoice(303));
+    unmount();
+    expect(stopSpy).not.toHaveBeenCalled();
+  });
 });

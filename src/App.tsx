@@ -65,6 +65,7 @@ function AppContent() {
       setActiveTab('home');
     },
     onInterceptExamLeave: () => {
+      voiceService.stop();
       if (typeof window !== 'undefined' && window.history) {
         backNavigation.incrementDepth();
         window.history.pushState({ appDepth: backNavigation.getDepth(), tab: 'exam' }, '');
@@ -89,6 +90,7 @@ function AppContent() {
         setActiveTab('home');
       },
       onInterceptExamLeave: () => {
+        voiceService.stop();
         if (typeof window !== 'undefined' && window.history) {
           backNavigation.incrementDepth();
           window.history.pushState({ appDepth: backNavigation.getDepth(), tab: 'exam' }, '');
@@ -105,6 +107,7 @@ function AppContent() {
     window.history.replaceState({ appDepth: 0 }, '');
 
     const handlePopState = () => {
+      voiceService.stop();
       backNavigation.decrementDepth();
       executeBackAction(navigationContextRef.current);
     };
@@ -207,6 +210,7 @@ function AppContent() {
   // Intercetta la navigazione se c'è un esame attivo per evitare perdita di progresso
   const handleSelectTab = (tab: NavTab) => {
     if (tab === activeTab) return;
+    voiceService.stop();
     if (isExamRunning) {
       setPendingTab(tab);
       if (typeof window !== 'undefined' && window.history) {
@@ -215,7 +219,6 @@ function AppContent() {
       }
       return;
     }
-    voiceService.stop();
 
     if (tab !== 'home' && activeTab === 'home') {
       if (typeof window !== 'undefined' && window.history) {

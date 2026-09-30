@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   RotateCcw,
   CheckCircle2,
@@ -10,6 +10,7 @@ import type { Question } from '../types/quiz';
 import { useQuiz } from '../context/QuizContext';
 import { QuestionCard } from './QuestionCard';
 import { QuizBottomBar } from './QuizBottomBar';
+import { voiceService } from '../services/voiceService';
 
 export const MistakesScreen: React.FC = () => {
   const {
@@ -28,6 +29,13 @@ export const MistakesScreen: React.FC = () => {
   const [reviewQuestions, setReviewQuestions] = useState<Question[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [reviewAnswers, setReviewAnswers] = useState<Record<number, 1 | 2 | 3>>({});
+
+  // Stop any voice playback on component unmount
+  useEffect(() => {
+    return () => {
+      voiceService.stop();
+    };
+  }, []);
 
   // Lista domande attualmente nel quaderno errori
   const mistakeQuestions = questions.filter(q => {
@@ -69,6 +77,32 @@ export const MistakesScreen: React.FC = () => {
   };
 
   const currentQ = reviewQuestions[currentIndex];
+  const autoAdvanceTimerRef = React.useRef<any>(null);
+
+  React.useEffect(() => {
+    return () => {
+      if (autoAdvanceTimerRef.current) {
+        clearTimeout(autoAdvanceTimerRef.current);
+        autoAdvanceTimerRef.current = null;
+      }
+    };
+  }, [currentIndex]);
+
+  const changeIndex = (newIndex: number) => {
+    if (autoAdvanceTimerRef.current) {
+      clearTimeout(autoAdvanceTimerRef.current);
+      autoAdvanceTimerRef.current = null;
+    }
+    setCurrentIndex(newIndex);
+    persistActiveSession({
+      type: 'mistakes',
+      subjectName: 'Quaderno Errori',
+      questionIds: reviewQuestions.map(q => q.id),
+      currentIndex: newIndex,
+      answers: reviewAnswers,
+      updatedAt: Date.now()
+    });
+  };
 
   const handleAnswer = async (ans: 1 | 2 | 3, qid?: number) => {
     const targetQid = qid ?? currentQ?.id;
@@ -89,18 +123,19 @@ export const MistakesScreen: React.FC = () => {
       answers: updatedAnswers,
       updatedAt: Date.now()
     });
-  };
 
-  const changeIndex = (newIndex: number) => {
-    setCurrentIndex(newIndex);
-    persistActiveSession({
-      type: 'mistakes',
-      subjectName: 'Quaderno Errori',
-      questionIds: reviewQuestions.map(q => q.id),
-      currentIndex: newIndex,
-      answers: reviewAnswers,
-      updatedAt: Date.now()
-    });
+    // Auto-advance on correct answer if enabled in settings
+    if (
+      isCorrect &&
+      settings.autoAdvanceOnCorrect !== false &&
+      currentIndex < reviewQuestions.length - 1 &&
+      targetQid === currentQ?.id
+    ) {
+      if (autoAdvanceTimerRef.current) clearTimeout(autoAdvanceTimerRef.current);
+      autoAdvanceTimerRef.current = setTimeout(() => {
+        changeIndex(currentIndex + 1);
+      }, 900);
+    }
   };
 
   // Registra la sessione audio attiva per lo switch universale
@@ -138,6 +173,11 @@ export const MistakesScreen: React.FC = () => {
         <div className="flex items-center justify-between p-2 sm:p-2.5 bg-zinc-900 border border-zinc-800 rounded-xl light:bg-white light:border-slate-200">
           <button
             onClick={() => {
+              voiceService.stop();
+              if (autoAdvanceTimerRef.current) {
+                clearTimeout(autoAdvanceTimerRef.current);
+                autoAdvanceTimerRef.current = null;
+              }
               setIsReviewing(false);
               dismissActiveSession();
             }}
@@ -197,6 +237,11 @@ export const MistakesScreen: React.FC = () => {
                   variant: 'emerald',
                   icon: <CheckCircle2 className="w-4 h-4" />,
                   onClick: () => {
+                    voiceService.stop();
+                    if (autoAdvanceTimerRef.current) {
+                      clearTimeout(autoAdvanceTimerRef.current);
+                      autoAdvanceTimerRef.current = null;
+                    }
                     setIsReviewing(false);
                     dismissActiveSession();
                   }

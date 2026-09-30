@@ -14,6 +14,55 @@ Questo documento registra in ordine cronologico tutte le lavorazioni svolte nel 
 - **Impatto sul Desiderata**: <Come questo intervento contribuisce al desiderata (cfr. DESIDERATA.md) e indicazioni per il prossimo agente>
 ```
 
+### [2026-09-30] - Interruzione Immediata della Voce su Indietro, Abbandono e Conclusione Quiz
+
+- **Cosa abbiamo fatto**:
+  * **Interruzione Immediata della Riproduzione Vocale su Azioni di Navigazione Indietro**:
+    - In [src/App.tsx](file:///c:/github/Quiz_VDS-VL/src/App.tsx):
+      * `handlePopState`: aggiunto `voiceService.stop()` all'evento `popstate` (tasto indietro hardware smartphone, gesture swipe back Android/iOS, freccia indietro browser).
+      * `onInterceptExamLeave`: aggiunto `voiceService.stop()` per interrompere immediatamente il parlato prima di mostrare il modale "Interrompere la Simulazione?".
+      * `handleSelectTab`: anticipata la chiamata `voiceService.stop()` prima della verifica `isExamRunning`, arrestando la voce all'istante non appena l'utente tocca un qualsiasi tab nella Navbar (Home, Materie, Errori, Archivio, Stats).
+  * **Interruzione su Abbandono, Conclusione e Sottomissione Quiz**:
+    - In [src/components/ExamScreen.tsx](file:///c:/github/Quiz_VDS-VL/src/components/ExamScreen.tsx):
+      * Aggiunto `voiceService.stop()` al click sul pulsante "Interrompi" della topbar (`#btn-abandon-exam`) e sul pulsante di conferma interruzione.
+      * Aggiunto `voiceService.stop()` ai pulsanti di consegna/conclusione (`#btn-submit-exam-top`, `#btn-tutor-complete-exam`, `#btn-submit-exam-bottom`).
+      * In `handleSubmitExam`: integrato `voiceService.stop()` su consegna esame (manuale o per scadenza timer 45 min).
+      * In `#btn-return-home`: arresto vocale al ritorno al cruscotto Home dalla revisione.
+      * Aggiunto `useEffect` di unmount cleanup in `ExamScreen` per silenziare qualsiasi parlato se la schermata viene smontata.
+    - In [src/components/TopicsScreen.tsx](file:///c:/github/Quiz_VDS-VL/src/components/TopicsScreen.tsx):
+      * Aggiunto `voiceService.stop()` sul pulsante `<ArrowLeft> Esci` della topbar di sessione e sul pulsante `Concludi` della bottom bar.
+      * Aggiunto `useEffect` di unmount cleanup in `TopicsScreen`.
+    - In [src/components/MistakesScreen.tsx](file:///c:/github/Quiz_VDS-VL/src/components/MistakesScreen.tsx):
+      * Aggiunto `voiceService.stop()` sul pulsante `<ArrowLeft> Esci` e sul pulsante `Concludi Ripasso`.
+      * Aggiunto `useEffect` di unmount cleanup in `MistakesScreen`.
+    - In [src/components/DriveModeScreen.tsx](file:///c:/github/Quiz_VDS-VL/src/components/DriveModeScreen.tsx):
+      * In `handleClose`: invocazione immediata di `stopVoice()` e `stopDriveIntro()` prima dell'apertura del modale di conferma abbandono.
+      * Aggiunto arresto voce (`voiceService.stop()`, `voiceService.stopDriveIntro()`) nel cleanup di unmount del componente.
+    - In [src/components/ArchiveScreen.tsx](file:///c:/github/Quiz_VDS-VL/src/components/ArchiveScreen.tsx) e [src/components/SettingsModal.tsx](file:///c:/github/Quiz_VDS-VL/src/components/SettingsModal.tsx):
+      * Aggiunto unmount cleanup in `ArchiveScreen` e arresto di `drive_intro` alla chiusura di `SettingsModal`.
+  * **Garanzia Architetturale nei Servizi & Hook**:
+    - In [src/context/QuizContext.tsx](file:///c:/github/Quiz_VDS-VL/src/context/QuizContext.tsx):
+      * Aggiunto `voiceService.stop()` in `closeDriveMode` e in `dismissActiveSession`.
+    - In [src/hooks/useAviationVoice.ts](file:///c:/github/Quiz_VDS-VL/src/hooks/useAviationVoice.ts):
+      * Aggiunto cleanup all'unmount: se il componente legato al `questionId` si smonta mentre quel quesito è in riproduzione nel `voiceService`, la voce si interrompe automaticamente.
+    - In [src/components/QuestionCard.tsx](file:///c:/github/Quiz_VDS-VL/src/components/QuestionCard.tsx):
+      * Pulizia audio rafforzata nel cleanup di `useEffect`: verifica sincronizzata su `voiceService.getState().currentQuestionId === question.id || isThisQuestionActiveRef.current`.
+    - In [src/services/voiceService.ts](file:///c:/github/Quiz_VDS-VL/src/services/voiceService.ts):
+      * Invocazione incondizionata di `window.speechSynthesis.cancel()` nel metodo `stop()`.
+  * **Test Unitari**:
+    - Creato [src/components/VoiceAutoStop.test.ts](file:///c:/github/Quiz_VDS-VL/src/components/VoiceAutoStop.test.ts) (6 test dedicati) per testare l'arresto vocale su unmount di ExamScreen, click su Interrompi/Concludi, unmount e click Esci in TopicsScreen, unmount e click Esci in MistakesScreen.
+    - Esteso [src/hooks/useAviationVoice.test.ts](file:///c:/github/Quiz_VDS-VL/src/hooks/useAviationVoice.test.ts) (2 nuovi test per la pulizia su unmount).
+    - Suite completa: 38 file di test, 282 test superati al 100%. Build e typecheck conformi.
+
+- **Scelte architetturali & Rationale**:
+  * *Interruzione Immediata all'Intento dell'Utente*: Non appena l'allievo esprime la volontà di tornare indietro o terminare una sessione (anche se viene mostrata una richiesta di conferma per non perdere dati), la voce deve cessare all'istante. Lasciare la voce attiva durante i dialoghi di conferma o dopo l'uscita causa disorientamento cognitivo ed è particolarmente sgradevole in altoparlante o in auto.
+  * *Ridondanza Difensiva a Due Livelli*: L'arresto è garantito sia al livello macro di navigazione (App.tsx popstate, tab switches, context dismiss) sia al livello dei singoli componenti (handler di click sui pulsanti Esci/Interrompi) e come fallback definitivo nel ciclo di vita React (unmount cleanup di `QuestionCard`, `useAviationVoice`, `ExamScreen`, `TopicsScreen`, `MistakesScreen`, `DriveModeScreen`).
+
+- **Impatto sul Desiderata**:
+  * Risolve l'anomalia segnalata dall'utente, garantendo un'esperienza vocale fluida, controllabile e priva di audio fantasma.
+
+---
+
 ### [2026-09-30] - Icona a Sfondo Bianco per Tema Chiaro e Diversificazione Icone Impostazioni (Voce & Audio / Mani Libere)
 
 - **Cosa abbiamo fatto**:

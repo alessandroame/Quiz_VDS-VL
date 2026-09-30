@@ -604,7 +604,7 @@ export class VoiceService {
     }
 
     this.clearSequence();
-    if (this.isDriveIntroPlaying && typeof window !== 'undefined' && 'speechSynthesis' in window) {
+    if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
       try {
         window.speechSynthesis.cancel();
       } catch {

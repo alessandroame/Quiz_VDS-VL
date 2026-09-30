@@ -4,6 +4,7 @@ import type { Question } from '../types/quiz';
 import { useQuiz } from '../context/QuizContext';
 import { soundFX } from '../utils/audio';
 import { useAviationVoice } from '../hooks/useAviationVoice';
+import { voiceService } from '../services/voiceService';
 
 interface QuestionCardProps {
   question: Question;
@@ -70,7 +71,7 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({
       playFullSequence();
     }
     return () => {
-      if (isThisQuestionActiveRef.current) {
+      if (isThisQuestionActiveRef.current || voiceService.getState().currentQuestionId === question.id) {
         stop();
       }
     };
