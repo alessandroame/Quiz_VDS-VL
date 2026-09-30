@@ -14,6 +14,38 @@ Questo documento registra in ordine cronologico tutte le lavorazioni svolte nel 
 - **Impatto sul Desiderata**: <Come questo intervento contribuisce al desiderata (cfr. DESIDERATA.md) e indicazioni per il prossimo agente>
 ```
 
+### [2026-09-30] - Filtri Debriefing Esame & Quaderno Errori Interattivo (TODO-09 & v1.4.0)
+
+- **Cosa abbiamo fatto**:
+  * **Filtri di Revisione e Ripasso Immediato nel Debriefing Esame ([ExamScreen.tsx](file:///c:/github/Quiz_VDS-VL/src/components/ExamScreen.tsx))**:
+    - Aggiunto selettore a filtri compatti nella sezione "Revisione Quesiti Sessione": `Tutti (${total})`, `Solo Errori (${errors})`, `⚑ Rivedi (${flagged})` e `Corretti (${correct})`.
+    - Impostato il filtro automatico su `Solo Errori` alla consegna se sono presenti errori (`wrongAnswers > 0`), azzerando il bisogno di scorrere 30 o 60 schede per trovare gli sbagli.
+    - Introdotto il banner con pulsante rapido *"Ripassa Ora in Tutor"* (`#btn-retry-mistakes-now`): con 1 tocco, avvia una sessione d'esercitazione guidata focalizzata esclusivamente sui quesiti appena sbagliati, con feedback immediato e spiegazione didattica Regola/Tranello.
+    - Implementato empty state contestuale per filtri senza elementi (es. 0 errori o 0 bandierine).
+  * **Interattività e Filtri per Materia nel Quaderno Errori ([MistakesScreen.tsx](file:///c:/github/Quiz_VDS-VL/src/components/MistakesScreen.tsx))**:
+    - Rese interattive e accessibili tutte le card dell'elenco errori (`role="button"`, `tabIndex={0}`, click o Invio/Spazio): apertura istantanea di [QuestionDetailModal.tsx](file:///c:/github/Quiz_VDS-VL/src/components/QuestionDetailModal.tsx) per consultare scheda didattica completa (soluzione verde smeraldo, Regola e Tranello, pronuncia audio neurale, note personali e telemetria).
+    - Aggiunta icona `ChevronRight` e styling reattivo con hover/focus e feedback visivo.
+    - Aggiunta barra di filtri rapidi per Materia (01..09) con badge dei conteggi live, visualizzata automaticamente se gli errori appartengono a più materie.
+    - Adattato il pulsante di ripasso dinamico: se è attiva una materia specifica, il tasto recita *"Ripassa i X Errori ([Materia])"* e avvia il ripasso Leitner solo su quel sottoinsieme.
+  * **Suite di Test & Quality Assurance**:
+    - Creato il file di test [src/components/MistakesScreen.test.ts](file:///c:/github/Quiz_VDS-VL/src/components/MistakesScreen.test.ts) (5 test) per coprire filtri materia, apertura modal e avvio ripasso.
+    - Creato il file di test [src/components/ExamScreenReview.test.ts](file:///c:/github/Quiz_VDS-VL/src/components/ExamScreenReview.test.ts) (1 test completo) per verificare filtri debriefing, conteggi e ripasso immediato in Tutor.
+    - Suite Vitest portata a 309 test passanti su 45 file (100% passanti, 0 fallimenti).
+    - Typecheck `tsc --noEmit` superato con 0 errori.
+    - Build Vite di produzione completata con successo (`tsc && vite build`).
+    - Collaudo headless visivo CDP verificato su mobile portrait (390x844) e desktop (1440x900) con 0 errori di console.
+  * **Avanzamento Versione**:
+    - Bump SemVer a `1.4.0` in [package.json](file:///c:/github/Quiz_VDS-VL/package.json).
+
+- **Scelte architetturali & Rationale**:
+  * *Rinnovamento Pedagogico*: Consultare gli errori subito dopo la consegna dell'esame è il momento di massima ritenzione mnemonica. Costringere l'allievo a scorrere 30 card per trovarli aumentava l'attrito cognitivo. Il filtro `Solo Errori` combinato con il ripasso immediato in modalità Tutor chiude il ciclo di apprendimento in pochi secondi.
+  * *Coerenza Interattiva*: Uniformato il comportamento delle liste errori: sia in `StatsScreen` (Top 10), sia in `SubjectDetailModal`, sia in `MistakesScreen`, il tocco sulla domanda apre `QuestionDetailModal` garantendo un modello mentale unico in tutta l'applicazione.
+
+- **Impatto sul Desiderata**:
+  * Completa il nuovo traguardo `TODO-09` della roadmap di riorganizzazione ergonomica V2 e potenzia l'apprendimento mirato del Quaderno Errori e dell'Esame.
+
+---
+
 ### [2026-09-30] - Armonizzazione UI/UX & Disambiguazione Stati Top Bar (TODO-08 & v1.3.5)
 
 - **Cosa abbiamo fatto**:

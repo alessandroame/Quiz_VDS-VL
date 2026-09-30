@@ -8,7 +8,8 @@ import {
   ArrowRight,
   RotateCcw,
   ListFilter,
-  BookOpen
+  BookOpen,
+  Filter
 } from 'lucide-react';
 import type { Question } from '../types/quiz';
 import type { ExamSession, ExamModeType } from '../types/database';
@@ -61,6 +62,7 @@ export const ExamScreen: React.FC<ExamScreenProps> = ({
   const [showSubmitModal, setShowSubmitModal] = useState(false);
   const [showAbandonModal, setShowAbandonModal] = useState(false);
   const [completedSession, setCompletedSession] = useState<ExamSession | null>(null);
+  const [reviewFilter, setReviewFilter] = useState<'all' | 'wrong' | 'flagged' | 'correct'>('all');
 
   // Stop any voice playback on component unmount
   useEffect(() => {
@@ -368,6 +370,7 @@ export const ExamScreen: React.FC<ExamScreenProps> = ({
 
     await saveExam(session);
     setCompletedSession(session);
+    setReviewFilter(session.wrongAnswers > 0 ? 'wrong' : 'all');
     setExamState('review');
     await dismissActiveSession();
 
@@ -383,6 +386,41 @@ export const ExamScreen: React.FC<ExamScreenProps> = ({
       }
     }
   }, [answers, examQuestions, flags, isMarathon, examMode, elapsedSeconds, recordAnswer, saveExam, startTime, dismissActiveSession, setIsExamRunning]);
+
+  const handleReviewMistakesNow = () => {
+    if (!completedSession) return;
+    voiceService.stop();
+    const wrongQuestions = examQuestions.filter((_, idx) => {
+      const snap = completedSession.snapshots[idx];
+      return snap && !snap.isCorrect;
+    });
+    if (wrongQuestions.length === 0) return;
+
+    setExamQuestions(wrongQuestions);
+    setCurrentIndex(0);
+    setAnswers({});
+    setFlags({});
+    recordedQuestionIds.current.clear();
+    setExamMode('tutor');
+    setElapsedSeconds(0);
+    setSecondsRemaining(0);
+    setIsMarathon(false);
+    setCompletedSession(null);
+    setExamState('running');
+
+    persistActiveSession({
+      type: 'exam',
+      examMode: 'tutor',
+      questionIds: wrongQuestions.map(q => q.id),
+      currentIndex: 0,
+      answers: {},
+      flags: {},
+      secondsRemaining: 0,
+      startTime: Date.now(),
+      isMarathon: false,
+      updatedAt: Date.now()
+    });
+  };
 
   // Registra la sessione audio attiva per consentire lo switch universale (Navbar o shortcut) senza perdere lo stato
   useEffect(() => {
@@ -702,27 +740,131 @@ export const ExamScreen: React.FC<ExamScreenProps> = ({
         </div>
 
         {/* Revisione Domande Sessione */}
-        <div className="space-y-4 pt-4">
-          <h3 className="text-sm font-bold text-zinc-200 light:text-slate-800">
-            Revisione Quesiti Sessione
-          </h3>
-          <div className="space-y-4">
-            {examQuestions.map((q, idx) => {
-              const snap = completedSession.snapshots[idx];
-              return (
-                <QuestionCard
-                  key={q.id}
-                  question={q}
-                  selectedAnswer={snap.userAnswer}
-                  onSelectAnswer={() => {}}
-                  showFeedback={true}
-                  indexNumber={idx + 1}
-                  totalNumber={totalCount}
-                />
-              );
-            })}
-          </div>
-        </div>
+        {(() => {
+          const flaggedCountInReview = completedSession.snapshots.filter(s => s.wasFlagged).length;
+          const filteredReviewItems = examQuestions
+            .map((q, idx) => ({ q, idx, snap: completedSession.snapshots[idx] }))
+            .filter(({ snap }) => {
+              if (!snap) return true;
+              if (reviewFilter === 'wrong') return !snap.isCorrect;
+              if (reviewFilter === 'correct') return snap.isCorrect;
+              if (reviewFilter === 'flagged') return Boolean(snap.wasFlagged);
+              return true;
+            });
+
+          return (
+            <div className="space-y-4 pt-4 border-t border-zinc-800 light:border-slate-200">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
+                <h3 className="text-sm font-bold text-zinc-200 light:text-slate-800 flex items-center gap-1.5">
+                  <Filter className="w-4 h-4 text-zinc-400" />
+                  <span>Revisione Quesiti ({filteredReviewItems.length}/{totalCount})</span>
+                </h3>
+
+                {/* Filtri Revisione */}
+                <div className="flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-none">
+                  <button
+                    id="btn-filter-review-all"
+                    onClick={() => setReviewFilter('all')}
+                    className={`px-2.5 py-1 rounded-lg text-xs font-semibold whitespace-nowrap transition-colors border ${
+                      reviewFilter === 'all'
+                        ? 'bg-zinc-800 text-zinc-100 border-zinc-600 light:bg-slate-200 light:text-slate-900 light:border-slate-400'
+                        : 'bg-zinc-900/60 text-zinc-400 border-zinc-800 hover:border-zinc-700 light:bg-white light:text-slate-600 light:border-slate-200'
+                    }`}
+                  >
+                    Tutti ({total})
+                  </button>
+
+                  <button
+                    id="btn-filter-review-wrong"
+                    onClick={() => setReviewFilter('wrong')}
+                    className={`px-2.5 py-1 rounded-lg text-xs font-semibold whitespace-nowrap transition-colors border flex items-center gap-1 ${
+                      reviewFilter === 'wrong'
+                        ? 'bg-rose-500/20 text-rose-300 border-rose-500/50 light:bg-rose-50 light:text-rose-700 light:border-rose-300'
+                        : 'bg-zinc-900/60 text-zinc-400 border-zinc-800 hover:border-zinc-700 light:bg-white light:text-slate-600 light:border-slate-200'
+                    }`}
+                  >
+                    <span>Solo Errori</span>
+                    <span className="font-mono text-[10px] opacity-90">({errors})</span>
+                  </button>
+
+                  {flaggedCountInReview > 0 && (
+                    <button
+                      id="btn-filter-review-flagged"
+                      onClick={() => setReviewFilter('flagged')}
+                      className={`px-2.5 py-1 rounded-lg text-xs font-semibold whitespace-nowrap transition-colors border flex items-center gap-1 ${
+                        reviewFilter === 'flagged'
+                          ? 'bg-amber-500/20 text-amber-300 border-amber-500/50 light:bg-amber-50 light:text-amber-700 light:border-amber-300'
+                          : 'bg-zinc-900/60 text-zinc-400 border-zinc-800 hover:border-zinc-700 light:bg-white light:text-slate-600 light:border-slate-200'
+                      }`}
+                    >
+                      <span>⚑ Rivedi</span>
+                      <span className="font-mono text-[10px] opacity-90">({flaggedCountInReview})</span>
+                    </button>
+                  )}
+
+                  <button
+                    id="btn-filter-review-correct"
+                    onClick={() => setReviewFilter('correct')}
+                    className={`px-2.5 py-1 rounded-lg text-xs font-semibold whitespace-nowrap transition-colors border flex items-center gap-1 ${
+                      reviewFilter === 'correct'
+                        ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/50 light:bg-emerald-50 light:text-emerald-700 light:border-emerald-300'
+                        : 'bg-zinc-900/60 text-zinc-400 border-zinc-800 hover:border-zinc-700 light:bg-white light:text-slate-600 light:border-slate-200'
+                    }`}
+                  >
+                    <span>Corretti</span>
+                    <span className="font-mono text-[10px] opacity-90">({correct})</span>
+                  </button>
+                </div>
+              </div>
+
+              {/* Banner Azione Rapida: Ripassa Subito Errori */}
+              {reviewFilter === 'wrong' && errors > 0 && (
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-3.5 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-200 light:bg-amber-50 light:border-amber-200 light:text-amber-900">
+                  <div className="flex items-center gap-2">
+                    <RotateCcw className="w-4 h-4 text-amber-400 flex-shrink-0" />
+                    <span className="text-xs font-semibold">Vuoi riprovare subito i quesiti sbagliati con il feedback immediato?</span>
+                  </div>
+                  <button
+                    id="btn-retry-mistakes-now"
+                    onClick={handleReviewMistakesNow}
+                    className="px-3.5 py-1.5 rounded-lg bg-amber-600 hover:bg-amber-500 text-white font-bold text-xs shadow-sm transition-colors flex items-center justify-center gap-1.5 whitespace-nowrap self-end sm:self-auto cursor-pointer"
+                  >
+                    <span>Ripassa Ora in Tutor ({errors})</span>
+                    <ArrowRight className="w-3.5 h-3.5" />
+                  </button>
+                </div>
+              )}
+
+              {/* Lista Quesiti Filtrati */}
+              {filteredReviewItems.length === 0 ? (
+                <div className="p-8 rounded-xl border border-zinc-700 bg-zinc-900/60 light:bg-white light:border-slate-300 text-center space-y-2 text-xs text-zinc-400 light:text-slate-600">
+                  <CheckCircle2 className="w-8 h-8 text-emerald-400 mx-auto opacity-80" />
+                  <p className="font-semibold text-zinc-200 light:text-slate-800">
+                    {reviewFilter === 'wrong'
+                      ? 'Nessun errore! Tutti i quesiti di questa sessione sono stati risposti correttamente.'
+                      : reviewFilter === 'flagged'
+                      ? 'Nessun quesito contrassegnato con la bandierina in questa sessione.'
+                      : 'Nessun quesito da mostrare per questo filtro.'}
+                  </p>
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  {filteredReviewItems.map(item => (
+                    <QuestionCard
+                      key={item.q.id}
+                      question={item.q}
+                      selectedAnswer={item.snap?.userAnswer}
+                      onSelectAnswer={() => {}}
+                      showFeedback={true}
+                      indexNumber={item.idx + 1}
+                      totalNumber={totalCount}
+                    />
+                  ))}
+                </div>
+              )}
+            </div>
+          );
+        })()}
       </div>
     );
   }

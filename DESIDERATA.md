@@ -164,6 +164,7 @@ Questo documento rappresenta la **bussola strategica e funzionale** del progetto
 | Avanzamento Automatico su Risposta Esatta (Auto-Advance) | 🟢 Completato | Avanzamento visivo automatico su risposta esatta dopo 900ms di conferma visiva emerald nei quiz di studio (Tutor, Materie, Quaderno Errori). Arresto immediato su risposta errata per permettere lo studio di Regola e Tranello. Toggle configurabile nelle Impostazioni (`autoAdvanceOnCorrect`, default attivo). |
 | Interattività Liste Statistiche (Dettaglio Materie & Domande) | 🟢 Completato | Liste materie e Top 10 errori interattive in StatsScreen. Implementati SubjectDetailModal (cruscotto materia, accuratezza, filtri 1-touch Tutte/Errori/Non viste/Corrette, lista quesiti scorrevole e scorciatoia allenamento verso TopicsScreen) e QuestionDetailModal (scheda integrale quesito, risposta esatta in verde con check, spiegazione Regola+Tranello, telemetria, note e audio). Sincronizzazione con Back Navigation Coordinator. |
 | Armonizzazione UI/UX & Disambiguazione Stati Top Bar | 🟢 Completato | Completato con TODO-08. Disambiguazione pulsante Modalità Audio (Headphones neutro su Home e mini-header), VoiceQuickMenu neutro coordinato alla testata senza pillola ambra ingannevole, ChevronLeft neutra su ritorno Home e badge 2017 zinc-800. |
+| Filtri Debriefing Esame & Quaderno Errori Interattivo | 🟢 Completato | Completato con TODO-09. Filtri di revisione post-esame (Solo Errori, Tutti, ⚑ Rivedi, Corretti) con salto automatico su errori e azione "Ripassa Ora in Tutor", interattività delle card nel Quaderno Errori con apertura di QuestionDetailModal e filtri rapidi per materia (01-09). |
 
 ---
 
@@ -206,6 +207,15 @@ Questa roadmap sintetizza il piano di riorganizzazione per massimizzare l'usabil
    - Rimossi il background e bordo ambra permanente (`bg-amber-500/10 border-amber-500/30 text-amber-400`) dai pulsanti di salto alla Modalità Audio (`#btn-drive-mode` e `#btn-mini-audio`), trasformandoli in pulsanti d'azione neutri e sobri (`border-zinc-800 bg-zinc-900/60`).
    - Rimosso lo stile a pillola ambra permanente di `VoiceQuickMenu` legato al default `ttsEnabled: true`, allineandolo allo stile neutro dei controlli top bar e lasciando la differenziazione unicamente all'icona interna (`Volume2` vs `VolumeX` e label `${rate}x` vs `Muto`).
    - Normalizzata la freccia di ritorno Home (`ChevronLeft` text-zinc-400) e il badge statico 2017 a colori neutri `zinc-800/80` per riservare l'ambra unicamente a veri stati attivi (`⚑ Rivedi`, audio in riproduzione effettiva, spiegazioni didattiche Tranello).
+9. **TODO-09: Filtri Debriefing Esame & Quaderno Errori Interattivo (Studio Errori a 1 Tocco)** `[COMPLETATO]`:
+   - **Debriefing Esame (`ExamScreen.tsx`)**:
+     * Filtri a tocco rapido per la revisione post-esame: `Solo Errori` (default se presenti errori per azzerare lo scroll), `Tutti (30)`, `⚑ Rivedi` e `Corretti`.
+     * Banner d'azione immediata *"Ripassa Ora in Tutor"* per avviare all'istante una sessione d'esercitazione guidata focalizzata esclusivamente sui quesiti appena sbagliati.
+     * Empty state contestuale per filtri con zero elementi.
+   - **Quaderno Errori Interattivo (`MistakesScreen.tsx`)**:
+     * Card quesiti interattive: tocco o invio apre `QuestionDetailModal` per consultare la scheda didattica completa (soluzione verde smeraldo, spiegazione Regola + Tranello, ascolto vocale, note personali e telemetria).
+     * Barra filtri rapidi per Materia (01-09) con badge dei conteggi per isolare gli errori di un argomento specifico (es. Aerodinamica o Meteo).
+     * Pulsante di ripasso dinamico adattato al filtro attivo (*"Ripassa i X Errori di [Materia]"* vs *"Ripassa le X Domande Sbagliate"*).
 
 
 ---

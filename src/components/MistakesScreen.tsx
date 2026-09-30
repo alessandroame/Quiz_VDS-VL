@@ -1,16 +1,18 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import {
   RotateCcw,
   CheckCircle2,
   ArrowLeft,
   Flame,
-  FileText
+  FileText,
+  ChevronRight
 } from 'lucide-react';
 import type { Question } from '../types/quiz';
 import { useQuiz } from '../context/QuizContext';
 import { QuestionCard } from './QuestionCard';
 import { QuizBottomBar } from './QuizBottomBar';
 import { voiceService } from '../services/voiceService';
+import { QuestionDetailModal } from './QuestionDetailModal';
 
 export const MistakesScreen: React.FC = () => {
   const {
@@ -30,6 +32,10 @@ export const MistakesScreen: React.FC = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [reviewAnswers, setReviewAnswers] = useState<Record<number, 1 | 2 | 3>>({});
 
+  const [selectedSubjectId, setSelectedSubjectId] = useState<number | null>(null);
+  const [selectedQuestionForModal, setSelectedQuestionForModal] = useState<Question | null>(null);
+  const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
+
   // Stop any voice playback on component unmount
   useEffect(() => {
     return () => {
@@ -38,13 +44,45 @@ export const MistakesScreen: React.FC = () => {
   }, []);
 
   // Lista domande attualmente nel quaderno errori
-  const mistakeQuestions = questions.filter(q => {
-    const s = statsMap.get(q.id);
-    return s && s.timesWrong > 0 && s.consecutiveCorrect < 2;
-  });
+  const mistakeQuestions = useMemo(() => {
+    return questions.filter(q => {
+      const s = statsMap.get(q.id);
+      return s && s.timesWrong > 0 && s.consecutiveCorrect < 2;
+    });
+  }, [questions, statsMap]);
+
+  // Materie presenti negli errori
+  const subjectsWithErrors = useMemo(() => {
+    const map = new Map<number, { id: number; name: string; count: number }>();
+    for (const q of mistakeQuestions) {
+      const entry = map.get(q.subjectId);
+      if (entry) {
+        entry.count++;
+      } else {
+        map.set(q.subjectId, { id: q.subjectId, name: q.subjectName, count: 1 });
+      }
+    }
+    return Array.from(map.values()).sort((a, b) => a.id - b.id);
+  }, [mistakeQuestions]);
+
+  // Resetta il filtro se la materia non ha più errori
+  useEffect(() => {
+    if (selectedSubjectId !== null) {
+      const hasQuestions = mistakeQuestions.some(q => q.subjectId === selectedSubjectId);
+      if (!hasQuestions) {
+        setSelectedSubjectId(null);
+      }
+    }
+  }, [mistakeQuestions, selectedSubjectId]);
+
+  // Domande mostrate in base al filtro materia
+  const displayedMistakeQuestions = useMemo(() => {
+    if (selectedSubjectId === null) return mistakeQuestions;
+    return mistakeQuestions.filter(q => q.subjectId === selectedSubjectId);
+  }, [mistakeQuestions, selectedSubjectId]);
 
   // Auto-resume mistakes review session if present
-  React.useEffect(() => {
+  useEffect(() => {
     if (!isReviewing && activeSession?.type === 'mistakes' && activeSession.questionIds?.length > 0) {
       const ordered = activeSession.questionIds
         .map(id => questions.find(q => q.id === id))
@@ -59,17 +97,22 @@ export const MistakesScreen: React.FC = () => {
     }
   }, [activeSession, isReviewing, questions]);
 
-  const startReviewSession = () => {
-    if (mistakeQuestions.length === 0) return;
-    setReviewQuestions(mistakeQuestions);
+  const startReviewSession = (poolToUse?: Question[]) => {
+    const targetPool = poolToUse ?? displayedMistakeQuestions;
+    if (targetPool.length === 0) return;
+    setReviewQuestions(targetPool);
     setCurrentIndex(0);
     setReviewAnswers({});
     setIsReviewing(true);
 
+    const activeSubjectName = selectedSubjectId
+      ? subjectsWithErrors.find(s => s.id === selectedSubjectId)?.name || 'Quaderno Errori'
+      : 'Quaderno Errori';
+
     persistActiveSession({
       type: 'mistakes',
-      subjectName: 'Quaderno Errori',
-      questionIds: mistakeQuestions.map(q => q.id),
+      subjectName: activeSubjectName,
+      questionIds: targetPool.map(q => q.id),
       currentIndex: 0,
       answers: {},
       updatedAt: Date.now()
@@ -283,33 +326,90 @@ export const MistakesScreen: React.FC = () => {
         </div>
       ) : (
         <>
+          {/* Filtro Materie con Errori */}
+          {subjectsWithErrors.length > 1 && (
+            <div className="flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-none">
+              <button
+                id="btn-mistakes-filter-all"
+                onClick={() => setSelectedSubjectId(null)}
+                className={`px-2.5 py-1 rounded-lg text-xs font-semibold whitespace-nowrap transition-colors border ${
+                  selectedSubjectId === null
+                    ? 'bg-zinc-800 text-zinc-100 border-zinc-600 light:bg-slate-200 light:text-slate-900 light:border-slate-400'
+                    : 'bg-zinc-900/60 text-zinc-400 border-zinc-800 hover:border-zinc-700 light:bg-white light:text-slate-600 light:border-slate-200'
+                }`}
+              >
+                Tutte ({mistakeQuestions.length})
+              </button>
+              {subjectsWithErrors.map(sub => (
+                <button
+                  key={sub.id}
+                  id={`btn-mistakes-filter-${sub.id}`}
+                  onClick={() => setSelectedSubjectId(selectedSubjectId === sub.id ? null : sub.id)}
+                  className={`px-2.5 py-1 rounded-lg text-xs font-semibold whitespace-nowrap transition-colors border flex items-center gap-1.5 ${
+                    selectedSubjectId === sub.id
+                      ? 'bg-rose-500/20 text-rose-300 border-rose-500/50 light:bg-rose-50 light:text-rose-700 light:border-rose-300'
+                      : 'bg-zinc-900/60 text-zinc-400 border-zinc-800 hover:border-zinc-700 light:bg-white light:text-slate-600 light:border-slate-200'
+                  }`}
+                >
+                  <span>{sub.name}</span>
+                  <span className="font-mono text-[10px] opacity-90">({sub.count})</span>
+                </button>
+              ))}
+            </div>
+          )}
+
           <button
-            onClick={startReviewSession}
-            className="w-full py-4 rounded-xl bg-rose-600 hover:bg-rose-500 text-white font-bold text-sm shadow-lg shadow-rose-950/40 flex items-center justify-center gap-2 transition-all"
+            id="btn-start-mistakes-review"
+            onClick={() => startReviewSession(displayedMistakeQuestions)}
+            className="w-full py-3.5 sm:py-4 rounded-xl bg-rose-600 hover:bg-rose-500 text-white font-bold text-xs sm:text-sm shadow-lg shadow-rose-950/40 flex items-center justify-center gap-2 transition-all active:scale-[0.99] cursor-pointer"
           >
             <RotateCcw className="w-4 h-4" />
-            <span>Ripassa le {mistakesCount} Domande Sbagliate</span>
+            <span>
+              {selectedSubjectId !== null
+                ? `Ripassa i ${displayedMistakeQuestions.length} Errori (${subjectsWithErrors.find(s => s.id === selectedSubjectId)?.name})`
+                : `Ripassa le ${mistakeQuestions.length} Domande Sbagliate`}
+            </span>
           </button>
 
           {/* Elenco dettagliato errori */}
           <div className="space-y-3">
-            <h3 className="text-xs font-bold text-zinc-300 light:text-slate-700 uppercase tracking-wider">
-              Domande da Ripassare
-            </h3>
+            <div className="flex items-center justify-between">
+              <h3 className="text-xs font-bold text-zinc-300 light:text-slate-700 uppercase tracking-wider">
+                Domande da Ripassare ({displayedMistakeQuestions.length})
+              </h3>
+              <span className="text-[11px] text-zinc-500 light:text-slate-400">
+                Tocca per aprire scheda e spiegazione
+              </span>
+            </div>
+
             <div className="space-y-2">
-              {mistakeQuestions.map(q => {
+              {displayedMistakeQuestions.map(q => {
                 const s = statsMap.get(q.id);
                 return (
                   <div
                     key={q.id}
-                    className="p-3.5 rounded-xl border border-zinc-700 bg-zinc-900/90 light:bg-white light:border-slate-300 light:shadow-sm flex items-start justify-between gap-3 text-xs"
+                    id={`mistake-card-${q.id}`}
+                    role="button"
+                    tabIndex={0}
+                    onClick={() => {
+                      setSelectedQuestionForModal(q);
+                      setIsDetailModalOpen(true);
+                    }}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        setSelectedQuestionForModal(q);
+                        setIsDetailModalOpen(true);
+                      }
+                    }}
+                    className="p-3.5 rounded-xl border border-zinc-700 bg-zinc-900/90 hover:bg-zinc-800/80 hover:border-zinc-600 light:bg-white light:border-slate-300 light:hover:border-slate-400 light:shadow-sm flex items-start justify-between gap-3 text-xs cursor-pointer transition-all active:scale-[0.99] group focus:outline-none focus:ring-1 focus:ring-amber-500/60"
                   >
-                    <div className="space-y-1">
+                    <div className="space-y-1 min-w-0 flex-1">
                       <div className="flex items-center gap-2">
                         <span className="font-mono font-bold text-amber-400">#{q.id}</span>
-                        <span className="text-zinc-400 light:text-slate-600">{q.subjectName}</span>
+                        <span className="text-zinc-400 light:text-slate-600 truncate">{q.subjectName}</span>
                       </div>
-                      <p className="text-zinc-200 light:text-slate-800 line-clamp-2">
+                      <p className="text-zinc-200 light:text-slate-800 line-clamp-2 group-hover:text-zinc-100 transition-colors">
                         {q.question}
                       </p>
                       {s?.userNote && (
@@ -320,13 +420,16 @@ export const MistakesScreen: React.FC = () => {
                       )}
                     </div>
 
-                    <div className="flex flex-col items-end flex-shrink-0 space-y-1">
-                      <span className="px-2 py-0.5 rounded bg-rose-500/20 text-rose-400 font-bold text-[10px]">
-                        {s?.timesWrong} err
-                      </span>
-                      <span className="text-[10px] text-zinc-400 light:text-slate-500 font-mono">
-                        {s?.consecutiveCorrect || 0}/2 ok
-                      </span>
+                    <div className="flex items-center gap-2 flex-shrink-0">
+                      <div className="flex flex-col items-end space-y-1">
+                        <span className="px-2 py-0.5 rounded bg-rose-500/20 text-rose-400 font-bold text-[10px]">
+                          {s?.timesWrong} err
+                        </span>
+                        <span className="text-[10px] text-zinc-400 light:text-slate-500 font-mono">
+                          {s?.consecutiveCorrect || 0}/2 ok
+                        </span>
+                      </div>
+                      <ChevronRight className="w-4 h-4 text-zinc-500 group-hover:text-zinc-300 light:text-slate-400 light:group-hover:text-slate-600 transition-colors" />
                     </div>
                   </div>
                 );
@@ -335,6 +438,16 @@ export const MistakesScreen: React.FC = () => {
           </div>
         </>
       )}
+
+      {/* Modal Dettaglio Domanda */}
+      <QuestionDetailModal
+        question={selectedQuestionForModal}
+        isOpen={isDetailModalOpen}
+        onClose={() => {
+          setIsDetailModalOpen(false);
+          setSelectedQuestionForModal(null);
+        }}
+      />
     </div>
   );
 };

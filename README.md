@@ -86,7 +86,10 @@
   - Modalità **Compressa a Singola Riga**: tutti i 30 quiz sono disposti orizzontalmente su **una sola riga** senza bisogno di scroll (tacche avioniche colorate a tutta larghezza con indicatore domanda attiva su smartphone, e numeri visibili su desktop).
   - Recupera oltre 70px verticali per favorire il layout *Zero-Scroll* con visualizzazione contemporanea di domanda, opzioni e spiegazione Regola/Tranello su smartphone compatti (390x844).
   - Persistenza automatica della preferenza compresso/espanso dell'allievo in memoria locale (`localStorage`).
-- **Debriefing Finale**: esito immediato, tempo di esecuzione, riepilogo grafico ed elenco analitico delle risposte errate con accesso diretto alle spiegazioni.
+- **Debriefing Finale con Filtri & Ripasso Immediato Errori**:
+  - Esito secco immediato (`IDONEO` / `NON IDONEO`), tempo impiegato, punteggio e ripartizione per materia con indicatore degli errori per argomento.
+  - **Filtri di Revisione a 1 Tocco**: navigazione istantanea sui quesiti della sessione con chip dedicati: `Solo Errori` (attivato automaticamente per azzerare lo scroll sui 30 quiz se presenti errori), `Tutti (30)`, `⚑ Rivedi` e `Corretti`.
+  - **Ripasso Immediato in Tutor**: banner d'azione rapida *"Ripassa Ora in Tutor"* per riprovare subito i soli quesiti sbagliati con il feedback immediato Regola/Tranello prima che i dettagli svaniscano dalla memoria.
 - **Navigation Guard (Protezione Sessione)**: avviso di sicurezza e blocco in caso di tentata navigazione verso altre schede o ricaricamento pagina (`beforeunload`), evitando la perdita accidentale della simulazione in corso.
 
 ### 4. Studio Guidato per Materie
@@ -94,10 +97,12 @@
 - Feedback visivo e sonoro istantaneo alla selezione di una risposta (`Esatta` / `Errata`).
 - Visualizzazione immediata della spiegazione (*Regola* e *Tranello*) per massimizzare l'apprendimento sul campo.
 
-### 5. Quaderno Errori con Ripetizione Spaziata
+### 5. Quaderno Errori con Ripetizione Spaziata & Ispezione Interattiva
 - Raccolta automatica di qualsiasi domanda errata durante le simulazioni o le sessioni di studio.
 - Algoritmo di **Spaced Repetition (Box Leitner)**: un quesito esce dal quaderno degli errori solo dopo **2 risposte corrette consecutive** (`consecutiveCorrect >= 2`).
-- Monitoraggio delle domande ancora da consolidare e avanzamento progressivo verso l'azzeramento degli errori.
+- **Ispezione Interattiva a 1 Tocco (`QuestionDetailModal`)**: toccando qualsiasi scheda domanda nell'elenco degli errori si apre la vista di dettaglio completa con il testo integrale, la risposta esatta evidenziata in verde smeraldo con spunta, la spiegazione didattica (**Regola** e **Tranello**), la pronuncia vocale neurale e la gestione di note personali e preferiti.
+- **Filtro Rapido per Materia**: se gli errori appartengono a materie diverse, compare una barra a scorrimento orizzontale (`Tutte`, `Normativa`, `Aerodinamica`...) con i conteggi puntuali per isolare e studiare gli errori di un argomento specifico.
+- **Pulsante Ripasso Dinamico**: avvio del ripasso Leitner sull'intero quaderno o mirato sui soli errori della materia filtrata.
 
 ### 6. Archivio con Ricerca Rapida Senza Tastiera (#ID Pad & Thematic Chips)
 - Consultazione istantanea dei 474 quiz del catalogo con numerazione ufficiale AeCI.
