@@ -98,15 +98,15 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab, openSet
 
             {/* Controlli Rapidi Mini-Header */}
             <div className="flex items-center gap-1 sm:gap-1.5 flex-shrink-0">
-              {/* Tasto Switch Rapido Modalità Audio */}
+              {/* Tasto Switch Rapido Modalità Mani Libere */}
               <button
                 id="btn-mini-audio"
                 onClick={() => openDriveMode()}
-                title="Passa all'ascolto hands-free (Modalità Audio)"
+                title="Passa all'ascolto hands-free (Modalità Mani Libere)"
                 className="p-1.5 sm:px-2.5 sm:py-1.5 rounded-lg bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 light:bg-amber-100 light:text-amber-800 border border-amber-500/30 flex items-center gap-1 text-xs font-bold transition-all active:scale-95 shadow-sm"
               >
                 <Headphones className="w-3.5 h-3.5 text-amber-400 light:text-amber-700" />
-                <span className="hidden sm:inline">Audio</span>
+                <span className="hidden sm:inline">Mani Libere</span>
               </button>
 
               {/* Quick Speech Menu */}
@@ -205,15 +205,15 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab, openSet
 
           {/* Action buttons */}
           <div className="flex items-center gap-1 sm:gap-1.5 flex-shrink-0">
-            {/* Modalità Audio */}
+            {/* Modalità Mani Libere */}
             <button
               id="btn-drive-mode"
               onClick={() => openDriveMode()}
-              title="Modalità Audio (Macro-target & Hands-free)"
+              title="Modalità Mani Libere (Macro-target & Hands-free)"
               className="p-1.5 sm:px-2.5 sm:py-1.5 rounded-lg bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 light:bg-amber-100 light:text-amber-800 border border-amber-500/30 flex items-center gap-1.5 text-xs font-bold transition-all active:scale-95 shadow-sm"
             >
               <Headphones className="w-4 h-4 text-amber-400 light:text-amber-700" />
-              <span className="hidden sm:inline">Audio</span>
+              <span className="hidden sm:inline">Mani Libere</span>
             </button>
 
             {/* Quick Voice / Speech Menu */}

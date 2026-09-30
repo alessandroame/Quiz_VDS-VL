@@ -73,7 +73,7 @@ export const DriveLauncher: React.FC<DriveLauncherProps> = ({
           </div>
           <div>
             <h1 className="text-xl font-black tracking-tight text-white light:text-slate-900 flex items-center gap-2">
-              <span>Modalità Audio</span>
+              <span>Modalità Mani Libere</span>
               <OfflineHUDTag />
             </h1>
             <p className="text-xs text-zinc-400 light:text-slate-500 font-medium">
@@ -92,7 +92,7 @@ export const DriveLauncher: React.FC<DriveLauncherProps> = ({
             id="btn-drive-exit"
             onClick={onClose}
             className="p-2.5 rounded-xl bg-zinc-900 border border-zinc-800 text-zinc-400 hover:text-white light:bg-white light:border-slate-200 light:text-slate-600 light:hover:text-slate-900 light:shadow-sm"
-            title="Esci dalla Modalità Audio"
+            title="Esci dalla Modalità Mani Libere"
           >
             <X className="w-6 h-6" />
           </button>
@@ -111,7 +111,7 @@ export const DriveLauncher: React.FC<DriveLauncherProps> = ({
         >
           <Radio className="w-4 h-4 flex-shrink-0" />
           <div className="text-left">
-            <div className="text-[10px] text-zinc-400 light:text-slate-500 uppercase font-semibold">Pilota Automatico</div>
+            <div className="text-[10px] text-zinc-400 light:text-slate-500 uppercase font-semibold">Avanzamento Automatico</div>
             <div>{isAutopilotEnabled ? 'ATTIVO (Radio)' : 'Manuale'}</div>
           </div>
         </button>

@@ -15,7 +15,7 @@
   - [5. Quaderno Errori con Ripetizione Spaziata (Box Leitner)](#5-quaderno-errori-con-ripetizione-spaziata-box-leitner)
   - [6. Archivio con Ricerca Rapida Senza Tastiera (#ID Pad & Thematic Chips)](#6-archivio-con-ricerca-rapida-senza-tastiera-id-pad--thematic-chips)
   - [7. Statistiche Avanzate & Indice di Preparazione](#7-statistiche-avanzate--indice-di-preparazione)
-  - [8. Modalità Audio (Hands-Free Outdoor & Macro-Target Bici/Corsa)](#8-modalità-audio-hands-free-outdoor--macro-target-bicicorsa)
+  - [8. Modalità Mani Libere (Hands-Free Outdoor & Macro-Target Bici/Corsa)](#8-modalità-mani-libere-hands-free-outdoor--macro-target-bicicorsa)
   - [9. Motore Vocale Neurale (TTS Multi-Voce Offline) & Audio Cockpit](#9-motore-vocale-neurale-tts-multi-voce-offline--audio-cockpit)
   - [10. Ergonomia Cockpit, Layout Zero-Scroll & Dimensione Font](#10-ergonomia-cockpit-layout-zero-scroll--dimensione-font)
   - [11. Fair Coverage Randomizer](#11-fair-coverage-randomizer)
@@ -49,7 +49,7 @@
   - Sostituita da una mini-header minimalista con pulsante `[← Home]`, indicatore del contesto e pulsante rapido `AUDIO` per lo switch hands-free.
   - **Salvaguardia Abbandono Esame**: modale di conferma per prevenire perdite involontarie di progresso se l'allievo preme `[← Home]` durante una prova d'esame in corso.
 - **Sincronizzazione Tasto Indietro Smartphone (Hardware & Gestures Back Coordinator)**:
-  - Il tasto fisico o le gesture di swipe indietro di Android e iOS eseguono sempre l'esatta azione del pulsante grafico visibile a schermo (chiusura del tastierino rapido nell'Archivio, chiusura dei fogli comandi, annullamento della modale di guardia esame, chiusura della Modalità Audio o Impostazioni e ritorno al cruscotto Home).
+  - Il tasto fisico o le gesture di swipe indietro di Android e iOS eseguono sempre l'esatta azione del pulsante grafico visibile a schermo (chiusura del tastierino rapido nell'Archivio, chiusura dei fogli comandi, annullamento della modale di guardia esame, chiusura della Modalità Mani Libere o Impostazioni e ritorno al cruscotto Home).
   - All'interno dei quiz di studio materie, il comando indietro riporta direttamente al cruscotto Home garantendo linearità d'uso e azzerando le chiusure accidentali della PWA.
 
 ### 3. Simulatore d'Esame & Simulazione Didattica (Tutor)
@@ -109,25 +109,25 @@
 - **Registro Storico Sessioni**: cronologia delle simulazioni svolte con esito (`IDONEO` / `NON IDONEO`), punteggio e tempo impiegato.
 - **Top 10 Domande Più Ostiche**: graduatoria dei quesiti che hanno registrato il maggior numero di risposte errate.
 
-### 8. Modalità Audio (Hands-Free Outdoor & Macro-Target Bici/Corsa)
+### 8. Modalità Mani Libere (Hands-Free Outdoor & Macro-Target Bici/Corsa)
 - Pensata per lo studio in movimento a mani libere (in auto, furgone navetta, sui rulli in bici o durante la corsa all'aperto) con smartphone a braccio o su manubrio.
-- **Riconcettualizzazione Visiva & Switch Universale**: iconografia a cuffie (`Headphones`) e pulsante rapido `AUDIO` accessibile in qualunque quiz (Navbar e mini-header di Tutor, Materie, Esame, Errori) per passare all'ascolto senza perdere l'indice della domanda o le risposte date.
+- **Riconcettualizzazione Visiva & Switch Universale**: iconografia a cuffie (`Headphones`) e pulsante rapido `Mani Libere` accessibile in qualunque quiz (Navbar e mini-header di Tutor, Materie, Esame, Errori) per passare all'ascolto senza perdere l'indice della domanda o le risposte date.
 - **Macro-Target Tattili Outdoor per Bici & Corsa**:
   - 3 macro-fasce a tutta larghezza con altezza minima garantita `min-h-[78px] sm:min-h-[85px]`.
   - Badge numerici giganti (44-56px) con contrasto estremo e caratteri maggiorati (`text-base sm:text-xl`).
   - Spaziatura protetta e zero elementi affiancati per eliminare il rischio di miss-clicks dovuti alle vibrazioni del manubrio o al movimento.
 - **Feedback Aptico di Bordo (`navigator.vibrate`)**: pattern di vibrazione tattile differenziati per tap, esito corretto, errore, cambio domanda e contrassegno bandierina.
 - **Layout Ergonomico a Schermo Intero**: viewport bloccato a `100dvh` con **zero scrolling**.
-- **Pilota Automatico ("Radio Quiz")**: modalità hands-free a tempo. L'app legge in sequenza la domanda e le opzioni, attende un intervallo configurabile (3-8s) e svela automaticamente la risposta esatta e la regola, passando da sola al quiz successivo.
+- **Avanzamento Automatico ("Radio Quiz")**: modalità hands-free a tempo. L'app legge in sequenza la domanda e le opzioni, attende un intervallo configurabile (3-8s) e svela automaticamente la risposta esatta e la regola, passando da sola al quiz successivo.
 - **Tutor Didattico Hands-Free (Regola & Tranello a Voce)**:
-  - Accesso diretto con pulsante rapido **"Tutor Didattico (30 Quiz)"** nel Launcher o commutazione istantanea dalla schermata Tutor tramite il tasto `AUDIO`.
-  - Lettura integrale della spiegazione didattica vocale neutrale ad ogni risposta (*"La risposta esatta è la... Regola: ... Tranello: ..."* senza prefissi fuorvianti di errore) con sincronizzazione anti-troncamento dell'autopilota (attesa fine del file audio + pausa di assimilazione di 2.5s prima di avanzare).
+  - Accesso diretto con pulsante rapido **"Tutor Didattico (30 Quiz)"** nel Launcher o commutazione istantanea dalla schermata Tutor tramite il tasto `Mani Libere`.
+  - Lettura integrale della spiegazione didattica vocale neutrale ad ogni risposta (*"La risposta esatta è la... Regola: ... Tranello: ..."* senza prefissi fuorvianti di errore) con sincronizzazione anti-troncamento dell'avanzamento automatico (attesa fine del file audio + pausa di assimilazione di 2.5s prima di avanzare).
   - Cronometro didattico incrementale (count-up senza limiti di tempo) e card didattica ad alto contrasto.
 - **Comandi Vocali Hands-Free in Italiano**: interazione completa a voce tramite Web Speech Recognition con comandi dedicati (`"Uno"`, `"Due"`, `"Tre"`, `"Avanti"`, `"Indietro"`, `"Ripeti"`, `"Bandiera"`, `"Pausa"`, `"Spiega"`, `"Tutor"`).
 - **Gestione Microfono Anti-Eco (Selettore Altoparlante / Cuffie)**:
   - 🔊 **Modalità Altoparlante (Default - Senza cuffie)**: il microfono è temporaneamente disattivato mentre l'altoparlante legge la domanda, le opzioni o le spiegazioni, e si attiva automaticamente **solo a fine parlato** (durante il countdown di risposta) o **mentre l'audio è in pausa**. Grazie a un buffer acustico di 250ms, elimina alla radice qualsiasi interferenza o falso comando innescato dalla voce dello smartphone.
   - 🎧 **Modalità Cuffie (Con microfono)**: microfono sempre attivo in continuo per consentire il "barge-in" (interruzione del parlato a voce in qualsiasi istante).
-  - Selettore rapido a 1 tocco nel Launcher, nell'HUD attivo della Modalità Audio e nelle Impostazioni (*Guida -> Dispositivo di Ascolto*).
+  - Selettore rapido a 1 tocco nel Launcher, nell'HUD attivo della Modalità Mani Libere e nelle Impostazioni (*Mani Libere -> Dispositivo di Ascolto*).
 - **Supporto Bivalente del Tema Colore (Cockpit Dark & Hangar Light)**: ottimizzato per zero riverberi notturni sul parabrezza e massima leggibilità sotto la luce diretta del sole.
 - **Menu Rapido Impostazioni Voce Integrato (Quick Speech Menu)**: accesso a 1 tocco alle impostazioni vocali (Giuseppe / Elsa, velocità 0.9x-1.25x, lettura automatica ed effetti sonori).
 - **Briefing Vocale Cockpit di Benvenuto**: spiegazione parlata chiara e sintetica all'apertura con salvataggio run-once in IndexedDB (`driveModeIntroPlayed: true`).
@@ -172,7 +172,7 @@
   - Suddivisione modulare in 6 argomenti dedicati con icone tematiche e **live preview badge dinamici**:
     * **🎨 Aspetto**: tema attivo (`Auto` / `Cockpit Dark` / `Hangar Light`) e feedback didattico immediato ON/OFF. Include toggle per massimizzazione a Schermo Intero (Browser Fullscreen).
     * **🎙️ Voce**: istruttore attivo (Giuseppe / Elsa), velocità di lettura, motore TTS (Web / Cache offline) ed effetti sonori cockpit.
-    * **🚗 Guida**: stato del pilota automatico radio quiz, countdown di risposta (3-8s) e riattivazione del briefing vocale iniziale.
+    * **🚗 Mani Libere**: stato dell'avanzamento automatico continuo, countdown di risposta (3-8s) e riattivazione del briefing vocale iniziale.
     * **☁️ Backup**: stato della sincronizzazione Google Drive GIS (`Auto-Sync` / `Manuale`), ultimo backup e gestione token.
     * **⚙️ Dati**: catalogo 504 quiz Dexie IndexedDB (SSOT), ripristino/esportazione JSON locale e reset totale.
     * **ℹ️ About**: versione attiva dell'applicazione (`v1.0.0 • AeCI`), riferimenti normativi ufficiali (D.P.R. 9 luglio 2010, n. 133 e regolamenti esame AeCI 30 quiz, 45 min, max 3 errori) e architettura di bordo.
@@ -207,7 +207,7 @@
 - **Resilienza Offline con Invio Differito**: studio fluido anche in decollo o in viaggio senza connettività; al rientro della rete (`online`), l'engine sincronizza silenziosamente le modifiche con Google Drive.
 - **Indicatore Offline Avionico (Cockpit Offline HUD & Briefing)**:
   - Rilevamento in tempo reale della connettività tramite `NetworkStatus` e `useOnlineStatus`.
-  - Pillola avionica ambra `[⚡ OFFLINE]` sempre visibile nell'header e nell'HUD della Modalità Audio quando si è senza connessione.
+  - Pillola avionica ambra `[⚡ OFFLINE]` sempre visibile nell'header e nell'HUD della Modalità Mani Libere quando si è senza connessione.
   - Banner informativo dismissibile con rassicurazione didattica: tutti i 474 quiz, risposte, esami e note sono 100% disponibili in locale su IndexedDB.
   - Modale di briefing a 1 tocco che spiega nel dettaglio la persistenza autonoma e la sincronizzazione in coda.
   - Transizione e badge di riconnessione verde `[ONLINE]` (3.5s) al ripristino della copertura.
@@ -282,7 +282,7 @@ npm run test:visual:all
 # Collaudo visivo navigazione esame, debriefing e zero-warning console
 npm run test:visual:review
 
-# Collaudo interattivo Modalità Audio (Launcher, radio quiz, risposta e chiusura)
+# Collaudo interattivo Modalità Mani Libere (Launcher, radio quiz, risposta e chiusura)
 npm run test:visual:drive:flow
 
 # Collaudo specifico della Modalità Alla Guida (CDP Mobile 390x844)

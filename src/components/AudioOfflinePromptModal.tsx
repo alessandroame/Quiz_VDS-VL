@@ -56,7 +56,7 @@ export const AudioOfflinePromptModal: React.FC<AudioOfflinePromptModalProps> = (
             </div>
             <div>
               <h3 id="audio-offline-title" className="text-base font-bold text-zinc-100 light:text-slate-900">
-                Audio Offline per la Modalità Audio
+                Audio Offline per la Modalità Mani Libere
               </h3>
               <p className="text-xs text-zinc-400 light:text-slate-500">
                 Preparazione all'ascolto senza connessione

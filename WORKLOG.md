@@ -16,6 +16,42 @@ Questo documento registra in ordine cronologico tutte le lavorazioni svolte nel 
 
 ---
 
+### [2026-09-30] - Ridenominazione UI in Modalità Mani Libere e Avanzamento Automatico
+
+- **Cosa abbiamo fatto**:
+  * **Riconcettualizzazione Semantica della Schermata Principale ("Modalità Mani Libere")**:
+    - Sostituita la dicitura generica *"Modalità Audio"* con la più chiara e descrittiva **"Modalità Mani Libere"** in tutti i punti di accesso e intestazioni dell'applicazione:
+      - [src/components/drive/DriveLauncher.tsx](file:///c:/github/Quiz_VDS-VL/src/components/drive/DriveLauncher.tsx): titolo principale dell'header (`Modalità Mani Libere`) e tooltip del pulsante di uscita.
+      - [src/components/HomeScreen.tsx](file:///c:/github/Quiz_VDS-VL/src/components/HomeScreen.tsx): pulsante rapido centrale di studio hands-free.
+      - [src/components/Navbar.tsx](file:///c:/github/Quiz_VDS-VL/src/components/Navbar.tsx): pulsante di navigazione desktop e mini-header compatto con etichetta `Mani Libere`.
+      - [src/components/ExamScreen.tsx](file:///c:/github/Quiz_VDS-VL/src/components/ExamScreen.tsx), [src/components/TopicsScreen.tsx](file:///c:/github/Quiz_VDS-VL/src/components/TopicsScreen.tsx), [src/components/MistakesScreen.tsx](file:///c:/github/Quiz_VDS-VL/src/components/MistakesScreen.tsx): pulsanti di commutazione sessione attiva verso la Modalità Mani Libere.
+      - [src/components/SettingsModal.tsx](file:///c:/github/Quiz_VDS-VL/src/components/SettingsModal.tsx): Sezione 3 dell'accordion (`Modalità Mani Libere`) e descrizioni della guida vocale.
+      - [src/components/AudioOfflinePromptModal.tsx](file:///c:/github/Quiz_VDS-VL/src/components/AudioOfflinePromptModal.tsx) e [src/components/VoiceCommandsModal.tsx](file:///c:/github/Quiz_VDS-VL/src/components/VoiceCommandsModal.tsx): modali e sottotitoli allineati.
+  * **Chiarificazione del Toggle Interno ("Avanzamento Automatico")**:
+    - Rinominato il toggle interno *"Pilota Automatico"* in **"Avanzamento Automatico"** sia nel Launcher (`AVANZAMENTO AUTOMATICO: ATTIVO (Radio) / Manuale`) sia nell'HUD attivo (`btn-drive-autopilot-toggle` con badge `Auto ON` / `Manuale`), eliminando sovrapposizioni concettuali e rendendo trasparente il comportamento del countdown e del ciclo continuo.
+    - Aggiornati i suggerimenti vocali e la tabella cheat sheet comandi vocali ([src/components/VoiceCommandsModal.tsx](file:///c:/github/Quiz_VDS-VL/src/components/VoiceCommandsModal.tsx)).
+  * **Tipizzazione TypeScript & Test Hardening**:
+    - In [src/components/SettingsModal.tsx](file:///c:/github/Quiz_VDS-VL/src/components/SettingsModal.tsx): protetto l'accesso a `syncState?.lastSyncedAt` con optional chaining per evitare TypeError con mock non esaustivi.
+    - Corretti i tipi nei file di test [src/components/QuizBottomBar.test.ts](file:///c:/github/Quiz_VDS-VL/src/components/QuizBottomBar.test.ts), [src/hooks/useAviationVoice.test.ts](file:///c:/github/Quiz_VDS-VL/src/hooks/useAviationVoice.test.ts), [src/hooks/useDriveVoiceCommands.test.ts](file:///c:/github/Quiz_VDS-VL/src/hooks/useDriveVoiceCommands.test.ts), [src/hooks/useOnlineStatus.test.ts](file:///c:/github/Quiz_VDS-VL/src/hooks/useOnlineStatus.test.ts).
+    - Aggiornate le descrizioni dei test in [src/utils/backNavigation.test.ts](file:///c:/github/Quiz_VDS-VL/src/utils/backNavigation.test.ts) e [src/utils/voiceCommandParser.test.ts](file:///c:/github/Quiz_VDS-VL/src/utils/voiceCommandParser.test.ts).
+    - Aggiornata la documentazione funzionale in [README.md](file:///c:/github/Quiz_VDS-VL/README.md) (Sezione 8 e riferimenti correlati).
+  * **Collaudo e Validazione**:
+    - `npm run test:unit`: 34 file di test superati, 251 test passati su 251 (100% success).
+    - `npx tsc --noEmit`: 0 errori di typecheck TypeScript strict.
+    - `npm run build`: bundle di produzione Vite PWA completato con successo (PWA Service Worker generato).
+  * **Avanzamento SemVer**:
+    - Avanzata la versione di progetto in [package.json](file:///c:/github/Quiz_VDS-VL/package.json) da `1.1.3` a `1.1.4`.
+
+- **Scelte architetturali & Rationale**:
+  * *Disambiguazione Linguistica*: La dicitura "Modalità Audio" risultava generica e poteva suggerire un mero lettore sonoro; "Modalità Mani Libere" descrive con precisione lo scopo d'uso (studio outdoor, sport o auto senza interazione manuale continua). Contemporaneamente, rinominare "Pilota Automatico" in "Avanzamento Automatico" evita cacofonie e chiarisce che si tratta dello scorrimento automatico dei quesiti a tempo.
+  * *Preservazione Identificatori Interni*: I nomi di variabili, impostazioni di database (`driveModeAutopilot`), storage keys ed ID DOM restano immutati, garantendo piena retrocompatibilità senza migrazioni di schema IndexedDB né regressioni per gli utenti esistenti.
+
+- **Impatto sul Desiderata**:
+  * Massima chiarezza didattica ed ergonomica per gli allievi piloti VDS-VL.
+  * Pronto per il rilascio.
+
+---
+
 ### [2026-09-30] - Risoluzione Interazione Touch Mobile su Impostazioni Voce/Audio e Accordion Compresso di Default
 
 - **Cosa abbiamo fatto**:

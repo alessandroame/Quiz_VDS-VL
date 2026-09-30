@@ -108,7 +108,7 @@ describe('Suite 21: Hardware and Graphic Back Navigation Synchronization', () =>
     expect(onNavigateHome).not.toHaveBeenCalled();
   });
 
-  it('BACK-05: se la Modalità Audio (DriveMode) è aperta, chiude la Modalità Audio', () => {
+  it('BACK-05: se la Modalità Mani Libere (DriveMode) è aperta, chiude la Modalità Mani Libere', () => {
     context.activeTab = 'topics';
     context.isDriveModeOpen = true;
 

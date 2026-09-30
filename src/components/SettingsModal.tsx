@@ -437,7 +437,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
   } • ${settings.driveModeAutoAdvanceSeconds || 5}s${settings.driveModeTutor ? ' • Tutor ON' : ''}`;
 
   const cloudSummary = `${
-    settings.autoSyncDrive ? 'Auto-Sync ON' : syncState.lastSyncedAt ? 'Drive Sincronizzato' : 'Manuale'
+    settings.autoSyncDrive ? 'Auto-Sync ON' : syncState?.lastSyncedAt ? 'Drive Sincronizzato' : 'Manuale'
   }`;
 
   const dataSummary = '504 Quiz • Dexie SSOT';
@@ -1128,11 +1128,11 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
             </div>
           </AccordionCard>
 
-          {/* SEZIONE 3: MODALITÀ AUDIO */}
+          {/* SEZIONE 3: MODALITÀ MANI LIBERE */}
           <AccordionCard
             id="drive"
-            label="Modalità Audio"
-            description="Radio quiz continuo, comandi vocali hands-free e macro-target outdoor"
+            label="Modalità Mani Libere"
+            description="Avanzamento automatico, comandi vocali hands-free e macro-target outdoor"
             summary={driveSummary}
             icon={Headphones}
             isExpanded={openSection === 'drive'}
@@ -1150,7 +1150,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                 <label className="flex items-center justify-between p-2.5 rounded-xl border border-zinc-800 bg-zinc-950/60 light:bg-slate-50 light:border-slate-200 cursor-pointer select-none active:scale-[0.99] touch-manipulation transition-all">
                   <div>
                     <span className="text-zinc-300 light:text-slate-700 font-medium block">
-                      Radio Quiz Continuo
+                      Avanzamento Automatico Continuo
                     </span>
                     <span className="text-[11px] text-zinc-500">
                       Legge le domande a catena senza tocco fisico
@@ -1323,7 +1323,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                       <span className="text-[11px] text-zinc-500">
                         {settings.driveModeIntroPlayed
                           ? 'Completata (non si ripeterà all\'avvio)'
-                          : "Verrà riprodotta all'apertura della modalità audio"}
+                          : "Verrà riprodotta all'apertura della modalità mani libere"}
                       </span>
                     </div>
                     <span className={`text-[10px] font-bold px-2 py-0.5 rounded-md ${
@@ -1355,7 +1355,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                           ? 'bg-amber-500/20 border-amber-500 text-amber-300'
                           : 'bg-zinc-800/80 border-zinc-700 hover:border-amber-500/50 text-zinc-300 light:bg-slate-200 light:border-slate-300 light:text-slate-700'
                       }`}
-                      title="Riattiva la spiegazione vocale al prossimo avvio della modalità audio"
+                      title="Riattiva la spiegazione vocale al prossimo avvio della modalità mani libere"
                     >
                       <RotateCcw className="w-3.5 h-3.5" />
                       <span>{settings.driveModeIntroPlayed ? "Riattiva all'avvio" : "Già attiva all'avvio"}</span>

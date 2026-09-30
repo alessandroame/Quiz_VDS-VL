@@ -48,7 +48,7 @@ const VOICE_HINTS = [
   'Dì "Attiva Tutor" o "Disattiva Tutor" per la modalità didattica',
   'Dì "Ripeti" per riascoltare l\'elemento attivo',
   'Dì "Avanti" o "Indietro" per scorrere i quesiti',
-  'Dì "Pausa", "Stop" o "Continua" per il pilota automatico',
+  'Dì "Pausa", "Stop" o "Continua" per l\'avanzamento automatico',
   'Dì "Bandiera" per contrassegnare il quiz',
   'Dì "Aiuto" o "Comandi" per aprire la guida a voce'
 ];

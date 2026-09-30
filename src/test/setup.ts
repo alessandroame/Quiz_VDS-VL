@@ -14,3 +14,6 @@ if (typeof globalThis.navigator === 'undefined') {
     configurable: true,
   });
 }
+
+// Enable React 19 act() support in happy-dom / test environments
+(globalThis as any).IS_REACT_ACT_ENVIRONMENT = true;

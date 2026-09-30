@@ -86,7 +86,7 @@ export const VoiceCommandsModal: React.FC<VoiceCommandsModalProps> = ({
     },
     {
       icon: <Play className="w-5 h-5 text-rose-400" />,
-      title: 'Pilota Automatico',
+      title: 'Avanzamento Automatico',
       primaryPhrase: '"Pausa" • "Stop" • "Continua"',
       alternatives: ['"Ferma"', '"Basta"', '"Attendi"', '"Riprendi"', '"Vai"'],
       description: 'Mette in pausa, ferma l\'audio (il riavvio riparte dalla domanda) o riprende la lettura.'
@@ -193,7 +193,7 @@ export const VoiceCommandsModal: React.FC<VoiceCommandsModalProps> = ({
                 </div>
                 <div>
                   <div className="text-xs font-bold text-white light:text-slate-900">Spiegazione Vocale di Benvenuto</div>
-                  <div className="text-[11px] text-zinc-400 light:text-slate-500">Riascolta l'introduzione alla Modalità Audio</div>
+                  <div className="text-[11px] text-zinc-400 light:text-slate-500">Riascolta l'introduzione alla Modalità Mani Libere</div>
                 </div>
               </div>
               <button

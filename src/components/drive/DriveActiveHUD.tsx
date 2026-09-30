@@ -207,7 +207,7 @@ export const DriveActiveHUD: React.FC<DriveActiveHUDProps> = ({
             onOpenChange={setIsVoiceMenuOpen}
           />
 
-          {/* Toggle Pilota Automatico */}
+          {/* Toggle Avanzamento Automatico */}
           <button
             id="btn-drive-autopilot-toggle"
             onClick={onToggleAutopilot}
@@ -216,10 +216,10 @@ export const DriveActiveHUD: React.FC<DriveActiveHUDProps> = ({
                 ? 'bg-amber-500/30 text-amber-300 ring-1 ring-amber-500/50 light:bg-amber-100 light:text-amber-800 light:ring-amber-400'
                 : 'bg-zinc-900 text-zinc-500 border border-zinc-800 light:bg-white light:text-slate-600 light:border-slate-200 light:shadow-sm'
             }`}
-            title="Pilota Automatico"
+            title="Avanzamento Automatico"
           >
             {isAutopilotEnabled ? <Pause className="w-3.5 h-3.5" /> : <Play className="w-3.5 h-3.5" />}
-            <span className="hidden sm:inline">{isAutopilotEnabled ? 'Pilota ON' : 'Manuale'}</span>
+            <span className="hidden sm:inline">{isAutopilotEnabled ? 'Auto ON' : 'Manuale'}</span>
           </button>
 
           {/* Toggle Modalità Tutor Didattica */}

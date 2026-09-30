@@ -65,7 +65,7 @@ describe('Suite: voiceCommandParser (Parser comandi vocali Modalità Guida)', ()
     expect(parseVoiceCommand('segna')).toBe('flag');
   });
 
-  it('VC-05: riconosce controllo pilota automatico (pausa, stop, ripresa)', () => {
+  it('VC-05: riconosce controllo avanzamento automatico (pausa, stop, ripresa)', () => {
     expect(parseVoiceCommand('pausa')).toBe('pause');
     expect(parseVoiceCommand('alt')).toBe('pause');
     expect(parseVoiceCommand('attendi')).toBe('pause');

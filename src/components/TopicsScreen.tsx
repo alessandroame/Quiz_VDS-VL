@@ -193,10 +193,10 @@ export const TopicsScreen: React.FC = () => {
                 });
               }}
               className="p-1.5 sm:px-2.5 sm:py-1.5 rounded-lg border border-amber-500/40 bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 light:bg-amber-100 light:text-amber-800 text-xs font-bold transition-all flex items-center gap-1.5 shadow-sm active:scale-95"
-              title="Passa alla Modalità Audio"
+              title="Passa alla Modalità Mani Libere"
             >
               <Headphones className="w-3.5 h-3.5" />
-              <span className="hidden sm:inline">Audio</span>
+              <span className="hidden sm:inline">Mani Libere</span>
             </button>
 
             <div className="text-xs font-mono text-amber-400 light:text-amber-600 font-semibold">
