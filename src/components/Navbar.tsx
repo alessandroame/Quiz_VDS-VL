@@ -185,7 +185,7 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab, openSet
                   }}
                   title={buildInfo.buildId}
                   aria-label={`Versione ${buildInfo.version} build ${buildInfo.buildNumber}`}
-                  className="text-[10px] px-1.5 py-0.5 rounded bg-zinc-800 hover:bg-zinc-700 text-zinc-200 hover:text-white border border-zinc-700 light:bg-slate-100 light:hover:bg-slate-200 light:text-slate-700 light:hover:text-slate-900 light:border-slate-300 font-mono hidden sm:inline-flex items-center flex-shrink-0 cursor-pointer select-none active:scale-95 transition-all shadow-sm"
+                  className="text-[10px] px-1.5 py-0.5 rounded bg-zinc-800 hover:bg-zinc-700 text-zinc-200 hover:text-white border border-zinc-700 light:bg-slate-100 light:hover:bg-slate-200 light:text-slate-700 light:hover:text-slate-900 light:border-slate-300 font-mono inline-flex items-center flex-shrink-0 cursor-pointer select-none active:scale-95 transition-all shadow-sm"
                 >
                   v{buildInfo.version}
                   {buildInfo.buildNumber && buildInfo.buildNumber !== '0' && (

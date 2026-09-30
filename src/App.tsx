@@ -428,12 +428,14 @@ function AppContent() {
 
             <div className="flex gap-2 pt-2">
               <button
+                id="btn-abandon-cancel-nav"
                 onClick={cancelNavigation}
                 className="flex-1 py-2.5 rounded-xl bg-amber-600 hover:bg-amber-500 text-white text-xs font-bold shadow-md transition-colors"
               >
                 Rimani nell'Esame
               </button>
               <button
+                id="btn-abandon-confirm-nav"
                 onClick={confirmAbandonAndNavigate}
                 className="flex-1 py-2.5 rounded-xl border border-rose-500/60 text-rose-400 hover:bg-rose-500/10 light:text-rose-600 light:border-rose-300 text-xs font-medium transition-colors"
               >

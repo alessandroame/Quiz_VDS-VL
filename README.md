@@ -3,10 +3,13 @@
 **VDS-VL Quiz Master** è una Progressive Web App (PWA) moderna, ad alte prestazioni e 100% offline-first, progettata con interfaccia ergonomica in stile avionico (*cockpit*).  
 È realizzata su misura per gli allievi piloti di **Parapendio (Volo Libero VDS/VL)** per la preparazione e la simulazione dell'esame teorico per il conseguimento dell'attestato VDS/VL, in piena conformità ai programmi ufficiali dell'**Aero Club d'Italia (AeCI)** e al **D.P.R. 133/2010**.
 
+> 📘 **[MANUALE UTENTE ILLUSTRATO (CLICCA QUI)](docs/MANUALE_UTENTE.md)**: Cerchi una guida rapida passo-passo "a prova di errore" con tutti gli screenshot reali, comandi vocali e scorciatoie da tastiera? Consulta subito la guida illustrata.
+
 ---
 
 ## 📑 Indice dei Contenuti
 
+- [📖 Manuale Utente Illustrato (Guida Rapida)](docs/MANUALE_UTENTE.md)
 - [Panoramica delle Funzionalità](#-panoramica-delle-funzionalità)
   - [1. Database Ufficiale dei Quiz (474 quesiti Parapendio & Teoria Comune)](#1-database-ufficiale-dei-quiz-474-quesiti-parapendio--teoria-comune)
   - [2. Architettura Home Hub & Back Navigation Cockpit V2](#2-architettura-home-hub--back-navigation-cockpit-v2)
@@ -317,6 +320,7 @@ npm run worklog:consolidate
 
 Questo progetto adotta un sistema di **governance della conoscenza inter-agente** strutturato per garantire continuità, integrità architetturale e trasparenza:
 
+- 📘 **[MANUALE_UTENTE.md](file:///c:/github/Quiz_VDS-VL/docs/MANUALE_UTENTE.md)**: Il manuale utente ufficiale illustrato con screenshot reali ad alta risoluzione, tavola delle scorciatoie da tastiera e comandi vocali.
 - 🧭 **[DESIDERATA.md](file:///c:/github/Quiz_VDS-VL/DESIDERATA.md)**: La visione di prodotto, i requisiti core e la matrice di stato di tutte le funzionalità.
 - 🧠 **[MEMORY.md](file:///c:/github/Quiz_VDS-VL/MEMORY.md)**: La memoria tecnica permanente contenente vincoli tecnici stabili, regole d'esame AeCI e lezioni apprese.
 - 📓 **[WORKLOG.md](file:///c:/github/Quiz_VDS-VL/WORKLOG.md)**: Il registro cronologico di tutte le lavorazioni svolte e delle decisioni architetturali (ADR).

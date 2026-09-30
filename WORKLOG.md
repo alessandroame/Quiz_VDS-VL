@@ -14,6 +14,35 @@ Questo documento registra in ordine cronologico tutte le lavorazioni svolte nel 
 - **Impatto sul Desiderata**: <Come questo intervento contribuisce al desiderata (cfr. DESIDERATA.md) e indicazioni per il prossimo agente>
 ```
 
+### [2026-09-30] - Manuale Utente Illustrato "A Prova di Errore" & Pipeline Screenshot CDP (TODO-10 & v1.5.0)
+
+- **Cosa abbiamo fatto**:
+  * **Stesura del Manuale Utente Integrale ([docs/MANUALE_UTENTE.md](file:///c:/github/Quiz_VDS-VL/docs/MANUALE_UTENTE.md))**:
+    - Redatta guida all'uso ufficiale completa, iper-sintetica e strutturata "a prova di errore/deficiente" (14 capitoli autoconsistenti, zero gergo accademico superfluo, passi numerati 1-2-3, tabelle semaforiche dei colori, trucchi rapidi).
+    - Copertura completa: Installazione PWA offline (Safari iOS / Chrome Android), Cruscotto Home Hub, Tutor Didattico con Regola e Tranello, Esame Ufficiale AeCI (45 min, soglia 3 errori), Debriefing con filtri errori e ripasso immediato a 1 tocco, Studio Materie 01-09, Quaderno Errori Leitner (regola delle 2 consecutive corrette), Scheda dettaglio domanda con telemetria, Archivio con tastierino #ID No-Keyboard e chips tematiche, Statistiche e drilldown materia, Modalità Audio Mani Libere con macro-target per bici/corsa, Impostazioni con accordion compresso e scala font, tabella scorciatoie da tastiera desktop e tabella comandi vocali in italiano.
+  * **Pipeline Automatizzata di Cattura Screenshot Reali CDP ([scripts/generate_manual_screenshots.cjs](file:///c:/github/Quiz_VDS-VL/scripts/generate_manual_screenshots.cjs))**:
+    - Script Node.js a zero dipendenze basato su Chrome/Edge CDP che avvia il server locale, popola IndexedDB con dati realistici, simula le interazioni necessarie e cattura 13 screenshot pixel-perfect in [docs/screenshots/](file:///c:/github/Quiz_VDS-VL/docs/screenshots/) a risoluzione mobile standard (390x844).
+    - Aggiunto comando npm dedicato `"screenshots:manual": "node scripts/generate_manual_screenshots.cjs"` in [package.json](file:///c:/github/Quiz_VDS-VL/package.json).
+  * **Integrazione UI e Documentazione**:
+    - Aggiunto banner hero ben visibile e link nell'indice e nella sezione documentazione di [README.md](file:///c:/github/Quiz_VDS-VL/README.md).
+    - Aggiunta card con pulsante "Apri Guida" direttamente nella schermata Impostazioni (scheda About) di [SettingsModal.tsx](file:///c:/github/Quiz_VDS-VL/src/components/SettingsModal.tsx).
+    - Assegnati ID dedicati (`#btn-abandon-cancel-nav`, `#btn-abandon-confirm-nav`) alla modale di guardia navigazione in [src/App.tsx](file:///c:/github/Quiz_VDS-VL/src/App.tsx).
+    - Reso il badge versione `#app-version-badge` sempre visibile su smartphone (`inline-flex` anziché `hidden sm:inline-flex` in [Navbar.tsx](file:///c:/github/Quiz_VDS-VL/src/components/Navbar.tsx)).
+  * **Suite di Test & Build**:
+    - Installate dipendenze di dev (`happy-dom`) e verificate tutte le 45 suite di test Vitest (309 test passanti, 0 fallimenti).
+    - Build Vite di produzione completata con successo in 3.67s.
+  * **Avanzamento Versione**:
+    - Bump SemVer a `1.5.0` in [package.json](file:///c:/github/Quiz_VDS-VL/package.json).
+
+- **Scelte architetturali & Rationale**:
+  * *Didattica a Zero Attrito*: Gli allievi piloti necessitano di consultare la guida direttamente sul cellulare, spesso sul campo di volo o mentre studiano la teoria. Organizzare la documentazione con schede d'azione rapide ("Cosa fa -> Come si usa in 3 passi -> Screenshot reale -> Semaforo colori") azzera il carico cognitivo e rende l'app fruibile a chiunque senza bisogno di spiegazioni ulteriori.
+  * *Screenshot Reali e Riproducibili*: Evitato l'inserimento di mockup statici obsoleti: la pipeline CDP genera screenshot veri direttamente dalla versione compilata, garantendo aggiornabilità a costo zero in future release.
+
+- **Impatto sul Desiderata**:
+  * Completa `TODO-10` della roadmap di riorganizzazione ergonomica V2 e dota l'applicazione di una documentazione utente all'altezza degli standard avionici del progetto.
+
+---
+
 ### [2026-09-30] - Filtri Debriefing Esame & Quaderno Errori Interattivo (TODO-09 & v1.4.0)
 
 - **Cosa abbiamo fatto**:

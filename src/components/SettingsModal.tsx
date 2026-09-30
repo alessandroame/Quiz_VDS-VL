@@ -27,7 +27,9 @@ import {
   ChevronDown,
   RefreshCw,
   Speech,
-  Tag
+  Tag,
+  BookOpen,
+  ExternalLink
 } from 'lucide-react';
 import { useTheme } from '../context/ThemeContext';
 import { useQuiz } from '../context/QuizContext';
@@ -1610,6 +1612,30 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                     </p>
                   </div>
                 </div>
+              </div>
+
+              {/* Guida Rapida & Manuale Utente */}
+              <div className="p-3.5 rounded-2xl border border-emerald-500/40 bg-emerald-950/20 light:bg-emerald-50/60 light:border-emerald-300 flex items-center justify-between gap-3 shadow-sm">
+                <div className="space-y-0.5 min-w-0">
+                  <span className="font-bold text-xs text-emerald-400 light:text-emerald-800 flex items-center gap-1.5">
+                    <BookOpen className="w-3.5 h-3.5 flex-shrink-0" />
+                    <span>Manuale Utente Illustrato</span>
+                  </span>
+                  <p className="text-[11px] text-zinc-400 light:text-slate-600 truncate">
+                    Guida rapida con screenshot reali, comandi vocali e scorciatoie.
+                  </p>
+                </div>
+                <a
+                  id="btn-open-user-manual"
+                  href="https://github.com/alessandroame/Quiz_VDS-VL/blob/main/docs/MANUALE_UTENTE.md"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs flex items-center gap-1 shrink-0 transition-all shadow-sm active:scale-95 cursor-pointer select-none"
+                  title="Apri il manuale utente completo su GitHub"
+                >
+                  <span>Apri Guida</span>
+                  <ExternalLink className="w-3 h-3" />
+                </a>
               </div>
 
               {/* Identificativo Release & PWA */}

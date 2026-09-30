@@ -165,6 +165,7 @@ Questo documento rappresenta la **bussola strategica e funzionale** del progetto
 | Interattività Liste Statistiche (Dettaglio Materie & Domande) | 🟢 Completato | Liste materie e Top 10 errori interattive in StatsScreen. Implementati SubjectDetailModal (cruscotto materia, accuratezza, filtri 1-touch Tutte/Errori/Non viste/Corrette, lista quesiti scorrevole e scorciatoia allenamento verso TopicsScreen) e QuestionDetailModal (scheda integrale quesito, risposta esatta in verde con check, spiegazione Regola+Tranello, telemetria, note e audio). Sincronizzazione con Back Navigation Coordinator. |
 | Armonizzazione UI/UX & Disambiguazione Stati Top Bar | 🟢 Completato | Completato con TODO-08. Disambiguazione pulsante Modalità Audio (Headphones neutro su Home e mini-header), VoiceQuickMenu neutro coordinato alla testata senza pillola ambra ingannevole, ChevronLeft neutra su ritorno Home e badge 2017 zinc-800. |
 | Filtri Debriefing Esame & Quaderno Errori Interattivo | 🟢 Completato | Completato con TODO-09. Filtri di revisione post-esame (Solo Errori, Tutti, ⚑ Rivedi, Corretti) con salto automatico su errori e azione "Ripassa Ora in Tutor", interattività delle card nel Quaderno Errori con apertura di QuestionDetailModal e filtri rapidi per materia (01-09). |
+| Manuale Utente Illustrato & Pipeline Screenshot CDP | 🟢 Completato | Completato con TODO-10. Manuale completo in `docs/MANUALE_UTENTE.md`, 13 screenshot reali pixel-perfect in `docs/screenshots/`, script automatico `scripts/generate_manual_screenshots.cjs`, link hero in `README.md` e card integrata in `SettingsModal.tsx` (About). |
 
 ---
 
@@ -216,6 +217,10 @@ Questa roadmap sintetizza il piano di riorganizzazione per massimizzare l'usabil
      * Card quesiti interattive: tocco o invio apre `QuestionDetailModal` per consultare la scheda didattica completa (soluzione verde smeraldo, spiegazione Regola + Tranello, ascolto vocale, note personali e telemetria).
      * Barra filtri rapidi per Materia (01-09) con badge dei conteggi per isolare gli errori di un argomento specifico (es. Aerodinamica o Meteo).
      * Pulsante di ripasso dinamico adattato al filtro attivo (*"Ripassa i X Errori di [Materia]"* vs *"Ripassa le X Domande Sbagliate"*).
+10. **TODO-10: Manuale Utente Illustrato "A Prova di Errore" & Pipeline Screenshot CDP** `[COMPLETATO]`:
+    - Creazione del manuale completo, sintetico e schematico in `docs/MANUALE_UTENTE.md` con 14 capitoli autoconsistenti.
+    - Script automatico di cattura CDP headless `scripts/generate_manual_screenshots.cjs` (`npm run screenshots:manual`) con seed dati realistici Dexie e generazione di 13 screenshot mobile (390x844).
+    - Collegamento visibile in `README.md` (banner hero e documentazione) e integrazione in `SettingsModal.tsx` (scheda About) con tasto rapido "Apri Guida".
 
 
 ---
