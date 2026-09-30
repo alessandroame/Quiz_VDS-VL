@@ -451,17 +451,6 @@ export const ExamScreen: React.FC<ExamScreenProps> = ({
               <span>Vuoi metterti alla prova col timer? Passa a <strong>Esame Ufficiale (45 min)</strong></span>
             </button>
           </div>
-
-          {onNavigateHome && (
-            <div className="flex justify-center pt-2">
-              <button
-                onClick={onNavigateHome}
-                className="text-xs font-semibold text-zinc-400 hover:text-zinc-200 light:text-slate-500 light:hover:text-slate-800 flex items-center gap-1.5 py-1 px-3 rounded-lg hover:bg-zinc-800/40 light:hover:bg-slate-200/60 transition-colors"
-              >
-                <span>← Torna al Cruscotto Home</span>
-              </button>
-            </div>
-          )}
         </div>
       );
     }
@@ -546,17 +535,6 @@ export const ExamScreen: React.FC<ExamScreenProps> = ({
             <span>Vuoi prima esercitarti senza limiti di tempo? Passa a <strong>Tutor Didattico</strong></span>
           </button>
         </div>
-
-        {onNavigateHome && (
-          <div className="flex justify-center pt-2">
-            <button
-              onClick={onNavigateHome}
-              className="text-xs font-semibold text-zinc-400 hover:text-zinc-200 light:text-slate-500 light:hover:text-slate-800 flex items-center gap-1.5 py-1 px-3 rounded-lg hover:bg-zinc-800/40 light:hover:bg-slate-200/60 transition-colors"
-            >
-              <span>← Torna al Cruscotto Home</span>
-            </button>
-          </div>
-        )}
       </div>
     );
   }
@@ -752,7 +730,7 @@ export const ExamScreen: React.FC<ExamScreenProps> = ({
           )}
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1.5 sm:gap-2">
           <button
             id="btn-exam-drive-mode"
             onClick={() => {
@@ -771,29 +749,30 @@ export const ExamScreen: React.FC<ExamScreenProps> = ({
                 title: examMode === 'tutor' ? 'Simulazione Didattica' : 'Esame Ufficiale'
               });
             }}
-            className="px-2.5 py-1.5 rounded-lg border border-amber-500/40 bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 light:bg-amber-100 light:text-amber-800 text-xs font-bold transition-all flex items-center gap-1.5 shadow-sm active:scale-95"
+            className="p-1.5 sm:px-2.5 sm:py-1.5 rounded-lg border border-amber-500/40 bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 light:bg-amber-100 light:text-amber-800 text-xs font-bold transition-all flex items-center gap-1.5 shadow-sm active:scale-95"
             title="Passa alla Modalità Audio per questa sessione"
           >
             <Headphones className="w-3.5 h-3.5" />
-            <span className="hidden sm:inline">AUDIO</span>
+            <span className="hidden sm:inline">Audio</span>
           </button>
 
           <button
             id="btn-abandon-exam"
             onClick={() => setShowAbandonModal(true)}
-            className="px-2.5 py-1.5 rounded-lg border border-rose-500/40 hover:border-rose-500 bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 hover:text-rose-300 light:border-rose-200 light:bg-rose-50 light:text-rose-700 light:hover:bg-rose-100 text-xs font-semibold transition-colors flex items-center gap-1"
+            className="p-1.5 sm:px-2.5 sm:py-1.5 rounded-lg border border-rose-500/40 hover:border-rose-500 bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 hover:text-rose-300 light:border-rose-200 light:bg-rose-50 light:text-rose-700 light:hover:bg-rose-100 text-xs font-semibold transition-colors flex items-center gap-1"
             title="Interrompi la simulazione"
           >
             <XCircle className="w-3.5 h-3.5" />
-            <span>Interrompi</span>
+            <span className="hidden sm:inline">Interrompi</span>
           </button>
 
           <button
             id="btn-submit-exam-top"
             onClick={() => setShowSubmitModal(true)}
-            className="px-3.5 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs shadow-sm transition-all"
+            className="px-2.5 py-1.5 sm:px-3.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs shadow-sm transition-all"
           >
-            {examMode === 'tutor' ? 'Concludi' : 'Consegna'} ({answeredCount}/{totalCount})
+            {examMode === 'tutor' ? 'Concludi' : 'Consegna'}
+            <span className="hidden sm:inline"> ({answeredCount}/{totalCount})</span>
           </button>
         </div>
       </div>
@@ -821,18 +800,6 @@ export const ExamScreen: React.FC<ExamScreenProps> = ({
           totalNumber={totalCount}
         />
       )}
-
-      {/* Link secondario inferiore per interrompere esame */}
-      <div className="flex justify-center pt-2">
-        <button
-          id="btn-bottom-abandon-exam"
-          onClick={() => setShowAbandonModal(true)}
-          className="text-xs text-zinc-500 hover:text-rose-400 light:text-slate-400 light:hover:text-rose-600 transition-colors flex items-center gap-1.5 py-1.5 px-3 rounded-lg hover:bg-zinc-900/60 light:hover:bg-slate-100"
-        >
-          <XCircle className="w-3.5 h-3.5" />
-          <span>Interrompi simulazione d'esame</span>
-        </button>
-      </div>
 
       {/* Barra Navigazione Quiz Ancorata in Basso */}
       <QuizBottomBar

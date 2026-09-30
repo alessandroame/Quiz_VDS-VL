@@ -12,7 +12,34 @@ Questo documento registra in ordine cronologico tutte le lavorazioni svolte nel 
 - **Cosa abbiamo fatto**: <Sintesi oggettiva degli interventi effettuati, componenti creati o modificati>
 - **Scelte architetturali & Rationale**: <Decisioni tecniche, librerie o pattern adottati, alternative scartate e motivazioni>
 - **Impatto sul Desiderata**: <Come questo intervento contribuisce al desiderata (cfr. DESIDERATA.md) e indicazioni per il prossimo agente>
-```
+### [2026-09-30] - Alleggerimento UI, Risoluzione Sovrapposizioni Pixel 7 e Progressive Disclosure per Scenari
+
+- **Cosa abbiamo fatto**:
+  * Risolto l'overlapping visivo riscontrato su Google Pixel 7 (412x915) e schermi mobile portrait:
+    - In [src/components/Navbar.tsx](file:///d:/Github/Quiz_VDS-VL/src/components/Navbar.tsx), compattata la testata con rimozione del badge anno `2017` e della telemetria secondaria su schermi `< 640px`, trasformato il pulsante Modalità Audio in formato icona compatta (`p-1.5` con label testuale nascosta su mobile) e ridotta la dimensione dell'icona brand a 28px (`w-7 h-7 sm:w-8 sm:h-8`).
+    - Nascosto il pulsante tema su mobile durante i quiz per lasciare massimo respiro alla barra di navigazione e ai comandi rapidi.
+  * De-cluttering radicale della schermata Home Hub in [src/components/HomeScreen.tsx](file:///d:/Github/Quiz_VDS-VL/src/components/HomeScreen.tsx):
+    - Eliminati testi ridondanti e gergo prolisso ("Cruscotto Allievo Pilota", "Seleziona Modalità di Studio", "Quota AeCI certificata", "Telemetria dettagliata").
+    - Sostituita la mastodontica card di benvenuto con una barra di stato compatta a singola riga contenente telemetria essenziale (Prontezza, Quiz Esplorati, Errori Attivi, Audio e barra di avanzamento sottile).
+    - Convertite le card di navigazione in card a 1 riga descrittiva ad alta leggibilità, riducendo l'altezza verticale complessiva della home di oltre 300px ed eliminando lo scroll superfluo su schermi mobile.
+    - Nascosti i tasti di scelta rapida da tastiera desktop (`[1]`..`[6]`) sui dispositivi touch/mobile (`hidden md:inline`).
+  * Progressive Disclosure nelle schermate Quiz ed Esame:
+    - In [src/components/QuestionNavigator.tsx](file:///d:/Github/Quiz_VDS-VL/src/components/QuestionNavigator.tsx), impostata la visualizzazione compressa predefinita su mobile (`window.innerWidth < 640`), collassando la griglia a 30 caselle in un elegante riepilogo a riga singola espandibile al tocco per recuperare 90px di spazio di lettura verticale.
+    - In [src/components/ExamScreen.tsx](file:///d:/Github/Quiz_VDS-VL/src/components/ExamScreen.tsx), compattati i comandi di testata (`AUDIO`, `Interrompi`, `Consegna`), rimosso il link duplicato di abbandono a piè di pagina e i collegamenti ridondanti di ritorno home, preservando `QuizBottomBar` come centro d'azione tattile esclusivo.
+    - In [src/components/QuestionCard.tsx](file:///d:/Github/Quiz_VDS-VL/src/components/QuestionCard.tsx), nascosto il contatore ridondante `(x/30)` all'interno della card su schermi stretti, essendo già presente in modo chiaro nella barra superiore e inferiore.
+    - Uniformata la testata delle schermate secondarie [src/components/TopicsScreen.tsx](file:///d:/Github/Quiz_VDS-VL/src/components/TopicsScreen.tsx) e [src/components/MistakesScreen.tsx](file:///d:/Github/Quiz_VDS-VL/src/components/MistakesScreen.tsx) con pulsante Audio compatto.
+  * Estesa la suite di collaudo visivo headless [.agents/skills/headless-pwa-tester/scripts/visual_check.js](file:///d:/Github/Quiz_VDS-VL/.agents/skills/headless-pwa-tester/scripts/visual_check.js) con il profilo nativo `pixel-7` (412x915, DPR 2.625).
+  * Verificati screenshot pixel-perfect e assenza di collisioni/errori in console per tutti i formati (Pixel 7, Mobile Portrait 390x844, Mobile Landscape 844x390, Desktop 1440x900) sia in Dark che in Light mode.
+
+- **Scelte architetturali & Rationale**:
+  - *Scenario-Driven Minimalism*: Mostrare all'utente soltanto gli strumenti e i dati rilevanti per l'azione contingente. Durante un esame o un quiz, l'allievo ha bisogno di leggere la domanda, visualizzare le opzioni e disporre di navigazione rapida col pollice; barre dense, badge ripetuti e doppie etichette creavano affaticamento cognitivo e layout shifts.
+  - *Bottom Action Anchor vs Top Status Bar*: Mantenere la parte superiore del viewport per le informazioni di stato leggere (tempo rimanente, identificativo quiz, uscita discreta) e concentrare le interazioni primarie col pollice nella barra inferiore (`QuizBottomBar`), prevenendo tocchi accidentali e sovrapposizioni.
+
+- **Impatto sul Desiderata**:
+  - Piena aderenza alle linee guida `minimal-ui-ux` (zero-distrazioni, microcopy essenziale, ergonomia touch).
+  - 212/212 test unitari superati con successo; build di produzione verificata senza warning o errori di tipo.
+
+---
 
 ### [2026-09-30] - Istruzione Agente per Avanzamento Versione, Tracciamento Build e Verificabilità Mobile PWA
 

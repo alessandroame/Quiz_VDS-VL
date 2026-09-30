@@ -40,6 +40,10 @@ export const QuestionNavigator: React.FC<QuestionNavigatorProps> = ({
     } catch {
       // Storage unavailable, fallback to default
     }
+    // Mobile default: compress navigator on mobile viewports to maximize vertical reading space
+    if (typeof window !== 'undefined' && window.innerWidth < 640) {
+      return true;
+    }
     return defaultCompressed;
   });
 

@@ -169,11 +169,11 @@ export const MistakesScreen: React.FC = () => {
                   title: 'Ripasso Errori'
                 });
               }}
-              className="px-2.5 py-1.5 rounded-lg border border-amber-500/40 bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 light:bg-amber-100 light:text-amber-800 text-xs font-bold transition-all flex items-center gap-1.5 shadow-sm active:scale-95"
+              className="p-1.5 sm:px-2.5 sm:py-1.5 rounded-lg border border-amber-500/40 bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 light:bg-amber-100 light:text-amber-800 text-xs font-bold transition-all flex items-center gap-1.5 shadow-sm active:scale-95"
               title="Passa alla Modalità Audio"
             >
               <Headphones className="w-3.5 h-3.5" />
-              <span>AUDIO</span>
+              <span className="hidden sm:inline">Audio</span>
             </button>
 
             <div className="text-xs font-mono text-amber-400 light:text-amber-600 font-semibold">

@@ -191,7 +191,7 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({
             {question.subjectName}
           </span>
           {indexNumber !== undefined && totalNumber !== undefined && (
-            <span className="text-zinc-500 light:text-slate-400">
+            <span className="text-zinc-500 light:text-slate-400 hidden sm:inline">
               ({indexNumber}/{totalNumber})
             </span>
           )}
