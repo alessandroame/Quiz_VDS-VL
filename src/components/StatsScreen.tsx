@@ -1,14 +1,22 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   TrendingUp,
   Award,
   Calendar,
   Clock,
-  AlertTriangle
+  AlertTriangle,
+  ChevronRight
 } from 'lucide-react';
+import type { Question } from '../types/quiz';
 import { useQuiz } from '../context/QuizContext';
+import { SubjectDetailModal } from './SubjectDetailModal';
+import { QuestionDetailModal } from './QuestionDetailModal';
 
-export const StatsScreen: React.FC = () => {
+export interface StatsScreenProps {
+  onTrainSubject?: (subjectId: number) => void;
+}
+
+export const StatsScreen: React.FC<StatsScreenProps> = ({ onTrainSubject }) => {
   const {
     questions,
     statsMap,
@@ -18,6 +26,9 @@ export const StatsScreen: React.FC = () => {
     mistakesCount,
     subjectsAnalytics
   } = useQuiz();
+
+  const [selectedSubjectId, setSelectedSubjectId] = useState<number | null>(null);
+  const [selectedQuestion, setSelectedQuestion] = useState<Question | null>(null);
 
   const totalQuestionsCount = questions.length;
   const coveragePercent = Math.round((totalSeen / totalQuestionsCount) * 100);
@@ -108,17 +119,28 @@ export const StatsScreen: React.FC = () => {
 
       {/* Radar / Prestazioni per Materia */}
       <div className="p-5 rounded-2xl border border-zinc-800 bg-zinc-900 light:bg-white light:border-slate-200 space-y-3">
-        <h3 className="text-xs font-bold text-zinc-400 light:text-slate-600 uppercase tracking-wider flex items-center gap-1.5">
-          <TrendingUp className="w-3.5 h-3.5 text-amber-400" />
-          <span>Risposte Esatte per Materia</span>
-        </h3>
+        <div className="flex items-center justify-between">
+          <h3 className="text-xs font-bold text-zinc-400 light:text-slate-600 uppercase tracking-wider flex items-center gap-1.5">
+            <TrendingUp className="w-3.5 h-3.5 text-amber-400" />
+            <span>Risposte Esatte per Materia</span>
+          </h3>
+          <span className="text-[10px] text-zinc-500 italic hidden sm:inline">
+            Tocca una materia per ispezionarla
+          </span>
+        </div>
 
-        <div className="space-y-3 pt-1">
+        <div className="space-y-1.5 pt-1">
           {subjectsAnalytics.map(sub => {
             return (
-              <div key={sub.id} className="space-y-1">
+              <button
+                type="button"
+                key={sub.id}
+                id={`btn-stat-subject-${sub.id}`}
+                onClick={() => setSelectedSubjectId(sub.id)}
+                className="w-full text-left space-y-1 p-2 rounded-xl hover:bg-zinc-800/50 light:hover:bg-slate-100 transition-colors group cursor-pointer"
+              >
                 <div className="flex items-center justify-between text-xs">
-                  <span className="text-zinc-300 light:text-slate-700 font-medium truncate max-w-[220px]">
+                  <span className="text-zinc-300 light:text-slate-700 font-medium truncate max-w-[220px] group-hover:text-amber-400 light:group-hover:text-amber-600 transition-colors">
                     0{sub.id} {sub.name}
                   </span>
                   <div className="flex items-center gap-2">
@@ -136,6 +158,7 @@ export const StatsScreen: React.FC = () => {
                     >
                       {sub.seen > 0 ? `${sub.accuracy}%` : '-'}
                     </span>
+                    <ChevronRight className="w-3.5 h-3.5 text-zinc-500 group-hover:text-zinc-300 light:group-hover:text-slate-700 transition-transform group-hover:translate-x-0.5" />
                   </div>
                 </div>
 
@@ -151,7 +174,7 @@ export const StatsScreen: React.FC = () => {
                     style={{ width: `${sub.accuracy}%` }}
                   />
                 </div>
-              </div>
+              </button>
             );
           })}
         </div>
@@ -217,18 +240,26 @@ export const StatsScreen: React.FC = () => {
       {/* Top 10 Domande Più Sbagliate */}
       {topWrongQuestions.length > 0 && (
         <div className="p-5 rounded-2xl border border-zinc-800 bg-zinc-900 light:bg-white light:border-slate-200 space-y-3">
-          <h3 className="text-xs font-bold text-rose-400 uppercase tracking-wider flex items-center gap-1.5">
-            <AlertTriangle className="w-3.5 h-3.5" />
-            <span>Top 10 Domande con Più Errori</span>
-          </h3>
+          <div className="flex items-center justify-between">
+            <h3 className="text-xs font-bold text-rose-400 uppercase tracking-wider flex items-center gap-1.5">
+              <AlertTriangle className="w-3.5 h-3.5" />
+              <span>Top 10 Domande con Più Errori</span>
+            </h3>
+            <span className="text-[10px] text-zinc-500 italic hidden sm:inline">
+              Tocca una domanda per la scheda completa
+            </span>
+          </div>
 
           <div className="space-y-2">
             {topWrongQuestions.map(item => (
-              <div
+              <button
+                type="button"
                 key={item.question.id}
-                className="p-2.5 rounded-lg border border-zinc-800/80 bg-zinc-950/40 light:bg-slate-50 light:border-slate-200 text-xs flex items-center justify-between gap-3"
+                id={`btn-stat-wrong-q-${item.question.id}`}
+                onClick={() => setSelectedQuestion(item.question)}
+                className="w-full text-left p-2.5 rounded-lg border border-zinc-800/80 bg-zinc-950/40 hover:bg-zinc-800/50 hover:border-zinc-700 light:bg-slate-50 light:border-slate-200 light:hover:bg-slate-100 text-xs flex items-center justify-between gap-3 transition-colors group cursor-pointer"
               >
-                <div className="space-y-0.5 truncate">
+                <div className="space-y-0.5 truncate flex-1 min-w-0">
                   <div className="flex items-center gap-2">
                     <span className="font-mono font-bold text-amber-400">
                       #{item.question.id}
@@ -237,21 +268,38 @@ export const StatsScreen: React.FC = () => {
                       {item.question.subjectName}
                     </span>
                   </div>
-                  <p className="text-zinc-300 light:text-slate-700 truncate">
+                  <p className="text-zinc-300 light:text-slate-700 truncate group-hover:text-zinc-100 light:group-hover:text-slate-900">
                     {item.question.question}
                   </p>
                 </div>
 
-                <div className="flex-shrink-0 text-right">
+                <div className="flex items-center gap-2 flex-shrink-0">
                   <span className="px-2 py-0.5 rounded bg-rose-500/20 text-rose-400 font-bold text-[10px]">
                     {item.timesWrong} {item.timesWrong === 1 ? 'errore' : 'errori'}
                   </span>
+                  <ChevronRight className="w-3.5 h-3.5 text-zinc-500 group-hover:text-zinc-300 light:group-hover:text-slate-700 transition-transform group-hover:translate-x-0.5" />
                 </div>
-              </div>
+              </button>
             ))}
           </div>
         </div>
       )}
+
+      {/* Modale Dettaglio Materia */}
+      <SubjectDetailModal
+        subjectId={selectedSubjectId}
+        isOpen={selectedSubjectId !== null}
+        onClose={() => setSelectedSubjectId(null)}
+        onSelectQuestion={(q) => setSelectedQuestion(q)}
+        onTrainSubject={onTrainSubject}
+      />
+
+      {/* Modale Dettaglio Domanda */}
+      <QuestionDetailModal
+        question={selectedQuestion}
+        isOpen={selectedQuestion !== null}
+        onClose={() => setSelectedQuestion(null)}
+      />
     </div>
   );
 };

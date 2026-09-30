@@ -45,6 +45,7 @@ function AppContent() {
   const [activeTab, setActiveTab] = useState<NavTab>('home');
   const [pendingTab, setPendingTab] = useState<NavTab | null>(null);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  const [selectedTopicSubjectId, setSelectedTopicSubjectId] = useState<number | null>(null);
   const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
   const [isAudioDownloading, setIsAudioDownloading] = useState(
     audioDownloadManager.isAnyDownloading()
@@ -361,10 +362,22 @@ function AppContent() {
               onSwitchMode={(mode) => handleSelectTab(mode === 'tutor' ? 'tutor' : 'exam')}
             />
           )}
-          {activeTab === 'topics' && <TopicsScreen />}
+          {activeTab === 'topics' && (
+            <TopicsScreen
+              initialSubjectId={selectedTopicSubjectId}
+              onClearInitialSubjectId={() => setSelectedTopicSubjectId(null)}
+            />
+          )}
           {activeTab === 'mistakes' && <MistakesScreen />}
           {activeTab === 'archive' && <ArchiveScreen />}
-          {activeTab === 'stats' && <StatsScreen />}
+          {activeTab === 'stats' && (
+            <StatsScreen
+              onTrainSubject={(subjectId) => {
+                setSelectedTopicSubjectId(subjectId);
+                handleSelectTab('topics');
+              }}
+            />
+          )}
         </Suspense>
       </main>
 

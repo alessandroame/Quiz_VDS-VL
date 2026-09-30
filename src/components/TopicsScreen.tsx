@@ -10,7 +10,15 @@ import { QuestionCard } from './QuestionCard';
 import { QuizBottomBar } from './QuizBottomBar';
 import { voiceService } from '../services/voiceService';
 
-export const TopicsScreen: React.FC = () => {
+export interface TopicsScreenProps {
+  initialSubjectId?: number | null;
+  onClearInitialSubjectId?: () => void;
+}
+
+export const TopicsScreen: React.FC<TopicsScreenProps> = ({
+  initialSubjectId,
+  onClearInitialSubjectId
+}) => {
   const {
     questions,
     filteredQuestions,
@@ -35,22 +43,6 @@ export const TopicsScreen: React.FC = () => {
       voiceService.stop();
     };
   }, []);
-
-  // Auto-resume topic session from activeSession if available
-  React.useEffect(() => {
-    if (activeSubjectId === null && activeSession?.type === 'topic' && activeSession.subjectId) {
-      const ordered = activeSession.questionIds
-        .map(id => questions.find(q => q.id === id))
-        .filter((q): q is Question => Boolean(q));
-
-      if (ordered.length > 0) {
-        setActiveSubjectId(activeSession.subjectId);
-        setSessionQuestions(ordered);
-        setCurrentIndex(Math.min(activeSession.currentIndex || 0, ordered.length - 1));
-        setSessionAnswers(activeSession.answers || {});
-      }
-    }
-  }, [activeSession, activeSubjectId, questions]);
 
   const startTopicSession = (subId: number, mode: 'all' | 'unseen' | 'wrong' = 'all') => {
     setActiveSubjectId(subId);
@@ -90,6 +82,30 @@ export const TopicsScreen: React.FC = () => {
       updatedAt: Date.now()
     });
   };
+
+  // Launch initial subject session if triggered from external drilldown (e.g. StatsScreen)
+  useEffect(() => {
+    if (initialSubjectId !== undefined && initialSubjectId !== null) {
+      startTopicSession(initialSubjectId, 'all');
+      onClearInitialSubjectId?.();
+    }
+  }, [initialSubjectId]);
+
+  // Auto-resume topic session from activeSession if available
+  React.useEffect(() => {
+    if (activeSubjectId === null && activeSession?.type === 'topic' && activeSession.subjectId) {
+      const ordered = activeSession.questionIds
+        .map(id => questions.find(q => q.id === id))
+        .filter((q): q is Question => Boolean(q));
+
+      if (ordered.length > 0) {
+        setActiveSubjectId(activeSession.subjectId);
+        setSessionQuestions(ordered);
+        setCurrentIndex(Math.min(activeSession.currentIndex || 0, ordered.length - 1));
+        setSessionAnswers(activeSession.answers || {});
+      }
+    }
+  }, [activeSession, activeSubjectId, questions]);
 
   const currentQ = sessionQuestions[currentIndex];
   const autoAdvanceTimerRef = React.useRef<any>(null);
