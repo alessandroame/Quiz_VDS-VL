@@ -14,6 +14,38 @@ Questo documento registra in ordine cronologico tutte le lavorazioni svolte nel 
 - **Impatto sul Desiderata**: <Come questo intervento contribuisce al desiderata (cfr. DESIDERATA.md) e indicazioni per il prossimo agente>
 ```
 
+### [2026-09-30] - Armonizzazione UI/UX & Disambiguazione Stati Top Bar (TODO-08 & v1.3.5)
+
+- **Cosa abbiamo fatto**:
+  * **Disambiguazione Pulsante Modalità Audio / Mani Libere (`#btn-drive-mode` e `#btn-mini-audio`)**:
+    - Rimosso lo sfondo e bordo ambra permanente (`bg-amber-500/10 border-amber-500/30 text-amber-400`) sia nell'header principale della Home Hub ([Navbar.tsx](file:///c:/github/Quiz_VDS-VL/src/components/Navbar.tsx)) sia nel mini-header delle sessioni attive.
+    - Convertito in pulsante pillola neutro ed ergonomico (`border-zinc-800 bg-zinc-900/60 hover:bg-zinc-800 text-zinc-300 light:bg-slate-100 light:border-slate-200 light:text-slate-700`) con icona cuffie neutra (`text-zinc-400 group-hover:text-zinc-200 light:text-slate-500`), eliminando l'ingannevole impressione che l'audio sia già attivo in background o sia una modalità da disattivare.
+  * **Disambiguazione Menu Rapido Voce (`VoiceQuickMenu.tsx`)**:
+    - Rimosso lo stile a pillola ambra permanente applicato ogni volta che `settings.ttsEnabled` era attivo.
+    - Allineato il trigger a pulsante neutro coordinato agli altri controlli di testata (`border-zinc-800 bg-zinc-900/60 text-zinc-300`).
+    - Rappresentato lo stato attivo/muto in modo semantico pulito unicamente dall'icona interna e dalla label (`Volume2` + `${rate}x` in zinco chiaro quando attivo, `VolumeX` + `Muto` in zinco spento quando disattivato).
+    - Eliminata la collisione visiva di due rettangoli ambra contigui nell'HUD superiore della Modalità Guida ([DriveActiveHUD.tsx](file:///c:/github/Quiz_VDS-VL/src/components/drive/DriveActiveHUD.tsx)), facendo risaltare nitidamente i soli veri toggle operativi (Pilota Automatico, Tutor Didattico, Microfono).
+  * **Igiene Visiva Elementi Secondari**:
+    - Normalizzata la freccia `ChevronLeft` del tasto ritorno Home (`#btn-nav-back-home`) da `text-amber-400` a `text-zinc-400 group-hover:text-white`.
+    - Normalizzato il badge statico "2017" a pillola sobria `bg-zinc-800/80 text-zinc-400 border border-zinc-700/60` coordinata al badge di versione dinamico.
+  * **Suite di Test Vitest & Collaudi Headless CDP**:
+    - Creato il file di test unitario [src/components/VoiceQuickMenu.test.ts](file:///c:/github/Quiz_VDS-VL/src/components/VoiceQuickMenu.test.ts) (3 test) per certificare lo stile neutro, lo stato muto e `forceDark`.
+    - Creato il file di test unitario [src/components/Navbar.test.ts](file:///c:/github/Quiz_VDS-VL/src/components/Navbar.test.ts) (4 test) per verificare la disambiguazione su mini-header e home header.
+    - Suite Vitest portata a 303 test su 43 suite (100% passanti, 0 fallimenti).
+    - Typecheck `tsc --noEmit` superato con 0 errori.
+    - Build Vite di produzione completata con successo.
+    - Collaudo headless visivo CDP verificato su mobile portrait (390x844) e desktop (1440x900) con 0 errori di console.
+  * **Avanzamento Versione**:
+    - Bump SemVer a `1.3.5` in [package.json](file:///c:/github/Quiz_VDS-VL/package.json).
+
+- **Scelte architetturali & Rationale**:
+  * *Tassonomia Semantica del Colore*: L'ambra (`amber-400`/`amber-500`) è un colore di allerta e stato operativo (domande contrassegnate per revisione `⚑`, spiegazioni didattiche Tranello, riproduzione audio in corso con ring animato). Utilizzare l'ambra su normali azioni di navigazione (apertura Modalità Audio) o trigger di dropdown flyout (Menu Voce) creava rumore cognitivo e falsa percezione di toggle acceso. La normalizzazione a pillole neutre rispetta le direttive di `minimal-ui-ux` e riserva l'ambra esclusivamente a informazioni critiche o a veri interruttori attivi.
+
+- **Impatto sul Desiderata**:
+  * Completa al 100% il task `TODO-08` e la **Fase 10** della roadmap, azzerando tutti i TODO funzionali inevasi del progetto.
+
+---
+
 ### [2026-09-30] - Elevazione Bordi Pannelli e Risoluzione Contrasto WCAG 2.1 in Tema Chiaro e Scuro (v1.3.4)
 
 - **Cosa abbiamo fatto**:

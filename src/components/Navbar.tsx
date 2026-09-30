@@ -68,10 +68,10 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab, openSet
               <button
                 id="btn-nav-back-home"
                 onClick={() => setActiveTab('home')}
-                className="flex items-center gap-1 sm:gap-1.5 px-2.5 py-1.5 rounded-xl bg-zinc-900 border border-zinc-700 hover:border-amber-500/50 hover:bg-zinc-800 text-zinc-200 hover:text-white light:bg-slate-100 light:border-slate-300 light:text-slate-800 text-xs font-bold transition-all active:scale-95 shadow-sm flex-shrink-0"
+                className="group flex items-center gap-1 sm:gap-1.5 px-2.5 py-1.5 rounded-xl bg-zinc-900 border border-zinc-700 hover:border-zinc-500 hover:bg-zinc-800 text-zinc-200 hover:text-white light:bg-slate-100 light:border-slate-300 light:text-slate-800 text-xs font-bold transition-all active:scale-95 shadow-sm flex-shrink-0"
                 title="Torna al cruscotto Home"
               >
-                <ChevronLeft className="w-4 h-4 text-amber-400 light:text-amber-600" />
+                <ChevronLeft className="w-4 h-4 text-zinc-400 group-hover:text-white light:text-slate-500 light:group-hover:text-slate-900 transition-colors" />
                 <span className="font-mono">Home</span>
               </button>
 
@@ -103,9 +103,9 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab, openSet
                 id="btn-mini-audio"
                 onClick={() => openDriveMode()}
                 title="Passa all'ascolto hands-free (Modalità Mani Libere)"
-                className="p-1.5 sm:px-2.5 sm:py-1.5 rounded-lg bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 light:bg-amber-100 light:text-amber-800 border border-amber-500/30 flex items-center gap-1 text-xs font-bold transition-all active:scale-95 shadow-sm"
+                className="group p-1.5 sm:px-2.5 sm:py-1.5 rounded-lg border border-zinc-800 bg-zinc-900/60 hover:bg-zinc-800 hover:border-zinc-700 text-zinc-300 hover:text-white light:bg-slate-100 light:border-slate-200 light:text-slate-700 light:hover:text-slate-900 flex items-center gap-1 text-xs font-semibold transition-all active:scale-95 shadow-sm"
               >
-                <Headphones className="w-3.5 h-3.5 text-amber-400 light:text-amber-700" />
+                <Headphones className="w-3.5 h-3.5 text-zinc-400 group-hover:text-zinc-200 light:text-slate-500 light:group-hover:text-slate-800 transition-colors" />
                 <span className="hidden sm:inline">Mani Libere</span>
               </button>
 
@@ -173,7 +173,7 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab, openSet
             <div className="min-w-0">
               <div className="font-bold text-sm tracking-wide flex items-center gap-1.5">
                 <span className="flex-shrink-0">VDS-VL</span>
-                <span className="text-[10px] px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-400 font-mono hidden sm:inline-flex flex-shrink-0">
+                <span className="text-[10px] px-1.5 py-0.5 rounded bg-zinc-800/80 text-zinc-400 border border-zinc-700/60 light:bg-slate-100 light:text-slate-600 light:border-slate-200 font-mono hidden sm:inline-flex flex-shrink-0">
                   2017
                 </span>
                 {/* Global dynamic version badge - touch-friendly and visible on mobile & desktop */}
@@ -211,9 +211,9 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab, openSet
               id="btn-drive-mode"
               onClick={() => openDriveMode()}
               title="Modalità Mani Libere (Macro-target & Hands-free)"
-              className="p-1.5 sm:px-2.5 sm:py-1.5 rounded-lg bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 light:bg-amber-100 light:text-amber-800 border border-amber-500/40 light:border-amber-300 flex items-center gap-1.5 text-xs font-bold transition-all active:scale-95 shadow-sm"
+              className="group p-1.5 sm:px-2.5 sm:py-1.5 rounded-lg border border-zinc-800 bg-zinc-900/60 hover:bg-zinc-800 hover:border-zinc-700 text-zinc-300 hover:text-white light:bg-slate-100 light:border-slate-200 light:text-slate-700 light:hover:text-slate-900 flex items-center gap-1.5 text-xs font-semibold transition-all active:scale-95 shadow-sm"
             >
-              <Headphones className="w-4 h-4 text-amber-400 light:text-amber-700" />
+              <Headphones className="w-4 h-4 text-zinc-400 group-hover:text-zinc-200 light:text-slate-500 light:group-hover:text-slate-800 transition-colors" />
               <span className="hidden sm:inline">Mani Libere</span>
             </button>
 

@@ -1,7 +1,7 @@
 # 📋 VDS-VL Quiz Master - Avanzamento Lavori (TODO)
 
 **Data Inizio**: 27/09/2026  
-**Stato Generale**: 🟢 **Fasi 0-6 Completate (100%), Fase 7 (Collaudo Manuale E2E) Pronta, Fasi 8 e 9 Completate al 100%, Fase 10 (Armonizzazione UI/UX & Disambiguazione Controlli Audio) Pianificata per Esecuzione Immediata**
+**Stato Generale**: 🟢 **Fasi 0-6 Completate (100%), Fase 7 (Collaudo Manuale E2E) Pronta, Fasi 8, 9 e 10 Completate al 100%**
 
 ---
 
@@ -345,33 +345,31 @@ Questo piano raccoglie e prioritizza gli interventi strutturali emersi dall'audi
 
 Piano dettagliato approvato: [docs/plans/2026-09-30_ui_audio_controls_disambiguation.md](file:///c:/github/Quiz_VDS-VL/docs/plans/2026-09-30_ui_audio_controls_disambiguation.md) (`TODO-08`).
 
-### 1. [ ] Top Bar & Header (`src/components/Navbar.tsx` & `src/components/VoiceQuickMenu.tsx`)
-- [ ] **Disambiguazione Pulsante Modalità Audio (`#btn-drive-mode` e `#btn-mini-audio`)**:
-  - Rimuovere il background ambra permanente (`bg-amber-500/10 border-amber-500/30 text-amber-400`).
-  - Convertire in pulsante pillola neutro (`border-zinc-800 bg-zinc-900/60 text-zinc-300 hover:text-white light:bg-slate-100 light:border-slate-200 light:text-slate-700`).
+### 1. [x] Top Bar & Header (`src/components/Navbar.tsx` & `src/components/VoiceQuickMenu.tsx`)
+- [x] **Disambiguazione Pulsante Modalità Audio (`#btn-drive-mode` e `#btn-mini-audio`)**:
+  - Rimosso il background ambra permanente (`bg-amber-500/10 border-amber-500/30 text-amber-400`).
+  - Convertito in pulsante pillola neutro (`border-zinc-800 bg-zinc-900/60 text-zinc-300 hover:text-white light:bg-slate-100 light:border-slate-200 light:text-slate-700`).
   - Icona `Headphones` neutra con accento al solo passaggio hover.
-- [ ] **Disambiguazione Menu Rapido Voce (`#btn-voice-quick-menu`)**:
-  - Rimuovere la pillola ambra permanente legata a `settings.ttsEnabled`.
-  - Applicare stile neutro coordinato agli altri controlli di testata.
-  - Rappresentare lo stato abilitato/muto esclusivamente con l'icona interna (`Volume2` + `1.0x` bianco/zinco quando attivo, `VolumeX` + `Muto` grigio/spento quando muto).
-- [ ] **Igiene Visiva Elementi Statici / Secondari**:
-  - Normalizzare la freccia `ChevronLeft` in `#btn-nav-back-home` (da `text-amber-400` a `text-zinc-400`).
-  - Normalizzare il badge statico "2017" accanto al logo a pillola neutra `zinc-800` coerente con il badge di build.
+- [x] **Disambiguazione Menu Rapido Voce (`#btn-voice-quick-menu`)**:
+  - Rimossa la pillola ambra permanente legata a `settings.ttsEnabled`.
+  - Applicato stile neutro coordinato agli altri controlli di testata.
+  - Rappresentato lo stato abilitato/muto esclusivamente con l'icona interna (`Volume2` + `1.0x` bianco/zinco quando attivo, `VolumeX` + `Muto` grigio/spento quando muto).
+- [x] **Igiene Visiva Elementi Statici / Secondari**:
+  - Normalizzata la freccia `ChevronLeft` in `#btn-nav-back-home` (da `text-amber-400` a `text-zinc-400 group-hover:text-white`).
+  - Normalizzato il badge statico "2017" accanto al logo a pillola neutra `bg-zinc-800/80 text-zinc-400 border border-zinc-700/60` coerente con il badge di build.
 
-### 2. [ ] Allineamento Pulsanti Audio nelle Schermate Interne
-- [ ] `src/components/HomeScreen.tsx`: convertire `#btn-home-audio-quick` nel box telemetria da pillola gialla a pulsante secondario neutro.
-- [ ] `src/components/ExamScreen.tsx`: convertire `#btn-exam-drive-mode` nella toolbar secondaria in pulsante di controllo neutro.
-- [ ] `src/components/TopicsScreen.tsx`: convertire `#btn-topics-drive-mode` nella barra materia in pulsante neutro.
-- [ ] `src/components/MistakesScreen.tsx`: convertire `#btn-mistakes-drive-mode` nella barra ripasso errori in pulsante neutro.
+### 2. [x] Allineamento Pulsanti Audio nelle Schermate Interne
+- [x] Verificata l'unificazione completa nel mini-header di testata (`Navbar.tsx` con `#btn-mini-audio` e `#btn-nav-back-home` neutri) per `ExamScreen.tsx`, `TopicsScreen.tsx` e `MistakesScreen.tsx`.
+- [x] `HomeScreen.tsx`: verificata telemetria pulita e azzeramento pulsanti di salto duplicati.
 
-### 3. [ ] Pulizia HUD Modalità Guida (`src/components/drive/DriveActiveHUD.tsx`)
-- [ ] Verificare che il menu rapido voce neutro faccia risaltare nitidamente solo i veri toggle attivi (Pilota Automatico, Tutor Didattico, Microfono).
+### 3. [x] Pulizia HUD Modalità Guida (`src/components/drive/DriveActiveHUD.tsx`)
+- [x] Confermato che il menu rapido voce neutro fa risaltare nitidamente solo i veri toggle attivi (Pilota Automatico, Tutor Didattico, Microfono).
 
-### 4. [ ] Collaudo Visivo & Regression Testing
-- [ ] Esecuzione screenshot CDP su mobile portrait (390x844) e desktop (1440x900) sia in tema Dark che Light.
-- [ ] Suite Vitest a 220+ test passanti al 100% (`npm run test:unit`).
-- [ ] Typecheck pulito a 0 errori (`tsc --noEmit`).
-- [ ] Aggiornamento registro di bordo `WORKLOG.md` e linee guida `minimal-ui-ux`.
+### 4. [x] Collaudo Visivo & Regression Testing
+- [x] Esecuzione screenshot CDP su mobile portrait (390x844) e desktop (1440x900) con visual check pulito.
+- [x] Suite Vitest a 303 test passanti al 100% su 43 file di test (`npm run test:unit`) inclusi i nuovi contratti di test per `VoiceQuickMenu` e `Navbar`.
+- [x] Typecheck pulito a 0 errori (`tsc --noEmit`) e build di produzione Vite completata con successo.
+- [x] Aggiornamento registri di bordo `WORKLOG.md` e [DESIDERATA.md](file:///c:/github/Quiz_VDS-VL/DESIDERATA.md).
 
 
 

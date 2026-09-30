@@ -163,7 +163,7 @@ Questo documento rappresenta la **bussola strategica e funzionale** del progetto
 | Ripetizione Selettiva Domanda e Opzioni (Mani Libere) | 🟢 Completato | Riascolto granulare di solo domanda o singola opzione via touch (area domanda e icona altoparlante isolata su ciascuna card), comandi vocali prioritari (*"Ripeti domanda"*, *"Ripeti uno/due/tre"*, *"Rileggi la due"*, *"Solo tre"*) e tastiera (`Q`, `Alt+1/2/3`). Sospensione e ripristino coordinato del countdown pilota automatico. |
 | Avanzamento Automatico su Risposta Esatta (Auto-Advance) | 🟢 Completato | Avanzamento visivo automatico su risposta esatta dopo 900ms di conferma visiva emerald nei quiz di studio (Tutor, Materie, Quaderno Errori). Arresto immediato su risposta errata per permettere lo studio di Regola e Tranello. Toggle configurabile nelle Impostazioni (`autoAdvanceOnCorrect`, default attivo). |
 | Interattività Liste Statistiche (Dettaglio Materie & Domande) | 🟢 Completato | Liste materie e Top 10 errori interattive in StatsScreen. Implementati SubjectDetailModal (cruscotto materia, accuratezza, filtri 1-touch Tutte/Errori/Non viste/Corrette, lista quesiti scorrevole e scorciatoia allenamento verso TopicsScreen) e QuestionDetailModal (scheda integrale quesito, risposta esatta in verde con check, spiegazione Regola+Tranello, telemetria, note e audio). Sincronizzazione con Back Navigation Coordinator. |
-| Armonizzazione UI/UX & Disambiguazione Stati Top Bar | 🟡 Pianificato | Dettagliato in TODO-08 e [docs/plans/2026-09-30_ui_audio_controls_disambiguation.md](file:///c:/github/Quiz_VDS-VL/docs/plans/2026-09-30_ui_audio_controls_disambiguation.md). Disambiguazione pulsante Modalità Audio e Menu Voce per eliminare l'aspetto ingannevole di toggle selezionati/attivi. |
+| Armonizzazione UI/UX & Disambiguazione Stati Top Bar | 🟢 Completato | Completato con TODO-08. Disambiguazione pulsante Modalità Audio (Headphones neutro su Home e mini-header), VoiceQuickMenu neutro coordinato alla testata senza pillola ambra ingannevole, ChevronLeft neutra su ritorno Home e badge 2017 zinc-800. |
 
 ---
 
@@ -202,10 +202,10 @@ Questa roadmap sintetizza il piano di riorganizzazione per massimizzare l'usabil
    - Scheda/Modale Dettaglio Domanda (`QuestionDetailModal`): testo completo ad alta leggibilità, 3 opzioni con risposta esatta evidenziata in verde smeraldo, spiegazione didattica (Regola + Tranello), telemetria allievo (volte vista/sbagliata, consecutive corrette), note personali, preferiti e audio neurale on-demand.
    - Apertura fluida a cascata: tocco su materia ➔ elenco quesiti ➔ tocco su quesito ➔ scheda domanda (o tocco diretto da Top 10 errori).
    - Sincronizzazione totale con il tasto hardware Indietro e gesture Android/iOS via `backNavigation.registerSubModal`.
-8. **TODO-08: Armonizzazione UI/UX & Disambiguazione Stati Top Bar (Zero-Confusion Audio & Controls)** `[DA FARE]`:
-   - Rimuovere il background e bordo ambra permanente (`bg-amber-500/10 border-amber-500/30 text-amber-400`) dai pulsanti di salto alla Modalità Audio (`#btn-drive-mode`, `#btn-mini-audio`, `#btn-home-audio-quick`, `#btn-exam-drive-mode`, `#btn-topics-drive-mode`, `#btn-mistakes-drive-mode`), trasformandoli in pulsanti d'azione neutri e sobri.
-   - Rimuovere lo stile a pillola ambra permanente di `VoiceQuickMenu` legato al default `ttsEnabled: true`, allineandolo allo stile neutro dei controlli top bar e lasciando la differenziazione unicamente all'icona interna (`Volume2` vs `VolumeX`).
-   - Normalizzare la freccia di ritorno Home e il badge 2017 a colori neutri `zinc` per riservare l'ambra unicamente a veri stati attivi (`⚑ Rivedi`, audio in riproduzione effettiva, spiegazioni didattiche Tranello).
+8. **TODO-08: Armonizzazione UI/UX & Disambiguazione Stati Top Bar (Zero-Confusion Audio & Controls)** `[COMPLETATO]`:
+   - Rimossi il background e bordo ambra permanente (`bg-amber-500/10 border-amber-500/30 text-amber-400`) dai pulsanti di salto alla Modalità Audio (`#btn-drive-mode` e `#btn-mini-audio`), trasformandoli in pulsanti d'azione neutri e sobri (`border-zinc-800 bg-zinc-900/60`).
+   - Rimosso lo stile a pillola ambra permanente di `VoiceQuickMenu` legato al default `ttsEnabled: true`, allineandolo allo stile neutro dei controlli top bar e lasciando la differenziazione unicamente all'icona interna (`Volume2` vs `VolumeX` e label `${rate}x` vs `Muto`).
+   - Normalizzata la freccia di ritorno Home (`ChevronLeft` text-zinc-400) e il badge statico 2017 a colori neutri `zinc-800/80` per riservare l'ambra unicamente a veri stati attivi (`⚑ Rivedi`, audio in riproduzione effettiva, spiegazioni didattiche Tranello).
 
 
 ---

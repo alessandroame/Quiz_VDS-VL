@@ -102,21 +102,21 @@ export const VoiceQuickMenu: React.FC<VoiceQuickMenuProps> = ({
         onClick={() => handleSetOpen(!isOpen)}
         title="Opzioni rapide parlato e voce"
         className={`px-2 py-1.5 rounded-lg border flex items-center gap-1.5 text-xs font-semibold transition-all active:scale-95 ${
-          isEnabled
-            ? forceDark
-              ? 'bg-amber-500/15 border-amber-500/30 text-amber-400 shadow-sm'
-              : 'bg-amber-500/15 border-amber-500/30 text-amber-400 light:bg-amber-50 light:border-amber-300 light:text-amber-700 shadow-sm'
-            : forceDark
-            ? 'border-transparent text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800/60'
-            : 'border-transparent text-zinc-400 hover:text-zinc-200 light:text-slate-600 light:hover:text-slate-900 hover:bg-zinc-800/60 light:hover:bg-slate-100'
+          forceDark
+            ? 'border-zinc-800 bg-zinc-900/60 hover:bg-zinc-800 hover:border-zinc-700 text-zinc-300 hover:text-white'
+            : 'border-zinc-800 bg-zinc-900/60 hover:bg-zinc-800 hover:border-zinc-700 text-zinc-300 hover:text-white light:bg-slate-100 light:border-slate-200 light:text-slate-700 light:hover:text-slate-900'
         } ${buttonClassName}`}
       >
         {isEnabled ? (
-          <Volume2 className={`w-4 h-4 text-amber-400 ${forceDark ? '' : 'light:text-amber-600'}`} />
+          <Volume2 className={`w-4 h-4 text-zinc-300 ${forceDark ? '' : 'light:text-slate-700'}`} />
         ) : (
-          <VolumeX className="w-4 h-4 text-zinc-500" />
+          <VolumeX className={`w-4 h-4 text-zinc-500 ${forceDark ? '' : 'light:text-slate-400'}`} />
         )}
-        <span className="hidden sm:inline font-mono text-[11px]">
+        <span className={`hidden sm:inline font-mono text-[11px] ${
+          isEnabled
+            ? forceDark ? 'text-zinc-300' : 'text-zinc-300 light:text-slate-700'
+            : forceDark ? 'text-zinc-500' : 'text-zinc-500 light:text-slate-400'
+        }`}>
           {isEnabled ? `${currentRate}x` : 'Muto'}
         </span>
       </button>
