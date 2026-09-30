@@ -360,6 +360,7 @@ export const ExamScreen: React.FC<ExamScreenProps> = ({
       onToggleFlag: (qid) => handleToggleFlag(qid),
       onNavigateIndex: (idx) => setCurrentIndex(idx),
       isExam: true,
+      isTutor: examMode === 'tutor',
       secondsRemaining: examMode === 'tutor' ? elapsedSeconds : secondsRemaining,
       onSubmitExam: handleSubmitExam,
       title: examMode === 'tutor' ? 'Simulazione Didattica' : 'Esame Ufficiale'
@@ -764,6 +765,7 @@ export const ExamScreen: React.FC<ExamScreenProps> = ({
                 onToggleFlag: (qid) => handleToggleFlag(qid),
                 onNavigateIndex: (idx) => setCurrentIndex(idx),
                 isExam: true,
+                isTutor: examMode === 'tutor',
                 secondsRemaining: examMode === 'tutor' ? elapsedSeconds : secondsRemaining,
                 onSubmitExam: handleSubmitExam,
                 title: examMode === 'tutor' ? 'Simulazione Didattica' : 'Esame Ufficiale'
