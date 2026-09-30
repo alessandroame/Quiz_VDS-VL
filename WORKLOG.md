@@ -14,6 +14,36 @@ Questo documento registra in ordine cronologico tutte le lavorazioni svolte nel 
 - **Impatto sul Desiderata**: <Come questo intervento contribuisce al desiderata (cfr. DESIDERATA.md) e indicazioni per il prossimo agente>
 ```
 
+### [2026-09-30] - Spiegazione Vocale in Modalità Tutor Condizionata all'Errore
+
+- **Cosa abbiamo fatto**:
+  * **Condizionamento Selettivo della Riproduzione Vocale Didattica**:
+    - In [src/components/DriveModeScreen.tsx](file:///c:/github/Quiz_VDS-VL/src/components/DriveModeScreen.tsx) (`handleSelectAnswer`), corretto il flusso di ascolto della Modalità Tutor (`isTutorEnabled`): la spiegazione vocale integrale (risposta esatta, regola e tranello) viene avviata in automatico **esclusivamente se l'allievo ha sbagliato la risposta** (`!isCorrect && (isTutorEnabled || settings.ttsAutoExplainOnMistake)`).
+    - In caso di risposta corretta, la voce didattica non viene avviata, azzerando i tempi morti e consentendo all'avanzamento automatico di procedere con transizione fluida (1.8s) verso la domanda successiva.
+    - In caso di timeout passivo senza risposta (`handleAutoRevealAndAdvance`), la spiegazione didattica continua a essere letta integralmente, trattandosi di mancata risposta (equivalente a quesito non superato).
+  * **Raffinamento Ergonomico UI & Microcopy**:
+    - In [src/components/drive/DriveActiveHUD.tsx](file:///c:/github/Quiz_VDS-VL/src/components/drive/DriveActiveHUD.tsx):
+      - Il pulsante della Scheda Didattica (`#btn-drive-replay-explanation`) ora commuta semanticamente tra **"Ascolta"** (con icona `Volume2` e titolo `"Ascolta spiegazione vocale"`) se l'utente ha risposto correttamente e la voce non è partita in automatico, e **"Riascolta"** (con icona `RotateCcw` e titolo `"Riascolta spiegazione vocale"`) se la risposta era errata ed è già stata letta a voce.
+      - Aggiornato il tooltip del pulsante Tutor nell'header in `Modalità Tutor attiva (spiegazione vocale su errore)`.
+    - In [src/components/drive/DriveLauncher.tsx](file:///c:/github/Quiz_VDS-VL/src/components/drive/DriveLauncher.tsx): aggiornata la descrizione del toggle Tutor in `ATTIVA (Regola + Tranello su errore)`.
+    - In [src/components/SettingsModal.tsx](file:///c:/github/Quiz_VDS-VL/src/components/SettingsModal.tsx): allineato il sottotitolo della Modalità Tutor in `Legge ad alta voce risposta esatta, regola e tranello in caso di errore prima di avanzare`.
+  * **Test Unitari & Di Contratto**:
+    - Creato [src/components/DriveModeScreen.test.ts](file:///c:/github/Quiz_VDS-VL/src/components/DriveModeScreen.test.ts) (2 unit test con Happy-DOM) per verificare formalmente il contratto: su risposta corretta `playExplanation` non viene mai chiamata, mentre su risposta errata viene invocata esattamente una volta dopo il debounce di 300ms.
+    - Aggiornati [src/components/drive/DriveAnswerFeedback.test.ts](file:///c:/github/Quiz_VDS-VL/src/components/drive/DriveAnswerFeedback.test.ts) e [src/components/drive/DriveTutorMode.test.ts](file:///c:/github/Quiz_VDS-VL/src/components/drive/DriveTutorMode.test.ts) con le nuove asserzioni su etichette e titoli "Ascolta" / "Riascolta".
+    - Suite completa Vitest: 35 file di test, 258 test passati con successo al 100%. Typecheck TypeScript e build di produzione verificati senza errori.
+  * **Allineamento Documentale & SemVer**:
+    - Aggiornato [README.md](file:///c:/github/Quiz_VDS-VL/README.md) (Sezione 8) e [DESIDERATA.md](file:///c:/github/Quiz_VDS-VL/DESIDERATA.md).
+    - Avanzamento versione semantica a `1.1.6` in [package.json](file:///c:/github/Quiz_VDS-VL/package.json).
+
+- **Scelte architetturali & Rationale**:
+  * *Ottimizzazione del Cognitive Load e dei Tempi di Studio*: Far riascoltare l'intera spiegazione (che dura tra i 10 e i 25 secondi) anche quando l'allievo ha risposto correttamente rallentava drasticamente il ritmo di assimilazione e generava frustrazione. Limitando la lettura vocale automatica ai soli errori, l'app premia la padronanza con un avanzamento rapido (1.8s) e interviene come un vero istruttore solo dove serve supporto correttivo.
+  * *Disponibilità Volontaria tramite Pulsante "Ascolta"*: La scheda didattica rimane comunque presente a schermo nella parte inferiore dell'HUD per consultazione visiva immediata; qualora l'allievo voglia comunque riascoltare a voce la regola pur avendo indovinato, può toccare il pulsante "Ascolta" o pronunciare il comando vocale "Spiega".
+
+- **Impatto sul Desiderata**:
+  * Risolve puntualmente la richiesta utente, perfezionando l'ergonomia didattica della Modalità Mani Libere / Tutor.
+
+---
+
 ---
 
 ### [2026-09-30] - De-duplicazione e Razionalizzazione Punti di Ingresso "Modalità Mani Libere" (SSOT in Navbar)

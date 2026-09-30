@@ -1174,7 +1174,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                       </span>
                     </span>
                     <span className="text-[11px] text-zinc-500">
-                      Legge ad alta voce l'intera spiegazione didattica prima di avanzare alla domanda successiva
+                      Legge ad alta voce risposta esatta, regola e tranello in caso di errore prima di avanzare
                     </span>
                   </div>
                   <input

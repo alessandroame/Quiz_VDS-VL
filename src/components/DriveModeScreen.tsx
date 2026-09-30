@@ -477,8 +477,9 @@ export const DriveModeScreen: React.FC<DriveModeScreenProps> = ({
       await recordAnswer(currentQ.id, false);
     }
 
-    if (isTutorEnabled) {
-      // MODALITÀ TUTOR: avvia lettura integrale e attende il completamento naturale
+    if (isTutorEnabled || settings.ttsAutoExplainOnMistake) {
+      // MODALITÀ TUTOR o spiegazione automatica su errore (timeout mancata risposta):
+      // avvia lettura integrale e attende il completamento naturale
       isWaitingForExplanationEndRef.current = true;
       setIsWaitingForExplanationEnd(true);
       playExplanation();
@@ -488,7 +489,7 @@ export const DriveModeScreen: React.FC<DriveModeScreenProps> = ({
         handleNextQuestionRef.current();
       }, 3500);
     }
-  }, [currentQ, settings.soundEnabled, isTutorEnabled, playExplanation, recordAnswer, isExamSession, sessionContext]);
+  }, [currentQ, settings.soundEnabled, isTutorEnabled, settings.ttsAutoExplainOnMistake, playExplanation, recordAnswer, isExamSession, sessionContext]);
 
   // Seleziona risposta
   const handleSelectAnswer = async (ans: 1 | 2 | 3) => {
@@ -526,8 +527,8 @@ export const DriveModeScreen: React.FC<DriveModeScreenProps> = ({
         await recordAnswer(currentQ.id, isCorrect);
       }
 
-      if (isTutorEnabled || (!isCorrect && settings.ttsAutoExplainOnMistake)) {
-        // MODALITÀ TUTOR o spiegazione automatica su errore:
+      if (!isCorrect && (isTutorEnabled || settings.ttsAutoExplainOnMistake)) {
+        // MODALITÀ TUTOR su errore o spiegazione automatica su errore:
         // riproduce la spiegazione didattica (Regola + Tranello) e sincronizza l'autopilota
         isWaitingForExplanationEndRef.current = true;
         setIsWaitingForExplanationEnd(true);
@@ -538,7 +539,7 @@ export const DriveModeScreen: React.FC<DriveModeScreenProps> = ({
       }
     }
 
-    // Se il pilota automatico è attivo (fuori da tutor mode e senza spiegazione su errore), avanza dopo tempo standard
+    // Se il pilota automatico è attivo (risposta corretta o modalità senza spiegazione), avanza dopo tempo standard
     if (isAutopilotEnabled) {
       setTimeout(() => {
         handleNextQuestionRef.current();

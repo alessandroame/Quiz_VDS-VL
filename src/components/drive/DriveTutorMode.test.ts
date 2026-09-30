@@ -63,6 +63,7 @@ describe('Drive Mode Tutor Integration', () => {
     expect(html).toContain('Tutor Didattico (30 Quiz)');
     expect(html).toContain('id="btn-drive-start-exam"');
     expect(html).toContain('Esame Ufficiale AeCI');
+    expect(html).toContain('ATTIVA (Regola + Tranello su errore)');
   });
 
   it('renders the didactic card with Rule and Trap when answer is selected in Tutor mode', () => {
@@ -126,6 +127,70 @@ describe('Drive Mode Tutor Integration', () => {
 
     // Timer badge indica tempo trascorso per tutor
     expect(html).toContain('title="Tempo trascorso (Tutor Didattico)"');
+
+    // Toggle button in HUD displays updated explanation on error title
+    expect(html).toContain('title="Modalità Tutor attiva (spiegazione vocale su errore)"');
+
+    // On correct answer, offer voluntary listen button without repeating
+    expect(html).toContain('title="Ascolta spiegazione vocale"');
+    expect(html).toContain('<span>Ascolta</span>');
+  });
+
+  it('renders "Riascolta" button on didactic card when user answer is wrong in Tutor mode', () => {
+    const html = renderToString(
+      React.createElement(DriveActiveHUD, {
+        currentQ: mockQuestion,
+        currentIndex: 0,
+        totalCount: 30,
+        isExamSession: true,
+        secondsRemaining: 42,
+        isIntroActive: false,
+        onDismissIntro: () => {},
+        onReplayIntro: () => {},
+        onOpenVoiceGuide: () => {},
+        setIsVoiceMenuOpen: () => {},
+        onClose: () => {},
+        onExecuteClose: () => {},
+        isAutopilotEnabled: true,
+        onToggleAutopilot: () => {},
+        isTutorEnabled: true,
+        onToggleTutor: () => {},
+        isVoiceSupported: true,
+        isVoiceCommandsEnabled: false,
+        voiceError: null,
+        isVoiceReceiving: false,
+        isVoiceListening: false,
+        onToggleVoiceCommands: () => {},
+        isPlaying: false,
+        isPaused: false,
+        isPartPlaying: () => false,
+        isExplanationPlaying: false,
+        onTogglePlayPause: () => {},
+        onRestartCurrentOrSequence: () => {},
+        onStopVoice: () => {},
+        onPlayExplanation: () => {},
+        waitingCountdown: null,
+        assimilationCountdown: null,
+        voiceInterimTranscript: '',
+        voiceLastTranscript: '',
+        lastRecognizedLabel: null,
+        unrecognizedSpeech: null,
+        voiceHint: '',
+        answers: { 1001: 3 }, // User answered WRONGLY (option 3 instead of 2)
+        flags: {},
+        revealedQuestionId: 1001,
+        onSelectAnswer: () => {},
+        onPrevQuestion: () => {},
+        onNextQuestion: () => {},
+        onToggleFlag: () => {},
+        onSubmitExam: () => {}
+      })
+    );
+
+    // Scheda didattica presente con opzione di riascolto (dopo lettura automatica su errore)
+    expect(html).toContain('id="drive-didactic-card"');
+    expect(html).toContain('title="Riascolta spiegazione vocale"');
+    expect(html).toContain('<span>Riascolta</span>');
   });
 
   it('correctly parses voice commands related to Tutor mode and didactics', () => {

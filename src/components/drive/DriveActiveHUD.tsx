@@ -231,7 +231,7 @@ export const DriveActiveHUD: React.FC<DriveActiveHUDProps> = ({
                 ? 'bg-amber-500/30 text-amber-300 ring-1 ring-amber-500/50 shadow-[0_0_10px_rgba(245,158,11,0.2)] light:bg-amber-100 light:text-amber-800 light:ring-amber-400'
                 : 'bg-zinc-900 text-zinc-500 border border-zinc-800 hover:text-zinc-300 light:bg-white light:text-slate-600 light:border-slate-200 light:hover:text-slate-900 light:shadow-sm'
             }`}
-            title={isTutorEnabled ? 'Modalità Tutor attiva (tocca per disattivare)' : 'Attiva modalità tutor (Regola + Tranello)'}
+            title={isTutorEnabled ? 'Modalità Tutor attiva (spiegazione vocale su errore)' : 'Attiva modalità tutor (spiegazione su errore)'}
           >
             <GraduationCap className="w-3.5 h-3.5" />
             <span className="hidden sm:inline">{isTutorEnabled ? 'Tutor ON' : 'Tutor'}</span>
@@ -664,10 +664,19 @@ export const DriveActiveHUD: React.FC<DriveActiveHUDProps> = ({
                       id="btn-drive-replay-explanation"
                       onClick={onPlayExplanation}
                       className="px-2 py-0.5 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-zinc-300 hover:text-white light:bg-slate-100 light:hover:bg-slate-200 light:text-slate-700 light:hover:text-slate-900 text-[11px] font-bold flex items-center gap-1 transition-colors"
-                      title="Riascolta spiegazione vocale"
+                      title={answers[currentQ.id] === currentQ.correctAnswer ? 'Ascolta spiegazione vocale' : 'Riascolta spiegazione vocale'}
                     >
-                      <RotateCcw className="w-3.5 h-3.5" />
-                      <span>Riascolta</span>
+                      {answers[currentQ.id] === currentQ.correctAnswer ? (
+                        <>
+                          <Volume2 className="w-3.5 h-3.5" />
+                          <span>Ascolta</span>
+                        </>
+                      ) : (
+                        <>
+                          <RotateCcw className="w-3.5 h-3.5" />
+                          <span>Riascolta</span>
+                        </>
+                      )}
                     </button>
                   )}
                 </div>

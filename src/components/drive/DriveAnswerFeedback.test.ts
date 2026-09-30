@@ -96,6 +96,9 @@ describe('DriveAnswerFeedback - Audio & Tutor Answer Feedback Verification', () 
     expect(html).toContain(sampleQuestion.explanation.rule);
     expect(html).toContain('Tranello');
     expect(html).toContain(sampleQuestion.explanation.trap);
+    // Pulsante con opzione di ascolto volontario (non narrato in automatico se corretto)
+    expect(html).toContain('title="Ascolta spiegazione vocale"');
+    expect(html).toContain('<span>Ascolta</span>');
   });
 
   it('AUDIO-FEEDBACK-02: quando l\'utente dà la risposta ERRATA in modalità Audio Tutor, evidenzia l\'opzione sbagliata in rosso e quella corretta in verde', () => {
@@ -159,6 +162,9 @@ describe('DriveAnswerFeedback - Audio & Tutor Answer Feedback Verification', () 
 
     // Scheda didattica visibile per spiegare la regola e il tranello
     expect(html).toContain('id="drive-didactic-card"');
+    // Pulsante con opzione di riascolto (poiché narrato in automatico all'errore)
+    expect(html).toContain('title="Riascolta spiegazione vocale"');
+    expect(html).toContain('<span>Riascolta</span>');
   });
 
   it('AUDIO-FEEDBACK-03: il testo pronunciato della spiegazione didattica è neutrale e NON contiene mai "Risposta errata"', () => {

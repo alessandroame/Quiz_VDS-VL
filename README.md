@@ -121,7 +121,7 @@
 - **Avanzamento Automatico ("Radio Quiz")**: modalità hands-free a tempo. L'app legge in sequenza la domanda e le opzioni, attende un intervallo configurabile (3-8s) e svela automaticamente la risposta esatta e la regola, passando da sola al quiz successivo.
 - **Tutor Didattico Hands-Free (Regola & Tranello a Voce)**:
   - Accesso diretto con pulsante rapido **"Tutor Didattico (30 Quiz)"** nel Launcher o commutazione istantanea dalla schermata Tutor tramite il tasto `Mani Libere`.
-  - Lettura integrale della spiegazione didattica vocale neutrale ad ogni risposta (*"La risposta esatta è la... Regola: ... Tranello: ..."* senza prefissi fuorvianti di errore) con sincronizzazione anti-troncamento dell'avanzamento automatico (attesa fine del file audio + pausa di assimilazione di 2.5s prima di avanzare).
+  - Spiegazione didattica vocale neutrale (*"La risposta esatta è la... Regola: ... Tranello: ..."*) riprodotta **esclusivamente in caso di risposta errata** o mancata risposta prima dell'avanzamento, preservando la rapidità dello studio sulle risposte corrette. Sincronizzazione anti-troncamento dell'avanzamento automatico (attesa fine del file audio + pausa di assimilazione di 2.5s prima di avanzare). Sulle risposte esatte, la scheda didattica rimane consultabile a schermo con pulsante "Ascolta" per approfondimento opzionale.
   - Cronometro didattico incrementale (count-up senza limiti di tempo) e card didattica ad alto contrasto.
 - **Comandi Vocali Hands-Free in Italiano**: interazione completa a voce tramite Web Speech Recognition con comandi dedicati (`"Uno"`, `"Due"`, `"Tre"`, `"Avanti"`, `"Indietro"`, `"Ripeti"`, `"Bandiera"`, `"Pausa"`, `"Spiega"`, `"Tutor"`).
 - **Gestione Microfono Anti-Eco (Selettore Altoparlante / Cuffie)**:

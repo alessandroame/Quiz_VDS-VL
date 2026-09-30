@@ -153,7 +153,7 @@ export const DriveLauncher: React.FC<DriveLauncherProps> = ({
             <GraduationCap className={`w-4 h-4 flex-shrink-0 ${isTutorEnabled ? 'text-amber-400' : 'text-zinc-500'}`} />
             <div className="text-left">
               <div className="text-[10px] text-zinc-400 light:text-slate-500 uppercase font-semibold">Modalità Tutor Didattica</div>
-              <div className="text-xs font-medium">{isTutorEnabled ? 'ATTIVA (Regola + Tranello a voce)' : 'Disattivata (Avanzamento rapido)'}</div>
+              <div className="text-xs font-medium">{isTutorEnabled ? 'ATTIVA (Regola + Tranello su errore)' : 'Disattivata (Avanzamento rapido)'}</div>
             </div>
           </div>
           <span className={`text-[10px] font-mono font-bold px-2 py-0.5 rounded-full ${isTutorEnabled ? 'bg-amber-500 text-zinc-950 font-black' : 'bg-zinc-800 text-zinc-400 light:bg-slate-200 light:text-slate-600'}`}>
