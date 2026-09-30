@@ -14,6 +14,46 @@ Questo documento registra in ordine cronologico tutte le lavorazioni svolte nel 
 - **Impatto sul Desiderata**: <Come questo intervento contribuisce al desiderata (cfr. DESIDERATA.md) e indicazioni per il prossimo agente>
 ```
 
+# Registro di Bordo: Pianificazione Armonizzazione UI/UX & Disambiguazione Stati Top Bar (TODO-08)
+
+**Data**: 30/09/2026  
+**Autore**: AI Agent (Pair Programming)  
+**Oggetto**: Formalizzazione del piano architetturale per la disambiguazione dei controlli audio nella top bar e allineamento con TODO.md e DESIDERATA.md.
+
+---
+
+### Cosa abbiamo fatto
+1. **Analisi Critica UI/UX & Audit Visivo**:
+   - Esaminata la segnalazione dell'utente relativa alla colorazione ambra/gialla ingannevole delle icone `Modalità Audio` (`Headphones`) e `Menu Rapido Voce` (`VoiceQuickMenu`) nella top bar.
+   - Analizzate tutte le 26 schermate/componenti dell'applicazione, mappando 4 pattern di incoerenza:
+     - Tasto navigazione "Modalità Audio" stilizzato come toggle selezionato permanente (`bg-amber-500/10 border-amber-500/30 text-amber-400`) in 5 file (`Navbar.tsx`, `HomeScreen.tsx`, `ExamScreen.tsx`, `TopicsScreen.tsx`, `MistakesScreen.tsx`).
+     - Menu a tendina `VoiceQuickMenu` permanentemente ambra a causa del default `ttsEnabled: true`.
+     - Freccia `ChevronLeft` in `Navbar.tsx` mini-header e badge "2017" colorati in ambra senza giustificazione semantica.
+2. **Definizione della Tassonomia Visiva dei Componenti**:
+   - Formalizzata una matrice rigida di categorizzazione:
+     * *Azione di Navigazione*: stile neutro (`zinc-400` / `slate-600`), hover evidenziato (`zinc-100` / `slate-900`).
+     * *Trigger Menu Dropdown*: contenitore sobrio neutro, stato affidato unicamente all'icona interna (`Volume2` vs `VolumeX`).
+     * *Vero Toggle*: si accende in ambra/smeraldo **solo ed esclusivamente quando attivo** (`isFlagged`, `isAutopilotEnabled`, `isPlaying`).
+3. **Redazione & Salvataggio del Piano di Progetto**:
+   - Redatto e salvato il piano completo in [docs/plans/2026-09-30_ui_audio_controls_disambiguation.md](file:///c:/github/Quiz_VDS-VL/docs/plans/2026-09-30_ui_audio_controls_disambiguation.md).
+4. **Aggiornamento Tracciamento Progetto**:
+   - Aggiunta la **Fase 10** in [TODO.md](file:///c:/github/Quiz_VDS-VL/TODO.md) con la checklist operativa dettagliata.
+   - Registrato **TODO-08** nella matrice di stato e nella roadmap di [DESIDERATA.md](file:///c:/github/Quiz_VDS-VL/DESIDERATA.md).
+
+---
+
+### Scelte Architetturali & Rationale
+- **Perché NON usare colori d'accento per azioni di navigazione**: Nel modello mentale dell'allievo pilota, un elemento con sfondo e bordo colorato indica uno stato "acceso" o "in pericolo". Presentare il tasto per aprire la Modalità Audio in giallo fa credere che la modalità sia già in esecuzione in background o che cliccandovi si disattivi qualcosa, inducendo l'utente in errore.
+- **Ruolo Unico per l'Ambra**: L'ambra (`amber-400` / `amber-500`) deve comunicare **allerta, memoria e revisione** (`⚑ Rivedi`, card didattiche **Tranello**, progresso prontezza %, player audio attivo). Smilitarizzare i controlli non-toggle restituisce la corretta priorità visiva.
+
+---
+
+### Impatto sul Desiderata
+- **Allineamento con DESIDERATA.md**: Aggiornato con il task `TODO-08` sia nella matrice che nella sezione 5 (Roadmap V2).
+- **Istruzioni per il prossimo agente**: Il piano è approvato e pronto per essere implementato a partire dalla Fase 10 di `TODO.md` (Step 1: Top Bar & Navbar, Step 2: Schermate Interne, Step 3: HUD Guida, Step 4: Collaudo Visivo CDP e suite Vitest).
+
+---
+
 ### [2026-09-30] - Risoluzione Logo App nella Top Bar (Base Path) e Sostituzione Icona nella Sezione About
 
 - **Cosa abbiamo fatto**:

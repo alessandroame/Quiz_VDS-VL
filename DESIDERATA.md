@@ -160,6 +160,7 @@ Questo documento rappresenta la **bussola strategica e funzionale** del progetto
 | Navigatore Quiz Comprimibile a Singola Riga | 🟢 Completato | Componente modulare `QuestionNavigator` con vista espansa a 3 righe (30 bolle) e modalità compressa a singola riga (30 tacche avioniche colorate a tutta larghezza su mobile, con numeri su desktop), persistenza preferenza in `localStorage` e risparmio di oltre 70px verticali per layout zero-scroll. |
 | Gestione Microfono Anti-Eco & Selettore Altoparlante / Cuffie | 🟢 Completato | Sospensione immediata del microfono (`rec.abort()`) durante la riproduzione audio in modalità altoparlante per azzerare l'eco dello speaker. Riattivazione a fine parlato o mentre l'audio è in pausa con cooldown acustico di 250ms, e selettore rapido Altoparlante vs Cuffie (ascolto continuo) nel Launcher, HUD e Impostazioni. |
 | Interattività Liste Statistiche (Dettaglio Materie & Domande) | 🟡 Pianificato | Dettagliato in TODO-07 e [docs/plans/2026-09-30_stats_interactive_drilldown.md](file:///c:/github/Quiz_VDS-VL/docs/plans/2026-09-30_stats_interactive_drilldown.md). |
+| Armonizzazione UI/UX & Disambiguazione Stati Top Bar | 🟡 Pianificato | Dettagliato in TODO-08 e [docs/plans/2026-09-30_ui_audio_controls_disambiguation.md](file:///c:/github/Quiz_VDS-VL/docs/plans/2026-09-30_ui_audio_controls_disambiguation.md). Disambiguazione pulsante Modalità Audio e Menu Voce per eliminare l'aspetto ingannevole di toggle selezionati/attivi. |
 
 ---
 
@@ -198,6 +199,11 @@ Questa roadmap sintetizza il piano di riorganizzazione per massimizzare l'usabil
    - Scheda/Modale Dettaglio Domanda (`QuestionDetailModal`): testo completo ad alta leggibilità, 3 opzioni con risposta esatta evidenziata in verde smeraldo, spiegazione didattica (Regola + Tranello), telemetria allievo (volte vista/sbagliata, consecutive corrette), note personali, preferiti e audio neurale on-demand.
    - Apertura fluida a cascata: tocco su materia ➔ elenco quesiti ➔ tocco su quesito ➔ scheda domanda (o tocco diretto da Top 10 errori).
    - Sincronizzazione totale con il tasto hardware Indietro e gesture Android/iOS via `backNavigation.registerSubModal`.
+8. **TODO-08: Armonizzazione UI/UX & Disambiguazione Stati Top Bar (Zero-Confusion Audio & Controls)** `[DA FARE]`:
+   - Rimuovere il background e bordo ambra permanente (`bg-amber-500/10 border-amber-500/30 text-amber-400`) dai pulsanti di salto alla Modalità Audio (`#btn-drive-mode`, `#btn-mini-audio`, `#btn-home-audio-quick`, `#btn-exam-drive-mode`, `#btn-topics-drive-mode`, `#btn-mistakes-drive-mode`), trasformandoli in pulsanti d'azione neutri e sobri.
+   - Rimuovere lo stile a pillola ambra permanente di `VoiceQuickMenu` legato al default `ttsEnabled: true`, allineandolo allo stile neutro dei controlli top bar e lasciando la differenziazione unicamente all'icona interna (`Volume2` vs `VolumeX`).
+   - Normalizzare la freccia di ritorno Home e il badge 2017 a colori neutri `zinc` per riservare l'ambra unicamente a veri stati attivi (`⚑ Rivedi`, audio in riproduzione effettiva, spiegazioni didattiche Tranello).
+
 
 ---
 
