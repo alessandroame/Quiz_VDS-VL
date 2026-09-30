@@ -34,6 +34,7 @@ export interface DriveLauncherProps {
   onOpenVoiceGuide: () => void;
   setIsVoiceMenuOpen: (open: boolean) => void;
   onStartExam: (marathon?: boolean) => void;
+  onStartTutorExam: () => void;
   onStartRadioQuiz: () => void;
   onStartMistakesQuiz: () => void;
   isWakeLockActive: boolean;
@@ -56,6 +57,7 @@ export const DriveLauncher: React.FC<DriveLauncherProps> = ({
   onOpenVoiceGuide,
   setIsVoiceMenuOpen,
   onStartExam,
+  onStartTutorExam,
   onStartRadioQuiz,
   onStartMistakesQuiz,
   isWakeLockActive,
@@ -269,20 +271,35 @@ export const DriveLauncher: React.FC<DriveLauncherProps> = ({
       <AudioDownloadBanner className="w-full mb-2 pointer-events-auto" />
 
       {/* Opzioni di Avvio Rapido */}
-      <div className="flex-1 flex flex-col justify-center gap-3.5">
+      <div className="flex-1 flex flex-col justify-center gap-3">
+        <button
+          id="btn-drive-start-tutor"
+          onClick={onStartTutorExam}
+          className="w-full py-4 px-5 rounded-2xl bg-emerald-700 hover:bg-emerald-600 active:scale-[0.98] text-white font-black text-base flex items-center justify-between shadow-xl transition-all"
+        >
+          <div className="flex items-center gap-3">
+            <GraduationCap className="w-6 h-6 text-emerald-200" />
+            <div className="text-left">
+              <div>Tutor Didattico (30 Quiz)</div>
+              <div className="text-xs text-emerald-200 font-medium">Spiegazioni vocali • Regola & Tranello • Senza fretta</div>
+            </div>
+          </div>
+          <ArrowRight className="w-5 h-5" />
+        </button>
+
         <button
           id="btn-drive-start-exam"
           onClick={() => onStartExam(false)}
-          className="w-full py-5 px-6 rounded-2xl bg-amber-600 hover:bg-amber-500 active:scale-[0.98] text-white font-black text-lg flex items-center justify-between shadow-xl transition-all"
+          className="w-full py-4 px-5 rounded-2xl bg-amber-600 hover:bg-amber-500 active:scale-[0.98] text-white font-black text-base flex items-center justify-between shadow-xl transition-all"
         >
           <div className="flex items-center gap-3">
-            <Zap className="w-7 h-7 text-amber-200" />
+            <Zap className="w-6 h-6 text-amber-200" />
             <div className="text-left">
               <div>Esame Ufficiale AeCI</div>
-              <div className="text-xs text-amber-200 font-medium">30 Quiz • 45 Minuti • Max 3 Errori</div>
+              <div className="text-xs text-amber-200 font-medium">30 Quiz • 45 Minuti • Max 3 Errori (alla cieca)</div>
             </div>
           </div>
-          <ArrowRight className="w-6 h-6" />
+          <ArrowRight className="w-5 h-5" />
         </button>
 
         <button

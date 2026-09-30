@@ -184,7 +184,14 @@ export const DriveActiveHUD: React.FC<DriveActiveHUDProps> = ({
             {currentIndex + 1} / {totalCount}
           </span>
           {isExamSession && (
-            <span className="px-2 py-0.5 rounded-md bg-amber-500/20 text-amber-300 light:bg-amber-100 light:text-amber-800 font-bold text-xs">
+            <span
+              className={`px-2 py-0.5 rounded-md font-bold text-xs ${
+                isTutorEnabled
+                  ? 'bg-emerald-500/20 text-emerald-300 light:bg-emerald-100 light:text-emerald-800'
+                  : 'bg-amber-500/20 text-amber-300 light:bg-amber-100 light:text-amber-800'
+              }`}
+              title={isTutorEnabled ? 'Tempo trascorso (Tutor Didattico)' : 'Tempo rimanente esame'}
+            >
               ⏱ {formatTime(secondsRemaining)}
             </span>
           )}
