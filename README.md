@@ -121,6 +121,10 @@
 - **Screen Wake Lock**: schermo mantenuto costantemente acceso, prevenendo spegnimenti e standby accidentali.
 - **Pilota Automatico ("Radio Quiz")**: modalità hands-free a tempo. L'app legge in sequenza la domanda e le opzioni, attende un intervallo configurabile (3-8s) e svela automaticamente la risposta esatta e la regola, passando da sola al quiz successivo.
 - **Comandi Vocali Hands-Free in Italiano**: interazione completa a voce tramite Web Speech Recognition con comandi dedicati (`"Uno"`, `"Due"`, `"Tre"`, `"Avanti"`, `"Indietro"`, `"Ripeti"`, `"Bandiera"`, `"Pausa"`, `"Spiega"`, `"Tutor"`).
+- **Gestione Microfono Anti-Eco (Selettore Altoparlante / Cuffie)**:
+  - 🔊 **Modalità Altoparlante (Default - Senza cuffie)**: il microfono è temporaneamente disattivato mentre l'altoparlante legge la domanda, le opzioni o le spiegazioni, e si attiva automaticamente **solo a fine parlato** (durante il countdown di risposta) o **mentre l'audio è in pausa**. Grazie a un buffer acustico di 250ms, elimina alla radice qualsiasi interferenza o falso comando innescato dalla voce dello smartphone.
+  - 🎧 **Modalità Cuffie (Con microfono)**: microfono sempre attivo in continuo per consentire il "barge-in" (interruzione del parlato a voce in qualsiasi istante).
+  - Selettore rapido a 1 tocco nel Launcher, nell'HUD attivo della Modalità Audio e nelle Impostazioni (*Guida -> Dispositivo di Ascolto*).
 - **Supporto Bivalente del Tema Colore (Cockpit Dark & Hangar Light)**: ottimizzato per zero riverberi notturni sul parabrezza e massima leggibilità sotto la luce diretta del sole.
 - **Menu Rapido Impostazioni Voce Integrato (Quick Speech Menu)**: accesso a 1 tocco alle impostazioni vocali (Giuseppe / Elsa, velocità 0.9x-1.25x, lettura automatica ed effetti sonori).
 - **Briefing Vocale Cockpit di Benvenuto**: spiegazione parlata chiara e sintetica all'apertura con salvataggio run-once in IndexedDB (`driveModeIntroPlayed: true`).

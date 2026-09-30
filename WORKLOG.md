@@ -14,6 +14,51 @@ Questo documento registra in ordine cronologico tutte le lavorazioni svolte nel 
 - **Impatto sul Desiderata**: <Come questo intervento contribuisce al desiderata (cfr. DESIDERATA.md) e indicazioni per il prossimo agente>
 ```
 
+# Worklog 2026-09-30: Gestione Microfono Anti-Eco & Gating Audio Vocale in Modalità Audio (Altoparlante vs Cuffie) 🛩️
+
+## Cosa Abbiamo Fatto
+
+1. **Gating Intelligente del Microfono & Sospensione Anti-Eco (`src/hooks/useDriveVoiceCommands.ts`)**:
+   - Integrato il parametro `isSuspended` nell'hook `useDriveVoiceCommands`: quando il parlato (Edge-TTS) è attivo, la cattura microfonica viene interrotta istantaneamente tramite `rec.abort()` per svuotare i buffer della Web Speech Recognition ed evitare la cattura dell'audio proveniente dall'altoparlante del telefono.
+   - Implementato un doppio blocco di sicurezza con cooldown acustico di 250ms e scarto preventivo (`ignoreResultsBeforeRef`) di qualsiasi evento vocale residuale registrato prima del silenzio ambientale o durante il riverbero della stanza/auto.
+   - Esportato `isSuspended` dal risultato dell'hook per abilitare il feedback visivo dinamico e reattivo nella UI.
+
+2. **Logica Pura di Calcolo Gating Audio (`src/utils/audio.ts`, `src/utils/audio.test.ts`)**:
+   - Estratta la funzione pura `shouldSuspendVoiceMic(audioOutputMode, playback)` che valuta le condizioni di ascolto:
+     * In modalità `'speaker'`: sospende il microfono se `isPlaying`, `isSequencePlaying` o `isDriveIntroPlaying` sono attivi e `isPaused` è falso. Se il parlato è in pausa (`isPaused = true`) o è terminato, il microfono è abilitato.
+     * In modalità `'headphones'`: il microfono non viene mai sospeso, consentendo il "barge-in" continuo (interruzione a voce della lettura).
+   - Creata suite di test dedicata con 4 nuovi test case unitari (AUDIO-03, AUDIO-04, AUDIO-05, AUDIO-06) con copertura al 100%.
+
+3. **Integrazione Coordinatore Modalità Audio (`src/components/DriveModeScreen.tsx`)**:
+   - Aggiunta preferenza persistita `driveModeAudioOutput: 'speaker' | 'headphones'` in Dexie (`AppSettings` e `DEFAULT_SETTINGS`).
+   - Sincronizzata la commutazione con toast audio di conferma ("🔊 Altoparlante: microfono attivo a fine parlato" vs "🎧 Cuffie: microfono sempre attivo").
+   - Collegata la sospensione reattiva `shouldSuspendVoiceCommands` all'hook vocale e passata a `DriveLauncher` e `DriveActiveHUD`.
+
+4. **UI/UX & Feedback Visivo Zero-Distrazioni (`src/components/drive/DriveActiveHUD.tsx`, `src/components/drive/DriveLauncher.tsx`, `src/components/SettingsModal.tsx`)**:
+   - Nel Launcher della Modalità Audio: aggiunto selettore a un tocco tra Altoparlante (anti-eco) e Cuffie con icone dedicate `Volume2` e `Headphones`.
+   - Nell'HUD attivo a `100dvh`:
+     * Icona microfono con stato ambra `Lettura in corso (mic in pausa)` durante la voce, e radar pulsante smeraldo a fine lettura o in pausa (`In ascolto: Dì "Uno", "Due" o "Tre"...` o `In pausa: Dì "Riprendi", "Uno", "Due"`).
+     * Pulsante rapido di commutazione Altoparlante / Cuffie integrato nella barra comandi.
+   - Nelle Impostazioni (*Guida*): aggiunta la card "Dispositivo di Ascolto & Microfono" con opzione Altoparlante (consigliata) e Cuffie con spiegazioni ergonomiche immediate.
+
+---
+
+## Scelte Architetturali & Rationale
+
+- **Abort Immediato (`rec.abort()`) vs Mute Software**: L'abort immediato del motore di riconoscimento evita che i frame audio dell'altoparlante finiscano nella coda di elaborazione del server vocale del browser, azzerando i falsi positivi ritardati che si verificavano alla fine dell'opzione 3.
+- **Cooldown Acustico di 250ms**: Il suono riflesso da superfici chiuse (abitacolo auto, pareti) decade in 150-200ms. Il ritardo di 250ms garantisce che il microfono si apra solo a camera acustica pulita, all'interno del tempo di attesa standard di 5s (`waitingCountdown`).
+- **Bivalenza Altoparlante vs Cuffie**: Riconoscere la differenza di contesto d'uso preserva la flessibilità per chi indossa auricolari Bluetooth e desidera rispondere al volo interrompendo la voce (barge-in), senza penalizzare chi usa il vivavoce del telefono.
+
+---
+
+## Impatto sul Desiderata
+
+- **Stato del Progetto**: Risolto al 100% il problema dell'auto-ascolto del microfono in vivavoce.
+- **Test Unitari**: 22 file, 205/205 test superati con successo in ~800ms (`npm run test:unit`).
+- **Build di Produzione**: `dist/assets/index.js` a 163.41 kB (38.39 kB gzip), PWA precache a 4.81 MB.
+
+---
+
 # Worklog 2026-09-29: Fase 9.5 (Decomposizione Modulare DriveModeScreen) & Fase 9.6 (De-duplicazione questions.json & Ottimizzazione Precache) 🛩️
 
 ## Cosa Abbiamo Fatto

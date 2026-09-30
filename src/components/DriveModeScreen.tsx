@@ -5,7 +5,7 @@ import type { ExamSession } from '../types/database';
 import { useQuiz } from '../context/QuizContext';
 import { generateExamQuestions } from '../utils/fairRandomizer';
 import { evaluateExam } from '../services/examEvaluator';
-import { soundFX } from '../utils/audio';
+import { soundFX, shouldSuspendVoiceMic } from '../utils/audio';
 import { triggerHapticFeedback } from '../utils/haptics';
 import { useAviationVoice } from '../hooks/useAviationVoice';
 import { useWakeLock } from '../hooks/useWakeLock';
@@ -30,6 +30,7 @@ export interface DriveModeSessionContext {
   onToggleFlag: (questionId: number) => void;
   onNavigateIndex: (index: number) => void;
   isExam?: boolean;
+  isTutor?: boolean;
   secondsRemaining?: number;
   onSubmitExam?: () => void;
   title?: string;
@@ -97,7 +98,9 @@ export const DriveModeScreen: React.FC<DriveModeScreenProps> = ({
     settings.driveModeVoiceCommands ?? false
   );
   const [isTutorEnabled, setIsTutorEnabled] = useState<boolean>(
-    settings.driveModeTutor ?? false
+    sessionContext?.isTutor !== undefined
+      ? sessionContext.isTutor
+      : (settings.driveModeTutor ?? false)
   );
   const [isWaitingForExplanationEnd, setIsWaitingForExplanationEnd] = useState<boolean>(false);
   const isWaitingForExplanationEndRef = useRef<boolean>(false);
@@ -106,10 +109,12 @@ export const DriveModeScreen: React.FC<DriveModeScreenProps> = ({
 
   // Sincronizza stato Tutor se aggiornato dall'esterno (es. Settings o VoiceQuickMenu)
   useEffect(() => {
-    if (settings.driveModeTutor !== undefined) {
+    if (sessionContext?.isTutor !== undefined) {
+      setIsTutorEnabled(sessionContext.isTutor);
+    } else if (settings.driveModeTutor !== undefined) {
       setIsTutorEnabled(settings.driveModeTutor);
     }
-  }, [settings.driveModeTutor]);
+  }, [settings.driveModeTutor, sessionContext?.isTutor]);
 
   const [voiceToast, setVoiceToast] = useState<string | null>(null);
   const [waitingCountdown, setWaitingCountdown] = useState<number | null>(null);
@@ -209,6 +214,9 @@ export const DriveModeScreen: React.FC<DriveModeScreenProps> = ({
       setAnswers(sessionContext.answers);
       setFlags(sessionContext.flags);
       setIsExamSession(sessionContext.isExam ?? false);
+      if (sessionContext.isTutor !== undefined) {
+        setIsTutorEnabled(sessionContext.isTutor);
+      }
       if (sessionContext.secondsRemaining !== undefined) {
         setSecondsRemaining(sessionContext.secondsRemaining);
       }
@@ -280,11 +288,14 @@ export const DriveModeScreen: React.FC<DriveModeScreenProps> = ({
     playDriveIntro();
   }, [stopVoice, playDriveIntro]);
 
-  // Countdown timer per esame attivo
+  // Timer per esame attivo (count-up se Tutor, countdown se Esame Ufficiale)
   useEffect(() => {
     if (!isOpen || internalMode !== 'running' || !isExamSession) return;
     const interval = setInterval(() => {
       setSecondsRemaining(prev => {
+        if (isTutorEnabled) {
+          return prev + 1;
+        }
         if (prev <= 1) {
           clearInterval(interval);
           handleSubmitExam();
@@ -294,7 +305,7 @@ export const DriveModeScreen: React.FC<DriveModeScreenProps> = ({
       });
     }, 1000);
     return () => clearInterval(interval);
-  }, [isOpen, internalMode, isExamSession]);
+  }, [isOpen, internalMode, isExamSession, isTutorEnabled]);
 
   // Avvio sequenza audio con Pilota Automatico
   const autoPlayTriggeredForRef = useRef<number | null>(null);
@@ -515,22 +526,19 @@ export const DriveModeScreen: React.FC<DriveModeScreenProps> = ({
         await recordAnswer(currentQ.id, isCorrect);
       }
 
-      if (isTutorEnabled) {
-        // MODALITÀ TUTOR: riproduce la spiegazione didattica (Regola + Tranello) e sincronizza l'autopilota
+      if (isTutorEnabled || (!isCorrect && settings.ttsAutoExplainOnMistake)) {
+        // MODALITÀ TUTOR o spiegazione automatica su errore:
+        // riproduce la spiegazione didattica (Regola + Tranello) e sincronizza l'autopilota
         isWaitingForExplanationEndRef.current = true;
         setIsWaitingForExplanationEnd(true);
         setTimeout(() => {
           playExplanation();
         }, 300);
         return; // L'avanzamento avverrà al termine della lettura vocale + pausa di assimilazione
-      } else {
-        if (!isCorrect && settings.ttsAutoExplainOnMistake) {
-          playExplanation();
-        }
       }
     }
 
-    // Se il pilota automatico è attivo (fuori da tutor mode), avanza dopo tempo standard
+    // Se il pilota automatico è attivo (fuori da tutor mode e senza spiegazione su errore), avanza dopo tempo standard
     if (isAutopilotEnabled) {
       setTimeout(() => {
         handleNextQuestionRef.current();
@@ -634,6 +642,15 @@ export const DriveModeScreen: React.FC<DriveModeScreenProps> = ({
       if (currentQ) {
         setRevealedQuestionId(currentQ.id);
       }
+      if (isAutopilotEnabled) {
+        if (assimilationTimeoutRef.current) {
+          clearTimeout(assimilationTimeoutRef.current);
+          assimilationTimeoutRef.current = null;
+          setAssimilationCountdown(null);
+        }
+        isWaitingForExplanationEndRef.current = true;
+        setIsWaitingForExplanationEnd(true);
+      }
       playExplanation();
     } else if (cmd === 'tutor_on') {
       showToast('🗣️ "Tutor Attivo"');
@@ -658,16 +675,39 @@ export const DriveModeScreen: React.FC<DriveModeScreenProps> = ({
     }
   }, [currentQ, handleSelectAnswer, handleNextQuestion, handlePrevQuestion, playFullSequence, restartCurrentOrSequence, handleToggleFlag, pauseVoice, stopVoice, resumeVoice, isPaused, playExplanation, updateSetting]);
 
+  // Audio output preference: 'speaker' (mic only after speech/paused) or 'headphones' (continuous listening)
+  const audioOutputMode = settings.driveModeAudioOutput || 'speaker';
+
+  const handleToggleAudioOutput = () => {
+    const nextVal = audioOutputMode === 'speaker' ? 'headphones' : 'speaker';
+    updateSetting('driveModeAudioOutput', nextVal);
+    showToast(
+      nextVal === 'headphones'
+        ? '🎧 Cuffie: microfono sempre attivo'
+        : '🔊 Altoparlante: microfono attivo a fine parlato'
+    );
+  };
+
+  // In speaker mode, suspend microphone during speech playback to prevent self-triggering from loudspeaker
+  const shouldSuspendVoiceCommands = shouldSuspendVoiceMic(audioOutputMode, {
+    isPlaying,
+    isSequencePlaying,
+    isDriveIntroPlaying,
+    isPaused
+  });
+
   // Hook Comandi Vocali
   const {
     isSupported: isVoiceSupported,
     isListening: isVoiceListening,
     isReceiving: isVoiceReceiving,
+    isSuspended: isVoiceSuspended,
     lastTranscript: voiceLastTranscript,
     interimTranscript: voiceInterimTranscript,
     error: voiceError
   } = useDriveVoiceCommands({
     enabled: isOpen && isVoiceCommandsEnabled && internalMode === 'running',
+    isSuspended: shouldSuspendVoiceCommands,
     onCommand: handleVoiceCommand
   });
 
@@ -811,6 +851,8 @@ export const DriveModeScreen: React.FC<DriveModeScreenProps> = ({
   const startDriveExam = (marathon = false) => {
     setIsMarathon(marathon);
     setIsExamSession(true);
+    setIsTutorEnabled(false);
+    updateSetting('driveModeTutor', false);
     const qs = generateExamQuestions(questions, statsMap, marathon);
     setInternalQuestions(qs);
     setCurrentIndex(0);
@@ -820,6 +862,34 @@ export const DriveModeScreen: React.FC<DriveModeScreenProps> = ({
     setStartTime(Date.now());
     setInternalMode('running');
   };
+
+  const startDriveTutorExam = () => {
+    setIsMarathon(false);
+    setIsExamSession(true);
+    setIsTutorEnabled(true);
+    updateSetting('driveModeTutor', true);
+    const qs = generateExamQuestions(questions, statsMap, false);
+    setInternalQuestions(qs);
+    setCurrentIndex(0);
+    setAnswers({});
+    setFlags({});
+    setSecondsRemaining(0);
+    setStartTime(Date.now());
+    setInternalMode('running');
+  };
+
+  const handleReplayExplanation = useCallback(() => {
+    if (isAutopilotEnabled) {
+      if (assimilationTimeoutRef.current) {
+        clearTimeout(assimilationTimeoutRef.current);
+        assimilationTimeoutRef.current = null;
+        setAssimilationCountdown(null);
+      }
+      isWaitingForExplanationEndRef.current = true;
+      setIsWaitingForExplanationEnd(true);
+    }
+    playExplanation();
+  }, [isAutopilotEnabled, playExplanation]);
 
   const startDriveMistakes = () => {
     const wrongQs = questions.filter(q => {
@@ -929,6 +999,8 @@ export const DriveModeScreen: React.FC<DriveModeScreenProps> = ({
           isVoiceCommandsEnabled={isVoiceCommandsEnabled}
           isVoiceSupported={isVoiceSupported}
           onToggleVoiceCommands={handleToggleVoiceCommands}
+          audioOutputMode={audioOutputMode}
+          onToggleAudioOutput={handleToggleAudioOutput}
           isTutorEnabled={isTutorEnabled}
           onToggleTutor={handleToggleTutor}
           isIntroActive={isIntroActive}
@@ -937,6 +1009,7 @@ export const DriveModeScreen: React.FC<DriveModeScreenProps> = ({
           onOpenVoiceGuide={() => setIsVoiceGuideOpen(true)}
           setIsVoiceMenuOpen={setIsVoiceMenuOpen}
           onStartExam={startDriveExam}
+          onStartTutorExam={startDriveTutorExam}
           onStartRadioQuiz={startDriveRadioQuiz}
           onStartMistakesQuiz={startDriveMistakes}
           isWakeLockActive={isWakeLockActive}
@@ -969,6 +1042,9 @@ export const DriveModeScreen: React.FC<DriveModeScreenProps> = ({
           voiceError={voiceError}
           isVoiceReceiving={isVoiceReceiving}
           isVoiceListening={isVoiceListening}
+          isVoiceSuspended={isVoiceSuspended}
+          audioOutputMode={audioOutputMode}
+          onToggleAudioOutput={handleToggleAudioOutput}
           onToggleVoiceCommands={handleToggleVoiceCommands}
           isPlaying={isPlaying}
           isPaused={isPaused}
@@ -977,7 +1053,7 @@ export const DriveModeScreen: React.FC<DriveModeScreenProps> = ({
           onTogglePlayPause={togglePlayPause}
           onRestartCurrentOrSequence={restartCurrentOrSequence}
           onStopVoice={stopVoice}
-          onPlayExplanation={playExplanation}
+          onPlayExplanation={handleReplayExplanation}
           waitingCountdown={waitingCountdown}
           assimilationCountdown={assimilationCountdown}
           voiceInterimTranscript={voiceInterimTranscript}

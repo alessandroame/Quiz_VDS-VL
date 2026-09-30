@@ -24,6 +24,8 @@ export interface DriveLauncherProps {
   isVoiceCommandsEnabled: boolean;
   isVoiceSupported: boolean;
   onToggleVoiceCommands: () => void;
+  audioOutputMode: 'speaker' | 'headphones';
+  onToggleAudioOutput: () => void;
   isTutorEnabled: boolean;
   onToggleTutor: () => void;
   isIntroActive: boolean;
@@ -44,6 +46,8 @@ export const DriveLauncher: React.FC<DriveLauncherProps> = ({
   isVoiceCommandsEnabled,
   isVoiceSupported,
   onToggleVoiceCommands,
+  audioOutputMode,
+  onToggleAudioOutput,
   isTutorEnabled,
   onToggleTutor,
   isIntroActive,
@@ -154,6 +158,49 @@ export const DriveLauncher: React.FC<DriveLauncherProps> = ({
             {isTutorEnabled ? 'TUTOR ON' : 'OFF'}
           </span>
         </button>
+
+        {/* Toggle Altoparlante vs Cuffie per Comandi Vocali */}
+        {isVoiceSupported && (
+          <button
+            id="btn-drive-toggle-audio-output"
+            onClick={onToggleAudioOutput}
+            className={`col-span-2 p-2.5 rounded-xl border flex items-center justify-between text-xs font-bold transition-all ${
+              audioOutputMode === 'speaker'
+                ? 'bg-zinc-900 border-zinc-800 text-zinc-300 light:bg-white light:border-slate-200 light:text-slate-800 light:shadow-sm'
+                : 'bg-indigo-950/70 border-indigo-500/70 text-indigo-200 light:bg-indigo-50 light:border-indigo-400 light:text-indigo-900'
+            }`}
+            title="Tocca per commutare tra Altoparlante (anti-eco) e Cuffie"
+          >
+            <div className="flex items-center gap-2">
+              <div className="w-4 h-4 flex-shrink-0 flex items-center justify-center">
+                {audioOutputMode === 'speaker' ? (
+                  <Volume2 className="w-4 h-4 text-amber-400" />
+                ) : (
+                  <Headphones className="w-4 h-4 text-indigo-400" />
+                )}
+              </div>
+              <div className="text-left">
+                <div className="text-[10px] text-zinc-400 light:text-slate-500 uppercase font-semibold">
+                  Microfono & Uscita Audio
+                </div>
+                <div className="text-xs font-medium">
+                  {audioOutputMode === 'speaker'
+                    ? 'Altoparlante (mic attivo a fine lettura o in pausa)'
+                    : 'Cuffie con Mic (ascolto continuo, interrompi a voce)'}
+                </div>
+              </div>
+            </div>
+            <span
+              className={`text-[10px] font-mono font-bold px-2 py-0.5 rounded-full ${
+                audioOutputMode === 'speaker'
+                  ? 'bg-amber-500/20 text-amber-300 border border-amber-500/30 light:bg-amber-100 light:text-amber-800'
+                  : 'bg-indigo-500 text-white font-black'
+              }`}
+            >
+              {audioOutputMode === 'speaker' ? 'ALTOPARLANTE' : 'CUFFIE'}
+            </span>
+          </button>
+        )}
       </div>
 
       {/* Spiegazione Vocale Briefing Banner (se attiva) */}

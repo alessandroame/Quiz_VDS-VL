@@ -25,6 +25,7 @@ export const DEFAULT_SETTINGS: AppSettings = {
   driveModeAutopilot: true,
   driveModeAutoAdvanceSeconds: 5,
   driveModeVoiceCommands: false,
+  driveModeAudioOutput: 'speaker',
   driveModeIntroPlayed: false,
   audioOfflinePromptDismissed: false,
   driveModeTutor: false,

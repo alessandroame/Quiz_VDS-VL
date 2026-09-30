@@ -58,6 +58,7 @@ export interface AppSettings {
   driveModeAutopilot: boolean;
   driveModeAutoAdvanceSeconds: number;
   driveModeVoiceCommands: boolean;
+  driveModeAudioOutput?: 'speaker' | 'headphones';
   driveModeIntroPlayed?: boolean;
   audioOfflinePromptDismissed?: boolean;
   driveModeTutor?: boolean;

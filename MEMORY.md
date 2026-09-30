@@ -94,6 +94,11 @@ Questo file costituisce la **memoria tecnica permanente** del progetto. Raccogli
   - Riproduzione automatica al primo accesso (nel Launcher o all'avvio del quiz), con banner discreto e tasto `[Salta]`.
   - Logica run-once: una volta riprodotta o saltata, salva `driveModeIntroPlayed: true` in Dexie settings e non si ripete più automaticamente.
   - Riascolto on-demand (Launcher `btn-replay-drive-intro`, modale comandi `VoiceCommandsModal`) e riattivazione all'avvio da `SettingsModal` (scheda Guida).
+- **Gestione Microfono Anti-Eco & Gating Audio (`src/utils/audio.ts`, `src/hooks/useDriveVoiceCommands.ts`)**:
+  - In modalità `'speaker'` (default senza cuffie), il microfono viene sospeso con abort immediato (`rec.abort()`) durante la riproduzione del parlato (domanda, opzioni, spiegazione didattica o intro).
+  - Il microfono si attiva esclusivamente a fine parlato (durante il countdown di attesa risposta) o mentre la riproduzione è in pausa (`isPaused: true`).
+  - Cooldown acustico di sicurezza di 250ms post-parlato prima della riattivazione per assorbire il riverbero dell'altoparlante ed eliminare qualsiasi falso comando.
+  - Modalità `'headphones'` (cuffie con microfono) opzionale per chi indossa auricolari e desidera l'ascolto continuo con interruzione vocale immediata (barge-in).
 
 ---
 

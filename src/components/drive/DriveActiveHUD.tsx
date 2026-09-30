@@ -16,7 +16,8 @@ import {
   AlertTriangle,
   HelpCircle,
   Square,
-  GraduationCap
+  GraduationCap,
+  Headphones
 } from 'lucide-react';
 import type { Question } from '../../types/quiz';
 import { formatTime } from '../../utils/timer';
@@ -47,6 +48,9 @@ export interface DriveActiveHUDProps {
   voiceError: string | null;
   isVoiceReceiving: boolean;
   isVoiceListening: boolean;
+  isVoiceSuspended?: boolean;
+  audioOutputMode?: 'speaker' | 'headphones';
+  onToggleAudioOutput?: () => void;
   onToggleVoiceCommands: () => void;
   isPlaying: boolean;
   isPaused: boolean;
@@ -96,6 +100,9 @@ export const DriveActiveHUD: React.FC<DriveActiveHUDProps> = ({
   voiceError,
   isVoiceReceiving,
   isVoiceListening,
+  isVoiceSuspended = false,
+  audioOutputMode = 'speaker',
+  onToggleAudioOutput,
   onToggleVoiceCommands,
   isPlaying,
   isPaused,
@@ -226,6 +233,30 @@ export const DriveActiveHUD: React.FC<DriveActiveHUDProps> = ({
           {/* Toggle Comandi Vocali & Guida Rapida */}
           {isVoiceSupported && (
             <div className="flex items-center gap-1">
+              {onToggleAudioOutput && isVoiceCommandsEnabled && (
+                <button
+                  type="button"
+                  id="btn-drive-hud-toggle-output"
+                  onClick={onToggleAudioOutput}
+                  className={`p-1.5 rounded-lg text-xs font-bold border transition-colors flex items-center justify-center ${
+                    audioOutputMode === 'headphones'
+                      ? 'bg-indigo-950/80 border-indigo-500 text-indigo-300 light:bg-indigo-100 light:border-indigo-400 light:text-indigo-800'
+                      : 'bg-zinc-900 border-zinc-800 text-zinc-400 hover:text-white light:bg-white light:border-slate-200 light:text-slate-600'
+                  }`}
+                  title={
+                    audioOutputMode === 'headphones'
+                      ? 'Modalità Cuffie (ascolto continuo). Tocca per passare ad Altoparlante.'
+                      : 'Modalità Altoparlante (mic attivo solo a fine lettura o in pausa). Tocca per passare a Cuffie.'
+                  }
+                >
+                  {audioOutputMode === 'headphones' ? (
+                    <Headphones className="w-3.5 h-3.5 text-indigo-400" />
+                  ) : (
+                    <Volume2 className="w-3.5 h-3.5 text-amber-400" />
+                  )}
+                </button>
+              )}
+
               <button
                 id="btn-drive-toggle-voice"
                 onClick={onToggleVoiceCommands}
@@ -236,6 +267,8 @@ export const DriveActiveHUD: React.FC<DriveActiveHUDProps> = ({
                     ? 'bg-rose-950/60 border border-rose-500 text-rose-300 light:bg-rose-50 light:border-rose-300 light:text-rose-700'
                     : isVoiceReceiving
                     ? 'bg-emerald-500/40 text-emerald-200 ring-2 ring-emerald-400 shadow-[0_0_12px_rgba(52,211,153,0.6)] light:bg-emerald-100 light:text-emerald-900 light:ring-emerald-500'
+                    : isVoiceSuspended
+                    ? 'bg-amber-500/20 text-amber-300 border border-amber-500/40 light:bg-amber-100 light:text-amber-800 light:border-amber-300'
                     : 'bg-emerald-500/30 text-emerald-300 ring-1 ring-emerald-500/50 light:bg-emerald-100 light:text-emerald-800 light:ring-emerald-400'
                 }`}
                 title={
@@ -243,6 +276,8 @@ export const DriveActiveHUD: React.FC<DriveActiveHUDProps> = ({
                     ? 'Attiva comandi vocali'
                     : voiceError
                     ? `Errore microfono: ${voiceError}`
+                    : isVoiceSuspended
+                    ? 'Microfono in pausa durante la lettura (anti-eco altoparlante)'
                     : isVoiceReceiving
                     ? 'Microfono: ricezione comandi vocali...'
                     : isVoiceListening
@@ -256,6 +291,8 @@ export const DriveActiveHUD: React.FC<DriveActiveHUDProps> = ({
                       className={`w-3.5 h-3.5 transition-transform ${
                         isVoiceReceiving
                           ? 'animate-pulse text-emerald-200 scale-125'
+                          : isVoiceSuspended
+                          ? 'text-amber-300 opacity-80'
                           : isVoiceListening
                           ? 'text-emerald-300'
                           : 'text-emerald-400/70'
@@ -475,6 +512,18 @@ export const DriveActiveHUD: React.FC<DriveActiveHUDProps> = ({
                 <AlertTriangle className="w-3.5 h-3.5 text-amber-400 flex-shrink-0" />
                 <span className="font-bold text-amber-400 flex-shrink-0">Sentito:</span>
                 <span className="text-zinc-200 light:text-slate-700 truncate">"{unrecognizedSpeech}" (non riconosciuto)</span>
+              </div>
+            ) : isVoiceSuspended ? (
+              <div className="flex items-center gap-1.5 truncate">
+                <span className="w-1.5 h-1.5 rounded-full bg-amber-400 flex-shrink-0" />
+                <span className="font-bold text-amber-400 flex-shrink-0">Lettura in corso:</span>
+                <span className="text-zinc-300 light:text-slate-600 truncate">Microfono attivo a fine parlato</span>
+              </div>
+            ) : isPaused ? (
+              <div className="flex items-center gap-1.5 truncate">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse flex-shrink-0" />
+                <span className="font-bold text-emerald-400 flex-shrink-0">In pausa:</span>
+                <span className="text-emerald-200/90 light:text-emerald-800 truncate">Dì "Riprendi", "Uno", "Due" o "Tre"</span>
               </div>
             ) : (
               <div className="flex items-center gap-1.5 truncate">

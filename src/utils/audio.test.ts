@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { soundFX } from './audio';
+import { soundFX, shouldSuspendVoiceMic } from './audio';
 
-describe('Suite 8: Audio Synthesis SoundFX (src/utils/audio.ts)', () => {
+describe('Suite 8: Audio Synthesis SoundFX & Mic Gating (src/utils/audio.ts)', () => {
   beforeEach(() => {
     vi.restoreAllMocks();
   });
@@ -55,5 +55,80 @@ describe('Suite 8: Audio Synthesis SoundFX (src/utils/audio.ts)', () => {
 
     soundFX.playClick();
     expect(mockOscillator.start).toHaveBeenCalled();
+  });
+
+  it('AUDIO-03: suspends microphone when in speaker mode and speech is actively playing', () => {
+    // Reading question or option snippet
+    expect(
+      shouldSuspendVoiceMic('speaker', {
+        isPlaying: true,
+        isSequencePlaying: false,
+        isDriveIntroPlaying: false,
+        isPaused: false
+      })
+    ).toBe(true);
+
+    // Reading full question/options sequence
+    expect(
+      shouldSuspendVoiceMic('speaker', {
+        isPlaying: false,
+        isSequencePlaying: true,
+        isDriveIntroPlaying: false,
+        isPaused: false
+      })
+    ).toBe(true);
+
+    // Reading intro briefing
+    expect(
+      shouldSuspendVoiceMic('speaker', {
+        isPlaying: false,
+        isSequencePlaying: false,
+        isDriveIntroPlaying: true,
+        isPaused: false
+      })
+    ).toBe(true);
+  });
+
+  it('AUDIO-04: keeps microphone active when in speaker mode and speech is paused', () => {
+    expect(
+      shouldSuspendVoiceMic('speaker', {
+        isPlaying: true,
+        isSequencePlaying: true,
+        isDriveIntroPlaying: false,
+        isPaused: true
+      })
+    ).toBe(false);
+  });
+
+  it('AUDIO-05: keeps microphone active when in speaker mode and speech has ended', () => {
+    // When sequence finishes and waiting countdown begins
+    expect(
+      shouldSuspendVoiceMic('speaker', {
+        isPlaying: false,
+        isSequencePlaying: false,
+        isDriveIntroPlaying: false,
+        isPaused: false
+      })
+    ).toBe(false);
+  });
+
+  it('AUDIO-06: never suspends microphone when in headphones mode (allows barge-in)', () => {
+    expect(
+      shouldSuspendVoiceMic('headphones', {
+        isPlaying: true,
+        isSequencePlaying: true,
+        isDriveIntroPlaying: true,
+        isPaused: false
+      })
+    ).toBe(false);
+
+    expect(
+      shouldSuspendVoiceMic('headphones', {
+        isPlaying: false,
+        isSequencePlaying: false,
+        isDriveIntroPlaying: false,
+        isPaused: false
+      })
+    ).toBe(false);
   });
 });

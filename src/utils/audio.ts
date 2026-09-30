@@ -91,3 +91,26 @@ class SoundFX {
 }
 
 export const soundFX = new SoundFX();
+
+/**
+ * Determines whether voice recognition microphone should be suspended to avoid
+ * picking up loudspeaker speech output (acoustic feedback prevention).
+ */
+export function shouldSuspendVoiceMic(
+  audioOutputMode: 'speaker' | 'headphones',
+  playback: {
+    isPlaying: boolean;
+    isSequencePlaying: boolean;
+    isDriveIntroPlaying?: boolean;
+    isPaused: boolean;
+  }
+): boolean {
+  if (audioOutputMode === 'headphones') {
+    return false;
+  }
+  const isSpeechActivelyPlaying =
+    (Boolean(playback.isPlaying) || Boolean(playback.isSequencePlaying) || Boolean(playback.isDriveIntroPlaying)) &&
+    !playback.isPaused;
+
+  return isSpeechActivelyPlaying;
+}

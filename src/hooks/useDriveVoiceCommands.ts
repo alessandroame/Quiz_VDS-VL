@@ -4,12 +4,14 @@ import { parseVoiceCommand, type VoiceCommand } from '../utils/voiceCommandParse
 export interface UseDriveVoiceCommandsProps {
   enabled: boolean;
   onCommand: (command: VoiceCommand) => void;
+  isSuspended?: boolean;
 }
 
 export interface UseDriveVoiceCommandsResult {
   isListening: boolean;
   isReceiving: boolean;
   isSupported: boolean;
+  isSuspended: boolean;
   lastTranscript: string;
   interimTranscript: string;
   error: string | null;
@@ -23,7 +25,8 @@ export interface UseDriveVoiceCommandsResult {
  */
 export function useDriveVoiceCommands({
   enabled,
-  onCommand
+  onCommand,
+  isSuspended = false
 }: UseDriveVoiceCommandsProps): UseDriveVoiceCommandsResult {
   const [isListening, setIsListening] = useState(false);
   const [isReceiving, setIsReceiving] = useState(false);
@@ -31,16 +34,22 @@ export function useDriveVoiceCommands({
   const [interimTranscript, setInterimTranscript] = useState('');
   const [error, setError] = useState<string | null>(null);
 
+  const isSuspendedEffective = Boolean(isSuspended);
+  const isSuspendedRef = useRef(isSuspendedEffective);
+  isSuspendedRef.current = isSuspendedEffective;
+
   const recognitionRef = useRef<any>(null);
-  const shouldBeListeningRef = useRef(enabled);
+  const shouldBeListeningRef = useRef(enabled && !isSuspendedEffective);
   const onCommandRef = useRef(onCommand);
   const fatalErrorRef = useRef(false);
   const restartTimeoutRef = useRef<any>(null);
   const receivingTimeoutRef = useRef<any>(null);
+  const acousticCooldownRef = useRef<any>(null);
+  const ignoreResultsBeforeRef = useRef<number>(0);
   const lastHandledIndexRef = useRef<number>(-1);
 
   onCommandRef.current = onCommand;
-  shouldBeListeningRef.current = enabled;
+  shouldBeListeningRef.current = enabled && !isSuspendedEffective;
 
   const isSupported =
     typeof window !== 'undefined' &&
@@ -60,7 +69,7 @@ export function useDriveVoiceCommands({
     }
   }, []);
 
-  const stop = useCallback(() => {
+  const stop = useCallback((useAbort: boolean = false) => {
     shouldBeListeningRef.current = false;
     fatalErrorRef.current = false;
 
@@ -72,10 +81,18 @@ export function useDriveVoiceCommands({
       clearTimeout(receivingTimeoutRef.current);
       receivingTimeoutRef.current = null;
     }
+    if (acousticCooldownRef.current) {
+      clearTimeout(acousticCooldownRef.current);
+      acousticCooldownRef.current = null;
+    }
 
     if (recognitionRef.current) {
       try {
-        recognitionRef.current.stop();
+        if (useAbort) {
+          recognitionRef.current.abort();
+        } else {
+          recognitionRef.current.stop();
+        }
       } catch {
         // Ignore errors on stopping an already stopped instance
       }
@@ -135,6 +152,11 @@ export function useDriveVoiceCommands({
       };
 
       rec.onresult = (event: any) => {
+        // Discard any sound or speech captured during speaker playback or during acoustic settling
+        if (isSuspendedRef.current || Date.now() < ignoreResultsBeforeRef.current) {
+          return;
+        }
+
         markReceiving(true);
 
         const lastIdx = event.results.length - 1;
@@ -228,22 +250,46 @@ export function useDriveVoiceCommands({
   }, [isSupported, markReceiving]);
 
   useEffect(() => {
+    if (acousticCooldownRef.current) {
+      clearTimeout(acousticCooldownRef.current);
+      acousticCooldownRef.current = null;
+    }
+
     if (enabled && isSupported) {
-      shouldBeListeningRef.current = true;
-      start();
+      if (isSuspendedEffective) {
+        // Speech output active: immediately abort capture to prevent acoustic speaker feedback
+        shouldBeListeningRef.current = false;
+        ignoreResultsBeforeRef.current = Date.now() + 300;
+        stop(true);
+      } else {
+        // Speech output ended or is paused: wait brief acoustic settling cooldown (250ms) before starting capture
+        shouldBeListeningRef.current = true;
+        ignoreResultsBeforeRef.current = Date.now() + 250;
+        acousticCooldownRef.current = setTimeout(() => {
+          if (shouldBeListeningRef.current && !recognitionRef.current) {
+            start();
+          }
+        }, 250);
+      }
     } else {
-      stop();
+      shouldBeListeningRef.current = false;
+      stop(false);
     }
 
     return () => {
-      stop();
+      if (acousticCooldownRef.current) {
+        clearTimeout(acousticCooldownRef.current);
+        acousticCooldownRef.current = null;
+      }
+      stop(true);
     };
-  }, [enabled, isSupported, start, stop]);
+  }, [enabled, isSupported, isSuspendedEffective, start, stop]);
 
   return {
     isListening,
     isReceiving,
     isSupported,
+    isSuspended: isSuspendedEffective,
     lastTranscript,
     interimTranscript,
     error,

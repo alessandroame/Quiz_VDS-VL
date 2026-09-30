@@ -380,7 +380,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
 
   const driveSummary = `${
     settings.driveModeVoiceCommands
-      ? 'Radio + Voce'
+      ? `Voce (${settings.driveModeAudioOutput === 'headphones' ? 'Cuffie' : 'Altoparlante'})`
       : settings.driveModeAutopilot ?? true
       ? 'Radio ON'
       : 'Manuale'
@@ -1159,6 +1159,61 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                     <span>Apri Guida Completa Comandi Vocali</span>
                     <HelpCircle className="w-3.5 h-3.5 opacity-70" />
                   </button>
+                </div>
+
+                {/* Modalità Audio Output / Microfono (Altoparlante vs Cuffie) */}
+                <div className="p-2.5 rounded-xl border border-zinc-800 bg-zinc-950/60 light:bg-slate-50 light:border-slate-200 space-y-2">
+                  <div className="flex justify-between items-center">
+                    <div>
+                      <span className="text-zinc-300 light:text-slate-700 font-medium block">
+                        Dispositivo di Ascolto
+                      </span>
+                      <span className="text-[11px] text-zinc-500">
+                        Gestione anti-eco del microfono per i comandi vocali
+                      </span>
+                    </div>
+                    <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded bg-zinc-800 text-zinc-300 light:bg-slate-200 light:text-slate-700">
+                      {settings.driveModeAudioOutput === 'headphones' ? 'CUFFIE' : 'ALTOPARLANTE'}
+                    </span>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-2 pt-1">
+                    <button
+                      type="button"
+                      onClick={() => updateSetting('driveModeAudioOutput', 'speaker')}
+                      className={`p-2 rounded-lg border text-left text-xs transition-all ${
+                        (settings.driveModeAudioOutput || 'speaker') === 'speaker'
+                          ? 'bg-amber-950/70 border-amber-500 text-amber-200 font-bold light:bg-amber-100 light:border-amber-500 light:text-amber-900'
+                          : 'bg-zinc-900/60 border-zinc-800 text-zinc-400 hover:text-zinc-200 light:bg-white light:border-slate-200 light:text-slate-700'
+                      }`}
+                    >
+                      <div className="flex items-center gap-1.5 font-bold mb-0.5">
+                        <Volume2 className="w-3.5 h-3.5 text-amber-400" />
+                        <span>Altoparlante (Consigliata)</span>
+                      </div>
+                      <p className="text-[10px] text-zinc-400 light:text-slate-500 leading-tight">
+                        Microfono attivo solo a fine lettura o in pausa. Elimina l'eco dell'altoparlante.
+                      </p>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => updateSetting('driveModeAudioOutput', 'headphones')}
+                      className={`p-2 rounded-lg border text-left text-xs transition-all ${
+                        settings.driveModeAudioOutput === 'headphones'
+                          ? 'bg-indigo-950/70 border-indigo-500 text-indigo-200 font-bold light:bg-indigo-100 light:border-indigo-500 light:text-indigo-900'
+                          : 'bg-zinc-900/60 border-zinc-800 text-zinc-400 hover:text-zinc-200 light:bg-white light:border-slate-200 light:text-slate-700'
+                      }`}
+                    >
+                      <div className="flex items-center gap-1.5 font-bold mb-0.5">
+                        <Headphones className="w-3.5 h-3.5 text-indigo-400" />
+                        <span>Cuffie con Mic</span>
+                      </div>
+                      <p className="text-[10px] text-zinc-400 light:text-slate-500 leading-tight">
+                        Microfono sempre attivo. Permette di interrompere il parlato in qualsiasi momento.
+                      </p>
+                    </button>
+                  </div>
                 </div>
 
                 <div className="p-2.5 rounded-xl border border-zinc-800 bg-zinc-950/60 light:bg-slate-50 light:border-slate-200 space-y-1.5">
