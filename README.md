@@ -295,7 +295,7 @@ npm run test:visual:review
 # Collaudo interattivo Modalità Mani Libere (Launcher, radio quiz, risposta e chiusura)
 npm run test:visual:drive:flow
 
-# Collaudo specifico della Modalità Alla Guida (CDP Mobile 390x844)
+# Collaudo specifico della Modalità Mani Libere (CDP Mobile 390x844)
 npm run test:visual:drive
 
 # Collaudo visivo del navigatore compresso a singola riga (CDP Mobile & Desktop)
