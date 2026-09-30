@@ -142,7 +142,12 @@
   - Banner di avanzamento compatto in basso (`AudioDownloadBanner`).
   - Gestione granulare nelle Impostazioni (🎙️ Voce) con verifica aggiornamenti differenziali basati su hash MD5 (`manifest.json`).
   - Fallback intelligente offline se la voce attiva non è presente nella cache locale.
-- **Normalizzazione Fonetica Aeronautica ICAO**: pronuncia fedele delle sigle e unità di misura (`aviationPhonetics.ts`).
+- **Normalizzazione Fonetica Aeronautica ICAO & Accenti Tonici (`aviationPhonetics.ts`)**:
+  - Risoluzione omografi e disambiguazione verbo/sostantivo (es. *decade* $\rightarrow$ *decàde*, *subito* $\rightarrow$ *sùbito*, *circuito* $\rightarrow$ *circùito*).
+  - Fissaggio dell'accento tonico piano su assi e dinamica del volo (*verticale/i* $\rightarrow$ *verticàle/i*, *orizzontale/i* $\rightarrow$ *orizzontàle/i*, *rollio* $\rightarrow$ *rollìo*).
+  - Accento tonico sdrucciolo su meteorologia e strumenti (*isobare* $\rightarrow$ *isòbare*, *variometro* $\rightarrow$ *variòmetro*, *anemometro* $\rightarrow$ *anemòmetro*, *altimetro* $\rightarrow$ *altìmetro*).
+  - Spaziatura fonetica lettera per lettera per acronimi tecnici (*UV*, *VNE*, *GPS*, *IAS*, *TAS*, *ATC*, *SIV*, *PIO*, *MSL*).
+  - Pronuncia fedele delle sigle istituzionali, normative e unità di misura (*D.P.R. 133/2010*, *AeCI*, *VDS/VL*, *hPa*, *km/h*, *m/s*, *kt*).
 - **Controlli Parlato Interattivi Universali (Play, Pausa, Riprendi, Da Capo)**: controlli dedicati su ogni frammento (domanda, singole opzioni 1, 2, 3 e spiegazione didattica).
 
 ### 10. Ergonomia Cockpit, Layout Zero-Scroll & Dimensione Font

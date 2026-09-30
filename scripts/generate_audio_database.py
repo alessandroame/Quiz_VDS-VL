@@ -83,7 +83,102 @@ def normalize_phonetics(text: str) -> str:
     
     # Soft punctuation: replace trailing question mark with period to avoid shrill pitch
     cleaned = re.sub(r'\?\s*$', '.', cleaned)
+
+    # Phonetic overrides to resolve homographs and enforce correct Italian tonic accents
+    for pattern, replacement in PHONETIC_OVERRIDES:
+        def repl(match):
+            val = match.group(0)
+            if val[0].isupper():
+                return replacement[0].upper() + replacement[1:]
+            return replacement
+        cleaned = re.sub(pattern, repl, cleaned, flags=re.IGNORECASE)
+
     return re.sub(r'\s+', ' ', cleaned).strip()
+
+# Phonetic overrides for neural Italian TTS (Diego and Elsa)
+PHONETIC_OVERRIDES = [
+    # 1. Verbs vs nouns/adjectives (homographs)
+    (r'\bdecade\b', 'decàde'),
+    (r'\bdecadono\b', 'decàdono'),
+    (r'\bsubito\b', 'sùbito'),
+    (r'\bcircuito\b', 'circùito'),
+    (r'\bcircuiti\b', 'circùiti'),
+    (r'\breticolo\b', 'retìcolo'),
+
+    # 2. Flight axes and flight dynamics (penultimate tonic accent)
+    (r'\bverticale\b', 'verticàle'),
+    (r'\bverticali\b', 'verticàli'),
+    (r'\bverticalmente\b', 'verticalménte'),
+    (r'\borizzontale\b', 'orizzontàle'),
+    (r'\borizzontali\b', 'orizzontàli'),
+    (r'\borizzontalmente\b', 'orizzontalménte'),
+    (r'\brollio\b', 'rollìo'),
+    (r'\bvelivolo\b', 'velìvolo'),
+    (r'\bvelivoli\b', 'velìvoli'),
+    (r'\baerodina\b', 'aerodìna'),
+    (r'\baerodine\b', 'aerodìne'),
+
+    # 3. Flight instruments (antepenultimate tonic accent)
+    (r'\bvariometro\b', 'variòmetro'),
+    (r'\bvariometri\b', 'variòmetri'),
+    (r'\banemometro\b', 'anemòmetro'),
+    (r'\banemometri\b', 'anemòmetri'),
+    (r'\baltimetro\b', 'altìmetro'),
+    (r'\baltimetri\b', 'altìmetri'),
+    (r'\bbarometro\b', 'baròmetro'),
+    (r'\bbarometri\b', 'baròmetri'),
+    (r'\bigrometro\b', 'igròmetro'),
+    (r'\bigrometri\b', 'igròmetri'),
+
+    # 4. Meteorology and cloud formations
+    (r'\bisobare\b', 'isòbare'),
+    (r'\bisobara\b', 'isòbara'),
+    (r'\bcumulo\b', 'cùmulo'),
+    (r'\bcumuli\b', 'cùmuli'),
+    (r'\bcumulonembo\b', 'cumulonèmbo'),
+    (r'\bcumulonembi\b', 'cumulonèmbi'),
+    (r'\bstratocumulo\b', 'stratocùmulo'),
+    (r'\bstratocumuli\b', 'stratocùmuli'),
+    (r'\baltocumulo\b', 'altocùmulo'),
+    (r'\baltocumuli\b', 'altocùmuli'),
+    (r'\bcirrostrato\b', 'cirrostràto'),
+    (r'\baltostrato\b', 'altostràto'),
+    (r'\bsottovento\b', 'sottovènto'),
+    (r'\bsopravvento\b', 'sopravvènto'),
+    (r'\bsopravento\b', 'sopravvènto'),
+
+    # 5. Technical acronyms spelled out as distinct letters
+    (r'\bVNE\b', 'V N E'),
+    (r'\bGPS\b', 'G P S'),
+    (r'\bIAS\b', 'I A S'),
+    (r'\bTAS\b', 'T A S'),
+    (r'\bGS\b', 'G S'),
+    (r'\bATC\b', 'A T C'),
+    (r'\bSIV\b', 'S I V'),
+    (r'\bPIO\b', 'P I O'),
+    (r'\bMSL\b', 'M S L'),
+    (r'\bAIP\b', 'A I P'),
+    (r'\bISA\b', 'I S A'),
+    (r'\bVMC\b', 'V M C'),
+    (r'\bUV\b', 'U V'),
+    (r'\bUR\b', 'U R'),
+]
+
+def is_question_affected_by_phonetics(q: dict) -> bool:
+    """Returns True if any text field in the question contains words affected by phonetic overrides."""
+    parts = [
+        q.get("question", ""),
+        q.get("options", ["", "", ""])[0],
+        q.get("options", ["", "", ""])[1],
+        q.get("options", ["", "", ""])[2],
+        q.get("explanation", {}).get("rule", ""),
+        q.get("explanation", {}).get("trap", "")
+    ]
+    combined = " ".join(parts)
+    for pattern, _ in PHONETIC_OVERRIDES:
+        if re.search(pattern, combined, flags=re.IGNORECASE):
+            return True
+    return False
 
 def build_segments(q: dict, part_filter: str = "all") -> list:
     qid = q["id"]
@@ -190,6 +285,7 @@ async def main():
     parser.add_argument("--force", action="store_true", help="Force overwrite existing audio files")
     parser.add_argument("--start", type=int, default=None, help="Start question ID (e.g. 1001)")
     parser.add_argument("--end", type=int, default=None, help="End question ID (e.g. 1040)")
+    parser.add_argument("--phonetic-only", action="store_true", help="Only process questions affected by phonetic overrides")
     parser.add_argument("--limit", type=int, default=None, help="Max number of quiz items to process")
     parser.add_argument("--concurrency", type=int, default=10, help="Concurrent edge-tts calls")
     args = parser.parse_args()
@@ -198,6 +294,8 @@ async def main():
         all_questions = json.load(f)
 
     target_questions = all_questions
+    if args.phonetic_only:
+        target_questions = [q for q in target_questions if is_question_affected_by_phonetics(q)]
     if args.start is not None:
         target_questions = [q for q in target_questions if q["id"] >= args.start]
     if args.end is not None:

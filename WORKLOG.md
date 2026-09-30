@@ -14,6 +14,68 @@ Questo documento registra in ordine cronologico tutte le lavorazioni svolte nel 
 - **Impatto sul Desiderata**: <Come questo intervento contribuisce al desiderata (cfr. DESIDERATA.md) e indicazioni per il prossimo agente>
 ```
 
+## [2026-09-30] Correzione Accenti Fonetici Neurali & Disambiguazione Omografi Vocali
+
+### Cosa abbiamo fatto
+- **Risoluzione sistematica delle pronunce anomale neurali**: individuata la causa radice per cui parole italiane come *decade*, *verticale*, *orizzontale*, *rollio*, *isobare*, *variometro* e acronimi come *UV*, *VNE* venivano pronunciate con accento errato o cadenza innaturale dai modelli Microsoft Azure Edge-TTS (`it-IT-DiegoNeural` / Giuseppe ed `it-IT-ElsaNeural` / Elsa).
+- **Mappa degli Override Fonetici (`PHONETIC_OVERRIDES`)**:
+  - *Verbi vs sostantivi*: *decade* $\rightarrow$ *decàde*, *decadono* $\rightarrow$ *decàdono*, *subito* $\rightarrow$ *sùbito*, *circuito* $\rightarrow$ *circùito*, *reticolo* $\rightarrow$ *retìcolo*.
+  - *Assi e dinamica del volo*: *verticale/i* $\rightarrow$ *verticàle/i*, *orizzontale/i* $\rightarrow$ *orizzontàle/i*, *verticalmente* $\rightarrow$ *verticalménte*, *orizzontalmente* $\rightarrow$ *orizzontalménte*, *rollio* $\rightarrow$ *rollìo*, *velivolo/i* $\rightarrow$ *velìvolo/i*, *aerodina/e* $\rightarrow$ *aerodìna/e*.
+  - *Strumenti*: *variometro/i* $\rightarrow$ *variòmetro/i*, *anemometro/i* $\rightarrow$ *anemòmetro/i*, *altimetro/i* $\rightarrow$ *altìmetro/i*, *barometro/i* $\rightarrow$ *baròmetro/i*, *igrometro/i* $\rightarrow$ *igròmetro/i*.
+  - *Meteorologia*: *isobare/a* $\rightarrow$ *isòbare/a*, *cumulo/i* $\rightarrow$ *cùmulo/i*, *cumulonembo/i* $\rightarrow$ *cumulonèmbo/i*, *stratocumulo/altocumulo* $\rightarrow$ *stratocùmulo/altocùmulo*, *cirrostrato/altostrato* $\rightarrow$ *cirrostràto/altostràto*, *sottovento* $\rightarrow$ *sottovènto*, *sopravvento* $\rightarrow$ *sopravvènto*.
+  - *Acronimi scanditi a lettere*: *UV* $\rightarrow$ *U V*, *VNE* $\rightarrow$ *V N E*, *GPS* $\rightarrow$ *G P S*, *IAS* $\rightarrow$ *I A S*, *TAS* $\rightarrow$ *T A S*, *GS* $\rightarrow$ *G S*, *ATC* $\rightarrow$ *A T C*, *SIV* $\rightarrow$ *S I V*, *PIO* $\rightarrow$ *P I O*, *MSL* $\rightarrow$ *M S L*, *AIP* $\rightarrow$ *A I P*, *ISA* $\rightarrow$ *I S A*, *VMC* $\rightarrow$ *V M C*, *UR* $\rightarrow$ *U R*.
+- **Allineamento TypeScript SSOT**: implementato `PHONETIC_OVERRIDES` e la preservazione del case iniziale in [src/utils/aviationPhonetics.ts](file:///c:/github/Quiz_VDS-VL/src/utils/aviationPhonetics.ts).
+- **Copertura Unit Test Vitest**: aggiunti 4 nuovi test in [src/utils/aviationPhonetics.test.ts](file:///c:/github/Quiz_VDS-VL/src/utils/aviationPhonetics.test.ts) (13 passed su 13).
+- **Batch Generator Python Esteso**: aggiornato [scripts/generate_audio_database.py](file:///c:/github/Quiz_VDS-VL/scripts/generate_audio_database.py) con gli stessi override fonetici, helper `is_question_affected_by_phonetics` e flag `--phonetic-only`.
+- **Rigenerazione Audio Mirata**: rigenerati tutti gli snippet audio delle 166 domande interessate per entrambe le voci Giuseppe ed Elsa con aggiornamento hash di catalogo in [public/audio/manifest.json](file:///c:/github/Quiz_VDS-VL/public/audio/manifest.json).
+- **Aggiornamento Documentazione**: sincronizzati [README.md](file:///c:/github/Quiz_VDS-VL/README.md) e [MEMORY.md](file:///c:/github/Quiz_VDS-VL/MEMORY.md).
+
+### Scelte architetturali & Rationale
+- *Separazione Ortografia Visiva / Fonetica Neurale*: il testo memorizzato in `questions.json` e mostrato a schermo rimane puro e privo di accenti spuri o spaziature forzate (*decade*, *verticale*, *UV*), rispettando i testi ministeriali ufficiali AeCI. La correzione avviene esclusivamente nello strato di normalizzazione fonetica audio prima della chiamata al sintetizzatore.
+- *Preservazione Case Iniziale*: la funzione di sostituzione riconosce se la parola originale era maiuscola a inizio frase (es. *Rollio*, *Subito*) e preserva la maiuscola nel sostituto fonetico (*Rollìo*, *Sùbito*).
+- *Generazione Selettiva `--phonetic-only`*: permette di rigenerare rapidamente in 2-3 minuti solo i quiz il cui testo è stato modificato dagli override fonetici, preservando gli oltre 4.000 file audio non toccati.
+
+### Impatto sul Desiderata
+- Rende la sintesi neurale impeccabile e naturale su tutte le 9 materie AeCI, risolvendo alla radice le imperfezioni prosodiche e fonetiche notate dall'utente durante l'ascolto hands-free.
+
+---
+
+---
+
+### [2026-09-30] - Audit della Suite di Test ed Estensione Massima della Copertura Mobile & Hooks
+
+- **Cosa abbiamo fatto**:
+  * **Audit Approfondito della Suite di Test**:
+    - Analizzato lo stato iniziale: 26 file di test, 220 unit test Vitest, copertura globale 64.11% linee.
+    - Individuate le zone d'ombra critiche: custom hooks mobile/hardware al 1.22% (`useWakeLock.ts` 0%, `useAviationVoice.ts` 0%, `useDriveVoiceCommands.ts` 0%), assenza di test di contratto per le schermate e i componenti React mobile.
+  * **Integrazione Infrastruttura Testing DOM & Hook Lifecycle**:
+    - Aggiunto `happy-dom` in devDependencies e configurato `globalThis.IS_REACT_ACT_ENVIRONMENT = true` in [src/test/setup.ts](file:///c:/github/Quiz_VDS-VL/src/test/setup.ts) per il supporto nativo di React 19 root e `act()`.
+    - Creato il test harness riutilizzabile [src/test/hookHarness.ts](file:///c:/github/Quiz_VDS-VL/src/test/hookHarness.ts) (`renderHook`) a zero overhead.
+  * **Copertura Completa Custom Hooks Mobile**:
+    - Creato [src/hooks/useWakeLock.test.ts](file:///c:/github/Quiz_VDS-VL/src/hooks/useWakeLock.test.ts) (5 test): acquisizione lock, rilascio su unmount/disabilitazione, riaggancio automatico all'evento `visibilitychange` (quando l'utente riapre il browser del telefono) e gestione errori permessi.
+    - Creato [src/hooks/useAviationVoice.test.ts](file:///c:/github/Quiz_VDS-VL/src/hooks/useAviationVoice.test.ts) (5 test): sincronizzazione reattiva con `voiceService.subscribe`, calcolo stati audio (playing/paused/active per specifica parte `question`/`opt1`..`3`/`explanation`), inoltro comandi a `voiceService` e pulizia su unmount.
+    - Creato [src/hooks/useDriveVoiceCommands.test.ts](file:///c:/github/Quiz_VDS-VL/src/hooks/useDriveVoiceCommands.test.ts) (7 test): mock Web Speech Recognition API (`it-IT`), avvio post-cooldown acustico di 250ms, rilevamento interim & final speech per comandi ("Due", "Ripeti"), soppressione immediata microfono su audio altoparlante (`abort()`) per azzerare l'eco dello speaker, gestione errori non fatali (`no-speech`) e permessi negati.
+    - Creato [src/hooks/useOnlineStatus.test.ts](file:///c:/github/Quiz_VDS-VL/src/hooks/useOnlineStatus.test.ts) (1 test): test transizione online/offline.
+    - Copertura della cartella `src/hooks/` passata da **1.22%** a **82.78%** (100% per `useAviationVoice` e `useOnlineStatus`).
+  * **Test di Contratto Componenti UI & Ergonomia Mobile**:
+    - Creato [src/components/HomeScreen.test.ts](file:///c:/github/Quiz_VDS-VL/src/components/HomeScreen.test.ts) (3 test): presenza dei 6 macro-pulsanti con ID univoci (`#btn-home-tutor`, `#btn-home-topics`, `#btn-home-exam`, `#btn-home-mistakes`, `#btn-home-archive`, `#btn-home-stats`), telemetria compatta (prontezza %, quiz esplorati /474, errori quaderno) e banner ripresa rapida sessione in corso.
+    - Creato [src/components/QuizBottomBar.test.ts](file:///c:/github/Quiz_VDS-VL/src/components/QuizBottomBar.test.ts) (4 test): ancoraggio fisso inferiore (`fixed bottom-0`), safe-area padding per notch/home bar (`env(safe-area-inset-bottom)`), tasti Precedente/Successiva, pulsante Flag (`⚑`) con feedback cromatico ambra e azione primaria Tutor.
+    - Creato [src/components/SettingsModal.test.ts](file:///c:/github/Quiz_VDS-VL/src/components/SettingsModal.test.ts) (4 test): layout accordion compresso di default (`defaultTab = null`), mutua esclusione all'apertura sezioni (`#tab-appearance`, `#tab-voice`, `#tab-drive`, `#tab-cloud`, `#tab-data`, `#tab-about`) e chiusura con pulsante X.
+    - Creato [src/components/BuildInfoModal.test.ts](file:///c:/github/Quiz_VDS-VL/src/components/BuildInfoModal.test.ts) (2 test): modale diagnostica versione PWA, rendering numero build, commit Git, pulsante "Forza Aggiornamento PWA" e "Copia Dettagli".
+  * **Metriche Finali di Suite**:
+    - File di test: da 26 a **34 file** (+8 nuove suite).
+    - Totale Unit Test: da 220 a **251 unit test passanti al 100%** (0 fallimenti).
+    - Copertura Linee: aumentata di **+12.65%** (da 64.11% a **76.76%**).
+    - Compilazione TypeScript (`npx tsc --noEmit`) e bundle di produzione (`npm run build`) 100% superati con successo.
+
+- **Scelte architetturali & Rationale**:
+  * *Zero Browser Dependency per Hook Testing*: L'adozione di `happy-dom` consente l'esecuzione di test con lifecycle React completo (`useEffect`, `useState`, `addEventListener`) in memoria a velocità supersonica (<50ms per suite), senza la lentezza e i requisiti di memoria di una sessione headless completa.
+  * *Contratti Visivi ed Ergonomici Assertivi*: Verificare gli ID univoci, le classi Tailwind di posizionamento mobile (`fixed bottom-0`, safe-area insets, `touch-manipulation`) e gli attributi ARIA previene regressioni invisibili nei refactoring dell'interfaccia.
+
+- **Impatto sul Desiderata**:
+  * Pieno allineamento con i requisiti di affidabilità, testabilità e robustezza mobile della PWA.
+  * Pronti per la successiva fase di automazione E2E multi-viewport.
+
 ---
 
 ### [2026-09-30] - Ridenominazione UI in Modalità Mani Libere e Avanzamento Automatico

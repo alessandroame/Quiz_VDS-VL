@@ -45,6 +45,40 @@ describe('aviationPhonetics', () => {
       expect(output.endsWith('.')).toBe(true);
       expect(output).not.toContain('?');
     });
+
+    it('enforces correct Italian tonic accents on verbs and aeronautical terms', () => {
+      const input = 'La portanza decade rapidamente con componente verticale e orizzontale, generando rollio nel circuito.';
+      const output = normalizeAviationPhonetics(input);
+      expect(output).toContain('decàde');
+      expect(output).toContain('verticàle');
+      expect(output).toContain('orizzontàle');
+      expect(output).toContain('rollìo');
+      expect(output).toContain('circùito');
+    });
+
+    it('corrects flight instruments and meteorological terms', () => {
+      const input = 'Consultare il variometro e le isobare attorno al cumulonembo.';
+      const output = normalizeAviationPhonetics(input);
+      expect(output).toContain('variòmetro');
+      expect(output).toContain('isòbare');
+      expect(output).toContain('cumulonèmbo');
+    });
+
+    it('preserves sentence-initial capitalization during phonetic replacement', () => {
+      const input = 'Rollio e beccheggio. Subito atterrare.';
+      const output = normalizeAviationPhonetics(input);
+      expect(output).toContain('Rollìo');
+      expect(output).toContain('Sùbito');
+    });
+
+    it('spells out technical aviation acronyms as spaced individual letters', () => {
+      const input = 'Danni da raggi UV prima della VNE controllati via GPS e circuito SIV.';
+      const output = normalizeAviationPhonetics(input);
+      expect(output).toContain('U V');
+      expect(output).toContain('V N E');
+      expect(output).toContain('G P S');
+      expect(output).toContain('S I V');
+    });
   });
 
   describe('formatOptionForSpeech', () => {

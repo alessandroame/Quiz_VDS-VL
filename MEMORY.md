@@ -77,8 +77,14 @@ Questo file costituisce la **memoria tecnica permanente** del progetto. Raccogli
 - **Archiviazione Segmenti Audio**:
   - `public/audio/{voice}/{qid}_{part}.mp3` dove `part` è `q` (domanda), `1`, `2`, `3` (opzioni) ed `e` (spiegazione didattica su errore).
   - 2.520 segmenti per ciascuna voce (504 quiz x 5 file), totale 5.040 segmenti audio.
-- **Normalizzazione Fonetica Aeronautica (`src/utils/aviationPhonetics.ts`)**:
+- **Normalizzazione Fonetica Aeronautica & Accenti Tonici (`src/utils/aviationPhonetics.ts`)**:
   - Tutti i testi passano dal normalizzatore per espansione acronimi (`D.P.R. 133/2010`, `VDS/VL`, `AeCI`, `hPa`, `FL`, `km/h`, `kt`, `m/s`).
+  - **Override Fonetici e Accenti Tonici (SSOT)**: dizionario di correzione per evitare pronunce errate dei modelli neurali italiani (Diego ed Elsa):
+    * Verbi/Omografi: *decade* $\rightarrow$ *decàde*, *decadono* $\rightarrow$ *decàdono*, *subito* $\rightarrow$ *sùbito*, *circuito* $\rightarrow$ *circùito*, *reticolo* $\rightarrow$ *retìcolo*.
+    * Dinamica del Volo: *verticale/i* $\rightarrow$ *verticàle/i*, *orizzontale/i* $\rightarrow$ *orizzontàle/i*, *rollio* $\rightarrow$ *rollìo*, *velivolo/i* $\rightarrow$ *velìvolo/i*, *aerodina/e* $\rightarrow$ *aerodìna/e*.
+    * Strumentazione: *variometro* $\rightarrow$ *variòmetro*, *anemometro* $\rightarrow$ *anemòmetro*, *altimetro* $\rightarrow$ *altìmetro*, *barometro* $\rightarrow$ *baròmetro*, *igrometro* $\rightarrow$ *igròmetro*.
+    * Meteorologia: *isobare/a* $\rightarrow$ *isòbare/a*, *cumulo/i* $\rightarrow$ *cùmulo/i*, *cumulonembo/i* $\rightarrow$ *cumulonèmbo/i*, *stratocumulo/altocumulo* $\rightarrow$ *stratocùmulo/altocùmulo*, *cirrostrato/altostrato* $\rightarrow$ *cirrostràto/altostràto*, *sottovento* $\rightarrow$ *sottovènto*, *sopravvento* $\rightarrow$ *sopravvènto*.
+    * Acronimi scanditi a lettere: *UV*, *VNE*, *GPS*, *IAS*, *TAS*, *GS*, *ATC*, *SIV*, *PIO*, *MSL*, *AIP*, *ISA*, *VMC*, *UR*.
   - Pronuncia domanda concisa (Zero Preamboli): le tracce audio delle domande (`_q.mp3`) contengono esclusivamente il testo della domanda normalizzato, omettendo tassativamente prefissi verbali come il numero (*"Domanda X"*) o il nome della materia/categoria per azzerare la latenza d'ascolto.
   - Pronuncia opzioni essenziale: *"Uno. [testo]"*, *"Due. [testo]"*, *"Tre. [testo]"*.
 - **Persistenza & Switch**: Selezione della voce salvata in Dexie (`settings.ttsVoice: 'giuseppe' | 'elsa'`) e commutabile istantaneamente dalle impostazioni.

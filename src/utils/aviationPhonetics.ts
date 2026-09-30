@@ -52,9 +52,88 @@ export function normalizeAviationPhonetics(text: string): string {
   // con punti fermi per evitare intonazioni acute stridule
   cleaned = cleaned.replace(/\?\s*$/g, '.');
 
+  // 9. Phonetic overrides to resolve homographs, enforce Italian tonic accents and spell out acronyms
+  for (const [pattern, replacement] of PHONETIC_OVERRIDES) {
+    cleaned = cleaned.replace(pattern, (match) => {
+      if (match[0] === match[0].toUpperCase() && match[0] !== match[0].toLowerCase()) {
+        return replacement.charAt(0).toUpperCase() + replacement.slice(1);
+      }
+      return replacement;
+    });
+  }
+
   // Remove double spaces
   return cleaned.replace(/\s+/g, ' ').trim();
 }
+
+// Phonetic overrides for neural Italian TTS (Diego and Elsa)
+const PHONETIC_OVERRIDES: Array<[RegExp, string]> = [
+  // 1. Verbs vs nouns/adjectives (homographs)
+  [/\bdecade\b/gi, 'decàde'],
+  [/\bdecadono\b/gi, 'decàdono'],
+  [/\bsubito\b/gi, 'sùbito'],
+  [/\bcircuito\b/gi, 'circùito'],
+  [/\bcircuiti\b/gi, 'circùiti'],
+  [/\breticolo\b/gi, 'retìcolo'],
+
+  // 2. Flight axes and flight dynamics (penultimate tonic accent)
+  [/\bverticale\b/gi, 'verticàle'],
+  [/\bverticali\b/gi, 'verticàli'],
+  [/\bverticalmente\b/gi, 'verticalménte'],
+  [/\borizzontale\b/gi, 'orizzontàle'],
+  [/\borizzontali\b/gi, 'orizzontàli'],
+  [/\borizzontalmente\b/gi, 'orizzontalménte'],
+  [/\brollio\b/gi, 'rollìo'],
+  [/\bvelivolo\b/gi, 'velìvolo'],
+  [/\bvelivoli\b/gi, 'velìvoli'],
+  [/\baerodina\b/gi, 'aerodìna'],
+  [/\baerodine\b/gi, 'aerodìne'],
+
+  // 3. Flight instruments (antepenultimate tonic accent)
+  [/\bvariometro\b/gi, 'variòmetro'],
+  [/\bvariometri\b/gi, 'variòmetri'],
+  [/\banemometro\b/gi, 'anemòmetro'],
+  [/\banemometri\b/gi, 'anemòmetri'],
+  [/\baltimetro\b/gi, 'altìmetro'],
+  [/\baltimetri\b/gi, 'altìmetri'],
+  [/\bbarometro\b/gi, 'baròmetro'],
+  [/\bbarometri\b/gi, 'baròmetri'],
+  [/\bigrometro\b/gi, 'igròmetro'],
+  [/\bigrometri\b/gi, 'igròmetri'],
+
+  // 4. Meteorology and cloud formations
+  [/\bisobare\b/gi, 'isòbare'],
+  [/\bisobara\b/gi, 'isòbara'],
+  [/\bcumulo\b/gi, 'cùmulo'],
+  [/\bcumuli\b/gi, 'cùmuli'],
+  [/\bcumulonembo\b/gi, 'cumulonèmbo'],
+  [/\bcumulonembi\b/gi, 'cumulonèmbi'],
+  [/\bstratocumulo\b/gi, 'stratocùmulo'],
+  [/\bstratocumuli\b/gi, 'stratocùmuli'],
+  [/\baltocumulo\b/gi, 'altocùmulo'],
+  [/\baltocumuli\b/gi, 'altocùmuli'],
+  [/\bcirrostrato\b/gi, 'cirrostràto'],
+  [/\baltostrato\b/gi, 'altostràto'],
+  [/\bsottovento\b/gi, 'sottovènto'],
+  [/\bsopravvento\b/gi, 'sopravvènto'],
+  [/\bsopravento\b/gi, 'sopravvènto'],
+
+  // 5. Technical acronyms spelled out as distinct letters
+  [/\bVNE\b/g, 'V N E'],
+  [/\bGPS\b/g, 'G P S'],
+  [/\bIAS\b/g, 'I A S'],
+  [/\bTAS\b/g, 'T A S'],
+  [/\bGS\b/g, 'G S'],
+  [/\bATC\b/g, 'A T C'],
+  [/\bSIV\b/g, 'S I V'],
+  [/\bPIO\b/g, 'P I O'],
+  [/\bMSL\b/g, 'M S L'],
+  [/\bAIP\b/g, 'A I P'],
+  [/\bISA\b/g, 'I S A'],
+  [/\bVMC\b/g, 'V M C'],
+  [/\bUV\b/g, 'U V'],
+  [/\bUR\b/g, 'U R']
+];
 
 /**
  * Formats a question text for speech output, strictly returning the normalized question
