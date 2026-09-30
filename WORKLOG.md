@@ -14,7 +14,38 @@ Questo documento registra in ordine cronologico tutte le lavorazioni svolte nel 
 - **Impatto sul Desiderata**: <Come questo intervento contribuisce al desiderata (cfr. DESIDERATA.md) e indicazioni per il prossimo agente>
 ```
 
-# Registro di Bordo: Pianificazione Armonizzazione UI/UX & Disambiguazione Stati Top Bar (TODO-08)
+---
+
+### [2026-09-30] - Risoluzione Interazione Touch Mobile su Impostazioni Voce/Audio e Accordion Compresso di Default
+
+- **Cosa abbiamo fatto**:
+  * **Risoluzione mancata ricezione click/touch su mobile nelle Impostazioni Voce e Audio**:
+    - Individuata la root cause: `html, body { user-select: none; }` in combinazione con il preflight Tailwind (`cursor: default` sui pulsanti) sopprime la sintesi dei click sintetici su WebKit / iOS Safari su elementi privi di `cursor: pointer` e `touch-action: manipulation`. Inoltre, le righe con checkbox avevano touch-target ridotti ai soli 16px del checkbox, e il micro-scroll `scrollIntoView({ behavior: 'smooth' })` immediato all'espansione intercettava e consumava i tocchi successivi interpretandoli come stop-scroll.
+    - In [src/index.css](file:///c:/github/Quiz_VDS-VL/src/index.css): aggiunte regole esplicite per garantire che tutti gli elementi interattivi (`button, input, select, textarea, label, [role="button"], a`) abbiano `cursor: pointer`, `touch-action: manipulation` e `-webkit-user-select: auto; user-select: auto`.
+    - In [src/components/SettingsModal.tsx](file:///c:/github/Quiz_VDS-VL/src/components/SettingsModal.tsx):
+      - Impostato `defaultTab = null` come valore predefinito: all'apertura delle Impostazioni tutte le 6 sezioni dell'accordion partono **completamente compresse**, fornendo una panoramica ordinata ed evitando scroll forzati.
+      - Sostituito `w-screen` con `w-full` per azzerare sfasamenti del viewport e deviazioni orizzontali delle bounding box su dispositivi mobili.
+      - Ottimizzato `toggleSection`: verifica il bounding client rect e attiva `scrollIntoView` con ritardo di 120ms solo se la card non è già visibile, prevenendo il blocco dei tap su schermi touch.
+      - Convertite le righe di impostazione (Lettura Vocale, Voce su errore, Autoplay domanda, Radio quiz continuo, Modalità Tutor, Rispondi a voce, Effetti sonori, Sincronizzazione automatica Cloud) in `<label className="... cursor-pointer select-none active:scale-[0.99] touch-manipulation">` a tutta riga: toccare ovunque attiva immediatamente l'opzione.
+      - Aggiunti feedback immediati e gestione errori visuali (`setAudioUpdateToast`) per download, annullamento, aggiornamento ed eliminazione cache MP3 offline (voci Giuseppe ed Elsa).
+      - Integrata ergonomia touch (`cursor-pointer active:scale-95 touch-manipulation`) su tutti i controlli: selettore istruttore (Giuseppe / Elsa), pulsanti velocità (0.9x, 1.0x, 1.15x, 1.25x), temi chiaro/scuro/auto, opzioni font, fullscreen e backup Drive.
+  * **Collaudo e Validazione**:
+    - Eseguito `npm run test:unit`: tutti i 26 file di test e i 220 unit test Vitest completati con successo (zero regressioni).
+    - Eseguito `npm run build`: compilazione TypeScript e bundling Vite PWA superati con successo in 2m 29s.
+    - Eseguito collaudo visuale e interattivo su CDP con viewport mobile `390x844` simulando tap ed espansione delle card, selezione voci, cambio velocità e compressione completa.
+  * **Avanzamento SemVer**:
+    - Avanzata la versione di progetto in [package.json](file:///c:/github/Quiz_VDS-VL/package.json) da `1.1.2` a `1.1.3`.
+
+- **Scelte architetturali & Rationale**:
+  * *Global Touch Hygiene su PWA*: L'adozione di `touch-action: manipulation` su tutti i target cliccabili elimina il ritardo di 300ms del tap su browser mobili e previene lo zoom accidentale da doppio tocco, rendendo l'esperienza PWA indistinguibile da un'applicazione nativa.
+  * *Full-Row Touch Hitboxes*: Sugli smartphone l'allievo pilota non deve mirare a una piccola casella di spunta da 16 pixel; convertire l'intera riga informativa in un `<label>` interattivo rispetta i criteri di ergonomia aeronautica e riduce a zero gli errori di digitazione.
+  * *Accordion Compresso di Default*: Permette una navigazione immediata e selettiva: l'utente vede l'indice completo dei 6 pannelli senza essere sovraccaricato dallo scroll delle opzioni di tema o voce non richieste al momento.
+
+- **Impatto sul Desiderata**:
+  * Piena conformità ai criteri di accessibilità ed ergonomia mobile per l'uso outdoor o su smartphone.
+  * Pronto per il rilascio su `main`.
+
+---
 
 **Data**: 30/09/2026  
 **Autore**: AI Agent (Pair Programming)  

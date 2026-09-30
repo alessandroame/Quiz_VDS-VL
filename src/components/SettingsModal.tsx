@@ -5,7 +5,6 @@ import {
   Moon,
   Monitor,
   Volume2,
-  VolumeX,
   Headphones,
   Cloud,
   Download,
@@ -86,7 +85,7 @@ const AccordionCard: React.FC<AccordionCardProps> = ({
         id={`tab-${id}`}
         onClick={onToggle}
         aria-expanded={isExpanded}
-        className="w-full p-3.5 sm:p-4 flex items-center justify-between text-left transition-colors cursor-pointer select-none group focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 rounded-2xl"
+        className="w-full p-3.5 sm:p-4 flex items-center justify-between text-left transition-colors cursor-pointer select-none group focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 rounded-2xl touch-manipulation active:scale-[0.99]"
       >
         <div className="flex items-center gap-3 min-w-0 pr-2">
           <div
@@ -151,13 +150,13 @@ const AccordionCard: React.FC<AccordionCardProps> = ({
 interface SettingsModalProps {
   isOpen: boolean;
   onClose: () => void;
-  defaultTab?: SettingsTab;
+  defaultTab?: SettingsTab | null;
 }
 
 export const SettingsModal: React.FC<SettingsModalProps> = ({
   isOpen,
   onClose,
-  defaultTab = 'appearance'
+  defaultTab = null
 }) => {
   const { theme, setTheme } = useTheme();
   const { settings, updateSetting, syncState, syncNow } = useQuiz();
@@ -178,6 +177,39 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
   const [voiceUpdateProgress, setVoiceUpdateProgress] = useState<Partial<Record<VoiceName, number>>>({});
   const [audioUpdateToast, setAudioUpdateToast] = useState<string | null>(null);
   const sectionRefs = useRef<Record<string, HTMLDivElement | null>>({});
+
+  const handleStartDownload = async (voice: VoiceName) => {
+    if (typeof window !== 'undefined' && !('caches' in window)) {
+      setAudioUpdateToast('CacheStorage non supportata su questo browser (necessario HTTPS o localhost)');
+      setTimeout(() => setAudioUpdateToast(null), 4000);
+      return;
+    }
+    try {
+      setAudioUpdateToast(`Avvio download audio ${voice === 'giuseppe' ? 'Giuseppe' : 'Elsa'}...`);
+      setTimeout(() => setAudioUpdateToast(null), 2500);
+      await audioDownloadManager.startDownload(voice);
+    } catch (err: any) {
+      setAudioUpdateToast(`Errore download: ${err?.message || 'operazione non riuscita'}`);
+      setTimeout(() => setAudioUpdateToast(null), 4000);
+    }
+  };
+
+  const handleDeleteCache = async (voice: VoiceName) => {
+    try {
+      await audioDownloadManager.deleteCache(voice);
+      setAudioUpdateToast(`Cache audio di ${voice === 'giuseppe' ? 'Giuseppe' : 'Elsa'} eliminata`);
+      setTimeout(() => setAudioUpdateToast(null), 3000);
+    } catch (err: any) {
+      setAudioUpdateToast(`Errore eliminazione cache: ${err?.message || 'operazione non riuscita'}`);
+      setTimeout(() => setAudioUpdateToast(null), 3000);
+    }
+  };
+
+  const handleCancelDownload = (voice: VoiceName) => {
+    audioDownloadManager.cancelDownload(voice);
+    setAudioUpdateToast(`Download audio ${voice === 'giuseppe' ? 'Giuseppe' : 'Elsa'} annullato`);
+    setTimeout(() => setAudioUpdateToast(null), 2500);
+  };
 
   const handleCheckAudioUpdates = async () => {
     setIsCheckingAudioUpdates(true);
@@ -229,8 +261,14 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
       const next = prev === tabId ? null : tabId;
       if (next) {
         setTimeout(() => {
-          sectionRefs.current[next]?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-        }, 50);
+          const el = sectionRefs.current[next];
+          if (el) {
+            const rect = el.getBoundingClientRect();
+            if (rect.top < 60 || rect.bottom > window.innerHeight) {
+              el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            }
+          }
+        }, 120);
       }
       return next;
     });
@@ -411,7 +449,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
       role="dialog"
       aria-modal="true"
       aria-label="Impostazioni"
-      className="fixed inset-0 z-50 flex flex-col h-[100dvh] w-screen bg-zinc-950 text-zinc-100 dark:bg-zinc-950 dark:text-zinc-100 light:bg-slate-50 light:text-slate-900 overflow-hidden font-sans animate-in fade-in duration-150"
+      className="fixed inset-0 z-50 flex flex-col h-[100dvh] w-full bg-zinc-950 text-zinc-100 dark:bg-zinc-950 dark:text-zinc-100 light:bg-slate-50 light:text-slate-900 overflow-hidden font-sans animate-in fade-in duration-150"
     >
       {/* Top Header */}
       <header className="sticky top-0 z-20 w-full border-b backdrop-blur bg-zinc-950/90 border-zinc-800 dark:bg-zinc-950/90 dark:border-zinc-800 light:bg-white/90 light:border-slate-200 transition-colors flex-shrink-0">
@@ -523,7 +561,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                         key={item.id}
                         id={`theme-btn-${item.id}`}
                         onClick={() => setTheme(item.id)}
-                        className={`py-2 px-3 rounded-xl border text-xs font-semibold flex items-center justify-center gap-1.5 transition-colors ${
+                        className={`py-2 px-3 rounded-xl border text-xs font-semibold flex items-center justify-center gap-1.5 transition-colors cursor-pointer active:scale-95 touch-manipulation ${
                           isSelected
                             ? 'border-amber-500 bg-amber-500/20 text-amber-400 light:border-amber-600 light:bg-amber-50 light:text-amber-700'
                             : 'border-zinc-800 bg-zinc-950/60 text-zinc-400 light:border-slate-200 light:bg-slate-50'
@@ -556,7 +594,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                         id={`font-size-btn-${opt.id}`}
                         type="button"
                         onClick={() => updateSetting('fontSizePreference', opt.id)}
-                        className={`py-2 px-2.5 rounded-xl border text-left flex flex-col justify-between transition-all ${
+                        className={`py-2 px-2.5 rounded-xl border text-left flex flex-col justify-between transition-all cursor-pointer active:scale-95 touch-manipulation ${
                           isSelected
                             ? 'border-amber-500 bg-amber-500/20 text-amber-300 light:border-amber-600 light:bg-amber-50 light:text-amber-800 shadow-sm'
                             : 'border-zinc-800 bg-zinc-950/60 text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800/40 light:border-slate-200 light:bg-slate-50 light:text-slate-600'
@@ -579,7 +617,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                 <label className="text-xs font-bold text-zinc-400 uppercase tracking-wider block">
                   Feedback di Studio
                 </label>
-                <div className="flex items-center justify-between p-3 rounded-xl border border-zinc-800 bg-zinc-950/60 light:bg-slate-50 light:border-slate-200">
+                <label className="flex items-center justify-between p-3 rounded-xl border border-zinc-800 bg-zinc-950/60 light:bg-slate-50 light:border-slate-200 cursor-pointer select-none active:scale-[0.99] touch-manipulation transition-all">
                   <div>
                     <span className="text-zinc-300 light:text-slate-700 font-medium block text-xs">
                       Verifica Immediata nelle Materie
@@ -594,7 +632,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                     onChange={e => updateSetting('immediateFeedbackInTopics', e.target.checked)}
                     className="w-4 h-4 accent-amber-500 rounded cursor-pointer"
                   />
-                </div>
+                </label>
               </div>
 
               {/* Opzione Schermo Intero Browser */}
@@ -616,7 +654,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                       type="button"
                       id="btn-toggle-fullscreen"
                       onClick={toggleBrowserFullscreen}
-                      className={`px-3 py-1.5 rounded-lg border text-xs font-semibold flex items-center gap-1.5 transition-colors ${
+                      className={`px-3 py-1.5 rounded-lg border text-xs font-semibold flex items-center gap-1.5 transition-colors cursor-pointer active:scale-95 touch-manipulation ${
                         isFullscreen
                           ? 'border-amber-500 bg-amber-500/20 text-amber-400 light:border-amber-600 light:bg-amber-50 light:text-amber-700'
                           : 'border-zinc-700 bg-zinc-800 hover:bg-zinc-700 text-zinc-300 light:border-slate-300 light:bg-slate-200 light:text-slate-700'
@@ -654,7 +692,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
             }}
           >
             <div className="space-y-3.5">
-              <div className="flex items-center justify-between p-2.5 rounded-xl border border-zinc-800 bg-zinc-950/60 light:bg-slate-50 light:border-slate-200">
+              <label className="flex items-center justify-between p-2.5 rounded-xl border border-zinc-800 bg-zinc-950/60 light:bg-slate-50 light:border-slate-200 cursor-pointer select-none active:scale-[0.99] touch-manipulation transition-all">
                 <div>
                   <span className="text-zinc-300 light:text-slate-700 font-medium block text-xs">
                     Attiva Lettura Vocale
@@ -669,7 +707,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                   onChange={e => updateSetting('ttsEnabled', e.target.checked)}
                   className="w-4 h-4 accent-amber-500 rounded cursor-pointer"
                 />
-              </div>
+              </label>
 
               {settings.ttsEnabled && (
                 <>
@@ -682,10 +720,10 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                       <button
                         type="button"
                         onClick={() => updateSetting('ttsVoice', 'giuseppe')}
-                        className={`p-2 rounded-xl border text-left flex items-center justify-between transition-all ${
+                        className={`p-2.5 rounded-xl border text-left flex items-center justify-between transition-all cursor-pointer active:scale-95 touch-manipulation ${
                           (settings.ttsVoice || 'giuseppe') === 'giuseppe'
                             ? 'border-amber-500 bg-amber-500/20 text-amber-300 light:border-amber-600 light:bg-amber-50 light:text-amber-800 font-semibold'
-                            : 'border-zinc-800 bg-zinc-900/60 text-zinc-400 light:border-slate-200 light:bg-slate-100'
+                            : 'border-zinc-800 bg-zinc-900/60 text-zinc-400 hover:text-zinc-200 light:border-slate-200 light:bg-slate-100'
                         }`}
                       >
                         <span className="text-xs">👨‍✈️ Giuseppe</span>
@@ -695,10 +733,10 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                       <button
                         type="button"
                         onClick={() => updateSetting('ttsVoice', 'elsa')}
-                        className={`p-2 rounded-xl border text-left flex items-center justify-between transition-all ${
+                        className={`p-2.5 rounded-xl border text-left flex items-center justify-between transition-all cursor-pointer active:scale-95 touch-manipulation ${
                           settings.ttsVoice === 'elsa'
                             ? 'border-amber-500 bg-amber-500/20 text-amber-300 light:border-amber-600 light:bg-amber-50 light:text-amber-800 font-semibold'
-                            : 'border-zinc-800 bg-zinc-900/60 text-zinc-400 light:border-slate-200 light:bg-slate-100'
+                            : 'border-zinc-800 bg-zinc-900/60 text-zinc-400 hover:text-zinc-200 light:border-slate-200 light:bg-slate-100'
                         }`}
                       >
                         <span className="text-xs">👩‍✈️ Elsa</span>
@@ -721,10 +759,11 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                       {[0.9, 1.0, 1.15, 1.25].map(rate => (
                         <button
                           key={rate}
+                          type="button"
                           onClick={() => updateSetting('ttsPlaybackRate', rate)}
-                          className={`py-1 rounded-lg text-xs font-semibold transition-colors ${
+                          className={`py-2 rounded-lg text-xs font-semibold transition-all cursor-pointer active:scale-95 touch-manipulation ${
                             (settings.ttsPlaybackRate || 1.0) === rate
-                              ? 'bg-amber-600 text-white'
+                              ? 'bg-amber-600 text-white shadow-sm'
                               : 'bg-zinc-800 hover:bg-zinc-700 text-zinc-300 light:bg-slate-200 light:text-slate-700'
                           }`}
                         >
@@ -736,23 +775,23 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
 
                   {/* Automazioni vocali */}
                   <div className="space-y-2 text-xs">
-                    <label className="flex items-center justify-between p-2 rounded-xl border border-zinc-800 bg-zinc-950/60 light:bg-slate-50 light:border-slate-200 cursor-pointer">
+                    <label className="flex items-center justify-between p-2.5 rounded-xl border border-zinc-800 bg-zinc-950/60 light:bg-slate-50 light:border-slate-200 cursor-pointer select-none active:scale-[0.99] touch-manipulation transition-all">
                       <span className="text-zinc-300 light:text-slate-700">Lettura automatica domanda</span>
                       <input
                         type="checkbox"
                         checked={settings.ttsAutoPlayQuestion}
                         onChange={e => updateSetting('ttsAutoPlayQuestion', e.target.checked)}
-                        className="w-4 h-4 accent-amber-500 rounded"
+                        className="w-4 h-4 accent-amber-500 rounded cursor-pointer"
                       />
                     </label>
 
-                    <label className="flex items-center justify-between p-2 rounded-xl border border-zinc-800 bg-zinc-950/60 light:bg-slate-50 light:border-slate-200 cursor-pointer">
+                    <label className="flex items-center justify-between p-2.5 rounded-xl border border-zinc-800 bg-zinc-950/60 light:bg-slate-50 light:border-slate-200 cursor-pointer select-none active:scale-[0.99] touch-manipulation transition-all">
                       <span className="text-zinc-300 light:text-slate-700">Spiegazione vocale su errore</span>
                       <input
                         type="checkbox"
                         checked={settings.ttsAutoExplainOnMistake}
                         onChange={e => updateSetting('ttsAutoExplainOnMistake', e.target.checked)}
-                        className="w-4 h-4 accent-amber-500 rounded"
+                        className="w-4 h-4 accent-amber-500 rounded cursor-pointer"
                       />
                     </label>
                   </div>
@@ -801,6 +840,11 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                               ? `Parziale: ${audioStatuses.giuseppe.downloadedCount} di ${audioStatuses.giuseppe.totalCount} file`
                               : 'Non scaricato (~154 MB)'}
                           </span>
+                          {audioStatuses.giuseppe.error && (
+                            <span className="text-[11px] text-rose-400 font-medium block mt-0.5">
+                              ⚠️ {audioStatuses.giuseppe.error}
+                            </span>
+                          )}
                         </div>
 
                         <div className="flex items-center gap-1.5 flex-wrap justify-end">
@@ -813,8 +857,8 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                             <button
                               type="button"
                               id="btn-cancel-download-giuseppe"
-                              onClick={() => audioDownloadManager.cancelDownload('giuseppe')}
-                              className="px-2.5 py-1 text-[11px] font-bold text-rose-400 border border-rose-500/40 rounded-lg hover:bg-rose-500/10 transition-colors"
+                              onClick={() => handleCancelDownload('giuseppe')}
+                              className="px-3 py-1.5 text-xs font-bold text-rose-400 border border-rose-500/40 rounded-lg hover:bg-rose-500/10 active:scale-95 cursor-pointer touch-manipulation transition-all"
                             >
                               Annulla
                             </button>
@@ -825,10 +869,10 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                                   type="button"
                                   id="btn-update-audio-giuseppe"
                                   onClick={() => handleApplyAudioUpdates('giuseppe')}
-                                  className="px-2.5 py-1 text-[11px] font-bold text-amber-300 bg-amber-500/20 border border-amber-500/40 rounded-lg hover:bg-amber-500/30 transition-colors flex items-center gap-1"
+                                  className="px-3 py-1.5 text-xs font-bold text-amber-300 bg-amber-500/20 border border-amber-500/40 rounded-lg hover:bg-amber-500/30 active:scale-95 cursor-pointer touch-manipulation transition-all flex items-center gap-1.5"
                                   title="Scarica solo i file modificati per la voce di Giuseppe"
                                 >
-                                  <RefreshCw className="w-3 h-3" />
+                                  <RefreshCw className="w-3.5 h-3.5" />
                                   <span>Aggiorna ({updateCheckResult.voiceUpdates.giuseppe.staleFiles.length})</span>
                                 </button>
                               )}
@@ -836,21 +880,21 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                                 <button
                                   type="button"
                                   id="btn-delete-cache-giuseppe"
-                                  onClick={() => audioDownloadManager.deleteCache('giuseppe')}
-                                  className="px-2.5 py-1 text-[11px] font-bold text-zinc-400 hover:text-rose-400 border border-zinc-800 hover:border-rose-500/40 rounded-lg hover:bg-rose-500/10 transition-colors flex items-center gap-1"
+                                  onClick={() => handleDeleteCache('giuseppe')}
+                                  className="px-3 py-1.5 text-xs font-bold text-zinc-400 hover:text-rose-400 border border-zinc-800 hover:border-rose-500/40 rounded-lg hover:bg-rose-500/10 active:scale-95 cursor-pointer touch-manipulation transition-all flex items-center gap-1.5"
                                   title="Elimina cache audio di Giuseppe"
                                 >
-                                  <Trash2 className="w-3 h-3" />
+                                  <Trash2 className="w-3.5 h-3.5" />
                                   <span>Elimina</span>
                                 </button>
                               ) : (
                                 <button
                                   type="button"
                                   id="btn-download-giuseppe"
-                                  onClick={() => audioDownloadManager.startDownload('giuseppe')}
-                                  className="px-2.5 py-1 text-[11px] font-bold text-amber-400 bg-amber-500/10 border border-amber-500/30 rounded-lg hover:bg-amber-500/20 transition-colors flex items-center gap-1"
+                                  onClick={() => handleStartDownload('giuseppe')}
+                                  className="px-3 py-1.5 text-xs font-bold text-amber-400 bg-amber-500/10 border border-amber-500/30 rounded-lg hover:bg-amber-500/20 active:scale-95 cursor-pointer touch-manipulation transition-all flex items-center gap-1.5"
                                 >
-                                  <Download className="w-3 h-3" />
+                                  <Download className="w-3.5 h-3.5" />
                                   <span>Scarica</span>
                                 </button>
                               )}
@@ -907,6 +951,11 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                               ? `Parziale: ${audioStatuses.elsa.downloadedCount} di ${audioStatuses.elsa.totalCount} file`
                               : 'Non scaricato (~148 MB)'}
                           </span>
+                          {audioStatuses.elsa.error && (
+                            <span className="text-[11px] text-rose-400 font-medium block mt-0.5">
+                              ⚠️ {audioStatuses.elsa.error}
+                            </span>
+                          )}
                         </div>
 
                         <div className="flex items-center gap-1.5 flex-wrap justify-end">
@@ -919,8 +968,8 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                             <button
                               type="button"
                               id="btn-cancel-download-elsa"
-                              onClick={() => audioDownloadManager.cancelDownload('elsa')}
-                              className="px-2.5 py-1 text-[11px] font-bold text-rose-400 border border-rose-500/40 rounded-lg hover:bg-rose-500/10 transition-colors"
+                              onClick={() => handleCancelDownload('elsa')}
+                              className="px-3 py-1.5 text-xs font-bold text-rose-400 border border-rose-500/40 rounded-lg hover:bg-rose-500/10 active:scale-95 cursor-pointer touch-manipulation transition-all"
                             >
                               Annulla
                             </button>
@@ -931,10 +980,10 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                                   type="button"
                                   id="btn-update-audio-elsa"
                                   onClick={() => handleApplyAudioUpdates('elsa')}
-                                  className="px-2.5 py-1 text-[11px] font-bold text-amber-300 bg-amber-500/20 border border-amber-500/40 rounded-lg hover:bg-amber-500/30 transition-colors flex items-center gap-1"
+                                  className="px-3 py-1.5 text-xs font-bold text-amber-300 bg-amber-500/20 border border-amber-500/40 rounded-lg hover:bg-amber-500/30 active:scale-95 cursor-pointer touch-manipulation transition-all flex items-center gap-1.5"
                                   title="Scarica solo i file modificati per la voce di Elsa"
                                 >
-                                  <RefreshCw className="w-3 h-3" />
+                                  <RefreshCw className="w-3.5 h-3.5" />
                                   <span>Aggiorna ({updateCheckResult.voiceUpdates.elsa.staleFiles.length})</span>
                                 </button>
                               )}
@@ -942,21 +991,21 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                                 <button
                                   type="button"
                                   id="btn-delete-cache-elsa"
-                                  onClick={() => audioDownloadManager.deleteCache('elsa')}
-                                  className="px-2.5 py-1 text-[11px] font-bold text-zinc-400 hover:text-rose-400 border border-zinc-800 hover:border-rose-500/40 rounded-lg hover:bg-rose-500/10 transition-colors flex items-center gap-1"
+                                  onClick={() => handleDeleteCache('elsa')}
+                                  className="px-3 py-1.5 text-xs font-bold text-zinc-400 hover:text-rose-400 border border-zinc-800 hover:border-rose-500/40 rounded-lg hover:bg-rose-500/10 active:scale-95 cursor-pointer touch-manipulation transition-all flex items-center gap-1.5"
                                   title="Elimina cache audio di Elsa"
                                 >
-                                  <Trash2 className="w-3 h-3" />
+                                  <Trash2 className="w-3.5 h-3.5" />
                                   <span>Elimina</span>
                                 </button>
                               ) : (
                                 <button
                                   type="button"
                                   id="btn-download-elsa"
-                                  onClick={() => audioDownloadManager.startDownload('elsa')}
-                                  className="px-2.5 py-1 text-[11px] font-bold text-amber-400 bg-amber-500/10 border border-amber-500/30 rounded-lg hover:bg-amber-500/20 transition-colors flex items-center gap-1"
+                                  onClick={() => handleStartDownload('elsa')}
+                                  className="px-3 py-1.5 text-xs font-bold text-amber-400 bg-amber-500/10 border border-amber-500/30 rounded-lg hover:bg-amber-500/20 active:scale-95 cursor-pointer touch-manipulation transition-all flex items-center gap-1.5"
                                 >
-                                  <Download className="w-3 h-3" />
+                                  <Download className="w-3.5 h-3.5" />
                                   <span>Scarica</span>
                                 </button>
                               )}
@@ -1001,9 +1050,9 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                           id="btn-check-audio-updates"
                           disabled={isCheckingAudioUpdates}
                           onClick={handleCheckAudioUpdates}
-                          className="px-2.5 py-1 text-[11px] font-bold text-zinc-300 hover:text-amber-400 border border-zinc-700 hover:border-amber-500/40 rounded-lg hover:bg-amber-500/10 transition-colors flex items-center gap-1.5 disabled:opacity-50 shrink-0"
+                          className="px-3 py-1.5 text-xs font-bold text-zinc-300 hover:text-amber-400 border border-zinc-700 hover:border-amber-500/40 rounded-lg hover:bg-amber-500/10 active:scale-95 cursor-pointer touch-manipulation transition-all flex items-center gap-1.5 disabled:opacity-50 shrink-0"
                         >
-                          <RefreshCw className={`w-3 h-3 ${isCheckingAudioUpdates ? 'animate-spin text-amber-400' : ''}`} />
+                          <RefreshCw className={`w-3.5 h-3.5 ${isCheckingAudioUpdates ? 'animate-spin text-amber-400' : ''}`} />
                           <span>{isCheckingAudioUpdates ? 'Verifica...' : 'Verifica ora'}</span>
                         </button>
                       </div>
@@ -1023,14 +1072,14 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                             Sincronizza silenziosamente file audio modificati all'avvio dell'app
                           </span>
                         </div>
-                        <label className="relative inline-flex items-center cursor-pointer">
+                        <label className="relative inline-flex items-center cursor-pointer select-none touch-manipulation p-1">
                           <input
                             type="checkbox"
                             className="sr-only peer"
                             checked={settings.audioAutoUpdateOnline ?? true}
                             onChange={(e) => updateSetting('audioAutoUpdateOnline', e.target.checked)}
                           />
-                          <div className="w-8 h-4 bg-zinc-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-zinc-300 after:border after:rounded-full after:h-3 after:w-3 after:transition-all peer-checked:bg-amber-500"></div>
+                          <div className="w-8 h-4 bg-zinc-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[6px] after:left-[6px] after:bg-white after:border-zinc-300 after:border after:rounded-full after:h-3 after:w-3 after:transition-all peer-checked:bg-amber-500"></div>
                         </label>
                       </div>
                     </div>
@@ -1044,8 +1093,12 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                         <button
                           type="button"
                           id="btn-reset-audio-prompt"
-                          onClick={() => updateSetting('audioOfflinePromptDismissed', false)}
-                          className="text-amber-400 hover:underline shrink-0 text-left"
+                          onClick={() => {
+                            updateSetting('audioOfflinePromptDismissed', false);
+                            setAudioUpdateToast('Intro audio ripristinata per il prossimo avvio');
+                            setTimeout(() => setAudioUpdateToast(null), 3000);
+                          }}
+                          className="text-amber-400 hover:underline shrink-0 text-left cursor-pointer active:opacity-75 touch-manipulation py-1"
                         >
                           Ripristina intro Audio
                         </button>
@@ -1056,7 +1109,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
               )}
 
               {/* Effetti Sonori */}
-              <div className="flex items-center justify-between p-2.5 rounded-xl border border-zinc-800 bg-zinc-950/60 light:bg-slate-50 light:border-slate-200">
+              <label className="flex items-center justify-between p-2.5 rounded-xl border border-zinc-800 bg-zinc-950/60 light:bg-slate-50 light:border-slate-200 cursor-pointer select-none active:scale-[0.99] touch-manipulation transition-all">
                 <div>
                   <span className="text-zinc-300 light:text-slate-700 font-medium block text-xs">
                     Effetti sonori
@@ -1065,15 +1118,13 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                     Feedback sonoro per tocco e conferma delle risposte
                   </span>
                 </div>
-                <button
-                  onClick={() => updateSetting('soundEnabled', !settings.soundEnabled)}
-                  className={`p-1.5 rounded-lg ${
-                    settings.soundEnabled ? 'text-amber-400' : 'text-zinc-500'
-                  }`}
-                >
-                  {settings.soundEnabled ? <Volume2 className="w-4 h-4" /> : <VolumeX className="w-4 h-4" />}
-                </button>
-              </div>
+                <input
+                  type="checkbox"
+                  checked={settings.soundEnabled}
+                  onChange={e => updateSetting('soundEnabled', e.target.checked)}
+                  className="w-4 h-4 accent-amber-500 rounded cursor-pointer"
+                />
+              </label>
             </div>
           </AccordionCard>
 
@@ -1096,7 +1147,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
               </p>
 
               <div className="space-y-2 text-xs">
-                <div className="flex items-center justify-between p-2.5 rounded-xl border border-zinc-800 bg-zinc-950/60 light:bg-slate-50 light:border-slate-200">
+                <label className="flex items-center justify-between p-2.5 rounded-xl border border-zinc-800 bg-zinc-950/60 light:bg-slate-50 light:border-slate-200 cursor-pointer select-none active:scale-[0.99] touch-manipulation transition-all">
                   <div>
                     <span className="text-zinc-300 light:text-slate-700 font-medium block">
                       Radio Quiz Continuo
@@ -1111,10 +1162,10 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                     onChange={e => updateSetting('driveModeAutopilot', e.target.checked)}
                     className="w-4 h-4 accent-amber-500 rounded cursor-pointer"
                   />
-                </div>
+                </label>
 
                 {/* Modalità Tutor Didattica */}
-                <div className="flex items-center justify-between p-2.5 rounded-xl border border-zinc-800 bg-zinc-950/60 light:bg-slate-50 light:border-slate-200">
+                <label className="flex items-center justify-between p-2.5 rounded-xl border border-zinc-800 bg-zinc-950/60 light:bg-slate-50 light:border-slate-200 cursor-pointer select-none active:scale-[0.99] touch-manipulation transition-all">
                   <div>
                     <span className="text-zinc-300 light:text-slate-700 font-medium block flex items-center gap-1.5">
                       <span>Modalità Tutor Didattica</span>
@@ -1133,10 +1184,10 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                     onChange={e => updateSetting('driveModeTutor', e.target.checked)}
                     className="w-4 h-4 accent-amber-500 rounded cursor-pointer"
                   />
-                </div>
+                </label>
 
                 <div className="p-2.5 rounded-xl border border-zinc-800 bg-zinc-950/60 light:bg-slate-50 light:border-slate-200 space-y-2">
-                  <div className="flex items-center justify-between">
+                  <label className="flex items-center justify-between cursor-pointer select-none touch-manipulation">
                     <div>
                       <span className="text-zinc-300 light:text-slate-700 font-medium block">
                         Rispondi a Voce (Hands-Free)
@@ -1151,7 +1202,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                       onChange={e => updateSetting('driveModeVoiceCommands', e.target.checked)}
                       className="w-4 h-4 accent-amber-500 rounded cursor-pointer"
                     />
-                  </div>
+                  </label>
 
                   {/* Cheat Sheet rapido & Bottone Guida */}
                   <div className="grid grid-cols-2 gap-1.5 text-[11px] text-zinc-400 light:text-slate-600">
@@ -1172,7 +1223,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                   <button
                     type="button"
                     onClick={() => setIsVoiceGuideOpen(true)}
-                    className="w-full py-1.5 px-3 rounded-lg bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/30 text-emerald-400 light:text-emerald-700 text-xs font-semibold flex items-center justify-center gap-1.5 transition-colors"
+                    className="w-full py-2 px-3 rounded-lg bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/30 text-emerald-400 light:text-emerald-700 text-xs font-semibold flex items-center justify-center gap-1.5 transition-all cursor-pointer active:scale-98 touch-manipulation"
                   >
                     <Mic className="w-3.5 h-3.5" />
                     <span>Apri Guida Completa Comandi Vocali</span>
@@ -1200,7 +1251,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                     <button
                       type="button"
                       onClick={() => updateSetting('driveModeAudioOutput', 'speaker')}
-                      className={`p-2 rounded-lg border text-left text-xs transition-all ${
+                      className={`p-2.5 rounded-lg border text-left text-xs transition-all cursor-pointer active:scale-98 touch-manipulation ${
                         (settings.driveModeAudioOutput || 'speaker') === 'speaker'
                           ? 'bg-amber-950/70 border-amber-500 text-amber-200 font-bold light:bg-amber-100 light:border-amber-500 light:text-amber-900'
                           : 'bg-zinc-900/60 border-zinc-800 text-zinc-400 hover:text-zinc-200 light:bg-white light:border-slate-200 light:text-slate-700'
@@ -1218,7 +1269,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                     <button
                       type="button"
                       onClick={() => updateSetting('driveModeAudioOutput', 'headphones')}
-                      className={`p-2 rounded-lg border text-left text-xs transition-all ${
+                      className={`p-2.5 rounded-lg border text-left text-xs transition-all cursor-pointer active:scale-98 touch-manipulation ${
                         settings.driveModeAudioOutput === 'headphones'
                           ? 'bg-indigo-950/70 border-indigo-500 text-indigo-200 font-bold light:bg-indigo-100 light:border-indigo-500 light:text-indigo-900'
                           : 'bg-zinc-900/60 border-zinc-800 text-zinc-400 hover:text-zinc-200 light:bg-white light:border-slate-200 light:text-slate-700'
@@ -1248,10 +1299,11 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                     {[3, 5, 8].map(sec => (
                       <button
                         key={sec}
+                        type="button"
                         onClick={() => updateSetting('driveModeAutoAdvanceSeconds', sec)}
-                        className={`py-1 rounded-lg text-xs font-semibold transition-colors ${
+                        className={`py-2 rounded-lg text-xs font-semibold transition-all cursor-pointer active:scale-95 touch-manipulation ${
                           (settings.driveModeAutoAdvanceSeconds || 5) === sec
-                            ? 'bg-amber-600 text-white'
+                            ? 'bg-amber-600 text-white shadow-sm'
                             : 'bg-zinc-800 hover:bg-zinc-700 text-zinc-300 light:bg-slate-200 light:text-slate-700'
                         }`}
                       >
@@ -1288,7 +1340,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                       type="button"
                       id="btn-settings-replay-intro"
                       onClick={() => voiceService.playDriveIntro()}
-                      className="flex-1 py-1.5 px-2.5 rounded-lg bg-zinc-800 hover:bg-zinc-700 light:bg-slate-200 light:hover:bg-slate-300 text-zinc-200 light:text-slate-800 text-xs font-semibold flex items-center justify-center gap-1.5 transition-colors"
+                      className="flex-1 py-2 px-2.5 rounded-lg bg-zinc-800 hover:bg-zinc-700 light:bg-slate-200 light:hover:bg-slate-300 text-zinc-200 light:text-slate-800 text-xs font-semibold flex items-center justify-center gap-1.5 transition-all cursor-pointer active:scale-95 touch-manipulation"
                       title="Ascolta adesso la spiegazione vocale"
                     >
                       <Volume2 className="w-3.5 h-3.5 text-amber-400" />
@@ -1298,7 +1350,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                       type="button"
                       id="btn-settings-toggle-intro"
                       onClick={() => updateSetting('driveModeIntroPlayed', !settings.driveModeIntroPlayed ? true : false)}
-                      className={`flex-1 py-1.5 px-2.5 rounded-lg text-xs font-semibold flex items-center justify-center gap-1.5 transition-colors border ${
+                      className={`flex-1 py-2 px-2.5 rounded-lg text-xs font-semibold flex items-center justify-center gap-1.5 transition-all border cursor-pointer active:scale-95 touch-manipulation ${
                         !settings.driveModeIntroPlayed
                           ? 'bg-amber-500/20 border-amber-500 text-amber-300'
                           : 'bg-zinc-800/80 border-zinc-700 hover:border-amber-500/50 text-zinc-300 light:bg-slate-200 light:border-slate-300 light:text-slate-700'
@@ -1334,7 +1386,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                 </label>
 
                 {/* Toggle Sincronizzazione Automatica */}
-                <div className="flex items-center justify-between p-3 rounded-xl border border-zinc-800 bg-zinc-950/60 light:bg-slate-50 light:border-slate-200">
+                <label className="flex items-center justify-between p-3 rounded-xl border border-zinc-800 bg-zinc-950/60 light:bg-slate-50 light:border-slate-200 cursor-pointer select-none active:scale-[0.99] touch-manipulation transition-all">
                   <div className="pr-3">
                     <span className="text-zinc-200 light:text-slate-800 font-semibold block text-xs">
                       Sincronizzazione Automatica (Auto-Sync)
@@ -1357,9 +1409,9 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                         setSyncStatus(res.message);
                       }
                     }}
-                    className="w-4 h-4 accent-amber-500 rounded flex-shrink-0"
+                    className="w-4 h-4 accent-amber-500 rounded flex-shrink-0 cursor-pointer"
                   />
-                </div>
+                </label>
 
                 {/* Barra di Stato Sincronizzazione */}
                 {settings.autoSyncDrive && (
@@ -1392,7 +1444,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                     id="btn-drive-upload"
                     onClick={handleBackupToDrive}
                     disabled={isProcessing}
-                    className="py-2.5 px-3 rounded-xl bg-amber-600 hover:bg-amber-500 text-white font-semibold text-xs flex items-center justify-center gap-1.5 shadow-sm transition-all disabled:opacity-50"
+                    className="py-2.5 px-3 rounded-xl bg-amber-600 hover:bg-amber-500 text-white font-semibold text-xs flex items-center justify-center gap-1.5 shadow-sm transition-all disabled:opacity-50 cursor-pointer active:scale-95 touch-manipulation"
                   >
                     <Upload className="w-3.5 h-3.5" />
                     <span>Salva adesso</span>
@@ -1402,7 +1454,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                     id="btn-drive-download"
                     onClick={handleRestoreFromDrive}
                     disabled={isProcessing}
-                    className="py-2.5 px-3 rounded-xl border border-zinc-800 bg-zinc-950 hover:bg-zinc-800 text-zinc-300 light:bg-slate-50 light:border-slate-200 light:text-slate-700 font-semibold text-xs flex items-center justify-center gap-1.5 transition-all disabled:opacity-50"
+                    className="py-2.5 px-3 rounded-xl border border-zinc-800 bg-zinc-950 hover:bg-zinc-800 text-zinc-300 light:bg-slate-50 light:border-slate-200 light:text-slate-700 font-semibold text-xs flex items-center justify-center gap-1.5 transition-all disabled:opacity-50 cursor-pointer active:scale-95 touch-manipulation"
                   >
                     <Download className="w-3.5 h-3.5" />
                     <span>Unisci dati (Merge)</span>
@@ -1423,13 +1475,13 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                 <div className="grid grid-cols-2 gap-2">
                   <button
                     onClick={handleExportLocalJson}
-                    className="py-2 px-3 rounded-xl border border-zinc-800 bg-zinc-950 hover:bg-zinc-800 text-zinc-300 light:bg-slate-50 light:border-slate-200 light:text-slate-700 text-xs font-medium flex items-center justify-center gap-1.5"
+                    className="py-2 px-3 rounded-xl border border-zinc-800 bg-zinc-950 hover:bg-zinc-800 text-zinc-300 light:bg-slate-50 light:border-slate-200 light:text-slate-700 text-xs font-medium flex items-center justify-center gap-1.5 cursor-pointer active:scale-95 touch-manipulation"
                   >
                     <Download className="w-3.5 h-3.5" />
                     <span>Scarica copia</span>
                   </button>
 
-                  <label className="py-2 px-3 rounded-xl border border-zinc-800 bg-zinc-950 hover:bg-zinc-800 text-zinc-300 light:bg-slate-50 light:border-slate-200 light:text-slate-700 text-xs font-medium flex items-center justify-center gap-1.5 cursor-pointer">
+                  <label className="py-2 px-3 rounded-xl border border-zinc-800 bg-zinc-950 hover:bg-zinc-800 text-zinc-300 light:bg-slate-50 light:border-slate-200 light:text-slate-700 text-xs font-medium flex items-center justify-center gap-1.5 cursor-pointer active:scale-95 touch-manipulation">
                     <Upload className="w-3.5 h-3.5" />
                     <span>Carica copia</span>
                     <input
@@ -1481,7 +1533,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                 <button
                   id="btn-reset-data"
                   onClick={handleResetData}
-                  className="w-full py-2.5 rounded-xl border border-rose-500/20 bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 text-xs font-semibold flex items-center justify-center gap-1.5 transition-colors"
+                  className="w-full py-2.5 rounded-xl border border-rose-500/20 bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 text-xs font-semibold flex items-center justify-center gap-1.5 transition-colors cursor-pointer active:scale-98 touch-manipulation"
                 >
                   <Trash2 className="w-3.5 h-3.5" />
                   <span>Cancella tutti i dati e ricomincia da zero</span>

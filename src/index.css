@@ -33,6 +33,20 @@ html, body {
   padding-bottom: env(safe-area-inset-bottom);
 }
 
+/* Ensure all interactive controls properly receive touch & click events on mobile WebKit/iOS */
+button,
+input,
+select,
+textarea,
+label,
+[role="button"],
+a {
+  cursor: pointer;
+  touch-action: manipulation;
+  -webkit-user-select: auto;
+  user-select: auto;
+}
+
 /* Custom scrollbars cockpit style */
 ::-webkit-scrollbar {
   width: 6px;
