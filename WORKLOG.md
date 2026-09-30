@@ -14,6 +14,33 @@ Questo documento registra in ordine cronologico tutte le lavorazioni svolte nel 
 - **Impatto sul Desiderata**: <Come questo intervento contribuisce al desiderata (cfr. DESIDERATA.md) e indicazioni per il prossimo agente>
 ```
 
+### [2026-09-30] - Conversione Dettaglio Materia in Pagina Fullscreen (v1.3.2)
+
+- **Cosa abbiamo fatto**:
+  * **Conversione da Modale Dialog a Vista Fullscreen Dedicata**:
+    - In [src/components/SubjectDetailModal.tsx](file:///c:/github/Quiz_VDS-VL/src/components/SubjectDetailModal.tsx), rimosso l'involucro modale flottante centrato con backdrop scuro (`fixed inset-0 ... bg-black/80 ... max-h-[90vh] rounded-2xl`).
+    - Trasformato il componente in una vista a schermo intero nativa (`fixed inset-0 z-50 flex flex-col h-[100dvh] w-full bg-zinc-950 light:bg-slate-50 overflow-hidden font-sans`).
+    - Introdotta barra di intestazione sticky (`<header>`) con tasto Indietro standard (`<ArrowLeft />` con etichetta "Statistiche"), badge codice materia (`formatSubjectCode`), titolo tronchevole e pulsante di chiusura rapida `[X]`.
+    - Area principale a scorrimento fluido (`<main className="flex-1 overflow-y-auto overscroll-contain">`) con contenitore centrato ergonomico (`max-w-2xl mx-auto px-4 py-4 space-y-4 pb-24`) che ospita la card dashboard materia e la lista quesiti a tutta larghezza.
+  * **Conservazione e Integrazione LIFO**:
+    - Mantenuti inalterati gli ID dei pulsanti (`btn-close-subject-detail`, `btn-train-subject`, `filter-chip-*`) garantendo continuità operativa e compatibilità con `backNavigation.registerSubModal`.
+    - L'apertura della singola domanda ([QuestionDetailModal.tsx](file:///c:/github/Quiz_VDS-VL/src/components/QuestionDetailModal.tsx)) opera regolarmente sopra la vista fullscreen a `z-[60]`.
+  * **Validazione e Test**:
+    - Typecheck `tsc --noEmit` completato con 0 errori.
+    - Suite completa Vitest: 41 file di test, 296 test passati con successo (100%).
+    - Build Vite di produzione riuscita.
+    - Collaudata via Chrome DevTools l'apertura, il filtraggio e il ritorno alle statistiche senza sfarfallii o glitch di layout.
+  * **Avanzamento Versione**:
+    - Bump SemVer a `1.3.2` in [package.json](file:///c:/github/Quiz_VDS-VL/package.json).
+
+- **Scelte architetturali & Rationale**:
+  * *Ergonomia di Consultazione per Liste Ampie*: Materie come Aerodinamica contengono fino a 150 quesiti. Una finestra modale popup da 90vh con sfondo oscurato creava un senso di claustrofobia e scorrimento ristretto. Una vista fullscreen con testata sticky offre l'esperienza d'uso naturale di una schermata dedicata dell'applicazione, massimizzando lo spazio utile e la leggibilità su schermi mobile.
+
+- **Impatto sul Desiderata**:
+  * Allinea la consultazione delle materie dai report statistici agli standard di accessibilità ed ergonomia mobile del design system cockpit.
+
+---
+
 ### [2026-09-30] - Armonizzazione Tema Chiaro e Pulizia Microcopy (v1.3.1)
 
 - **Cosa abbiamo fatto**:
