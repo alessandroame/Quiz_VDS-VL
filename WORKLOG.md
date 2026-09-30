@@ -14,6 +14,82 @@ Questo documento registra in ordine cronologico tutte le lavorazioni svolte nel 
 - **Impatto sul Desiderata**: <Come questo intervento contribuisce al desiderata (cfr. DESIDERATA.md) e indicazioni per il prossimo agente>
 ```
 
+### [2026-09-30] - Avanzamento Automatico su Risposta Esatta (Auto-Advance) nello Studio Standard (v1.2.0)
+
+- **Cosa abbiamo fatto**:
+  * **Avanzamento Automatico Visivo su Risposta Esatta**:
+    - Implementato il meccanismo di auto-advance fluido su risposta corretta nelle schermate di studio visivo:
+      * [src/components/ExamScreen.tsx](file:///c:/github/Quiz_VDS-VL/src/components/ExamScreen.tsx): in modalità Tutor didattica (`examMode === 'tutor'`), su selezione della risposta esatta attende 900ms con feedback verde smeraldo e avanza automaticamente a `currentIndex + 1`.
+      * [src/components/TopicsScreen.tsx](file:///c:/github/Quiz_VDS-VL/src/components/TopicsScreen.tsx): nello studio guidato per materie, su risposta corretta avanza automaticamente a `currentIndex + 1` dopo 900ms.
+      * [src/components/MistakesScreen.tsx](file:///c:/github/Quiz_VDS-VL/src/components/MistakesScreen.tsx): nel Quaderno Errori Leitner, su risposta corretta avanza automaticamente a `currentIndex + 1` dopo 900ms.
+    - **Protezione Didattica su Risposta Errata**: in caso di errore, l'avanzamento automatico NON viene mai innescato, arrestando l'interfaccia affinché l'allievo possa consultare con calma e senza fretta la scheda didattica (**Regola** e **Tranello**).
+    - **Gestione Timer & Lifecycle Sicuro**:
+      * Creato `autoAdvanceTimerRef` con cancellazione deterministica (`clearTimeout`) su cambio domanda, navigazione manuale (`changeIndex`), abbandono della sessione, submit o smontaggio del componente (`unmount`).
+      * Protezione boundary: nessun avanzamento oltre l'ultima domanda (`currentIndex < totalCount - 1`).
+  * **Persistenza & Configurazione nelle Impostazioni**:
+    - In [src/types/database.ts](file:///c:/github/Quiz_VDS-VL/src/types/database.ts), aggiunto il campo opzionale `autoAdvanceOnCorrect?: boolean;` nell'interfaccia `AppSettings`.
+    - In [src/db/index.ts](file:///c:/github/Quiz_VDS-VL/src/db/index.ts), integrato `autoAdvanceOnCorrect: true` in `DEFAULT_SETTINGS`.
+    - In [src/components/SettingsModal.tsx](file:///c:/github/Quiz_VDS-VL/src/components/SettingsModal.tsx), aggiunto il toggle dedicato `#setting-auto-advance-on-correct` nella sezione "Feedback di Studio": *"Avanzamento automatico su risposta esatta"* con sottotitolo *"Passa alla domanda successiva dopo 0.9s solo se la risposta è corretta; si ferma in caso di errore per studiare Regola e Tranello"*.
+  * **Test Unitari & Di Integrazione**:
+    - Creato [src/components/AutoAdvance.test.ts](file:///c:/github/Quiz_VDS-VL/src/components/AutoAdvance.test.ts) (5 test completi AA-01..AA-05) con fake timers per verificare: 1) auto-advance in ExamScreen Tutor; 2) auto-advance in TopicsScreen; 3) auto-advance in MistakesScreen; 4) blocco assoluto dell'avanzamento su risposta errata; 5) rispetto del disarmo dell'impostazione (`autoAdvanceOnCorrect: false`).
+    - Aggiornato [src/components/SettingsModal.test.ts](file:///c:/github/Quiz_VDS-VL/src/components/SettingsModal.test.ts) per verificare il rendering e il toggle del campo `autoAdvanceOnCorrect`.
+    - Tutti i 38 file di test (282 test unitari) passati al 100%. Typecheck TypeScript e build di produzione completati senza errori.
+  * **Allineamento Documentale & SemVer**:
+    - Aggiornati [DESIDERATA.md](file:///c:/github/Quiz_VDS-VL/DESIDERATA.md) e [README.md](file:///c:/github/Quiz_VDS-VL/README.md).
+    - Avanzata versione semantica a `1.2.0` in [package.json](file:///c:/github/Quiz_VDS-VL/package.json).
+
+- **Scelte architetturali & Rationale**:
+  * *Perché 900ms di delay*: 900ms è la finestra ottimale di percezione cognitiva che conferma visivamente il successo della risposta (verde smeraldo, check icon) senza imporre pause frustranti né richiedere il tocco manuale continuo del tasto "Prossima Domanda".
+  * *Arresto asimmetrico su errore*: Nella preparazione all'esame AeCI, l'obiettivo non è fare "speedrun" cieco ma consolidare le nozioni teoriche. Quando l'allievo sbaglia, l'arresto forzato garantisce che l'attenzione si concentri sulla Regola fisica/normativa e sul Tranello lessicale, evitando che una domanda errata scivoli via inosservata.
+  * *Autonomia da audio*: A differenza della modalità "Mani Libere" che richiede sintesi vocale e speech recognition, questa modalità è 100% visiva e silenziosa, perfetta per studiare ovunque con una mano sola.
+
+- **Impatto sul Desiderata**:
+  * Risolve l'attrito del doppio tocco continuo nello studio visivo standard, combinando la fluidità e il ritmo del "Radio Quiz" con il massimo rigore didattico sui concetti non ancora assimilati.
+
+---
+
+### [2026-09-30] - Ripetizione Selettiva Domanda e Singole Opzioni in Modalità Mani Libere (v1.1.9)
+
+- **Cosa abbiamo fatto**:
+  * **Parser Vocale Deterministico per Comandi Selettivi**:
+    - In [src/utils/voiceCommandParser.ts](file:///c:/github/Quiz_VDS-VL/src/utils/voiceCommandParser.ts), aggiunti i comandi `repeat_question`, `repeat_opt1`, `repeat_opt2`, `repeat_opt3`.
+    - RegEx ad alta priorità posizionate PRIMA dei comandi generici a cifra singola ("uno", "due", "tre") e del comando generico "ripeti", prevenendo match accidentali:
+      * `repeat_question`: cattura "ripeti domanda", "rileggi la domanda", "solo domanda", "ancora la domanda".
+      * `repeat_opt1` / `2` / `3`: cattura "ripeti uno / due / tre", "rileggi la uno / due / tre", "solo uno / due / tre", "ancora la uno / due / tre", "opzione uno / due / tre".
+    - Test unitari dedicati in [src/utils/voiceCommandParser.test.ts](file:///c:/github/Quiz_VDS-VL/src/utils/voiceCommandParser.test.ts) (`VC-03b`).
+  * **HUD Mani Libere con Controlli Touch Ergonomici e Sicuri**:
+    - In [src/components/drive/DriveActiveHUD.tsx](file:///c:/github/Quiz_VDS-VL/src/components/drive/DriveActiveHUD.tsx):
+      * L'intera card del testo della domanda è resa interattiva (`cursor-pointer`) con titolo esplicito "Tocca per riascoltare solo la domanda", e pulsante dedicato `#btn-drive-play-question` con icona `Volume2` e dicitura `[Solo Domanda]`.
+      * Su ciascuna delle tre macro-fasce delle opzioni di risposta (1, 2, 3), inserito sul lato destro un trigger dedicato `#btn-drive-opt-audio-N` con icona altoparlante `Volume2`.
+      * Implementato con pattern semantico `<span role="button" tabIndex={0}>` con `e.stopPropagation()` sia su `onClick` che su `onKeyDown` (Enter/Space), evitando nesting illegale di `<button>` in `<button>` e garantendo che il tocco dell'audio non selezioni né invii mai la risposta involontariamente.
+  * **Coordinamento del Flusso Parlato & Pilota Automatico in DriveModeScreen**:
+    - In [src/components/DriveModeScreen.tsx](file:///c:/github/Quiz_VDS-VL/src/components/DriveModeScreen.tsx):
+      * Esposte le funzioni `playQuestion` e `playOption` dall'hook `useAviationVoice`.
+      * Implementati gli handler `handlePlayQuestion` e `handlePlayOption` con feedback aptico `triggerHaptic('light')`.
+      * Routing dei nuovi comandi vocali `repeat_question`, `repeat_opt1`, `repeat_opt2`, `repeat_opt3` in `handleVoiceCommand`.
+      * Aggiunte scorciatoie da tastiera: `Q` per ripetere solo la domanda, `Alt+1`, `Alt+2`, `Alt+3` per ripetere le singole opzioni.
+      * Sincronizzazione del Pilota Automatico: se la lettura selettiva viene attivata durante il countdown di attesa della risposta, il countdown viene interrotto e riavviato automaticamente appena il frammento audio selezionato termina di parlare.
+      * Aggiunti suggerimenti rotativi ("'Ripeti domanda' o 'Ripeti uno'") nell'array `VOICE_HINTS`.
+  * **Cheat Sheet Comandi Vocali Aggiornato**:
+    - In [src/components/VoiceCommandsModal.tsx](file:///c:/github/Quiz_VDS-VL/src/components/VoiceCommandsModal.tsx), aggiornata la sezione "Riascolta Audio" con i comandi selettivi e le scorciatoie `Q` e `Alt+1/2/3`.
+  * **Suite di Test & Build**:
+    - Aggiunti 3 test di integrazione in [src/components/DriveModeScreen.test.ts](file:///c:/github/Quiz_VDS-VL/src/components/DriveModeScreen.test.ts) (`DRIVE-SELECTIVE-01`, `DRIVE-SELECTIVE-02`, `DRIVE-SELECTIVE-03`).
+    - Risolto bug Windows NTFS `ENOTEMPTY` in `vite.config.ts` impostando `build.emptyOutDir: false`.
+    - Suite Vitest: 38 file di test e 282 test passati al 100%.
+    - Build di produzione `tsc && vite build` completata con successo a zero errori.
+  * **Documentazione & Versionamento**:
+    - Aggiornati [README.md](file:///c:/github/Quiz_VDS-VL/README.md), [DESIDERATA.md](file:///c:/github/Quiz_VDS-VL/DESIDERATA.md) e [package.json](file:///c:/github/Quiz_VDS-VL/package.json) (versione `1.1.9`).
+
+- **Scelte architetturali & Rationale**:
+  * *Disaccoppiamento Ascolto / Sottomissione con stopPropagation*: In una modalità d'uso mobile (auto, bici, corsa, guanti), il rischio di inviare per errore una risposta mentre si voleva solo riascoltarla è elevato. Isolare l'icona altoparlante sul margine destro della fascia con stopPropagation assicura che il tocco audio non scateni in alcun caso la logica di risposta.
+  * *Precedenza RegEx del Parser Vocale*: I comandi vocali per la selezione delle opzioni sono parole brevi come "uno", "due", "tre". Anteporre i pattern "ripeti uno" / "rileggi la uno" / "solo uno" garantisce che la parola non venga interpretata erroneamente come sottomissione della risposta 1.
+  * *Resilienza Windows NTFS Build*: L'impostazione `emptyOutDir: false` in Vite impedisce a `fs.rmSync` di fallire a causa del blocco asincrono dei file MP3 della cartella `dist/audio` su sistemi Windows.
+
+- **Impatto sul Desiderata**:
+  * Risponde puntualmente alla richiesta utente, perfezionando l'interazione hands-free e l'ergonomia audio della PWA VDS-VL.
+
+---
+
 ### [2026-09-30] - Interruzione Immediata della Voce su Indietro, Abbandono e Conclusione Quiz
 
 - **Cosa abbiamo fatto**:

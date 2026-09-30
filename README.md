@@ -59,7 +59,11 @@
     - **Nessun limite di tempo**: studio rilassato senza countdown, con cronometro discreto del tempo trascorso.
     - **Verifica e Feedback Immediato**: alla selezione di una risposta, l'opzione viene validata all'istante (verde/rosso), con visualizzazione esplicita della soluzione esatta e della spiegazione contestuale didattica (**Regola** e **Tranello**).
     - **Mappa Interattiva a 30 Bolle**: la griglia dei quesiti colora ciascuno slot in tempo reale (verde smeraldo per le risposte esatte, rosso per gli errori) consentendo un'analisi immediata del proprio rendimento.
-    - **Avanzamento Fluido a 1 Tocco**: pulsante dedicato *"Prossima Domanda"* visualizzato sotto al feedback per studiare comodamente con una mano su smartphone.
+    - **Avanzamento Fluido a 1 Tocco & Auto-Advance su Risposta Esatta**:
+      * In caso di risposta corretta, l'applicazione attende un intervallo percettivo di 900ms con conferma visiva verde smeraldo e avanza automaticamente alla domanda successiva, velocizzando le sessioni di studio sia in **Tutor**, sia in **Studio per Materie**, sia nel **Quaderno Errori**.
+      * In caso di risposta errata, l'avanzamento automatico si arresta tassativamente per permettere all'allievo di consultare con calma la scheda didattica (**Regola** e **Tranello**).
+      * Disattivabile in qualsiasi momento nelle Impostazioni (*Feedback di Studio* ➔ *Avanzamento automatico su risposta esatta*).
+      * Pulsante dedicato *"Prossima Domanda"* sempre disponibile per avanzamento manuale.
     - **Registrazione Istantanea**: statistiche e telemetria salvate in tempo reale in IndexedDB, alimentando subito il Quaderno Errori senza attendere la fine della scheda.
   - ⏱️ **Simulazione Esame Ufficiale AeCI (Prova Formale)**:
     - 30 quesiti AeCI, timer countdown di 45 minuti con indicatori di stato visivi e allarmi negli ultimi minuti.
@@ -123,7 +127,8 @@
   - Accesso diretto con pulsante rapido **"Tutor Didattico (30 Quiz)"** nel Launcher o commutazione istantanea dalla schermata Tutor tramite il tasto `Mani Libere`.
   - Spiegazione didattica vocale neutrale (*"La risposta esatta è la... Regola: ... Tranello: ..."*) riprodotta **esclusivamente in caso di risposta errata** o mancata risposta prima dell'avanzamento, preservando la rapidità dello studio sulle risposte corrette. Sincronizzazione anti-troncamento dell'avanzamento automatico (attesa fine del file audio + pausa di assimilazione di 2.5s prima di avanzare). Sulle risposte esatte, la scheda didattica rimane consultabile a schermo con pulsante "Ascolta" per approfondimento opzionale.
   - Cronometro didattico incrementale (count-up senza limiti di tempo) e card didattica ad alto contrasto.
-- **Comandi Vocali Hands-Free in Italiano**: interazione completa a voce tramite Web Speech Recognition con comandi dedicati (`"Uno"`, `"Due"`, `"Tre"`, `"Avanti"`, `"Indietro"`, `"Ripeti"`, `"Bandiera"`, `"Pausa"`, `"Spiega"`, `"Tutor"`).
+- **Ripetizione Selettiva Domanda e Opzioni (Touch, Voce & Tastiera)**: possibilità di isolare l'ascolto senza dover risentire l'intera sequenza di 20-30 secondi. Toccando l'area della domanda o il pulsante `[Solo Domanda]` viene ripetuta esclusivamente la domanda. Toccando il pulsante altoparlante `[🔊]` presente sul lato destro di ciascuna delle 3 macro-fasce (senza selezionare o rischiare sottomissioni involontarie) viene riletta unicamente quella specifica opzione. Pieno supporto a voce con comandi naturali (*"Ripeti domanda"*, *"Ripeti uno"*, *"Rileggi la due"*, *"Solo tre"*) e da tastiera (`Q` per domanda, `Alt+1` / `Alt+2` / `Alt+3` per opzioni).
+- **Comandi Vocali Hands-Free in Italiano**: interazione completa a voce tramite Web Speech Recognition con comandi dedicati (`"Uno"`, `"Due"`, `"Tre"`, `"Avanti"`, `"Indietro"`, `"Ripeti"`, `"Ripeti Domanda"`, `"Ripeti Uno/Due/Tre"`, `"Bandiera"`, `"Pausa"`, `"Spiega"`, `"Tutor"`).
 - **Gestione Microfono Anti-Eco (Selettore Altoparlante / Cuffie)**:
   - 🔊 **Modalità Altoparlante (Default - Senza cuffie)**: il microfono è temporaneamente disattivato mentre l'altoparlante legge la domanda, le opzioni o le spiegazioni, e si attiva automaticamente **solo a fine parlato** (durante il countdown di risposta) o **mentre l'audio è in pausa**. Grazie a un buffer acustico di 250ms, elimina alla radice qualsiasi interferenza o falso comando innescato dalla voce dello smartphone.
   - 🎧 **Modalità Cuffie (Con microfono)**: microfono sempre attivo in continuo per consentire il "barge-in" (interruzione del parlato a voce in qualsiasi istante).
@@ -164,7 +169,7 @@
 - **Barra Navigazione Quiz Ancorata in Basso (`QuizBottomBar`)**:
   - Comandi `Precedente`, `⚑ Segna`, `Prossima Domanda` e `Consegna` costantemente visibili in basso a portata di pollice con supporto safe-area.
 - **Schermata Impostazioni Fullscreen ad Accordion Compresso Singolo**:
-  - 6 argomenti verticali ad apertura esclusiva (Aspetto, Voce, Guida, Backup, Dati, About) con badge live riassuntivi.
+  - 6 argomenti verticali ad apertura esclusiva (Aspetto, Voce, Mani Libere, Backup, Dati, About) con badge live riassuntivi.
 - **Temi Cockpit Dark & Hangar Light, Palette ad Alto Contrasto e Scorciatoie da Tastiera**:
   - Zero dominante blu (tonalità neutre `zinc` + accento ambra avionico), icone Aero Shield, e scorciatoie fisiche complete (`1`, `2`, `3`, `F`, `Spazio`, `Q`, `Esc`).
   - Rimozione della bottom bar fissa per liberare fino a 60px di altezza utile su smartphone per il testo dei quiz, le risposte e il feedback didattico immediato.
