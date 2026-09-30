@@ -105,6 +105,10 @@ Questo file costituisce la **memoria tecnica permanente** del progetto. Raccogli
   - Il microfono si attiva esclusivamente a fine parlato (durante il countdown di attesa risposta) o mentre la riproduzione è in pausa (`isPaused: true`).
   - Cooldown acustico di sicurezza di 250ms post-parlato prima della riattivazione per assorbire il riverbero dell'altoparlante ed eliminare qualsiasi falso comando.
   - Modalità `'headphones'` (cuffie con microfono) opzionale per chi indossa auricolari e desidera l'ascolto continuo con interruzione vocale immediata (barge-in).
+- **Trimming Silenzio di Coda & Cadenza Rapida (Zero Dead Air)**:
+  - Tutti i file audio MP3 generati da Edge-TTS (`it-IT-DiegoNeural` ed `it-IT-ElsaNeural`) sono sottoposti a trimming del silenzio finale mediante filtro audio FFmpeg inverso (`areverse,silenceremove,areverse,apad=pad_dur=0.1`).
+  - Il silenzio piatto appeso dal motore TTS (~920ms per Diego) viene rimosso, lasciando esattamente 100ms di decadimento naturale. Questo azzera i tempi morti tra domanda e opzioni (la pausa software di 350ms in `voiceService` resta pulita e naturale) e rende il microfono per i comandi vocali immediatamente reattivo (attivo a T+350ms dal termine del parlato anziché T+1,2s).
+  - Pipeline automatizzata via [scripts/trim_audio_silence.py](file:///c:/github/Quiz_VDS-VL/scripts/trim_audio_silence.py) e integrata in [scripts/generate_audio_database.py](file:///c:/github/Quiz_VDS-VL/scripts/generate_audio_database.py).
 
 ---
 

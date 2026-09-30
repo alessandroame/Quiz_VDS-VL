@@ -12,7 +12,11 @@ import json
 import asyncio
 import re
 import argparse
+import subprocess
+import imageio_ffmpeg
 import edge_tts
+
+FFMPEG_EXE = imageio_ffmpeg.get_ffmpeg_exe()
 
 VOICE_CONFIGS = {
     "giuseppe": {
@@ -233,7 +237,23 @@ async def generate_single(out_dir: str, filename: str, text: str, voice_cfg: dic
                 )
                 await comm.save(tmp_dest)
                 if os.path.exists(tmp_dest) and os.path.getsize(tmp_dest) > 1000:
-                    os.replace(tmp_dest, dest)
+                    # Trim trailing silence leaving clean 100ms decay padding
+                    trimmed_tmp = f"{tmp_dest}.trimmed.mp3"
+                    trim_cmd = [
+                        FFMPEG_EXE, "-y", "-i", tmp_dest,
+                        "-af", "areverse,silenceremove=start_periods=1:start_duration=0.1:start_threshold=-45dB,areverse,apad=pad_dur=0.1",
+                        "-ar", "24000", "-ac", "1", "-b:a", "48k",
+                        trimmed_tmp
+                    ]
+                    trim_res = subprocess.run(trim_cmd, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+                    if trim_res.returncode == 0 and os.path.exists(trimmed_tmp) and os.path.getsize(trimmed_tmp) > 1000:
+                        os.replace(trimmed_tmp, dest)
+                        if os.path.exists(tmp_dest):
+                            os.remove(tmp_dest)
+                    else:
+                        if os.path.exists(trimmed_tmp):
+                            os.remove(trimmed_tmp)
+                        os.replace(tmp_dest, dest)
                     return True
                 else:
                     if os.path.exists(tmp_dest):

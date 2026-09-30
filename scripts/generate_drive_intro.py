@@ -9,7 +9,11 @@ Supports both Giuseppe and Elsa voices using Edge-TTS:
 import os
 import sys
 import asyncio
+import subprocess
+import imageio_ffmpeg
 import edge_tts
+
+FFMPEG_EXE = imageio_ffmpeg.get_ffmpeg_exe()
 
 INTRO_TEXT = (
     "Benvenuto nella modalità a mani libere. "
@@ -39,6 +43,7 @@ VOICE_CONFIGS = {
 async def generate_voice_intro(name: str, config: dict):
     dest = config["dest"]
     os.makedirs(os.path.dirname(dest), exist_ok=True)
+    tmp_dest = f"{dest}.tmp.mp3"
     print(f"Generating drive intro for voice '{name}' ({config['voice']})...")
     comm = edge_tts.Communicate(
         text=INTRO_TEXT,
@@ -46,9 +51,18 @@ async def generate_voice_intro(name: str, config: dict):
         rate=config["rate"],
         pitch=config["pitch"]
     )
-    await comm.save(dest)
+    await comm.save(tmp_dest)
+    trim_cmd = [
+        FFMPEG_EXE, "-y", "-i", tmp_dest,
+        "-af", "areverse,silenceremove=start_periods=1:start_duration=0.1:start_threshold=-45dB,areverse,apad=pad_dur=0.1",
+        "-ar", "24000", "-ac", "1", "-b:a", "48k",
+        dest
+    ]
+    subprocess.run(trim_cmd, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, check=True)
+    if os.path.exists(tmp_dest):
+        os.remove(tmp_dest)
     size = os.path.getsize(dest)
-    print(f"Saved {dest} ({size} bytes)")
+    print(f"Saved trimmed {dest} ({size} bytes)")
 
 async def main():
     for name, config in VOICE_CONFIGS.items():

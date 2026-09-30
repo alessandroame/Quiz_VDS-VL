@@ -14,6 +14,35 @@ Questo documento registra in ordine cronologico tutte le lavorazioni svolte nel 
 - **Impatto sul Desiderata**: <Come questo intervento contribuisce al desiderata (cfr. DESIDERATA.md) e indicazioni per il prossimo agente>
 ```
 
+### [2026-09-30] - Trimming Silenzio di Coda Audio Neurale & Reattività Vocale (v1.5.1)
+
+- **Cosa abbiamo fatto**:
+  * **Diagnosi Strumentale del Silenzio di Coda**:
+    - Misurato con PyAV e campionamento PCM l'audio generato da Microsoft Edge-TTS: rilevato che la voce maschile Giuseppe (`it-IT-DiegoNeural`) appendeva sistematicamente ~900-940ms di silenzio piatto al termine di ogni singolo frammento audio, quadruplicando la coda rispetto ad Elsa (`it-IT-ElsaNeural`, ~220ms).
+    - Identificato l'effetto cumulo: i ~920ms di silenzio nei file MP3 posticipavano l'evento browser `ended`, sommandosi ai 350ms di pausa sequenza (totale >1,25s tra domanda e opzioni), ai 250ms di cooldown acustico del microfono (microfono sordo per ~1,2s dopo l'ultima parola dell'opzione 3), ai 5s del countdown e ai 2,5s della pausa di assimilazione didattica in Modalità Tutor (blocco visivo di ~3,4s).
+  * **Pipeline di Trimming Silenzio Automatica ([scripts/trim_audio_silence.py](file:///c:/github/Quiz_VDS-VL/scripts/trim_audio_silence.py))**:
+    - Creato script multi-processo basato sul motore FFmpeg v7.1 (`imageio_ffmpeg`) con filtro audio inverso (`areverse,silenceremove=start_periods=1:start_duration=0.1:start_threshold=-45dB,areverse,apad=pad_dur=0.1`).
+    - Il filtro rimuove il silenzio piatto finale senza intaccare in alcun modo il parlato o le pause naturali interne tra "Uno." e il testo, lasciando un pulito e morbido decadimento acustico di 100ms (`apad=pad_dur=0.1`).
+    - Eseguito il trimming su tutti i 5.042 file MP3 dell'intero dataset (`public/audio/giuseppe` ed `public/audio/elsa`), azzerando tutti i tempi morti con 0 errori e risparmiando 14.42 MB di storage (da 314.31 MB a 299.89 MB).
+  * **Automazione Pipeline & Manifest**:
+    - Integrato il passo di trimming del silenzio direttamente nelle pipeline generatrici [scripts/generate_audio_database.py](file:///c:/github/Quiz_VDS-VL/scripts/generate_audio_database.py) e [scripts/generate_drive_intro.py](file:///c:/github/Quiz_VDS-VL/scripts/generate_drive_intro.py).
+    - Rigenerato il catalogo hash in [public/audio/manifest.json](file:///c:/github/Quiz_VDS-VL/public/audio/manifest.json) per garantire la corretta sincronizzazione differenziale della cache offline PWA.
+    - Aggiunto il comando npm `"audio:trim": "python scripts/trim_audio_silence.py"` in [package.json](file:///c:/github/Quiz_VDS-VL/package.json).
+  * **Allineamento Memoria & SemVer**:
+    - Aggiornata la memoria tecnica permanente in [MEMORY.md](file:///c:/github/Quiz_VDS-VL/MEMORY.md).
+    - Verificata la suite completa Vitest (309 test passanti su 309, 45 suite).
+    - Build Vite di produzione completata con successo.
+    - Bump SemVer a `1.5.1` in [package.json](file:///c:/github/Quiz_VDS-VL/package.json).
+
+- **Scelte architetturali & Rationale**:
+  * *Trimming Fisico alla Sorgente vs Workaround Software*: Anziché tentare euristiche software complesse (come `timeupdate` o interruzione anticipata della riproduzione nel browser, che rischierebbero di troncare la fine delle parole su dispositivi lenti o con browser diversi), rimuovere il silenzio fisicamente alla sorgente garantisce un comportamento deterministico, compatibile al 100% con iOS Safari, Android Chrome e la Cache PWA.
+  * *Decadimento Naturale (100ms apad)*: Tagliare a zero assoluto l'audio potrebbe produrre click o artefatti digitali; l'aggiunta di 100ms di padding e la frequenza di campionamento preservata (24000Hz mono 48kbps) garantiscono naturalezza acustica priva di glitch.
+
+- **Impatto sul Desiderata**:
+  * Risolve l'anomalia di latenza segnalata dall'allievo, donando all'esperienza vocale Hands-Free e allo studio guidato una reattività istantanea, fluida e naturale.
+
+---
+
 ### [2026-09-30] - Manuale Utente Illustrato "A Prova di Errore" & Pipeline Screenshot CDP (TODO-10 & v1.5.0)
 
 - **Cosa abbiamo fatto**:
