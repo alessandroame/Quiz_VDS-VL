@@ -48,7 +48,8 @@ export const StatsScreen: React.FC<StatsScreenProps> = ({ onTrainSubject }) => {
     .slice(0, 10);
 
   return (
-    <div className="max-w-2xl mx-auto px-4 py-6 space-y-6">
+    <>
+      <div className="max-w-2xl mx-auto px-4 py-6 space-y-6">
       <div>
         <h1 className="text-xl font-bold tracking-tight">I tuoi Progressi</h1>
         <p className="text-xs text-zinc-400 light:text-slate-600">
@@ -284,6 +285,7 @@ export const StatsScreen: React.FC<StatsScreenProps> = ({ onTrainSubject }) => {
           </div>
         </div>
       )}
+      </div>
 
       {/* Modale Dettaglio Materia */}
       <SubjectDetailModal
@@ -300,6 +302,6 @@ export const StatsScreen: React.FC<StatsScreenProps> = ({ onTrainSubject }) => {
         isOpen={selectedQuestion !== null}
         onClose={() => setSelectedQuestion(null)}
       />
-    </div>
+    </>
   );
 };

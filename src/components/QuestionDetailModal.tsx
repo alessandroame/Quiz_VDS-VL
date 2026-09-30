@@ -95,7 +95,7 @@ export const QuestionDetailModal: React.FC<QuestionDetailModalProps> = ({
       role="dialog"
       aria-modal="true"
       aria-labelledby="question-detail-title"
-      className="fixed inset-0 z-[60] flex items-center justify-center p-3 sm:p-4 bg-black/80 backdrop-blur-sm animate-in fade-in duration-200"
+      className="fixed inset-0 z-[60] flex items-center justify-center p-3 sm:p-4 !m-0 bg-black/80 backdrop-blur-sm animate-in fade-in duration-200"
       onClick={(e) => {
         if (e.target === e.currentTarget) {
           stop();

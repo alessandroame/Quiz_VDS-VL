@@ -108,7 +108,7 @@ export const SubjectDetailModal: React.FC<SubjectDetailModalProps> = ({
       id="subject-detail-view"
       role="region"
       aria-label={`Dettaglio materia: ${subjectMeta.name}`}
-      className="fixed inset-0 z-50 flex flex-col h-[100dvh] w-full bg-zinc-950 text-zinc-100 dark:bg-zinc-950 dark:text-zinc-100 light:bg-slate-50 light:text-slate-900 overflow-hidden font-sans animate-in fade-in duration-150"
+      className="fixed inset-0 top-0 left-0 right-0 bottom-0 z-50 flex flex-col h-[100dvh] w-full !m-0 !p-0 bg-zinc-950 text-zinc-100 dark:bg-zinc-950 dark:text-zinc-100 light:bg-slate-50 light:text-slate-900 overflow-hidden font-sans animate-in fade-in duration-150"
     >
       {/* Top Header */}
       <header className="sticky top-0 z-20 w-full border-b backdrop-blur bg-zinc-950/90 border-zinc-800 dark:bg-zinc-950/90 dark:border-zinc-800 light:bg-white/90 light:border-slate-200 transition-colors flex-shrink-0">

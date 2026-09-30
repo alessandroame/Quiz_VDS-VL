@@ -14,6 +14,32 @@ Questo documento registra in ordine cronologico tutte le lavorazioni svolte nel 
 - **Impatto sul Desiderata**: <Come questo intervento contribuisce al desiderata (cfr. DESIDERATA.md) e indicazioni per il prossimo agente>
 ```
 
+### [2026-09-30] - Risoluzione Offset Superiore Dettaglio Materia ed Edge-to-Edge Fullscreen (v1.3.3)
+
+- **Cosa abbiamo fatto**:
+  * **Risoluzione Radice del Gap Superiore (Navbar Visibile in Background)**:
+    - Diagnosticato il motivo per cui l'intestazione della vista dettaglio materia risultava abbassata di 24px mostrando parzialmente la Navbar sottostante: [StatsScreen.tsx](file:///c:/github/Quiz_VDS-VL/src/components/StatsScreen.tsx) conteneva l'intero layout all'interno di un div con classe Tailwind `space-y-6`, la quale applica un selettore `> :not([hidden]) ~ :not([hidden]) { margin-top: 1.5rem; }` a ogni figlio diretto successivo, iniettando `margin-top: 24px` sul div `position: fixed; inset: 0` della vista dettaglio.
+    - Estratti sia [SubjectDetailModal.tsx](file:///c:/github/Quiz_VDS-VL/src/components/SubjectDetailModal.tsx) che [QuestionDetailModal.tsx](file:///c:/github/Quiz_VDS-VL/src/components/QuestionDetailModal.tsx) all'esterno del contenitore `.space-y-6` mediante Fragment React (`<> ... </>`) in [StatsScreen.tsx](file:///c:/github/Quiz_VDS-VL/src/components/StatsScreen.tsx).
+    - Rinforzata la schermata fullscreen in [SubjectDetailModal.tsx](file:///c:/github/Quiz_VDS-VL/src/components/SubjectDetailModal.tsx) con `fixed inset-0 top-0 left-0 right-0 bottom-0 z-50 !m-0 !p-0` azzerando qualsiasi margine o padding ereditabile.
+    - Uniformata anche [QuestionDetailModal.tsx](file:///c:/github/Quiz_VDS-VL/src/components/QuestionDetailModal.tsx) con `!m-0` e livello di sovrapposizione `z-[60]` garantendo sovrapposizione pulita sopra la pagina materia.
+  * **Collaudo Headless Visivo CDP e Suite di Test**:
+    - Verificato tramite Chrome DevTools MCP che `rect.top` è esattamente `0px`, `marginTop: 0px`, con copertura visiva 100% edge-to-edge dello schermo (390x844).
+    - Verificato che aprendo un quesito la modale di dettaglio domanda si posiziona perfettamente sopra senza alterare lo stato della vista materia.
+    - Console del browser pulita con 0 errori/warning.
+    - Typecheck `tsc --noEmit` superato con 0 errori.
+    - Esecuzione unit test Vitest: 41 file di test passati, 296 test superati (100%).
+    - Build Vite di produzione completata con successo.
+  * **Avanzamento Versione**:
+    - Bump SemVer a `1.3.3` in [package.json](file:///c:/github/Quiz_VDS-VL/package.json).
+
+- **Scelte architetturali & Rationale**:
+  * *Isolamento Strutturale da Tailwind space-y*: Le classi di spaziatura tra figli di Tailwind (`space-y-*`) applicano margini superiori a tutti i nodi adiacenti. I componenti overlay e fullscreen (come schermate modali o takeover a tutto schermo) non devono mai risiedere come figli diretti di contenitori con `space-y-*` per evitare che la regola di layout del genitore impatti la geometria `position: fixed`. L'uso di un React Fragment isola semanticamente il contenuto scrollabile della pagina dagli overlay a tutto schermo.
+
+- **Impatto sul Desiderata**:
+  * Risolve l'anomalia visiva segnalata dall'allievo, garantendo un'esperienza a schermo intero pulita, immersiva e priva di sovrapposizioni indesiderate con la barra di navigazione.
+
+---
+
 ### [2026-09-30] - Conversione Dettaglio Materia in Pagina Fullscreen (v1.3.2)
 
 - **Cosa abbiamo fatto**:
