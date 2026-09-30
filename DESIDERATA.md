@@ -159,6 +159,7 @@ Questo documento rappresenta la **bussola strategica e funzionale** del progetto
 | Sincronizzazione Tasto Indietro Hardware (Back Coordinator) | 🟢 Completato | Gestione unificata `popstate` e gestures Android/iOS: il tasto indietro del telefono esegue sempre l'azione del tasto grafico visibile (chiusura submodali, annullamento guardia esame, chiusura Audio/Impostazioni, ritorno a Home). |
 | Navigatore Quiz Comprimibile a Singola Riga | 🟢 Completato | Componente modulare `QuestionNavigator` con vista espansa a 3 righe (30 bolle) e modalità compressa a singola riga (30 tacche avioniche colorate a tutta larghezza su mobile, con numeri su desktop), persistenza preferenza in `localStorage` e risparmio di oltre 70px verticali per layout zero-scroll. |
 | Gestione Microfono Anti-Eco & Selettore Altoparlante / Cuffie | 🟢 Completato | Sospensione immediata del microfono (`rec.abort()`) durante la riproduzione audio in modalità altoparlante per azzerare l'eco dello speaker. Riattivazione a fine parlato o mentre l'audio è in pausa con cooldown acustico di 250ms, e selettore rapido Altoparlante vs Cuffie (ascolto continuo) nel Launcher, HUD e Impostazioni. |
+| Interattività Liste Statistiche (Dettaglio Materie & Domande) | 🟡 Pianificato | Dettagliato in TODO-07 e [docs/plans/2026-09-30_stats_interactive_drilldown.md](file:///c:/github/Quiz_VDS-VL/docs/plans/2026-09-30_stats_interactive_drilldown.md). |
 
 ---
 
@@ -191,6 +192,12 @@ Questa roadmap sintetizza il piano di riorganizzazione per massimizzare l'usabil
    - 3 livelli di scala carattere selezionabili (`Compatto` 14px, `Normale` 16px, `Grande/Outdoor` 18px).
    - Persistenza in Dexie (`fontSizePreference: 'compact' | 'normal' | 'large'`).
    - Adattamento fluido dei layout zero-scroll via CSS `rem` proporzionale per preservare la visibilità completa dei testi anche a font maggiorato.
+7. **TODO-07: Interattività e Ispezione Liste nelle Statistiche (Dettaglio Materie & Domande)** `[DA FARE]`:
+   - Rendere interattive e cliccabili le liste della schermata `StatsScreen` ("Risposte Esatte per Materia" e "Top 10 Domande con Più Errori").
+   - Scheda/Modale Dettaglio Materia (`SubjectDetailModal`): cruscotto materia con accuratezza e copertura, tasto azione rapida "Allenati su questa materia" verso `TopicsScreen`, filtri veloci (Tutte, Errori, Non viste, Corrette) ed elenco compatto e scorrevole dei singoli quesiti.
+   - Scheda/Modale Dettaglio Domanda (`QuestionDetailModal`): testo completo ad alta leggibilità, 3 opzioni con risposta esatta evidenziata in verde smeraldo, spiegazione didattica (Regola + Tranello), telemetria allievo (volte vista/sbagliata, consecutive corrette), note personali, preferiti e audio neurale on-demand.
+   - Apertura fluida a cascata: tocco su materia ➔ elenco quesiti ➔ tocco su quesito ➔ scheda domanda (o tocco diretto da Top 10 errori).
+   - Sincronizzazione totale con il tasto hardware Indietro e gesture Android/iOS via `backNavigation.registerSubModal`.
 
 ---
 

@@ -14,6 +14,26 @@ Questo documento registra in ordine cronologico tutte le lavorazioni svolte nel 
 - **Impatto sul Desiderata**: <Come questo intervento contribuisce al desiderata (cfr. DESIDERATA.md) e indicazioni per il prossimo agente>
 ```
 
+### [2026-09-30] - Definizione Piano Architetturale: Interattività e Ispezione Liste nelle Statistiche (TODO-07)
+
+- **Cosa abbiamo fatto**:
+  * Redatto il piano tecnico e architetturale dettagliato per rendere interattive le liste nella schermata Statistiche (`StatsScreen.tsx`):
+    - Dettaglio Materia ([src/components/SubjectDetailModal.tsx](file:///c:/github/Quiz_VDS-VL/src/components/SubjectDetailModal.tsx)): apertura al tocco sulle righe della lista "Risposte Esatte per Materia", con cruscotto delle prestazioni, pulsante rapido per allenarsi su quella materia, filtri per stato (Tutte, Errori, Non viste, Corrette) e lista scorrevole dei singoli quesiti.
+    - Dettaglio Domanda ([src/components/QuestionDetailModal.tsx](file:///c:/github/Quiz_VDS-VL/src/components/QuestionDetailModal.tsx)): apertura al tocco sia dalla "Top 10 Domande con Più Errori" che dalla lista interna della materia, con visualizzazione completa del testo del quesito, 3 opzioni con risposta esatta evidenziata in verde smeraldo, spiegazione didattica (Regola + Tranello), telemetria allievo (volte vista, errori, consecutive corrette), note personali salvate in Dexie e audio player neurale on-demand.
+  * Salvato il documento di specifica formale in [docs/plans/2026-09-30_stats_interactive_drilldown.md](file:///c:/github/Quiz_VDS-VL/docs/plans/2026-09-30_stats_interactive_drilldown.md).
+  * Aggiornato [DESIDERATA.md](file:///c:/github/Quiz_VDS-VL/DESIDERATA.md) con l'inclusione del nuovo requisito nella matrice di stato e l'aggiunta di `TODO-07` nella roadmap.
+  * Creato l'artifact di progetto per consultazione e revisione visiva.
+
+- **Scelte architetturali & Rationale**:
+  * *Layered Touch Modals vs Accordion/Page Navigation*: Scartata l'espansione ad accordion inline (che avrebbe generato centinaia di righe allungando la pagina delle statistiche) e la navigazione ad altre schermate (che avrebbe strappato l'utente dal contesto di analisi statistica). L'uso di modali touch-friendly con scroll interno e backdrop blur mantiene il focus analitico immediato.
+  * *Sincronizzazione Hardware Back Button*: Integrazione nativa con `backNavigation.registerSubModal`, garantendo che l'utente su smartphone Android o con gesture iOS possa chiudere la scheda del quesito o della materia premendo il tasto "Indietro" senza causare ricaricamenti o uscite accidentali.
+
+- **Impatto sul Desiderata**:
+  * Formalizzato il requisito `TODO-07` in [DESIDERATA.md](file:///c:/github/Quiz_VDS-VL/DESIDERATA.md).
+  * Base documentale pronta per l'implementazione del codice dei componenti e dei relativi test unitari.
+
+---
+
 ### [2026-09-30] - Risoluzione Falso Errore Vocale in Modalità Audio e Neutralizzazione Spiegazioni Didattiche
 
 - **Cosa abbiamo fatto**:
