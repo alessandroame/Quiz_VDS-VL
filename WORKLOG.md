@@ -14,6 +14,30 @@ Questo documento registra in ordine cronologico tutte le lavorazioni svolte nel 
 - **Impatto sul Desiderata**: <Come questo intervento contribuisce al desiderata (cfr. DESIDERATA.md) e indicazioni per il prossimo agente>
 ```
 
+---
+
+### [2026-09-30] - De-duplicazione e Razionalizzazione Punti di Ingresso "Modalità Mani Libere" (SSOT in Navbar)
+
+- **Cosa abbiamo fatto**:
+  - **Eliminazione Radicale della Duplicazione dei Pulsanti "Mani Libere"**: rimosso il pulsante locale ridondante da tutte le 4 viste interne in cui compariva contemporaneamente al pulsante universale della testata:
+    * [src/components/HomeScreen.tsx](file:///c:/github/Quiz_VDS-VL/src/components/HomeScreen.tsx): eliminato `#btn-home-audio-quick` dal box telemetria "Preparazione Esame", ripristinando la pulizia del card informativo.
+    * [src/components/ExamScreen.tsx](file:///c:/github/Quiz_VDS-VL/src/components/ExamScreen.tsx): eliminato `#btn-exam-drive-mode` dalla sticky top bar dell'esame e del tutor, recuperando spazio orizzontale critico su viewport mobile stretti (390px) per timer, contatore e consegna.
+    * [src/components/TopicsScreen.tsx](file:///c:/github/Quiz_VDS-VL/src/components/TopicsScreen.tsx): eliminato il pulsante locale dalla top bar di sessione per materia.
+    * [src/components/MistakesScreen.tsx](file:///c:/github/Quiz_VDS-VL/src/components/MistakesScreen.tsx): eliminato il pulsante locale dalla top bar del ripasso errori.
+  - **Single Source of Truth per l'Ingresso Hands-Free**: stabilito che l'unico titolare dell'azione "Mani Libere" è la testata superiore dell'applicazione ([src/components/Navbar.tsx](file:///c:/github/Quiz_VDS-VL/src/components/Navbar.tsx)), tramite `#btn-drive-mode` nella Home e `#btn-mini-audio` nelle sessioni interne.
+  - **Integrità Transizione di Stato**: preservato integralmente il bridge reattivo `registerAudioSessionContext`, garantendo che cliccando "Mani Libere" nel Mini-Header da qualunque schermata (Esame, Tutor, Materie, Errori), la sessione attiva venga trasferita senza alcuna perdita di indice quesito o risposte date.
+  - **Allineamento Suite di Test**: aggiornato [src/components/HomeScreen.test.ts](file:///c:/github/Quiz_VDS-VL/src/components/HomeScreen.test.ts) e lo script di collaudo headless CDP [scripts/test_drive_flow_interactive.cjs](file:///c:/github/Quiz_VDS-VL/scripts/test_drive_flow_interactive.cjs) per agganciare `#btn-drive-mode` in Navbar.
+  - **Collaudo Regressione**: 255/255 test unitari Vitest superati al 100% su 34 suite e compilazione TypeScript/Vite completata a 0 errori.
+
+- **Scelte architetturali & Rationale**:
+  - *Zero Ridondanza Visiva (Single Point of Action)*: un'azione globale di commutazione modale non deve competere visivamente con i controlli locali della sessione. Concentrare "Mani Libere" nell'header offre un'esperienza utente prevedibile e coerente su ogni vista della PWA, eliminando la duplicazione gemella di pulsanti a 5 pixel di distanza.
+  - *Ergonomia Mobile Superiore (Viewport 390px)*: rimuovere il pulsante dalle toolbar interne previene l'affollamento e i ritagli di testo su schermi di smartphone compatti, dove timer, contatore e pulsante di consegna richiedono massima priorità visiva.
+
+- **Impatto sul Desiderata**:
+  - Risolve definitivamente la duplicazione segnalata dall'utente, garantendo un'interfaccia sobria, minimale e priva di ridondanze cognitive in piena aderenza alla skill `minimal-ui-ux`.
+
+---
+
 ## [2026-09-30] Correzione Accenti Fonetici Neurali & Disambiguazione Omografi Vocali
 
 ### Cosa abbiamo fatto
