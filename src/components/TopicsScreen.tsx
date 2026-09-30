@@ -2,8 +2,7 @@ import React, { useState } from 'react';
 import {
   ArrowRight,
   ArrowLeft,
-  CheckCircle2,
-  Headphones
+  CheckCircle2
 } from 'lucide-react';
 import type { Question } from '../types/quiz';
 import { useQuiz } from '../context/QuizContext';
@@ -18,7 +17,6 @@ export const TopicsScreen: React.FC = () => {
     recordAnswer,
     subjectsAnalytics,
     settings,
-    openDriveMode,
     registerAudioSessionContext,
     activeSession,
     persistActiveSession,
@@ -177,31 +175,8 @@ export const TopicsScreen: React.FC = () => {
             {currentSubjectMeta?.name}
           </div>
 
-          <div className="flex items-center gap-2">
-            <button
-              onClick={() => {
-                openDriveMode({
-                  questions: sessionQuestions,
-                  currentIndex,
-                  answers: sessionAnswers,
-                  flags: {},
-                  onAnswer: (qid: number, ans: 1 | 2 | 3) => handleAnswer(ans, qid),
-                  onToggleFlag: () => {},
-                  onNavigateIndex: (idx: number) => changeIndex(idx),
-                  isExam: false,
-                  title: currentSubjectMeta?.name || 'Materia'
-                });
-              }}
-              className="p-1.5 sm:px-2.5 sm:py-1.5 rounded-lg border border-amber-500/40 bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 light:bg-amber-100 light:text-amber-800 text-xs font-bold transition-all flex items-center gap-1.5 shadow-sm active:scale-95"
-              title="Passa alla Modalità Mani Libere"
-            >
-              <Headphones className="w-3.5 h-3.5" />
-              <span className="hidden sm:inline">Mani Libere</span>
-            </button>
-
-            <div className="text-xs font-mono text-amber-400 light:text-amber-600 font-semibold">
-              {currentIndex + 1}/{sessionQuestions.length}
-            </div>
+          <div className="text-xs font-mono text-amber-400 light:text-amber-600 font-semibold">
+            {currentIndex + 1}/{sessionQuestions.length}
           </div>
         </div>
 

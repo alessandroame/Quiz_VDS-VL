@@ -68,7 +68,7 @@ describe('HomeScreen Component (Home Hub Contracts)', () => {
     );
 
     expect(html).toContain('Preparazione Esame');
-    expect(html).toContain('id="btn-home-audio-quick"');
+    expect(html).not.toContain('id="btn-home-audio-quick"');
     expect(html).toContain('82');
     expect(html).toContain('210');
     expect(html).toContain('474');

@@ -150,10 +150,10 @@ async function run() {
       return res.result ? res.result.value : null;
     };
 
-    console.log('1. Opening Audio Mode from Home...');
+    console.log('1. Opening Hands-Free Mode from Home Navbar...');
     await evaluate(`
-      const btnAudio = document.getElementById('btn-home-audio-quick');
-      if (btnAudio) btnAudio.click();
+      const btnDrive = document.getElementById('btn-drive-mode');
+      if (btnDrive) btnDrive.click();
     `);
     await sleep(1500);
 

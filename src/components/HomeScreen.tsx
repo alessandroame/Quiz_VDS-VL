@@ -7,8 +7,7 @@ import {
   Search,
   BarChart3,
   Play,
-  ArrowRight,
-  Headphones
+  ArrowRight
 } from 'lucide-react';
 import type { NavTab } from './Navbar';
 import { getScenarioByShortcut } from '../utils/navigation';
@@ -24,8 +23,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectTab }) => {
     mistakesCount,
     totalSeen,
     questions,
-    activeSession,
-    openDriveMode
+    activeSession
   } = useQuiz();
 
   const totalQuestions = questions.length; // 474 quiz
@@ -56,16 +54,6 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectTab }) => {
               Preparazione Esame
             </span>
           </div>
-
-          <button
-            id="btn-home-audio-quick"
-            onClick={() => openDriveMode()}
-            className="px-2.5 py-1 rounded-lg bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 light:bg-amber-100 light:text-amber-800 border border-amber-500/30 flex items-center gap-1.5 text-xs font-bold transition-all active:scale-95 shadow-sm shrink-0"
-            title="Avvia sessione a mani libere (Modalità Mani Libere)"
-          >
-            <Headphones className="w-3.5 h-3.5 text-amber-400 light:text-amber-700" />
-            <span>Modalità Mani Libere</span>
-          </button>
         </div>
 
         {/* Telemetria sintetica a 3 colonne */}

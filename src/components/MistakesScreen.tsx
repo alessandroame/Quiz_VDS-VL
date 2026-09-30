@@ -4,8 +4,7 @@ import {
   CheckCircle2,
   ArrowLeft,
   Flame,
-  FileText,
-  Headphones
+  FileText
 } from 'lucide-react';
 import type { Question } from '../types/quiz';
 import { useQuiz } from '../context/QuizContext';
@@ -19,7 +18,6 @@ export const MistakesScreen: React.FC = () => {
     recordAnswer,
     mistakesCount,
     settings,
-    openDriveMode,
     registerAudioSessionContext,
     activeSession,
     persistActiveSession,
@@ -154,31 +152,8 @@ export const MistakesScreen: React.FC = () => {
             <span>Ripasso Errori</span>
           </div>
 
-          <div className="flex items-center gap-2">
-            <button
-              onClick={() => {
-                openDriveMode({
-                  questions: reviewQuestions,
-                  currentIndex,
-                  answers: reviewAnswers,
-                  flags: {},
-                  onAnswer: (qid, ans) => handleAnswer(ans, qid),
-                  onToggleFlag: () => {},
-                  onNavigateIndex: (idx) => changeIndex(idx),
-                  isExam: false,
-                  title: 'Ripasso Errori'
-                });
-              }}
-              className="p-1.5 sm:px-2.5 sm:py-1.5 rounded-lg border border-amber-500/40 bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 light:bg-amber-100 light:text-amber-800 text-xs font-bold transition-all flex items-center gap-1.5 shadow-sm active:scale-95"
-              title="Passa alla Modalità Mani Libere"
-            >
-              <Headphones className="w-3.5 h-3.5" />
-              <span className="hidden sm:inline">Mani Libere</span>
-            </button>
-
-            <div className="text-xs font-mono text-amber-400 light:text-amber-600 font-semibold">
-              {currentIndex + 1}/{reviewQuestions.length}
-            </div>
+          <div className="text-xs font-mono text-amber-400 light:text-amber-600 font-semibold">
+            {currentIndex + 1}/{reviewQuestions.length}
           </div>
         </div>
 

@@ -8,7 +8,6 @@ import {
   ArrowRight,
   RotateCcw,
   ListFilter,
-  Headphones,
   BookOpen
 } from 'lucide-react';
 import type { Question } from '../types/quiz';
@@ -42,7 +41,6 @@ export const ExamScreen: React.FC<ExamScreenProps> = ({
     recordAnswer,
     settings,
     setIsExamRunning,
-    openDriveMode,
     registerAudioSessionContext,
     activeSession,
     persistActiveSession,
@@ -731,31 +729,6 @@ export const ExamScreen: React.FC<ExamScreenProps> = ({
         </div>
 
         <div className="flex items-center gap-1.5 sm:gap-2">
-          <button
-            id="btn-exam-drive-mode"
-            onClick={() => {
-              openDriveMode({
-                questions: examQuestions,
-                currentIndex,
-                answers,
-                flags,
-                onAnswer: (qid, ans) => handleSelectAnswer(ans, qid),
-                onToggleFlag: (qid) => handleToggleFlag(qid),
-                onNavigateIndex: (idx) => setCurrentIndex(idx),
-                isExam: true,
-                isTutor: examMode === 'tutor',
-                secondsRemaining: examMode === 'tutor' ? elapsedSeconds : secondsRemaining,
-                onSubmitExam: handleSubmitExam,
-                title: examMode === 'tutor' ? 'Simulazione Didattica' : 'Esame Ufficiale'
-              });
-            }}
-            className="p-1.5 sm:px-2.5 sm:py-1.5 rounded-lg border border-amber-500/40 bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 light:bg-amber-100 light:text-amber-800 text-xs font-bold transition-all flex items-center gap-1.5 shadow-sm active:scale-95"
-            title="Passa alla Modalità Mani Libere per questa sessione"
-          >
-            <Headphones className="w-3.5 h-3.5" />
-            <span className="hidden sm:inline">Mani Libere</span>
-          </button>
-
           <button
             id="btn-abandon-exam"
             onClick={() => setShowAbandonModal(true)}
