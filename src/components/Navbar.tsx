@@ -17,6 +17,7 @@ import { OfflineIndicator } from './OfflineIndicator';
 import { AudioDownloadBanner } from './AudioDownloadBanner';
 import { BuildInfoModal } from './BuildInfoModal';
 import { getBuildInfo } from '../utils/buildInfo';
+import { APP_ICON_URL, APP_FAVICON_URL } from '../utils/assets';
 
 import { getHeaderTitle, type NavTab } from '../utils/navigation';
 
@@ -156,7 +157,18 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab, openSet
             className="flex items-center gap-2 sm:gap-2.5 cursor-pointer min-w-0"
             onClick={() => setActiveTab('home')}
           >
-            <img src="/favicon.svg" alt="VDS-VL" className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg shadow-sm flex-shrink-0" />
+            <img
+              id="navbar-app-logo"
+              src={APP_ICON_URL}
+              onError={(e) => {
+                const target = e.currentTarget;
+                if (!target.src.endsWith('favicon.svg')) {
+                  target.src = APP_FAVICON_URL;
+                }
+              }}
+              alt="VDS-VL"
+              className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg shadow-sm flex-shrink-0 object-cover"
+            />
             <div className="min-w-0">
               <div className="font-bold text-sm tracking-wide flex items-center gap-1.5">
                 <span className="flex-shrink-0">VDS-VL</span>

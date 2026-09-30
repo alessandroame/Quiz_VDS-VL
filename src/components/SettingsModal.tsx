@@ -39,6 +39,7 @@ import { FONT_SIZE_OPTIONS, getFontSizeLabel } from '../utils/fontSize';
 import { VoiceCommandsModal } from './VoiceCommandsModal';
 import { BuildInfoModal } from './BuildInfoModal';
 import { getBuildInfo, formatBuildDate, forceReloadPWA } from '../utils/buildInfo';
+import { APP_ICON_URL, APP_FAVICON_URL } from '../utils/assets';
 import {
   audioDownloadManager,
   VoiceName,
@@ -1506,8 +1507,19 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
               {/* App Identity Banner */}
               <div className="p-3.5 rounded-2xl border border-amber-500/30 bg-gradient-to-br from-amber-500/10 via-zinc-950 to-zinc-950 light:from-amber-50/80 light:via-white light:to-white light:border-amber-400/40 shadow-sm">
                 <div className="flex items-start gap-3">
-                  <div className="w-10 h-10 rounded-xl bg-amber-500/20 border border-amber-500/40 flex items-center justify-center flex-shrink-0 text-amber-400 shadow-inner">
-                    <span className="text-xl">🛩️</span>
+                  <div className="w-10 h-10 rounded-xl overflow-hidden border border-amber-500/40 flex items-center justify-center flex-shrink-0 shadow-inner bg-zinc-900 light:bg-white">
+                    <img
+                      id="settings-about-app-logo"
+                      src={APP_ICON_URL}
+                      onError={(e) => {
+                        const target = e.currentTarget;
+                        if (!target.src.endsWith('favicon.svg')) {
+                          target.src = APP_FAVICON_URL;
+                        }
+                      }}
+                      alt="VDS-VL"
+                      className="w-full h-full object-cover"
+                    />
                   </div>
                   <div className="min-w-0 flex-1">
                     <div className="flex items-center gap-1.5 flex-wrap">

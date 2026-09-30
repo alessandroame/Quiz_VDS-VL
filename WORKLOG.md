@@ -14,6 +14,36 @@ Questo documento registra in ordine cronologico tutte le lavorazioni svolte nel 
 - **Impatto sul Desiderata**: <Come questo intervento contribuisce al desiderata (cfr. DESIDERATA.md) e indicazioni per il prossimo agente>
 ```
 
+### [2026-09-30] - Risoluzione Logo App nella Top Bar (Base Path) e Sostituzione Icona nella Sezione About
+
+- **Cosa abbiamo fatto**:
+  * **Risoluzione mancato download icona nella Top Bar (Navbar)**:
+    - Identificato che in [src/components/Navbar.tsx](file:///c:/github/Quiz_VDS-VL/src/components/Navbar.tsx) l'icona del brand era hardcoded come `<img src="/favicon.svg" ... />`.
+    - Quando l'applicazione viene distribuita su GitHub Pages (o sottocartelle con `BASE_PATH` come `/Quiz_VDS-VL/`), il percorso assoluto `/favicon.svg` veniva risolto dal browser rispetto al dominio radice (`https://<username>.github.io/favicon.svg`), restituendo HTTP 404 e mostrando l'icona placeholder nativa di immagine non caricata.
+    - Creata l'utility centralizzata [src/utils/assets.ts](file:///c:/github/Quiz_VDS-VL/src/utils/assets.ts) (`getAssetUrl`, `APP_ICON_URL`, `APP_FAVICON_URL`) che tiene conto dinamicamente di `import.meta.env.BASE_URL` sia su ambiente locale (`/`) che in produzione (`/Quiz_VDS-VL/`).
+    - Aggiornato [src/components/Navbar.tsx](file:///c:/github/Quiz_VDS-VL/src/components/Navbar.tsx) per utilizzare `APP_ICON_URL` (`icons/icon-192x192.png`) con fallback automatico `onError` su `APP_FAVICON_URL`.
+  * **Correzione icona nella Sezione About delle Impostazioni**:
+    - Identificato che in [src/components/SettingsModal.tsx](file:///c:/github/Quiz_VDS-VL/src/components/SettingsModal.tsx) (Sezione 6: Informazioni & Regolamento) e in [src/components/BuildInfoModal.tsx](file:///c:/github/Quiz_VDS-VL/src/components/BuildInfoModal.tsx) veniva mostrata l'emoji aereo a motore `🛩️`, incoerente con il Volo Libero VDS-VL (parapendio/deltaplano) e non corrispondente all'icona ufficiale dell'app.
+    - Sostituita l'emoji con l'elemento immagine del logo ufficiale master *Paraglider Question Mark* (`APP_ICON_URL`), incorniciato in uno squircle con bordo ambra e sfondo scuro/chiaro ad alto contrasto.
+  * **Compatibilità SVG e Suite di Test**:
+    - Aggiornato [public/favicon.svg](file:///c:/github/Quiz_VDS-VL/public/favicon.svg) inserendo il namespace `xmlns:xlink="http://www.w3.org/1999/xlink"` e l'attributo `xlink:href` sull'elemento `<image>` per la piena conformità sia con SVG 1.1 che SVG 2 su tutti i browser e motori WebKit.
+    - Aggiunti test unitari dedicati in [src/utils/assets.test.ts](file:///c:/github/Quiz_VDS-VL/src/utils/assets.test.ts) (3 test) per validare la corretta risoluzione dei percorsi con e senza slash iniziale e la presenza delle costanti icona.
+    - Creato script di collaudo headless CDP [scripts/test_icons_visual.cjs](file:///c:/github/Quiz_VDS-VL/scripts/test_icons_visual.cjs) che valida l'effettivo caricamento e rendering pixel-perfect delle immagini (`naturalWidth > 0`, `complete === true`) nella Navbar, nel modale Impostazioni (About) e nel modale BuildInfo, con 0 errori di console e 0 richieste HTTP fallite.
+  * **Avanzamento di Versione (SemVer)**:
+    - Incrementata la versione semantica da `1.1.1` a `1.1.2` in [package.json](file:///c:/github/Quiz_VDS-VL/package.json) e [package-lock.json](file:///c:/github/Quiz_VDS-VL/package-lock.json).
+
+- **Scelte architetturali & Rationale**:
+  * *Single Source of Truth per gli Asset Statici (`src/utils/assets.ts`)*: Evitare percorsi stringa hardcoded dispersi nei componenti React. Centralizzando la risoluzione del prefisso `BASE_URL` in un unico helper, qualsiasi futuro asset statico condiviso funzionerà in modo deterministico su qualsiasi base path.
+  * *Raster PNG (`icon-192x192.png`) per UI & Fallback SVG*: L'utilizzo diretto del PNG pre-renderizzato per gli elementi `<img>` in-app elimina il tempo di parsing XML degli SVG complessi e garantisce nitidezza assoluta su display Retina/HDPI. Il gestore `onError` garantisce massima resilienza.
+  * *Allineamento Identitario Volo Libero*: L'eliminazione dell'emoji aeroplano a motore `🛩️` a favore dell'icona ufficiale del parapendio a punto interrogativo rispetta la specificità dell'attestato VDS/VL (Volo Libero non a motore) come richiesto dal regolamento AeCI e dal design system del progetto.
+
+- **Impatto sul Desiderata**:
+  * Allineamento con il Principio 3 (UI/UX & Iconografia Ufficiale) di [DESIDERATA.md](file:///c:/github/Quiz_VDS-VL/DESIDERATA.md).
+  * 26 suite di test su 26 superate con **220 test unitari verdi** in Vitest (`npm run test:unit`).
+  * Collaudo visivo headless superato con successo su viewport mobile e desktop a zero errori console.
+
+---
+
 ### [2026-09-30] - Definizione Piano Architetturale: Interattività e Ispezione Liste nelle Statistiche (TODO-07)
 
 - **Cosa abbiamo fatto**:

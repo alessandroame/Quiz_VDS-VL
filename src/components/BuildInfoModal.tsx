@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { X, RefreshCw, Copy, Check, GitCommit, Calendar, Tag, ShieldCheck } from 'lucide-react';
 import { getBuildInfo, formatBuildDate, forceReloadPWA } from '../utils/buildInfo';
+import { APP_ICON_URL, APP_FAVICON_URL } from '../utils/assets';
 
 interface BuildInfoModalProps {
   isOpen: boolean;
@@ -55,8 +56,21 @@ export const BuildInfoModal: React.FC<BuildInfoModalProps> = ({ isOpen, onClose 
       >
         {/* Header */}
         <div className="flex items-center justify-between border-b border-zinc-800/80 pb-3 light:border-slate-200">
-          <div className="flex items-center gap-2">
-            <span className="text-xl">🛩️</span>
+          <div className="flex items-center gap-2.5">
+            <div className="w-8 h-8 rounded-lg overflow-hidden border border-amber-500/40 flex items-center justify-center flex-shrink-0 shadow-sm bg-zinc-900 light:bg-white">
+              <img
+                id="build-info-app-logo"
+                src={APP_ICON_URL}
+                onError={(e) => {
+                  const target = e.currentTarget;
+                  if (!target.src.endsWith('favicon.svg')) {
+                    target.src = APP_FAVICON_URL;
+                  }
+                }}
+                alt="VDS-VL"
+                className="w-full h-full object-cover"
+              />
+            </div>
             <div>
               <h2 id="build-info-title" className="text-sm font-bold tracking-tight">
                 Versione e Build
