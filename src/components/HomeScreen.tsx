@@ -47,7 +47,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectTab }) => {
   return (
     <div className="max-w-4xl mx-auto px-3 sm:px-4 py-4 space-y-4 animate-in fade-in">
       {/* Status Strip: Prontezza & Telemetria Compatta */}
-      <div className="p-3.5 sm:p-4 rounded-2xl bg-zinc-900 border border-zinc-800 shadow-sm dark:bg-zinc-900 dark:border-zinc-800 light:bg-white light:border-slate-200 space-y-2.5">
+      <div className="p-3.5 sm:p-4 rounded-2xl bg-zinc-900 border border-zinc-700 shadow-sm dark:bg-zinc-900 dark:border-zinc-700 light:bg-white light:border-slate-300 light:shadow-sm space-y-2.5">
         <div className="flex items-center justify-between gap-2">
           <div className="flex items-center gap-2 min-w-0">
             <span className="text-xs font-bold uppercase tracking-wider text-zinc-300 light:text-slate-700">
@@ -57,9 +57,9 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectTab }) => {
         </div>
 
         {/* Telemetria sintetica a 3 colonne */}
-        <div className="grid grid-cols-3 gap-2 pt-1 border-t border-zinc-800/80 light:border-slate-100 text-xs">
+        <div className="grid grid-cols-3 gap-2 pt-1 border-t border-zinc-700/60 light:border-slate-200 text-xs">
           <div className="space-y-0.5">
-            <span className="text-[10px] text-zinc-500 light:text-slate-400 uppercase font-mono block">
+            <span className="text-[10px] text-zinc-400 light:text-slate-600 uppercase font-mono font-medium block">
               Prontezza
             </span>
             <div className="flex items-center gap-1.5">
@@ -70,19 +70,19 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectTab }) => {
           </div>
 
           <div className="space-y-0.5">
-            <span className="text-[10px] text-zinc-500 light:text-slate-400 uppercase font-mono block">
+            <span className="text-[10px] text-zinc-400 light:text-slate-600 uppercase font-mono font-medium block">
               Quiz Esplorati
             </span>
             <div className="flex items-center gap-1.5">
               <span className="font-mono font-bold text-base sm:text-lg text-zinc-200 light:text-slate-800">
                 {totalSeen}
               </span>
-              <span className="text-zinc-500 text-[11px] font-mono">/{totalQuestions}</span>
+              <span className="text-zinc-400 light:text-slate-500 text-[11px] font-mono">/{totalQuestions}</span>
             </div>
           </div>
 
           <div className="space-y-0.5">
-            <span className="text-[10px] text-zinc-500 light:text-slate-400 uppercase font-mono block">
+            <span className="text-[10px] text-zinc-400 light:text-slate-600 uppercase font-mono font-medium block">
               Errori Attivi
             </span>
             <div className="flex items-center gap-1.5">
@@ -93,13 +93,13 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectTab }) => {
               >
                 {mistakesCount}
               </span>
-              <span className="text-zinc-500 text-[11px] font-mono">da rivedere</span>
+              <span className="text-zinc-400 light:text-slate-500 text-[11px] font-mono">da rivedere</span>
             </div>
           </div>
         </div>
 
         {/* Barra di progresso prontezza */}
-        <div className="w-full h-1 rounded-full bg-zinc-800 light:bg-slate-100 overflow-hidden">
+        <div className="w-full h-1.5 rounded-full bg-zinc-950/80 border border-zinc-800 light:bg-slate-200 light:border-slate-300/60 overflow-hidden">
           <div
             className="h-full bg-gradient-to-r from-amber-500 to-emerald-400 transition-all duration-500 rounded-full"
             style={{ width: `${Math.min(100, Math.max(0, readinessScore))}%` }}
@@ -151,7 +151,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectTab }) => {
         <button
           id="btn-home-tutor"
           onClick={() => onSelectTab('tutor')}
-          className="group relative p-3.5 sm:p-4 rounded-xl bg-zinc-900 border border-zinc-800 hover:border-emerald-500/80 text-left transition-all shadow-sm hover:shadow-emerald-950/20 light:bg-white light:border-slate-200 light:hover:border-emerald-500 flex flex-col justify-between min-h-[105px] active:scale-[0.99]"
+          className="group relative p-3.5 sm:p-4 rounded-xl bg-zinc-900 border border-zinc-700 hover:border-emerald-500/80 text-left transition-all shadow-sm hover:shadow-emerald-950/20 light:bg-white light:border-slate-300 light:shadow-sm light:hover:border-emerald-500 flex flex-col justify-between min-h-[105px] active:scale-[0.99]"
         >
           <div className="space-y-1.5">
             <div className="flex items-center justify-between gap-2">
@@ -164,10 +164,10 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectTab }) => {
                 </h2>
               </div>
               <div className="flex items-center gap-1.5">
-                <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 light:bg-emerald-100 light:text-emerald-800 uppercase tracking-wider font-mono">
+                <span className="text-[10px] font-bold px-2 py-0.5 rounded-full border border-emerald-500/40 bg-emerald-500/20 text-emerald-300 light:bg-emerald-100 light:border-emerald-300 light:text-emerald-800 uppercase tracking-wider font-mono">
                   Senza Limiti
                 </span>
-                <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-zinc-800 text-zinc-400 light:bg-slate-100 light:text-slate-500 hidden md:inline">
+                <span className="text-[10px] font-mono px-1.5 py-0.5 rounded border border-zinc-700 light:border-slate-300 bg-zinc-800 text-zinc-300 light:bg-slate-100 light:text-slate-700 font-semibold hidden md:inline">
                   [1]
                 </span>
               </div>
@@ -183,7 +183,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectTab }) => {
         <button
           id="btn-home-topics"
           onClick={() => onSelectTab('topics')}
-          className="group relative p-3.5 sm:p-4 rounded-xl bg-zinc-900 border border-zinc-800 hover:border-amber-500/80 text-left transition-all shadow-sm light:bg-white light:border-slate-200 light:hover:border-amber-500 flex flex-col justify-between min-h-[105px] active:scale-[0.99]"
+          className="group relative p-3.5 sm:p-4 rounded-xl bg-zinc-900 border border-zinc-700 hover:border-amber-500/80 text-left transition-all shadow-sm light:bg-white light:border-slate-300 light:shadow-sm light:hover:border-amber-500 flex flex-col justify-between min-h-[105px] active:scale-[0.99]"
         >
           <div className="space-y-1.5">
             <div className="flex items-center justify-between gap-2">
@@ -196,10 +196,10 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectTab }) => {
                 </h2>
               </div>
               <div className="flex items-center gap-1.5">
-                <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-zinc-800 text-zinc-300 light:bg-slate-100 light:text-slate-700 font-mono">
+                <span className="text-[10px] font-bold px-2 py-0.5 rounded-full border border-zinc-700/60 light:border-slate-300 bg-zinc-800 text-zinc-200 light:bg-slate-100 light:text-slate-700 font-mono">
                   9 Materie
                 </span>
-                <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-zinc-800 text-zinc-400 light:bg-slate-100 light:text-slate-500 hidden md:inline">
+                <span className="text-[10px] font-mono px-1.5 py-0.5 rounded border border-zinc-700 light:border-slate-300 bg-zinc-800 text-zinc-300 light:bg-slate-100 light:text-slate-700 font-semibold hidden md:inline">
                   [2]
                 </span>
               </div>
@@ -215,7 +215,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectTab }) => {
         <button
           id="btn-home-exam"
           onClick={() => onSelectTab('exam')}
-          className="group relative p-3.5 sm:p-4 rounded-xl bg-zinc-900 border border-zinc-800 hover:border-sky-500/80 text-left transition-all shadow-sm light:bg-white light:border-slate-200 light:hover:border-sky-500 flex flex-col justify-between min-h-[105px] active:scale-[0.99]"
+          className="group relative p-3.5 sm:p-4 rounded-xl bg-zinc-900 border border-zinc-700 hover:border-sky-500/80 text-left transition-all shadow-sm light:bg-white light:border-slate-300 light:shadow-sm light:hover:border-sky-500 flex flex-col justify-between min-h-[105px] active:scale-[0.99]"
         >
           <div className="space-y-1.5">
             <div className="flex items-center justify-between gap-2">
@@ -228,10 +228,10 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectTab }) => {
                 </h2>
               </div>
               <div className="flex items-center gap-1.5">
-                <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-sky-500/20 text-sky-300 light:bg-sky-100 light:text-sky-800 uppercase tracking-wider font-mono">
+                <span className="text-[10px] font-bold px-2 py-0.5 rounded-full border border-sky-500/40 bg-sky-500/20 text-sky-300 light:bg-sky-100 light:border-sky-300 light:text-sky-800 uppercase tracking-wider font-mono">
                   45 Minuti
                 </span>
-                <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-zinc-800 text-zinc-400 light:bg-slate-100 light:text-slate-500 hidden md:inline">
+                <span className="text-[10px] font-mono px-1.5 py-0.5 rounded border border-zinc-700 light:border-slate-300 bg-zinc-800 text-zinc-300 light:bg-slate-100 light:text-slate-700 font-semibold hidden md:inline">
                   [3]
                 </span>
               </div>
@@ -247,7 +247,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectTab }) => {
         <button
           id="btn-home-mistakes"
           onClick={() => onSelectTab('mistakes')}
-          className="group relative p-3.5 sm:p-4 rounded-xl bg-zinc-900 border border-zinc-800 hover:border-rose-500/80 text-left transition-all shadow-sm light:bg-white light:border-slate-200 light:hover:border-rose-500 flex flex-col justify-between min-h-[105px] active:scale-[0.99]"
+          className="group relative p-3.5 sm:p-4 rounded-xl bg-zinc-900 border border-zinc-700 hover:border-rose-500/80 text-left transition-all shadow-sm light:bg-white light:border-slate-300 light:shadow-sm light:hover:border-rose-500 flex flex-col justify-between min-h-[105px] active:scale-[0.99]"
         >
           <div className="space-y-1.5">
             <div className="flex items-center justify-between gap-2">
@@ -261,15 +261,15 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectTab }) => {
               </div>
               <div className="flex items-center gap-1.5">
                 <span
-                  className={`text-[10px] font-bold px-2 py-0.5 rounded-full font-mono ${
+                  className={`text-[10px] font-bold px-2 py-0.5 rounded-full font-mono border ${
                     mistakesCount > 0
-                      ? 'bg-rose-500/20 text-rose-300 light:bg-rose-100 light:text-rose-800'
-                      : 'bg-emerald-500/20 text-emerald-300 light:bg-emerald-100 light:text-emerald-800'
+                      ? 'bg-rose-500/20 border-rose-500/40 text-rose-300 light:bg-rose-100 light:border-rose-300 light:text-rose-800'
+                      : 'bg-emerald-500/20 border-emerald-500/40 text-emerald-300 light:bg-emerald-100 light:border-emerald-300 light:text-emerald-800'
                   }`}
                 >
                   {mistakesCount > 0 ? `${mistakesCount} Errori` : '0 Errori'}
                 </span>
-                <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-zinc-800 text-zinc-400 light:bg-slate-100 light:text-slate-500 hidden md:inline">
+                <span className="text-[10px] font-mono px-1.5 py-0.5 rounded border border-zinc-700 light:border-slate-300 bg-zinc-800 text-zinc-300 light:bg-slate-100 light:text-slate-700 font-semibold hidden md:inline">
                   [4]
                 </span>
               </div>
@@ -285,7 +285,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectTab }) => {
         <button
           id="btn-home-archive"
           onClick={() => onSelectTab('archive')}
-          className="group relative p-3.5 sm:p-4 rounded-xl bg-zinc-900 border border-zinc-800 hover:border-purple-500/80 text-left transition-all shadow-sm light:bg-white light:border-slate-200 light:hover:border-purple-500 flex flex-col justify-between min-h-[105px] active:scale-[0.99]"
+          className="group relative p-3.5 sm:p-4 rounded-xl bg-zinc-900 border border-zinc-700 hover:border-purple-500/80 text-left transition-all shadow-sm light:bg-white light:border-slate-300 light:shadow-sm light:hover:border-purple-500 flex flex-col justify-between min-h-[105px] active:scale-[0.99]"
         >
           <div className="space-y-1.5">
             <div className="flex items-center justify-between gap-2">
@@ -298,10 +298,10 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectTab }) => {
                 </h2>
               </div>
               <div className="flex items-center gap-1.5">
-                <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-zinc-800 text-zinc-300 light:bg-slate-100 light:text-slate-700 font-mono">
+                <span className="text-[10px] font-bold px-2 py-0.5 rounded-full border border-zinc-700/60 light:border-slate-300 bg-zinc-800 text-zinc-200 light:bg-slate-100 light:text-slate-700 font-mono">
                   474 Quiz
                 </span>
-                <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-zinc-800 text-zinc-400 light:bg-slate-100 light:text-slate-500 hidden md:inline">
+                <span className="text-[10px] font-mono px-1.5 py-0.5 rounded border border-zinc-700 light:border-slate-300 bg-zinc-800 text-zinc-300 light:bg-slate-100 light:text-slate-700 font-semibold hidden md:inline">
                   [5]
                 </span>
               </div>
@@ -317,7 +317,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectTab }) => {
         <button
           id="btn-home-stats"
           onClick={() => onSelectTab('stats')}
-          className="group relative p-3.5 sm:p-4 rounded-xl bg-zinc-900 border border-zinc-800 hover:border-amber-500/80 text-left transition-all shadow-sm light:bg-white light:border-slate-200 light:hover:border-amber-500 flex flex-col justify-between min-h-[105px] active:scale-[0.99]"
+          className="group relative p-3.5 sm:p-4 rounded-xl bg-zinc-900 border border-zinc-700 hover:border-amber-500/80 text-left transition-all shadow-sm light:bg-white light:border-slate-300 light:shadow-sm light:hover:border-amber-500 flex flex-col justify-between min-h-[105px] active:scale-[0.99]"
         >
           <div className="space-y-1.5">
             <div className="flex items-center justify-between gap-2">
@@ -330,10 +330,10 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectTab }) => {
                 </h2>
               </div>
               <div className="flex items-center gap-1.5">
-                <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 light:bg-amber-100 light:text-amber-800 font-mono">
+                <span className="text-[10px] font-bold px-2 py-0.5 rounded-full border border-amber-500/40 bg-amber-500/20 text-amber-300 light:bg-amber-100 light:border-amber-300 light:text-amber-800 font-mono">
                   {readinessScore}%
                 </span>
-                <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-zinc-800 text-zinc-400 light:bg-slate-100 light:text-slate-500 hidden md:inline">
+                <span className="text-[10px] font-mono px-1.5 py-0.5 rounded border border-zinc-700 light:border-slate-300 bg-zinc-800 text-zinc-300 light:bg-slate-100 light:text-slate-700 font-semibold hidden md:inline">
                   [6]
                 </span>
               </div>

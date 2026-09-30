@@ -60,7 +60,7 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab, openSet
       <>
         <header
           id="mini-header"
-          className="fixed top-0 left-0 right-0 z-40 w-full h-12 border-b backdrop-blur bg-zinc-950/95 border-zinc-800 dark:bg-zinc-950/95 dark:border-zinc-800 light:bg-white/95 light:border-slate-200 light:text-slate-900 transition-colors shadow-sm"
+          className="fixed top-0 left-0 right-0 z-40 w-full h-12 border-b backdrop-blur bg-zinc-950/95 border-zinc-700/80 dark:bg-zinc-950/95 dark:border-zinc-700/80 light:bg-white/95 light:border-slate-300 light:text-slate-900 transition-colors shadow-sm"
         >
           <div className="max-w-4xl mx-auto px-2 sm:px-4 h-full flex items-center justify-between gap-2">
             {/* Tasto Ritorno a Home Hub */}
@@ -68,7 +68,7 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab, openSet
               <button
                 id="btn-nav-back-home"
                 onClick={() => setActiveTab('home')}
-                className="flex items-center gap-1 sm:gap-1.5 px-2.5 py-1.5 rounded-xl bg-zinc-900/90 border border-zinc-800 hover:border-amber-500/50 hover:bg-zinc-800 text-zinc-300 hover:text-white light:bg-slate-100 light:border-slate-300 light:text-slate-800 text-xs font-bold transition-all active:scale-95 shadow-sm flex-shrink-0"
+                className="flex items-center gap-1 sm:gap-1.5 px-2.5 py-1.5 rounded-xl bg-zinc-900 border border-zinc-700 hover:border-amber-500/50 hover:bg-zinc-800 text-zinc-200 hover:text-white light:bg-slate-100 light:border-slate-300 light:text-slate-800 text-xs font-bold transition-all active:scale-95 shadow-sm flex-shrink-0"
                 title="Torna al cruscotto Home"
               >
                 <ChevronLeft className="w-4 h-4 text-amber-400 light:text-amber-600" />
@@ -150,7 +150,7 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab, openSet
   // HEADER COMPLETO PER HOME HUB (Singola barra da 56px, zero clutter)
   return (
     <>
-      <header className="fixed top-0 left-0 right-0 z-40 w-full h-14 border-b backdrop-blur bg-zinc-950/95 border-zinc-800 dark:bg-zinc-950/95 dark:border-zinc-800 light:bg-white/95 light:border-slate-200 light:text-slate-900 transition-colors shadow-sm">
+      <header className="fixed top-0 left-0 right-0 z-40 w-full h-14 border-b backdrop-blur bg-zinc-950/95 border-zinc-700/80 dark:bg-zinc-950/95 dark:border-zinc-700/80 light:bg-white/95 light:border-slate-300 light:text-slate-900 transition-colors shadow-sm">
         <div className="max-w-4xl mx-auto px-3 sm:px-4 h-full flex items-center justify-between gap-1 sm:gap-2">
           {/* Logo & Brand */}
           <div
@@ -185,11 +185,11 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab, openSet
                   }}
                   title={buildInfo.buildId}
                   aria-label={`Versione ${buildInfo.version} build ${buildInfo.buildNumber}`}
-                  className="text-[10px] px-1.5 py-0.5 rounded bg-zinc-800/80 hover:bg-zinc-700 text-zinc-300 hover:text-white border border-zinc-700/60 light:bg-slate-100 light:hover:bg-slate-200 light:text-slate-700 light:hover:text-slate-900 light:border-slate-300 font-mono hidden sm:inline-flex items-center flex-shrink-0 cursor-pointer select-none active:scale-95 transition-all shadow-sm"
+                  className="text-[10px] px-1.5 py-0.5 rounded bg-zinc-800 hover:bg-zinc-700 text-zinc-200 hover:text-white border border-zinc-700 light:bg-slate-100 light:hover:bg-slate-200 light:text-slate-700 light:hover:text-slate-900 light:border-slate-300 font-mono hidden sm:inline-flex items-center flex-shrink-0 cursor-pointer select-none active:scale-95 transition-all shadow-sm"
                 >
                   v{buildInfo.version}
                   {buildInfo.buildNumber && buildInfo.buildNumber !== '0' && (
-                    <span className="hidden sm:inline text-zinc-500 light:text-slate-400 font-normal">
+                    <span className="hidden sm:inline text-zinc-400 light:text-slate-500 font-normal">
                       {' '}#{buildInfo.buildNumber}
                     </span>
                   )}
@@ -198,7 +198,7 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab, openSet
                 <OfflineIndicator />
               </div>
               {/* Secondary telemetry subtitle - hidden on mobile to avoid overlap */}
-              <div className="text-[11px] text-zinc-400 light:text-slate-500 truncate hidden sm:block">
+              <div className="text-[11px] text-zinc-400 light:text-slate-600 truncate hidden sm:block">
                 Preparazione: <strong className="text-amber-400 light:text-amber-600">{readinessScore}%</strong>
               </div>
             </div>
@@ -211,7 +211,7 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab, openSet
               id="btn-drive-mode"
               onClick={() => openDriveMode()}
               title="Modalità Mani Libere (Macro-target & Hands-free)"
-              className="p-1.5 sm:px-2.5 sm:py-1.5 rounded-lg bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 light:bg-amber-100 light:text-amber-800 border border-amber-500/30 flex items-center gap-1.5 text-xs font-bold transition-all active:scale-95 shadow-sm"
+              className="p-1.5 sm:px-2.5 sm:py-1.5 rounded-lg bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 light:bg-amber-100 light:text-amber-800 border border-amber-500/40 light:border-amber-300 flex items-center gap-1.5 text-xs font-bold transition-all active:scale-95 shadow-sm"
             >
               <Headphones className="w-4 h-4 text-amber-400 light:text-amber-700" />
               <span className="hidden sm:inline">Mani Libere</span>
@@ -226,7 +226,7 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab, openSet
                 id="btn-cloud-sync"
                 onClick={openSettings}
                 title={getSyncTooltip()}
-                className="p-1.5 sm:p-2 rounded-lg text-zinc-400 hover:text-zinc-200 light:text-slate-600 light:hover:text-slate-900 hover:bg-zinc-800/60 light:hover:bg-slate-100 transition-colors"
+                className="p-1.5 sm:p-2 rounded-lg text-zinc-300 hover:text-white light:text-slate-700 light:hover:text-slate-900 border border-zinc-700 hover:border-zinc-600 light:border-slate-300 light:shadow-sm hover:bg-zinc-800/60 light:hover:bg-slate-100 transition-colors"
               >
                 {syncState.status === 'syncing' ? (
                   <RefreshCw className="w-4 h-4 text-amber-400 animate-spin" />
@@ -236,7 +236,7 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab, openSet
                     <span className="absolute -top-1 -right-1 w-2 h-2 rounded-full bg-amber-500" />
                   </div>
                 ) : syncState.status === 'offline' ? (
-                  <CloudOff className="w-4 h-4 text-zinc-500" />
+                  <CloudOff className="w-4 h-4 text-zinc-400" />
                 ) : (
                   <Cloud className="w-4 h-4 text-emerald-400" />
                 )}
@@ -248,7 +248,7 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab, openSet
               id="btn-theme-toggle"
               onClick={cycleTheme}
               title={`Tema: ${theme}`}
-              className="p-1.5 sm:p-2 rounded-lg text-zinc-400 hover:text-zinc-200 light:text-slate-600 light:hover:text-slate-900 hover:bg-zinc-800/60 light:hover:bg-slate-100 transition-colors"
+              className="p-1.5 sm:p-2 rounded-lg text-zinc-300 hover:text-white light:text-slate-700 light:hover:text-slate-900 border border-zinc-700 hover:border-zinc-600 light:border-slate-300 light:shadow-sm hover:bg-zinc-800/60 light:hover:bg-slate-100 transition-colors"
             >
               {theme === 'dark' && <Moon className="w-4 h-4" />}
               {theme === 'light' && <Sun className="w-4 h-4 text-amber-500" />}
@@ -261,7 +261,7 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab, openSet
               aria-label="Impostazioni"
               onClick={openSettings}
               title="Impostazioni"
-              className="p-1.5 sm:p-2 rounded-lg text-zinc-400 hover:text-zinc-200 light:text-slate-600 light:hover:text-slate-900 hover:bg-zinc-800/60 light:hover:bg-slate-100 transition-colors"
+              className="p-1.5 sm:p-2 rounded-lg text-zinc-300 hover:text-white light:text-slate-700 light:hover:text-slate-900 border border-zinc-700 hover:border-zinc-600 light:border-slate-300 light:shadow-sm hover:bg-zinc-800/60 light:hover:bg-slate-100 transition-colors"
             >
               <SettingsIcon className="w-4 h-4" />
             </button>

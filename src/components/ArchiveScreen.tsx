@@ -76,11 +76,11 @@ const ArchiveItemExpandedContent: React.FC<ArchiveItemExpandedContentProps> = ({
   } = useAviationVoice(q.id);
 
   return (
-    <div className="p-3.5 border-t border-zinc-800/80 light:border-slate-100 bg-zinc-950/60 light:bg-slate-50 space-y-3">
+    <div className="p-3.5 border-t border-zinc-700/80 light:border-slate-200 bg-zinc-950/60 light:bg-slate-50 space-y-3">
       {/* Barra comandi vocali rapidi */}
           {settings.ttsEnabled && (
-            <div className="flex items-center justify-between pb-2 border-b border-zinc-800/60 light:border-slate-200 text-xs">
-              <span className="text-[11px] text-zinc-400 font-medium">
+            <div className="flex items-center justify-between pb-2 border-b border-zinc-700/60 light:border-slate-200 text-xs">
+              <span className="text-[11px] text-zinc-400 light:text-slate-600 font-medium">
                 Ascolto Vocale
               </span>
               <div className="flex items-center gap-1.5">
@@ -178,7 +178,7 @@ const ArchiveItemExpandedContent: React.FC<ArchiveItemExpandedContentProps> = ({
                   className={`p-2.5 rounded-lg text-xs flex items-start gap-2 border transition-all ${
                     isCorrect
                       ? 'bg-emerald-950/30 border-emerald-500/50 text-emerald-300 light:bg-emerald-50 light:border-emerald-300 light:text-emerald-900 font-medium'
-                      : 'bg-zinc-900/60 border-zinc-800/60 text-zinc-400 light:bg-white light:border-slate-200 light:text-slate-600'
+                      : 'bg-zinc-900/60 border-zinc-700/80 text-zinc-300 light:bg-white light:border-slate-300 light:text-slate-700'
                   } ${isOptPlaying ? 'ring-1 ring-amber-400' : isOptPaused ? 'ring-1 ring-amber-400/50' : ''}`}
                 >
                   <span className="font-bold">{optNum}.</span>
@@ -213,7 +213,7 @@ const ArchiveItemExpandedContent: React.FC<ArchiveItemExpandedContentProps> = ({
                     ) : (
                       <button
                         onClick={() => playOption(optNum)}
-                        className="p-0.5 rounded transition-colors text-zinc-600 hover:text-zinc-300 light:text-slate-400 light:hover:text-slate-600"
+                        className="p-0.5 rounded transition-colors text-zinc-500 hover:text-zinc-300 light:text-slate-500 light:hover:text-slate-700"
                         title={`Ascolta opzione ${optNum}`}
                       >
                         <Volume2 className="w-3.5 h-3.5" />
@@ -230,8 +230,8 @@ const ArchiveItemExpandedContent: React.FC<ArchiveItemExpandedContentProps> = ({
           </div>
 
           {/* Spiegazione Sintetica con tasto ascolto */}
-          <div className="p-2.5 rounded-lg bg-zinc-900 border border-zinc-800 light:bg-white light:border-slate-200 text-xs space-y-1 text-zinc-300 light:text-slate-700">
-            <div className="flex items-center justify-between pb-1 border-b border-zinc-800/60 light:border-slate-100">
+          <div className="p-2.5 rounded-lg bg-zinc-900 border border-zinc-700 light:bg-white light:border-slate-300 text-xs space-y-1 text-zinc-300 light:text-slate-700">
+            <div className="flex items-center justify-between pb-1 border-b border-zinc-700/60 light:border-slate-200">
               <span className="font-bold text-[11px] text-zinc-400">Spiegazione Didattica</span>
               {settings.ttsEnabled && (
                 isPartActive('explanation') ? (
@@ -297,8 +297,8 @@ const ArchiveItemExpandedContent: React.FC<ArchiveItemExpandedContentProps> = ({
 
           {/* Sezione Nota Personale */}
           {stat?.userNote && !isEditingNote && (
-            <div className="p-3 rounded-xl border bg-amber-950/40 border-amber-800/40 dark:bg-amber-950/40 dark:border-amber-800/40 dark:text-zinc-100 light:bg-amber-50 light:border-amber-200 light:text-amber-950 text-xs space-y-1.5 shadow-sm">
-              <div className="flex items-center justify-between border-b border-amber-800/40 light:border-amber-200/80 pb-1.5">
+            <div className="p-3 rounded-xl border bg-amber-950/40 border-amber-700/60 dark:bg-amber-950/40 dark:border-amber-700/60 dark:text-zinc-100 light:bg-amber-50 light:border-amber-300 light:text-amber-950 text-xs space-y-1.5 shadow-sm">
+              <div className="flex items-center justify-between border-b border-amber-700/60 light:border-amber-300/80 pb-1.5">
                 <span className="font-bold flex items-center gap-1.5 text-amber-400 light:text-amber-700 text-[11px] uppercase tracking-wider">
                   <FileText className="w-3.5 h-3.5" />
                   Nota Personale
@@ -335,7 +335,7 @@ const ArchiveItemExpandedContent: React.FC<ArchiveItemExpandedContentProps> = ({
           )}
 
           {isEditingNote && (
-            <div className="p-3 rounded-xl border bg-zinc-950/90 border-zinc-800 dark:bg-zinc-950/90 dark:border-zinc-800 light:bg-slate-50 light:border-slate-300 space-y-2.5">
+            <div className="p-3 rounded-xl border bg-zinc-950/90 border-zinc-700 dark:bg-zinc-950/90 dark:border-zinc-700 light:bg-slate-50 light:border-slate-300 space-y-2.5">
               <div className="flex items-center justify-between text-xs">
                 <span className="font-bold text-amber-400 light:text-amber-700 text-[11px] uppercase tracking-wider flex items-center gap-1">
                   <Edit3 className="w-3.5 h-3.5" />
@@ -361,13 +361,13 @@ const ArchiveItemExpandedContent: React.FC<ArchiveItemExpandedContentProps> = ({
                 value={noteText}
                 onChange={e => setNoteText(e.target.value)}
                 placeholder="Scrivi qui la tua nota personale per questo quesito..."
-                className="w-full bg-zinc-900 dark:bg-zinc-900 border border-zinc-800 dark:border-zinc-800 rounded-lg p-2.5 text-xs text-zinc-100 dark:text-zinc-100 light:bg-white light:border-slate-200 light:text-slate-900 resize-none outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500"
+                className="w-full bg-zinc-900 dark:bg-zinc-900 border border-zinc-700 dark:border-zinc-700 rounded-lg p-2.5 text-xs text-zinc-100 dark:text-zinc-100 light:bg-white light:border-slate-300 light:text-slate-900 resize-none outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500"
                 rows={3}
               />
               <div className="flex justify-end gap-2">
                 <button
                   onClick={() => setIsEditingNote(false)}
-                  className="text-xs px-3 py-1.5 rounded-lg border border-zinc-800 dark:border-zinc-800 text-zinc-400 hover:text-zinc-200 light:border-slate-300 light:text-slate-700 hover:bg-zinc-800/40 light:hover:bg-slate-100 transition-colors"
+                  className="text-xs px-3 py-1.5 rounded-lg border border-zinc-700 dark:border-zinc-700 text-zinc-300 hover:text-white light:border-slate-300 light:text-slate-700 hover:bg-zinc-800/40 light:hover:bg-slate-100 transition-colors"
                 >
                   Annulla
                 </button>
@@ -392,7 +392,7 @@ const ArchiveItemExpandedContent: React.FC<ArchiveItemExpandedContentProps> = ({
                 setNoteText('');
                 setIsEditingNote(true);
               }}
-              className="w-full py-2 px-3 rounded-lg border border-dashed border-zinc-800 dark:border-zinc-800 hover:border-amber-500/60 light:border-slate-300 light:hover:border-amber-600 text-zinc-400 hover:text-amber-400 light:text-slate-500 light:hover:text-amber-700 text-xs font-medium flex items-center justify-center gap-1.5 transition-colors"
+              className="w-full py-2 px-3 rounded-lg border border-dashed border-zinc-700 dark:border-zinc-700 hover:border-amber-500/60 light:border-slate-300 light:hover:border-amber-600 text-zinc-300 hover:text-amber-400 light:text-slate-600 light:hover:text-amber-700 text-xs font-medium flex items-center justify-center gap-1.5 transition-colors"
             >
               <Plus className="w-3.5 h-3.5" />
               <span>Aggiungi una nota personale sulla domanda #{q.id}</span>
@@ -407,7 +407,7 @@ const ArchiveItem: React.FC<ArchiveItemProps> = ({ question: q, isExpanded, onTo
   const stat = statsMap.get(q.id);
 
   return (
-    <div className="border border-zinc-800 rounded-xl overflow-hidden bg-zinc-900/40 light:bg-white light:border-slate-200">
+    <div className="border border-zinc-700 rounded-xl overflow-hidden bg-zinc-900/50 light:bg-white light:border-slate-300 light:shadow-sm">
       <div
         id={`archive-item-${q.id}`}
         onClick={onToggle}
@@ -418,7 +418,7 @@ const ArchiveItem: React.FC<ArchiveItemProps> = ({ question: q, isExpanded, onTo
             <span className="font-mono font-bold text-amber-400 text-xs">
               #{q.id}
             </span>
-            <span className="text-[11px] text-zinc-400 light:text-slate-500">
+            <span className="text-[11px] text-zinc-400 light:text-slate-600 font-medium">
               {q.subjectName}
             </span>
             {stat?.isBookmarked && (
@@ -435,7 +435,7 @@ const ArchiveItem: React.FC<ArchiveItemProps> = ({ question: q, isExpanded, onTo
             {q.question}
           </p>
           {stat?.userNote && (
-            <div className="flex items-center gap-1.5 mt-1 text-[11px] text-amber-400 light:text-amber-800 bg-amber-950/50 light:bg-amber-50 px-2 py-0.5 rounded border border-amber-800/40 light:border-amber-200 w-fit max-w-full">
+            <div className="flex items-center gap-1.5 mt-1 text-[11px] text-amber-400 light:text-amber-800 bg-amber-950/50 light:bg-amber-50 px-2 py-0.5 rounded border border-amber-700/50 light:border-amber-300 w-fit max-w-full">
               <FileText className="w-3 h-3 flex-shrink-0 text-amber-400 light:text-amber-600" />
               <span className="truncate italic font-normal">"{stat.userNote}"</span>
             </div>
@@ -597,7 +597,7 @@ export const ArchiveScreen: React.FC = () => {
             Catalogo 474 quiz: Parapendio e teoria comune AeCI
           </p>
         </div>
-        <div className="text-xs font-mono font-bold px-2.5 py-1 rounded-lg bg-zinc-900 border border-zinc-800 text-amber-400 light:bg-slate-100 light:border-slate-200 shrink-0">
+        <div className="text-xs font-mono font-bold px-2.5 py-1 rounded-lg bg-zinc-900 border border-zinc-700 text-amber-400 light:bg-white light:border-slate-300 light:text-amber-700 shrink-0">
           {filteredQuestions.length} / {questions.length}
         </div>
       </div>
@@ -615,7 +615,7 @@ export const ArchiveScreen: React.FC = () => {
               if (numericBuffer && !e.target.value) setNumericBuffer('');
             }}
             placeholder="Cerca testo, parola chiave o #ID..."
-            className="w-full pl-9 pr-8 py-2.5 bg-zinc-900 border border-zinc-800 rounded-xl text-xs text-zinc-100 placeholder-zinc-500 outline-none focus:border-amber-500 light:bg-white light:border-slate-200 light:text-slate-900 transition-colors"
+            className="w-full pl-9 pr-8 py-2.5 bg-zinc-900 border border-zinc-700 rounded-xl text-xs text-zinc-100 placeholder-zinc-400 outline-none focus:border-amber-500 light:bg-white light:border-slate-300 light:text-slate-900 light:placeholder-slate-400 transition-colors"
           />
           {searchQuery && (
             <button
@@ -642,7 +642,7 @@ export const ArchiveScreen: React.FC = () => {
           className={`px-3 py-2.5 rounded-xl border text-xs font-bold font-mono flex items-center gap-1.5 shrink-0 transition-all ${
             isKeypadOpen
               ? 'border-amber-500 bg-amber-500/20 text-amber-300 shadow-[0_0_10px_rgba(245,158,11,0.2)]'
-              : 'border-zinc-800 bg-zinc-900 text-zinc-300 hover:text-white hover:bg-zinc-800 light:bg-white light:border-slate-200 light:text-slate-700'
+              : 'border-zinc-700 bg-zinc-900 text-zinc-300 hover:text-white hover:bg-zinc-800 light:bg-white light:border-slate-300 light:text-slate-700'
           }`}
           title="Apri tastierino rapido per salto a #ID"
         >
@@ -653,9 +653,9 @@ export const ArchiveScreen: React.FC = () => {
 
       {/* Tastierino Numerico Rapido (#ID Jump) */}
       {isKeypadOpen && (
-        <div className="p-3 bg-zinc-900/95 backdrop-blur-md border border-zinc-800 rounded-2xl space-y-2.5 light:bg-white light:border-slate-200 shadow-xl animate-in fade-in duration-150">
+        <div className="p-3 bg-zinc-900/95 backdrop-blur-md border border-zinc-700 rounded-2xl space-y-2.5 light:bg-white light:border-slate-300 shadow-xl animate-in fade-in duration-150">
           <div className="flex items-center justify-between px-1">
-            <span className="text-[11px] font-semibold text-zinc-400 light:text-slate-500">
+            <span className="text-[11px] font-semibold text-zinc-400 light:text-slate-600">
               Salto rapido a #ID:
             </span>
             <div className="flex items-center gap-2">
@@ -669,7 +669,7 @@ export const ArchiveScreen: React.FC = () => {
                     setSearchQuery('');
                     triggerHapticFeedback('tap');
                   }}
-                  className="text-[11px] text-zinc-500 hover:text-zinc-300 p-0.5"
+                  className="text-[11px] text-zinc-400 hover:text-zinc-200 p-0.5"
                   title="Cancella inserimento"
                 >
                   <X className="w-3.5 h-3.5" />
@@ -684,21 +684,21 @@ export const ArchiveScreen: React.FC = () => {
               <button
                 key={num}
                 onClick={() => handleKeypadDigit(num.toString())}
-                className="py-2.5 rounded-xl border border-zinc-800 bg-zinc-950 hover:bg-zinc-800 active:scale-95 text-sm font-mono font-bold text-zinc-200 transition-all light:bg-slate-100 light:border-slate-200 light:text-slate-800"
+                className="py-2.5 rounded-xl border border-zinc-700 bg-zinc-950 hover:bg-zinc-800 active:scale-95 text-sm font-mono font-bold text-zinc-200 transition-all light:bg-slate-100 light:border-slate-300 light:text-slate-800"
               >
                 {num}
               </button>
             ))}
             <button
               onClick={handleKeypadBackspace}
-              className="py-2.5 rounded-xl border border-zinc-800 bg-zinc-950 hover:bg-zinc-800 active:scale-95 text-xs font-semibold text-zinc-400 flex items-center justify-center transition-all light:bg-slate-100 light:border-slate-200 light:text-slate-700"
+              className="py-2.5 rounded-xl border border-zinc-700 bg-zinc-950 hover:bg-zinc-800 active:scale-95 text-xs font-semibold text-zinc-400 flex items-center justify-center transition-all light:bg-slate-100 light:border-slate-300 light:text-slate-700"
               title="Cancella ultima cifra"
             >
               <Delete className="w-4 h-4" />
             </button>
             <button
               onClick={() => handleKeypadDigit('0')}
-              className="py-2.5 rounded-xl border border-zinc-800 bg-zinc-950 hover:bg-zinc-800 active:scale-95 text-sm font-mono font-bold text-zinc-200 transition-all light:bg-slate-100 light:border-slate-200 light:text-slate-800"
+              className="py-2.5 rounded-xl border border-zinc-700 bg-zinc-950 hover:bg-zinc-800 active:scale-95 text-sm font-mono font-bold text-zinc-200 transition-all light:bg-slate-100 light:border-slate-300 light:text-slate-800"
             >
               0
             </button>
@@ -716,7 +716,7 @@ export const ArchiveScreen: React.FC = () => {
 
       {/* 1. Barra Rapida Materie (01..09 + TUTTE) */}
       <div className="space-y-1">
-        <div className="flex items-center justify-between text-[11px] text-zinc-400 light:text-slate-500 font-medium px-0.5">
+        <div className="flex items-center justify-between text-[11px] text-zinc-400 light:text-slate-600 font-medium px-0.5">
           <span>Filtro Materia</span>
           {selectedSubject !== 'all' && (
             <button
@@ -739,7 +739,7 @@ export const ArchiveScreen: React.FC = () => {
             className={`px-3 py-1.5 rounded-lg border text-xs font-bold transition-all shrink-0 ${
               selectedSubject === 'all'
                 ? 'bg-amber-500 text-zinc-950 border-amber-500 shadow-sm'
-                : 'bg-zinc-900 border-zinc-800 text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800 light:bg-white light:border-slate-200 light:text-slate-700'
+                : 'bg-zinc-900 border-zinc-700 text-zinc-300 hover:text-white hover:bg-zinc-800 light:bg-white light:border-slate-300 light:text-slate-700'
             }`}
           >
             TUTTE
@@ -758,7 +758,7 @@ export const ArchiveScreen: React.FC = () => {
                 className={`px-2.5 py-1.5 rounded-lg border font-mono text-xs font-bold transition-all shrink-0 ${
                   isSelected
                     ? 'bg-amber-500 text-zinc-950 border-amber-500 shadow-sm'
-                    : 'bg-zinc-900 border-zinc-800 text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800 light:bg-white light:border-slate-200 light:text-slate-700'
+                    : 'bg-zinc-900 border-zinc-700 text-zinc-300 hover:text-white hover:bg-zinc-800 light:bg-white light:border-slate-300 light:text-slate-700'
                 }`}
               >
                 {formatSubjectCode(id)}
@@ -791,7 +791,7 @@ export const ArchiveScreen: React.FC = () => {
               className={`px-2.5 py-1.5 rounded-lg border text-xs font-semibold flex items-center gap-1.5 shrink-0 transition-all ${
                 isActive
                   ? 'bg-zinc-200 text-zinc-950 border-zinc-200 font-bold light:bg-zinc-800 light:text-white'
-                  : 'bg-zinc-900 border-zinc-800 text-zinc-400 hover:text-zinc-200 light:bg-white light:border-slate-200 light:text-slate-700'
+                  : 'bg-zinc-900 border-zinc-700 text-zinc-300 hover:text-white light:bg-white light:border-slate-300 light:text-slate-700'
               }`}
             >
               <span>{filter.label}</span>
@@ -799,7 +799,7 @@ export const ArchiveScreen: React.FC = () => {
                 className={`text-[10px] px-1 py-0.2 rounded-full font-mono ${
                   isActive
                     ? 'bg-zinc-400/40 text-zinc-950 font-bold light:bg-zinc-700 light:text-white'
-                    : 'bg-zinc-800 text-zinc-400 light:bg-slate-100 light:text-slate-600'
+                    : 'bg-zinc-800 text-zinc-300 light:bg-slate-200 light:text-slate-700'
                 }`}
               >
                 {filter.count}
@@ -811,7 +811,7 @@ export const ArchiveScreen: React.FC = () => {
 
       {/* 3. Quick Chips Concetti Frequenti */}
       <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-0.5">
-        <div className="flex items-center gap-1 text-[11px] text-zinc-500 shrink-0 font-medium pl-0.5">
+        <div className="flex items-center gap-1 text-[11px] text-zinc-400 light:text-slate-600 shrink-0 font-medium pl-0.5">
           <Sparkles className="w-3 h-3 text-amber-400" />
           <span>Temi:</span>
         </div>
@@ -827,7 +827,7 @@ export const ArchiveScreen: React.FC = () => {
               className={`px-2.5 py-1 rounded-full border text-[11px] font-medium transition-all shrink-0 ${
                 isActive
                   ? 'border-amber-500/80 bg-amber-500/20 text-amber-300 shadow-[0_0_8px_rgba(245,158,11,0.2)]'
-                  : 'border-zinc-800 bg-zinc-900/60 text-zinc-400 hover:text-zinc-200 light:bg-white light:border-slate-200 light:text-slate-600'
+                  : 'border-zinc-700 bg-zinc-900/60 text-zinc-300 hover:text-white light:bg-white light:border-slate-300 light:text-slate-700'
               }`}
             >
               {chip.label}
@@ -839,7 +839,7 @@ export const ArchiveScreen: React.FC = () => {
       {/* Reset filtri attivi */}
       {hasActiveFilters && (
         <div className="flex items-center justify-between text-xs pt-1 px-0.5">
-          <span className="text-zinc-500 text-[11px]">
+          <span className="text-zinc-400 light:text-slate-600 text-[11px]">
             Filtri applicati ({filteredQuestions.length} risultati)
           </span>
           <button
@@ -854,7 +854,7 @@ export const ArchiveScreen: React.FC = () => {
       {/* Lista Domande */}
       <div className="space-y-2 pt-1">
         {filteredQuestions.length === 0 ? (
-          <div className="text-center py-12 text-zinc-500 text-xs border border-dashed border-zinc-800 rounded-xl">
+          <div className="text-center py-12 text-zinc-400 light:text-slate-600 text-xs border border-dashed border-zinc-700 light:border-slate-300 rounded-xl">
             Nessun quiz trovato con i filtri attuali
           </div>
         ) : (
@@ -875,7 +875,7 @@ export const ArchiveScreen: React.FC = () => {
                     setVisibleCount(prev => prev + 50);
                     triggerHapticFeedback('tap');
                   }}
-                  className="px-4 py-2.5 rounded-xl border border-zinc-800 bg-zinc-900 hover:bg-zinc-800 text-xs font-bold text-amber-400 light:bg-white light:border-slate-200 light:text-amber-700 light:hover:bg-slate-50 transition-all shadow-sm"
+                  className="px-4 py-2.5 rounded-xl border border-zinc-700 bg-zinc-900 hover:bg-zinc-800 text-xs font-bold text-amber-400 light:bg-white light:border-slate-300 light:text-amber-700 light:hover:bg-slate-50 transition-all shadow-sm"
                 >
                   Mostra altri ({filteredQuestions.length - visibleCount} rimanenti)
                 </button>

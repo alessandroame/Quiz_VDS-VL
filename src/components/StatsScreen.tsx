@@ -58,10 +58,10 @@ export const StatsScreen: React.FC<StatsScreenProps> = ({ onTrainSubject }) => {
       </div>
 
       {/* Card Prontezza Esame Principale */}
-      <div className="p-6 rounded-2xl border border-zinc-800 bg-zinc-900 shadow-md light:bg-white light:border-slate-200 space-y-4">
+      <div className="p-6 rounded-2xl border border-zinc-700 bg-zinc-900 shadow-md light:bg-white light:border-slate-300 light:shadow-sm space-y-4">
         <div className="flex items-center justify-between">
           <div className="space-y-1">
-            <span className="text-xs font-bold text-zinc-400 light:text-slate-500 uppercase tracking-wider">
+            <span className="text-xs font-bold text-zinc-400 light:text-slate-600 uppercase tracking-wider">
               Preparazione Esame
             </span>
             <div className="text-3xl sm:text-4xl font-black text-amber-400 light:text-amber-600">
@@ -75,7 +75,7 @@ export const StatsScreen: React.FC<StatsScreenProps> = ({ onTrainSubject }) => {
         </div>
 
         {/* Progress bar Prontezza */}
-        <div className="w-full bg-zinc-950 light:bg-slate-100 rounded-full h-2.5 overflow-hidden">
+        <div className="w-full bg-zinc-950/80 border border-zinc-800 light:bg-slate-200 light:border-slate-300/60 rounded-full h-2.5 overflow-hidden">
           <div
             className={`h-full rounded-full transition-all duration-500 ${
               readinessScore >= 90
@@ -90,24 +90,24 @@ export const StatsScreen: React.FC<StatsScreenProps> = ({ onTrainSubject }) => {
 
         {/* 3 Metric Box */}
         <div className="grid grid-cols-3 gap-2 pt-2 text-center text-xs">
-          <div className="p-2.5 rounded-xl bg-zinc-950/60 light:bg-slate-50 border border-zinc-800/80 light:border-slate-200">
-            <div className="text-zinc-400 light:text-slate-500 text-[10px]">Quiz Visti</div>
+          <div className="p-2.5 rounded-xl bg-zinc-950/60 light:bg-slate-50 border border-zinc-700/80 light:border-slate-300">
+            <div className="text-zinc-400 light:text-slate-600 text-[10px]">Quiz Visti</div>
             <div className="font-bold text-zinc-200 light:text-slate-800 mt-0.5">
               {totalSeen}/{totalQuestionsCount}
             </div>
             <div className="text-[10px] text-amber-400">{coveragePercent}%</div>
           </div>
 
-          <div className="p-2.5 rounded-xl bg-zinc-950/60 light:bg-slate-50 border border-zinc-800/80 light:border-slate-200">
-            <div className="text-zinc-400 light:text-slate-500 text-[10px]">Errori</div>
+          <div className="p-2.5 rounded-xl bg-zinc-950/60 light:bg-slate-50 border border-zinc-700/80 light:border-slate-300">
+            <div className="text-zinc-400 light:text-slate-600 text-[10px]">Errori</div>
             <div className="font-bold text-rose-400 mt-0.5">
               {mistakesCount}
             </div>
-            <div className="text-[10px] text-zinc-500 light:text-slate-500">da rivedere</div>
+            <div className="text-[10px] text-zinc-400 light:text-slate-600">da rivedere</div>
           </div>
 
-          <div className="p-2.5 rounded-xl bg-zinc-950/60 light:bg-slate-50 border border-zinc-800/80 light:border-slate-200">
-            <div className="text-zinc-400 light:text-slate-500 text-[10px]">Simulazioni</div>
+          <div className="p-2.5 rounded-xl bg-zinc-950/60 light:bg-slate-50 border border-zinc-700/80 light:border-slate-300">
+            <div className="text-zinc-400 light:text-slate-600 text-[10px]">Simulazioni</div>
             <div className="font-bold text-zinc-200 light:text-slate-800 mt-0.5">
               {sessions.length}
             </div>
@@ -119,7 +119,7 @@ export const StatsScreen: React.FC<StatsScreenProps> = ({ onTrainSubject }) => {
       </div>
 
       {/* Radar / Prestazioni per Materia */}
-      <div className="p-5 rounded-2xl border border-zinc-800 bg-zinc-900 light:bg-white light:border-slate-200 space-y-3">
+      <div className="p-5 rounded-2xl border border-zinc-700 bg-zinc-900 light:bg-white light:border-slate-300 light:shadow-sm space-y-3">
         <div className="flex items-center justify-between">
           <h3 className="text-xs font-bold text-zinc-400 light:text-slate-600 uppercase tracking-wider flex items-center gap-1.5">
             <TrendingUp className="w-3.5 h-3.5 text-amber-400" />
@@ -145,7 +145,7 @@ export const StatsScreen: React.FC<StatsScreenProps> = ({ onTrainSubject }) => {
                     0{sub.id} {sub.name}
                   </span>
                   <div className="flex items-center gap-2">
-                    <span className="text-zinc-400 text-[11px]">
+                    <span className="text-zinc-400 light:text-slate-600 text-[11px]">
                       {sub.seen}/{sub.total}
                     </span>
                     <span
@@ -154,16 +154,16 @@ export const StatsScreen: React.FC<StatsScreenProps> = ({ onTrainSubject }) => {
                           ? 'text-emerald-400'
                           : sub.accuracy >= 70
                           ? 'text-amber-400'
-                          : 'text-zinc-400'
+                          : 'text-zinc-400 light:text-slate-600'
                       }`}
                     >
                       {sub.seen > 0 ? `${sub.accuracy}%` : '-'}
                     </span>
-                    <ChevronRight className="w-3.5 h-3.5 text-zinc-500 group-hover:text-zinc-300 light:group-hover:text-slate-700 transition-transform group-hover:translate-x-0.5" />
+                    <ChevronRight className="w-3.5 h-3.5 text-zinc-400 light:text-slate-500 group-hover:text-zinc-200 light:group-hover:text-slate-800 transition-transform group-hover:translate-x-0.5" />
                   </div>
                 </div>
 
-                <div className="w-full bg-zinc-950 light:bg-slate-100 rounded-full h-1.5 overflow-hidden">
+                <div className="w-full bg-zinc-950/80 border border-zinc-800 light:bg-slate-200 light:border-slate-300/60 rounded-full h-1.5 overflow-hidden">
                   <div
                     className={`h-full rounded-full transition-all duration-300 ${
                       sub.accuracy >= 90
@@ -182,14 +182,14 @@ export const StatsScreen: React.FC<StatsScreenProps> = ({ onTrainSubject }) => {
       </div>
 
       {/* Storico Ultime Simulazioni */}
-      <div className="p-5 rounded-2xl border border-zinc-800 bg-zinc-900 light:bg-white light:border-slate-200 space-y-3">
+      <div className="p-5 rounded-2xl border border-zinc-700 bg-zinc-900 light:bg-white light:border-slate-300 light:shadow-sm space-y-3">
         <h3 className="text-xs font-bold text-zinc-400 light:text-slate-600 uppercase tracking-wider flex items-center gap-1.5">
           <Calendar className="w-3.5 h-3.5 text-amber-400" />
           <span>Storico Simulazioni d'Esame</span>
         </h3>
 
         {sessions.length === 0 ? (
-          <p className="text-xs text-zinc-500 py-3 text-center">
+          <p className="text-xs text-zinc-400 light:text-slate-600 py-3 text-center">
             Nessuna simulazione completata finora.
           </p>
         ) : (
@@ -206,7 +206,7 @@ export const StatsScreen: React.FC<StatsScreenProps> = ({ onTrainSubject }) => {
               return (
                 <div
                   key={s.id || idx}
-                  className="p-3 rounded-xl border border-zinc-800 bg-zinc-950/60 light:bg-slate-50 light:border-slate-200 flex items-center justify-between text-xs"
+                  className="p-3 rounded-xl border border-zinc-700 bg-zinc-950/60 light:bg-slate-50 light:border-slate-300 flex items-center justify-between text-xs"
                 >
                   <div className="space-y-0.5">
                     <div className="flex items-center gap-2">
@@ -223,7 +223,7 @@ export const StatsScreen: React.FC<StatsScreenProps> = ({ onTrainSubject }) => {
                         {s.correctAnswers}/{s.totalQuestions} ({s.wrongAnswers} err)
                       </span>
                     </div>
-                    <div className="text-[10px] text-zinc-500 flex items-center gap-2">
+                    <div className="text-[10px] text-zinc-400 light:text-slate-600 flex items-center gap-2">
                       <span>{dateStr}</span>
                       <span>•</span>
                       <span className="flex items-center gap-0.5">
@@ -240,13 +240,13 @@ export const StatsScreen: React.FC<StatsScreenProps> = ({ onTrainSubject }) => {
 
       {/* Top 10 Domande Più Sbagliate */}
       {topWrongQuestions.length > 0 && (
-        <div className="p-5 rounded-2xl border border-zinc-800 bg-zinc-900 light:bg-white light:border-slate-200 space-y-3">
+        <div className="p-5 rounded-2xl border border-zinc-700 bg-zinc-900 light:bg-white light:border-slate-300 light:shadow-sm space-y-3">
           <div className="flex items-center justify-between">
             <h3 className="text-xs font-bold text-rose-400 uppercase tracking-wider flex items-center gap-1.5">
               <AlertTriangle className="w-3.5 h-3.5" />
               <span>Top 10 Domande con Più Errori</span>
             </h3>
-            <span className="text-[10px] text-zinc-500 italic hidden sm:inline">
+            <span className="text-[10px] text-zinc-400 light:text-slate-600 italic hidden sm:inline">
               Tocca una domanda per la scheda completa
             </span>
           </div>
@@ -258,14 +258,14 @@ export const StatsScreen: React.FC<StatsScreenProps> = ({ onTrainSubject }) => {
                 key={item.question.id}
                 id={`btn-stat-wrong-q-${item.question.id}`}
                 onClick={() => setSelectedQuestion(item.question)}
-                className="w-full text-left p-2.5 rounded-lg border border-zinc-800/80 bg-zinc-950/40 hover:bg-zinc-800/50 hover:border-zinc-700 light:bg-slate-50 light:border-slate-200 light:hover:bg-slate-100 text-xs flex items-center justify-between gap-3 transition-colors group cursor-pointer"
+                className="w-full text-left p-2.5 rounded-lg border border-zinc-700/80 bg-zinc-950/40 hover:bg-zinc-800/50 hover:border-zinc-600 light:bg-slate-50 light:border-slate-300 light:hover:bg-slate-100 text-xs flex items-center justify-between gap-3 transition-colors group cursor-pointer"
               >
                 <div className="space-y-0.5 truncate flex-1 min-w-0">
                   <div className="flex items-center gap-2">
                     <span className="font-mono font-bold text-amber-400">
                       #{item.question.id}
                     </span>
-                    <span className="text-[10px] text-zinc-500">
+                    <span className="text-[10px] text-zinc-400 light:text-slate-600">
                       {item.question.subjectName}
                     </span>
                   </div>
@@ -278,7 +278,7 @@ export const StatsScreen: React.FC<StatsScreenProps> = ({ onTrainSubject }) => {
                   <span className="px-2 py-0.5 rounded bg-rose-500/20 text-rose-400 light:bg-rose-100 light:text-rose-700 font-bold text-[10px]">
                     {item.timesWrong} {item.timesWrong === 1 ? 'errore' : 'errori'}
                   </span>
-                  <ChevronRight className="w-3.5 h-3.5 text-zinc-500 group-hover:text-zinc-300 light:group-hover:text-slate-700 transition-transform group-hover:translate-x-0.5" />
+                  <ChevronRight className="w-3.5 h-3.5 text-zinc-400 light:text-slate-500 group-hover:text-zinc-200 light:group-hover:text-slate-800 transition-transform group-hover:translate-x-0.5" />
                 </div>
               </button>
             ))}

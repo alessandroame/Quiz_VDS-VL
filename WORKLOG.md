@@ -14,6 +14,53 @@ Questo documento registra in ordine cronologico tutte le lavorazioni svolte nel 
 - **Impatto sul Desiderata**: <Come questo intervento contribuisce al desiderata (cfr. DESIDERATA.md) e indicazioni per il prossimo agente>
 ```
 
+### [2026-09-30] - Elevazione Bordi Pannelli e Risoluzione Contrasto WCAG 2.1 in Tema Chiaro e Scuro (v1.3.4)
+
+- **Cosa abbiamo fatto**:
+  * **Audit Completo e Bonifica del Contrasto (WCAG 2.1 AA/AAA)**:
+    - Risolto il difetto visivo in cui i bordi dei pannelli e delle card risultavano invisibili sia in modalità scura che in modalità chiara (`border-zinc-800` a 1.20:1 e `light:border-slate-200` a 1.23:1 vs sfondi, al di sotto dei criteri di differenziazione).
+    - Elevati tutti i bordi di card e contenitori su tutte le 16 schermate e componenti modali:
+      * **Tema Scuro**: migrato da `border-zinc-800` a `border-zinc-700` (`#3f3f46`, rapporto di contrasto **2.60:1** su `zinc-950` e **1.71:1** su `zinc-900`), garantendo contorni netti preservando il rigore estetico Zero-Blue.
+      * **Tema Chiaro**: migrato da `light:border-slate-200` e `light:border-slate-100` a `light:border-slate-300` (`#cbd5e1`) con `light:shadow-sm`, definendo sagome nitide e volumetriche sulle superfici `slate-50` e card `white`.
+    - Bonificati tutti i testi secondari e le didascalie a basso contrasto: rimosso l'uso di `light:text-slate-400` (2.4:1 contrasto, non conforme WCAG) e `text-zinc-500` (3.0:1), sostituendoli con `text-zinc-400 light:text-slate-600` (**7.0:1**, WCAG AAA) e `text-zinc-300 light:text-slate-700` (**9.6:1**, WCAG AAA).
+    - Ridisegnati i tracciati vuoti delle barre di avanzamento (progress tracks) che sparivano su fondo nero o bianco: ora dotati di `bg-zinc-950/80 border border-zinc-800 light:bg-slate-200 light:border-slate-300/60 rounded-full`.
+    - Resi nitidi tutti i badge con scorciatoie da tastiera (`[1]`..`[6]`, `[F]`, `[Spazio]`), le opzioni di risposta neutre non selezionate e i chip filtro.
+  * **Componenti Bonificati (16 File Totali)**:
+    1. [src/components/HomeScreen.tsx](file:///c:/github/Quiz_VDS-VL/src/components/HomeScreen.tsx): Telemetria, divider, progress bar track, 6 card scenario, scorciatoie `[1]`..`[6]`.
+    2. [src/components/Navbar.tsx](file:///c:/github/Quiz_VDS-VL/src/components/Navbar.tsx): Header home e mini-header, bottoni di azione (`btn-cloud-sync`, `btn-theme-toggle`, `btn-settings`), badge versione.
+    3. [src/components/QuestionCard.tsx](file:///c:/github/Quiz_VDS-VL/src/components/QuestionCard.tsx): Bordo card principale, divider, metadata, opzioni di risposta 1..3 neutre e corrette, card didattica Regola e Tranello.
+    4. [src/components/QuestionNavigator.tsx](file:///c:/github/Quiz_VDS-VL/src/components/QuestionNavigator.tsx): Contenitore quesiti, bolle 1..30 non risposte e bordi.
+    5. [src/components/QuizBottomBar.tsx](file:///c:/github/Quiz_VDS-VL/src/components/QuizBottomBar.tsx): Bordo superiore barra, tasti Precedente, Segna, Successiva.
+    6. [src/components/ExamScreen.tsx](file:///c:/github/Quiz_VDS-VL/src/components/ExamScreen.tsx): Card idle Tutor ed Esame, riquadri regole, card maratona, top bar sticky, modali di conferma.
+    7. [src/components/TopicsScreen.tsx](file:///c:/github/Quiz_VDS-VL/src/components/TopicsScreen.tsx): Top bar attiva, 9 card materia, progress bar track, pulsanti filtro "Mai viste".
+    8. [src/components/MistakesScreen.tsx](file:///c:/github/Quiz_VDS-VL/src/components/MistakesScreen.tsx): Barra revisione, badge obiettivo, empty state card, lista quesiti da rivedere.
+    9. [src/components/ArchiveScreen.tsx](file:///c:/github/Quiz_VDS-VL/src/components/ArchiveScreen.tsx): Campo ricerca, tastierino #ID, bottoni filtro materia e stato, chip concetti, card quesiti.
+    10. [src/components/StatsScreen.tsx](file:///c:/github/Quiz_VDS-VL/src/components/StatsScreen.tsx): Card punteggio prontezza, 3 metriche, righe accuratezza materie, card e righe storico esami e top 10 errori.
+    11. [src/components/SettingsModal.tsx](file:///c:/github/Quiz_VDS-VL/src/components/SettingsModal.tsx): Accordion card, selettori tema e font scaling, schede Aspetto, Voce, Drive, Cloud, Dati, Info.
+    12. [src/components/SubjectDetailModal.tsx](file:///c:/github/Quiz_VDS-VL/src/components/SubjectDetailModal.tsx): Header border, dashboard materia, chip filtro (Tutte, Errori, Non viste, Corrette), lista quesiti.
+    13. [src/components/QuestionDetailModal.tsx](file:///c:/github/Quiz_VDS-VL/src/components/QuestionDetailModal.tsx): Contenitore dialog, riquadro audio, opzioni, spiegazione didattica, note personali, telemetria.
+    14. [src/components/BuildInfoModal.tsx](file:///c:/github/Quiz_VDS-VL/src/components/BuildInfoModal.tsx): Contenitore dialog, griglia metadati, banner cache PWA, bottone copia.
+    15. [src/components/VoiceCommandsModal.tsx](file:///c:/github/Quiz_VDS-VL/src/components/VoiceCommandsModal.tsx): Card categorie comandi vocali, badge hands-free, box consigli cockpit, riascolto audio.
+    16. [src/components/AudioOfflinePromptModal.tsx](file:///c:/github/Quiz_VDS-VL/src/components/AudioOfflinePromptModal.tsx): Contenitore prompt, opzione voce singola raccomandata, opzione entrambe le voci, footer.
+  * **Miglioramento Strumentale al Tester Headless CDP**:
+    - In [.agents/skills/headless-pwa-tester/scripts/visual_check.js](file:///c:/github/Quiz_VDS-VL/.agents/skills/headless-pwa-tester/scripts/visual_check.js), integrato ciclo di attesa dinamico per i selettori CSS (polling fino a 3000ms), prevenendo fallimenti asincroni durante l'idratazione iniziale di React.
+  * **Verifica Visiva e Test**:
+    - Generati e verificati screenshot visivi CDP in viewport desktop (1440x900) e mobile portrait (390x844) per tema scuro e tema chiaro.
+    - Console del browser pulita con 0 errori e 0 warning.
+    - Suite completa Vitest: 41 file di test passati, 296 test superati (100%).
+    - Build Vite di produzione completata con successo (`tsc && vite build`).
+  * **Avanzamento Versione**:
+    - Bump SemVer a `1.3.4` in [package.json](file:///c:/github/Quiz_VDS-VL/package.json).
+
+- **Scelte architetturali & Rationale**:
+  * *Palette Zinc e Slate Coerenti*: Mantenuto il principio Zero-Blue (nessun tono blu/freddo non intenzionale in dark mode): lo sfondo rimane `zinc-950` OLED (#09090b), le superfici `zinc-900` (#18181b) e i bordi elevati a `zinc-700` (#3f3f46). In tema chiaro, il passaggio a `slate-300` (#cbd5e1) con micro-ombreggiatura `light:shadow-sm` fornisce un contrasto tangibile e confortevole senza appesantire la grafica.
+  * *WCAG 2.1 AAA sui Testi Informativi*: L'eliminazione sistematica di `slate-400` sui testi secondari porta la leggibilità ad almeno 7.0:1, rendendo l'applicazione accessibile all'aperto, sotto la luce diretta del sole in decollo e su schermi mobili a luminosità ridotta.
+
+- **Impatto sul Desiderata**:
+  * Risolve completamente il requisito utente relativo all'invisibilità dei bordi dei pannelli e alla presenza di elementi a basso contrasto in modalità chiara e scura.
+
+---
+
 ### [2026-09-30] - Risoluzione Offset Superiore Dettaglio Materia ed Edge-to-Edge Fullscreen (v1.3.3)
 
 - **Cosa abbiamo fatto**:

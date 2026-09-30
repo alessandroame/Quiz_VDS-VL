@@ -53,11 +53,11 @@ export const BuildInfoModal: React.FC<BuildInfoModalProps> = ({ isOpen, onClose 
       onClick={onClose}
     >
       <div
-        className="relative w-full max-w-sm rounded-2xl bg-zinc-900 border border-zinc-800 p-5 shadow-2xl text-zinc-100 dark:bg-zinc-900 dark:border-zinc-800 light:bg-white light:border-slate-200 light:text-slate-900 space-y-4"
+        className="relative w-full max-w-sm rounded-2xl bg-zinc-900 border border-zinc-700 p-5 shadow-2xl text-zinc-100 dark:bg-zinc-900 dark:border-zinc-700 light:bg-white light:border-slate-300 light:shadow-xl light:text-slate-900 space-y-4"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
-        <div className="flex items-center justify-between border-b border-zinc-800/80 pb-3 light:border-slate-200">
+        <div className="flex items-center justify-between border-b border-zinc-700 pb-3 light:border-slate-300">
           <div className="flex items-center gap-2.5">
             <div className="w-8 h-8 rounded-lg overflow-hidden border border-amber-500/40 flex items-center justify-center flex-shrink-0 shadow-sm bg-zinc-900 light:bg-white">
               <img
@@ -78,7 +78,7 @@ export const BuildInfoModal: React.FC<BuildInfoModalProps> = ({ isOpen, onClose 
               <h2 id="build-info-title" className="text-sm font-bold tracking-tight">
                 Versione e Build
               </h2>
-              <p className="text-[10px] text-zinc-400 light:text-slate-500">
+              <p className="text-[10px] text-zinc-400 light:text-slate-600">
                 Identificativo installazione PWA
               </p>
             </div>
@@ -86,7 +86,7 @@ export const BuildInfoModal: React.FC<BuildInfoModalProps> = ({ isOpen, onClose 
           <button
             onClick={onClose}
             aria-label="Chiudi"
-            className="p-1.5 rounded-lg text-zinc-400 hover:text-zinc-100 hover:bg-zinc-800/80 light:text-slate-500 light:hover:text-slate-900 light:hover:bg-slate-100 transition-colors"
+            className="p-1.5 rounded-lg text-zinc-400 hover:text-zinc-100 hover:bg-zinc-800/80 light:text-slate-600 light:hover:text-slate-900 light:hover:bg-slate-100 transition-colors"
           >
             <X className="w-4 h-4" />
           </button>
@@ -95,8 +95,8 @@ export const BuildInfoModal: React.FC<BuildInfoModalProps> = ({ isOpen, onClose 
         {/* Build Metadata Grid */}
         <div className="grid grid-cols-2 gap-2 text-xs">
           {/* Version */}
-          <div className="p-2.5 rounded-xl bg-zinc-950/70 border border-zinc-800/80 light:bg-slate-50 light:border-slate-200 space-y-0.5">
-            <div className="flex items-center gap-1 text-[10px] text-zinc-400 light:text-slate-500 font-medium">
+          <div className="p-2.5 rounded-xl bg-zinc-950/70 border border-zinc-700 light:bg-white light:border-slate-300 light:shadow-sm space-y-0.5">
+            <div className="flex items-center gap-1 text-[10px] text-zinc-400 light:text-slate-600 font-medium">
               <Tag className="w-3 h-3 text-amber-500" />
               <span>Versione</span>
             </div>
@@ -106,8 +106,8 @@ export const BuildInfoModal: React.FC<BuildInfoModalProps> = ({ isOpen, onClose 
           </div>
 
           {/* Build Number */}
-          <div className="p-2.5 rounded-xl bg-zinc-950/70 border border-zinc-800/80 light:bg-slate-50 light:border-slate-200 space-y-0.5">
-            <div className="flex items-center gap-1 text-[10px] text-zinc-400 light:text-slate-500 font-medium">
+          <div className="p-2.5 rounded-xl bg-zinc-950/70 border border-zinc-700 light:bg-white light:border-slate-300 light:shadow-sm space-y-0.5">
+            <div className="flex items-center gap-1 text-[10px] text-zinc-400 light:text-slate-600 font-medium">
               <span className="font-mono text-amber-500 font-bold">#</span>
               <span>Numero Build</span>
             </div>
@@ -117,8 +117,8 @@ export const BuildInfoModal: React.FC<BuildInfoModalProps> = ({ isOpen, onClose 
           </div>
 
           {/* Commit Hash */}
-          <div className="p-2.5 rounded-xl bg-zinc-950/70 border border-zinc-800/80 light:bg-slate-50 light:border-slate-200 space-y-0.5">
-            <div className="flex items-center gap-1 text-[10px] text-zinc-400 light:text-slate-500 font-medium">
+          <div className="p-2.5 rounded-xl bg-zinc-950/70 border border-zinc-700 light:bg-white light:border-slate-300 light:shadow-sm space-y-0.5">
+            <div className="flex items-center gap-1 text-[10px] text-zinc-400 light:text-slate-600 font-medium">
               <GitCommit className="w-3 h-3 text-sky-400" />
               <span>Commit Git</span>
             </div>
@@ -128,8 +128,8 @@ export const BuildInfoModal: React.FC<BuildInfoModalProps> = ({ isOpen, onClose 
           </div>
 
           {/* Build Date */}
-          <div className="p-2.5 rounded-xl bg-zinc-950/70 border border-zinc-800/80 light:bg-slate-50 light:border-slate-200 space-y-0.5">
-            <div className="flex items-center gap-1 text-[10px] text-zinc-400 light:text-slate-500 font-medium">
+          <div className="p-2.5 rounded-xl bg-zinc-950/70 border border-zinc-700 light:bg-white light:border-slate-300 light:shadow-sm space-y-0.5">
+            <div className="flex items-center gap-1 text-[10px] text-zinc-400 light:text-slate-600 font-medium">
               <Calendar className="w-3 h-3 text-emerald-400" />
               <span>Data Generazione</span>
             </div>
@@ -140,7 +140,7 @@ export const BuildInfoModal: React.FC<BuildInfoModalProps> = ({ isOpen, onClose 
         </div>
 
         {/* PWA Cache Status Banner */}
-        <div className="p-2.5 rounded-xl bg-zinc-950/40 border border-zinc-800/60 light:bg-slate-100/70 light:border-slate-200 flex items-start gap-2 text-[11px] text-zinc-400 light:text-slate-600">
+        <div className="p-2.5 rounded-xl bg-zinc-950/40 border border-zinc-700/80 light:bg-slate-50 light:border-slate-300 flex items-start gap-2 text-[11px] text-zinc-300 light:text-slate-700">
           <ShieldCheck className="w-4 h-4 text-emerald-400 flex-shrink-0 mt-0.5" />
           <div>
             <p className="leading-snug">
@@ -162,7 +162,7 @@ export const BuildInfoModal: React.FC<BuildInfoModalProps> = ({ isOpen, onClose 
 
           <button
             onClick={handleCopy}
-            className="w-full py-2 px-3 rounded-xl bg-zinc-800/80 hover:bg-zinc-800 text-zinc-300 hover:text-white light:bg-slate-100 light:hover:bg-slate-200 light:text-slate-700 text-xs font-medium flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
+            className="w-full py-2 px-3 rounded-xl bg-zinc-800 border border-zinc-700 text-zinc-300 hover:text-white hover:bg-zinc-700 light:bg-slate-100 light:hover:bg-slate-200 light:border-slate-300 light:text-slate-700 text-xs font-medium flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
           >
             {isCopied ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
             <span>{isCopied ? 'Dettagli copiati negli appunti' : 'Copia Dettagli Build'}</span>

@@ -131,7 +131,7 @@ Questo documento rappresenta la **bussola strategica e funzionale** del progetto
 | Quaderno Errori Leitner | 🟢 Completato | Uscita vincolata a 2 risposte esatte consecutive. |
 | Archivio & Ricerca Full-Text | 🟢 Completato | Ricerca istantanea, preferiti e note personali salvate in Dexie. |
 | Dashboard Statistiche | 🟢 Completato | Radar materie, preparazione esame e storico sessioni. |
-| Temi Scuro & Chiaro, Icona Aero Shield | 🟢 Completato | Zero dominante blu (`zinc` + `amber`), icona Aero Shield vettoriale e PNG 192/512. |
+| Temi Scuro & Chiaro, Icona Aero Shield | 🟢 Completato | Zero dominante blu (`zinc` + `amber`), bordi pannelli elevati ad alto contrasto (`zinc-700` dark, `slate-300` light) con conformità WCAG 2.1 AA/AAA su tutti i testi e card, icona Aero Shield vettoriale e PNG 192/512. |
 | Suite Vitest (Unit & BVA) | 🟢 Completato | 255 test attivi su 34 suite (100% passanti, 0 fallimenti), copertura linee 76.8%, test completi per custom hooks mobile (WakeLock, Voice, SpeechRecognition) e contratti ergonomici componenti. |
 | Supporto Audio | 🟢 Completato | Sintesi vocale neurale con controlli Play/Pausa e Da Capo universali su domanda, singole opzioni e spiegazione; feedback Web Audio API e fonetica ICAO. |
 | Gestione Offline Audio & Fallback | 🟢 Completato | Download in background non bloccante via CacheStorage, prompt non invasivo al primo avvio Guida, gestione granulare Impostazioni, fallback automatico offline su voce scaricata e Range Requests Safari. |

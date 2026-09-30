@@ -78,7 +78,7 @@ const AccordionCard: React.FC<AccordionCardProps> = ({
       className={`rounded-2xl border transition-colors duration-150 overflow-hidden ${
         isExpanded
           ? 'border-amber-500/50 bg-zinc-900/80 shadow-md shadow-amber-500/5 light:border-amber-400 light:bg-white ring-1 ring-amber-500/20 light:ring-amber-400/20'
-          : 'border-zinc-800/80 bg-zinc-900/40 hover:bg-zinc-900/70 hover:border-zinc-700/80 light:border-slate-200 light:bg-white light:hover:bg-slate-50'
+          : 'border-zinc-700/80 bg-zinc-900/50 hover:bg-zinc-900/80 hover:border-zinc-600 light:border-slate-300 light:bg-white light:shadow-sm light:hover:bg-slate-50'
       }`}
     >
       <button
@@ -93,7 +93,7 @@ const AccordionCard: React.FC<AccordionCardProps> = ({
             className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 transition-colors ${
               isExpanded
                 ? 'bg-amber-500/20 text-amber-400 border border-amber-500/40 light:bg-amber-100 light:text-amber-800 light:border-amber-300'
-                : 'bg-zinc-800/80 text-zinc-400 border border-zinc-700/40 group-hover:text-zinc-200 group-hover:border-zinc-600 light:bg-slate-100 light:text-slate-700 light:border-slate-200 light:shadow-sm light:group-hover:bg-slate-200 light:group-hover:text-slate-900 light:group-hover:border-slate-300'
+                : 'bg-zinc-800/80 text-zinc-300 border border-zinc-700/60 group-hover:text-white group-hover:border-zinc-500 light:bg-slate-100 light:text-slate-700 light:border-slate-300 light:shadow-sm light:group-hover:bg-slate-200 light:group-hover:text-slate-900'
             }`}
           >
             <Icon className="w-4 h-4" />
@@ -114,13 +114,13 @@ const AccordionCard: React.FC<AccordionCardProps> = ({
                 className={`text-[10px] sm:text-[11px] font-medium px-2 py-0.5 rounded-full border truncate max-w-[190px] sm:max-w-xs transition-colors ${
                   isExpanded
                     ? 'bg-amber-500/10 text-amber-300/90 border-amber-500/30 light:bg-amber-50 light:text-amber-700 light:border-amber-200'
-                    : 'bg-zinc-800/60 text-zinc-400 border-zinc-700/50 light:bg-slate-100 light:text-slate-600 light:border-slate-200 light:group-hover:text-slate-800'
+                    : 'bg-zinc-800/60 text-zinc-300 border-zinc-700 light:bg-slate-100 light:text-slate-700 light:border-slate-300 light:group-hover:text-slate-900'
                 }`}
               >
                 {summary}
               </span>
             </div>
-            <p className="text-[11px] text-zinc-400 light:text-slate-500 line-clamp-1 mt-0.5">
+            <p className="text-[11px] text-zinc-400 light:text-slate-600 line-clamp-1 mt-0.5">
               {description}
             </p>
           </div>
@@ -131,7 +131,7 @@ const AccordionCard: React.FC<AccordionCardProps> = ({
             className={`w-7 h-7 rounded-lg flex items-center justify-center transition-transform duration-200 ${
               isExpanded
                 ? 'rotate-180 bg-amber-500/10 text-amber-400 light:bg-amber-100 light:text-amber-800'
-                : 'text-zinc-500 group-hover:text-zinc-300 light:text-slate-400 light:group-hover:text-slate-600'
+                : 'text-zinc-400 group-hover:text-zinc-200 light:text-slate-500 light:group-hover:text-slate-700'
             }`}
           >
             <ChevronDown className="w-4 h-4" />
@@ -140,7 +140,7 @@ const AccordionCard: React.FC<AccordionCardProps> = ({
       </button>
 
       {isExpanded && (
-        <div className="px-3.5 pb-4 pt-1 sm:px-4 sm:pb-5 border-t border-zinc-800/70 light:border-slate-100 animate-in fade-in duration-150">
+        <div className="px-3.5 pb-4 pt-1 sm:px-4 sm:pb-5 border-t border-zinc-700/70 light:border-slate-200 animate-in fade-in duration-150">
           {children}
         </div>
       )}
@@ -456,7 +456,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
       className="fixed inset-0 z-50 flex flex-col h-[100dvh] w-full bg-zinc-950 text-zinc-100 dark:bg-zinc-950 dark:text-zinc-100 light:bg-slate-50 light:text-slate-900 overflow-hidden font-sans animate-in fade-in duration-150"
     >
       {/* Top Header */}
-      <header className="sticky top-0 z-20 w-full border-b backdrop-blur bg-zinc-950/90 border-zinc-800 dark:bg-zinc-950/90 dark:border-zinc-800 light:bg-white/90 light:border-slate-200 transition-colors flex-shrink-0">
+      <header className="sticky top-0 z-20 w-full border-b backdrop-blur bg-zinc-950/90 border-zinc-700 dark:bg-zinc-950/90 dark:border-zinc-700 light:bg-white/90 light:border-slate-300 light:shadow-sm transition-colors flex-shrink-0">
         <div className="max-w-2xl mx-auto px-4 h-14 flex items-center justify-between">
           <div className="flex items-center gap-2">
             <button
@@ -469,7 +469,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
               <ArrowLeft className="w-5 h-5" />
               <span className="text-xs font-semibold hidden sm:inline">Indietro</span>
             </button>
-            <div className="h-4 w-px bg-zinc-800 light:bg-slate-200 mx-1 hidden sm:block" />
+            <div className="h-4 w-px bg-zinc-700 light:bg-slate-300 mx-1 hidden sm:block" />
             <h1 className="text-base font-bold text-zinc-100 light:text-slate-900 flex items-center gap-2">
               <SettingsIcon className="w-4 h-4 text-amber-500" />
               <span>Impostazioni</span>
@@ -482,7 +482,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
               >
                 v{buildInfo.version}
                 {buildInfo.buildNumber && buildInfo.buildNumber !== '0' && (
-                  <span className="text-zinc-500 light:text-slate-400 font-normal">
+                  <span className="text-zinc-400 light:text-slate-500 font-normal">
                     {' '}#{buildInfo.buildNumber}
                   </span>
                 )}
@@ -508,7 +508,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
           
           {/* Quick Toolbar / Overview */}
           <div className="flex items-center justify-between px-1 text-xs">
-            <div className="flex items-center gap-1.5 text-zinc-400 light:text-slate-500">
+            <div className="flex items-center gap-1.5 text-zinc-400 light:text-slate-600">
               <span className="font-semibold text-zinc-300 light:text-slate-700">Pannelli di Controllo</span>
               <span>•</span>
               <span>6 sezioni configurabili</span>
@@ -549,7 +549,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
           >
             <div className="space-y-4">
               <div className="space-y-2">
-                <label className="text-xs font-bold text-zinc-400 uppercase tracking-wider block">
+                <label className="text-xs font-bold text-zinc-400 light:text-slate-600 uppercase tracking-wider block">
                   Tema dell'applicazione
                 </label>
                 <div className="grid grid-cols-3 gap-2">
@@ -568,7 +568,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                         className={`py-2 px-3 rounded-xl border text-xs font-semibold flex items-center justify-center gap-1.5 transition-colors cursor-pointer active:scale-95 touch-manipulation ${
                           isSelected
                             ? 'border-amber-500 bg-amber-500/20 text-amber-400 light:border-amber-600 light:bg-amber-50 light:text-amber-700'
-                            : 'border-zinc-800 bg-zinc-950/60 text-zinc-400 light:border-slate-200 light:bg-slate-50'
+                            : 'border-zinc-700 bg-zinc-950/60 text-zinc-300 hover:text-white light:border-slate-300 light:bg-slate-50 light:text-slate-700'
                         }`}
                       >
                         <Icon className="w-3.5 h-3.5" />
@@ -580,9 +580,9 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
               </div>
 
               {/* Selezione Scala Caratteri (Font Scaling) */}
-              <div className="space-y-2 pt-2 border-t border-zinc-800/80 light:border-slate-100">
+              <div className="space-y-2 pt-2 border-t border-zinc-700/80 light:border-slate-200">
                 <div className="flex items-center justify-between">
-                  <label className="text-xs font-bold text-zinc-400 uppercase tracking-wider block">
+                  <label className="text-xs font-bold text-zinc-400 light:text-slate-600 uppercase tracking-wider block">
                     Dimensione Caratteri
                   </label>
                   <span className="text-[11px] font-mono text-amber-400 font-semibold">
@@ -601,7 +601,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                         className={`py-2 px-2.5 rounded-xl border text-left flex flex-col justify-between transition-all cursor-pointer active:scale-95 touch-manipulation ${
                           isSelected
                             ? 'border-amber-500 bg-amber-500/20 text-amber-300 light:border-amber-600 light:bg-amber-50 light:text-amber-800 shadow-sm'
-                            : 'border-zinc-800 bg-zinc-950/60 text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800/40 light:border-slate-200 light:bg-slate-50 light:text-slate-600'
+                            : 'border-zinc-700 bg-zinc-950/60 text-zinc-300 hover:text-white hover:bg-zinc-800/40 light:border-slate-300 light:bg-slate-50 light:text-slate-700'
                         }`}
                       >
                         <div className="flex items-center justify-between w-full">
@@ -617,16 +617,16 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                 </div>
               </div>
 
-              <div className="space-y-2 pt-2 border-t border-zinc-800/80 light:border-slate-100">
-                <label className="text-xs font-bold text-zinc-400 uppercase tracking-wider block">
+              <div className="space-y-2 pt-2 border-t border-zinc-700/80 light:border-slate-200">
+                <label className="text-xs font-bold text-zinc-400 light:text-slate-600 uppercase tracking-wider block">
                   Feedback di Studio
                 </label>
-                <label className="flex items-center justify-between p-3 rounded-xl border border-zinc-800 bg-zinc-950/60 light:bg-slate-50 light:border-slate-200 cursor-pointer select-none active:scale-[0.99] touch-manipulation transition-all">
+                <label className="flex items-center justify-between p-3 rounded-xl border border-zinc-700 bg-zinc-950/60 light:bg-slate-50 light:border-slate-300 cursor-pointer select-none active:scale-[0.99] touch-manipulation transition-all">
                   <div>
                     <span className="text-zinc-300 light:text-slate-700 font-medium block text-xs">
                       Verifica Immediata nelle Materie
                     </span>
-                    <span className="text-[11px] text-zinc-500 block">
+                    <span className="text-[11px] text-zinc-400 light:text-slate-600 block">
                       Durante lo studio per materie, mostra subito se la risposta è esatta
                     </span>
                   </div>
@@ -638,12 +638,12 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                   />
                 </label>
 
-                <label className="flex items-center justify-between p-3 rounded-xl border border-zinc-800 bg-zinc-950/60 light:bg-slate-50 light:border-slate-200 cursor-pointer select-none active:scale-[0.99] touch-manipulation transition-all">
+                <label className="flex items-center justify-between p-3 rounded-xl border border-zinc-700 bg-zinc-950/60 light:bg-slate-50 light:border-slate-300 cursor-pointer select-none active:scale-[0.99] touch-manipulation transition-all">
                   <div>
                     <span className="text-zinc-300 light:text-slate-700 font-medium block text-xs">
                       Avanzamento Automatico su Risposta Esatta
                     </span>
-                    <span className="text-[11px] text-zinc-500 block">
+                    <span className="text-[11px] text-zinc-400 light:text-slate-600 block">
                       Passa da solo alla domanda successiva se indovini. In caso di errore si ferma per farti studiare Regola e Tranello.
                     </span>
                   </div>
@@ -659,16 +659,16 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
 
               {/* Opzione Schermo Intero Browser */}
               {typeof document !== 'undefined' && Boolean(document.fullscreenEnabled) && (
-                <div className="space-y-2 pt-2 border-t border-zinc-800/80 light:border-slate-100">
-                  <label className="text-xs font-bold text-zinc-400 uppercase tracking-wider block">
+                <div className="space-y-2 pt-2 border-t border-zinc-700/80 light:border-slate-200">
+                  <label className="text-xs font-bold text-zinc-400 light:text-slate-600 uppercase tracking-wider block">
                     Schermo Intero
                   </label>
-                  <div className="flex items-center justify-between p-3 rounded-xl border border-zinc-800 bg-zinc-950/60 light:bg-slate-50 light:border-slate-200">
+                  <div className="flex items-center justify-between p-3 rounded-xl border border-zinc-700 bg-zinc-950/60 light:bg-slate-50 light:border-slate-300">
                     <div>
                       <span className="text-zinc-300 light:text-slate-700 font-medium block text-xs">
                         Modalità a Schermo Intero (Fullscreen)
                       </span>
-                      <span className="text-[11px] text-zinc-500 block">
+                      <span className="text-[11px] text-zinc-400 light:text-slate-600 block">
                         Massimizza l'applicazione nascondendo le barre del browser
                       </span>
                     </div>
@@ -714,12 +714,12 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
             }}
           >
             <div className="space-y-3.5">
-              <label className="flex items-center justify-between p-2.5 rounded-xl border border-zinc-800 bg-zinc-950/60 light:bg-slate-50 light:border-slate-200 cursor-pointer select-none active:scale-[0.99] touch-manipulation transition-all">
+              <label className="flex items-center justify-between p-2.5 rounded-xl border border-zinc-700 bg-zinc-950/60 light:bg-slate-50 light:border-slate-300 cursor-pointer select-none active:scale-[0.99] touch-manipulation transition-all">
                 <div>
                   <span className="text-zinc-300 light:text-slate-700 font-medium block text-xs">
                     Attiva Lettura Vocale
                   </span>
-                  <span className="text-[11px] text-zinc-500 block">
+                  <span className="text-[11px] text-zinc-400 light:text-slate-600 block">
                     Ascolta domande e opzioni lette a voce alta
                   </span>
                 </div>
@@ -734,7 +734,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
               {settings.ttsEnabled && (
                 <>
                   {/* Selettore Voce */}
-                  <div className="p-2.5 rounded-xl border border-zinc-800 bg-zinc-950/60 light:bg-slate-50 light:border-slate-200 space-y-2">
+                  <div className="p-2.5 rounded-xl border border-zinc-700 bg-zinc-950/60 light:bg-slate-50 light:border-slate-300 space-y-2">
                     <span className="text-zinc-300 light:text-slate-700 font-medium block text-xs">
                       Voce Istruttore
                     </span>
@@ -745,7 +745,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                         className={`p-2.5 rounded-xl border text-left flex items-center justify-between transition-all cursor-pointer active:scale-95 touch-manipulation ${
                           (settings.ttsVoice || 'giuseppe') === 'giuseppe'
                             ? 'border-amber-500 bg-amber-500/20 text-amber-300 light:border-amber-600 light:bg-amber-50 light:text-amber-800 font-semibold'
-                            : 'border-zinc-800 bg-zinc-900/60 text-zinc-400 hover:text-zinc-200 light:border-slate-200 light:bg-slate-100'
+                            : 'border-zinc-700 bg-zinc-900/60 text-zinc-300 hover:text-white light:border-slate-300 light:bg-slate-100 light:text-slate-700'
                         }`}
                       >
                         <span className="text-xs">👨‍✈️ Giuseppe</span>
@@ -758,7 +758,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                         className={`p-2.5 rounded-xl border text-left flex items-center justify-between transition-all cursor-pointer active:scale-95 touch-manipulation ${
                           settings.ttsVoice === 'elsa'
                             ? 'border-amber-500 bg-amber-500/20 text-amber-300 light:border-amber-600 light:bg-amber-50 light:text-amber-800 font-semibold'
-                            : 'border-zinc-800 bg-zinc-900/60 text-zinc-400 hover:text-zinc-200 light:border-slate-200 light:bg-slate-100'
+                            : 'border-zinc-700 bg-zinc-900/60 text-zinc-300 hover:text-white light:border-slate-300 light:bg-slate-100 light:text-slate-700'
                         }`}
                       >
                         <span className="text-xs">👩‍✈️ Elsa</span>
@@ -768,7 +768,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                   </div>
 
                   {/* Velocità di Lettura */}
-                  <div className="p-2.5 rounded-xl border border-zinc-800 bg-zinc-950/60 light:bg-slate-50 light:border-slate-200 space-y-1.5">
+                  <div className="p-2.5 rounded-xl border border-zinc-700 bg-zinc-950/60 light:bg-slate-50 light:border-slate-300 space-y-1.5">
                     <div className="flex justify-between items-center text-xs">
                       <span className="text-zinc-300 light:text-slate-700 font-medium">
                         Velocità di Lettura
@@ -797,7 +797,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
 
                   {/* Automazioni vocali */}
                   <div className="space-y-2 text-xs">
-                    <label className="flex items-center justify-between p-2.5 rounded-xl border border-zinc-800 bg-zinc-950/60 light:bg-slate-50 light:border-slate-200 cursor-pointer select-none active:scale-[0.99] touch-manipulation transition-all">
+                    <label className="flex items-center justify-between p-2.5 rounded-xl border border-zinc-700 bg-zinc-950/60 light:bg-slate-50 light:border-slate-300 cursor-pointer select-none active:scale-[0.99] touch-manipulation transition-all">
                       <span className="text-zinc-300 light:text-slate-700">Lettura automatica domanda</span>
                       <input
                         type="checkbox"
@@ -807,7 +807,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                       />
                     </label>
 
-                    <label className="flex items-center justify-between p-2.5 rounded-xl border border-zinc-800 bg-zinc-950/60 light:bg-slate-50 light:border-slate-200 cursor-pointer select-none active:scale-[0.99] touch-manipulation transition-all">
+                    <label className="flex items-center justify-between p-2.5 rounded-xl border border-zinc-700 bg-zinc-950/60 light:bg-slate-50 light:border-slate-300 cursor-pointer select-none active:scale-[0.99] touch-manipulation transition-all">
                       <span className="text-zinc-300 light:text-slate-700">Spiegazione vocale su errore</span>
                       <input
                         type="checkbox"
@@ -819,13 +819,13 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                   </div>
 
                   {/* Sezione Offline Audio TTS */}
-                  <div className="p-3 rounded-xl border border-zinc-800 bg-zinc-950/60 light:bg-slate-50 light:border-slate-200 space-y-3">
+                  <div className="p-3 rounded-xl border border-zinc-700 bg-zinc-950/60 light:bg-slate-50 light:border-slate-300 space-y-3">
                     <div className="flex items-center justify-between">
                       <div>
                         <span className="text-zinc-300 light:text-slate-700 font-bold block text-xs">
                           Archivio Audio Offline (PWA)
                         </span>
-                        <span className="text-[11px] text-zinc-500 block">
+                        <span className="text-[11px] text-zinc-400 light:text-slate-600 block">
                           2.520 file audio MP3 per voce salvati nella cache del dispositivo
                         </span>
                       </div>
@@ -833,7 +833,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                     </div>
 
                     {/* Giuseppe Card */}
-                    <div className="p-2.5 rounded-xl border border-zinc-800/80 bg-zinc-900/60 light:bg-white light:border-slate-200 flex flex-col gap-2">
+                    <div className="p-2.5 rounded-xl border border-zinc-700/80 bg-zinc-900/60 light:bg-white light:border-slate-300 light:shadow-sm flex flex-col gap-2">
                       <div className="flex items-center justify-between">
                         <div>
                           <div className="flex items-center gap-1.5 flex-wrap">
@@ -851,7 +851,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                               </span>
                             )}
                           </div>
-                          <span className="text-[11px] text-zinc-400 light:text-slate-500 block">
+                          <span className="text-[11px] text-zinc-400 light:text-slate-600 block">
                             {audioStatuses.giuseppe.isDownloading
                               ? `Download in corso: ${audioStatuses.giuseppe.percent}% (${audioStatuses.giuseppe.downloadedCount}/${audioStatuses.giuseppe.totalCount})`
                               : updatingVoices.giuseppe
@@ -903,7 +903,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                                   type="button"
                                   id="btn-delete-cache-giuseppe"
                                   onClick={() => handleDeleteCache('giuseppe')}
-                                  className="px-3 py-1.5 text-xs font-bold text-zinc-400 hover:text-rose-400 border border-zinc-800 hover:border-rose-500/40 rounded-lg hover:bg-rose-500/10 active:scale-95 cursor-pointer touch-manipulation transition-all flex items-center gap-1.5"
+                                  className="px-3 py-1.5 text-xs font-bold text-zinc-300 hover:text-rose-400 border border-zinc-700 hover:border-rose-500/40 light:border-slate-300 light:text-slate-700 rounded-lg hover:bg-rose-500/10 active:scale-95 cursor-pointer touch-manipulation transition-all flex items-center gap-1.5"
                                   title="Elimina cache audio di Giuseppe"
                                 >
                                   <Trash2 className="w-3.5 h-3.5" />
@@ -944,7 +944,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                     </div>
 
                     {/* Elsa Card */}
-                    <div className="p-2.5 rounded-xl border border-zinc-800/80 bg-zinc-900/60 light:bg-white light:border-slate-200 flex flex-col gap-2">
+                    <div className="p-2.5 rounded-xl border border-zinc-700/80 bg-zinc-900/60 light:bg-white light:border-slate-300 light:shadow-sm flex flex-col gap-2">
                       <div className="flex items-center justify-between">
                         <div>
                           <div className="flex items-center gap-1.5 flex-wrap">
@@ -962,7 +962,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                               </span>
                             )}
                           </div>
-                          <span className="text-[11px] text-zinc-400 light:text-slate-500 block">
+                          <span className="text-[11px] text-zinc-400 light:text-slate-600 block">
                             {audioStatuses.elsa.isDownloading
                               ? `Download in corso: ${audioStatuses.elsa.percent}% (${audioStatuses.elsa.downloadedCount}/${audioStatuses.elsa.totalCount})`
                               : updatingVoices.elsa
@@ -1014,7 +1014,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                                   type="button"
                                   id="btn-delete-cache-elsa"
                                   onClick={() => handleDeleteCache('elsa')}
-                                  className="px-3 py-1.5 text-xs font-bold text-zinc-400 hover:text-rose-400 border border-zinc-800 hover:border-rose-500/40 rounded-lg hover:bg-rose-500/10 active:scale-95 cursor-pointer touch-manipulation transition-all flex items-center gap-1.5"
+                                  className="px-3 py-1.5 text-xs font-bold text-zinc-300 hover:text-rose-400 border border-zinc-700 hover:border-rose-500/40 light:border-slate-300 light:text-slate-700 rounded-lg hover:bg-rose-500/10 active:scale-95 cursor-pointer touch-manipulation transition-all flex items-center gap-1.5"
                                   title="Elimina cache audio di Elsa"
                                 >
                                   <Trash2 className="w-3.5 h-3.5" />
@@ -1055,13 +1055,13 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                     </div>
 
                     {/* Control Panel: Verifica manuale + Switch Auto-Update */}
-                    <div className="p-2.5 rounded-xl border border-zinc-800/80 bg-zinc-900/60 light:bg-white light:border-slate-200 space-y-2.5">
+                    <div className="p-2.5 rounded-xl border border-zinc-700/80 bg-zinc-900/60 light:bg-white light:border-slate-300 light:shadow-sm space-y-2.5">
                       <div className="flex items-center justify-between gap-2">
                         <div>
                           <span className="text-xs font-semibold text-zinc-200 light:text-slate-800 block">
                             Verifica aggiornamenti audio
                           </span>
-                          <span className="text-[11px] text-zinc-400 light:text-slate-500 block">
+                          <span className="text-[11px] text-zinc-400 light:text-slate-600 block">
                             {settings.lastAudioCheckAt
                               ? `Ultima verifica: ${new Date(settings.lastAudioCheckAt).toLocaleString('it-IT', { dateStyle: 'short', timeStyle: 'short' })}`
                               : 'Confronta la cache locale con le modifiche su server'}
@@ -1085,12 +1085,12 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                         </div>
                       )}
 
-                      <div className="pt-2 border-t border-zinc-800 light:border-slate-100 flex items-center justify-between">
+                      <div className="pt-2 border-t border-zinc-700 light:border-slate-200 flex items-center justify-between">
                         <div>
                           <span className="text-xs text-zinc-300 light:text-slate-700 font-medium block">
                             Aggiornamento automatico online
                           </span>
-                          <span className="text-[10px] text-zinc-500 block">
+                          <span className="text-[10px] text-zinc-400 light:text-slate-600 block">
                             Sincronizza silenziosamente file audio modificati all'avvio dell'app
                           </span>
                         </div>
@@ -1107,7 +1107,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                     </div>
 
                     {/* Note fallback & reset */}
-                    <div className="pt-2 border-t border-zinc-800/80 light:border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-1 text-[11px] text-zinc-400 light:text-slate-500">
+                    <div className="pt-2 border-t border-zinc-700/80 light:border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-1 text-[11px] text-zinc-400 light:text-slate-600">
                       <span>
                         💡 Se sei offline e la voce scelta non è scaricata, l'app usa l'altra voce presente.
                       </span>
@@ -1131,12 +1131,12 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
               )}
 
               {/* Effetti Sonori */}
-              <label className="flex items-center justify-between p-2.5 rounded-xl border border-zinc-800 bg-zinc-950/60 light:bg-slate-50 light:border-slate-200 cursor-pointer select-none active:scale-[0.99] touch-manipulation transition-all">
+              <label className="flex items-center justify-between p-2.5 rounded-xl border border-zinc-700 bg-zinc-950/60 light:bg-slate-50 light:border-slate-300 cursor-pointer select-none active:scale-[0.99] touch-manipulation transition-all">
                 <div>
                   <span className="text-zinc-300 light:text-slate-700 font-medium block text-xs">
                     Effetti sonori
                   </span>
-                  <span className="text-[11px] text-zinc-500 block">
+                  <span className="text-[11px] text-zinc-400 light:text-slate-600 block">
                     Feedback sonoro per tocco e conferma delle risposte
                   </span>
                 </div>
@@ -1164,17 +1164,17 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
             }}
           >
             <div className="space-y-3">
-              <p className="text-[11px] text-zinc-400 light:text-slate-500 leading-relaxed">
+              <p className="text-[11px] text-zinc-400 light:text-slate-600 leading-relaxed">
                 Macro-pulsanti per bici/corsa e audio automatico per ripassare senza guardare lo schermo in totale sicurezza.
               </p>
 
               <div className="space-y-2 text-xs">
-                <label className="flex items-center justify-between p-2.5 rounded-xl border border-zinc-800 bg-zinc-950/60 light:bg-slate-50 light:border-slate-200 cursor-pointer select-none active:scale-[0.99] touch-manipulation transition-all">
+                <label className="flex items-center justify-between p-2.5 rounded-xl border border-zinc-700 bg-zinc-950/60 light:bg-slate-50 light:border-slate-300 cursor-pointer select-none active:scale-[0.99] touch-manipulation transition-all">
                   <div>
                     <span className="text-zinc-300 light:text-slate-700 font-medium block">
                       Avanzamento Automatico Continuo
                     </span>
-                    <span className="text-[11px] text-zinc-500">
+                    <span className="text-[11px] text-zinc-400 light:text-slate-600">
                       Legge le domande a catena senza tocco fisico
                     </span>
                   </div>
@@ -1187,7 +1187,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                 </label>
 
                 {/* Modalità Tutor Didattica */}
-                <label className="flex items-center justify-between p-2.5 rounded-xl border border-zinc-800 bg-zinc-950/60 light:bg-slate-50 light:border-slate-200 cursor-pointer select-none active:scale-[0.99] touch-manipulation transition-all">
+                <label className="flex items-center justify-between p-2.5 rounded-xl border border-zinc-700 bg-zinc-950/60 light:bg-slate-50 light:border-slate-300 cursor-pointer select-none active:scale-[0.99] touch-manipulation transition-all">
                   <div>
                     <span className="text-zinc-300 light:text-slate-700 font-medium block flex items-center gap-1.5">
                       <span>Modalità Tutor Didattica</span>
@@ -1195,7 +1195,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                         REGOLA + TRANELLO
                       </span>
                     </span>
-                    <span className="text-[11px] text-zinc-500">
+                    <span className="text-[11px] text-zinc-400 light:text-slate-600">
                       Legge ad alta voce risposta esatta, regola e tranello in caso di errore prima di avanzare
                     </span>
                   </div>
@@ -1208,13 +1208,13 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                   />
                 </label>
 
-                <div className="p-2.5 rounded-xl border border-zinc-800 bg-zinc-950/60 light:bg-slate-50 light:border-slate-200 space-y-2">
+                <div className="p-2.5 rounded-xl border border-zinc-700 bg-zinc-950/60 light:bg-slate-50 light:border-slate-300 space-y-2">
                   <label className="flex items-center justify-between cursor-pointer select-none touch-manipulation">
                     <div>
                       <span className="text-zinc-300 light:text-slate-700 font-medium block">
                         Rispondi a Voce (Hands-Free)
                       </span>
-                      <span className="text-[11px] text-zinc-500">
+                      <span className="text-[11px] text-zinc-400 light:text-slate-600">
                         Controlla quiz e navigazione a mani libere
                       </span>
                     </div>
@@ -1227,17 +1227,17 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                   </label>
 
                   {/* Cheat Sheet rapido & Bottone Guida */}
-                  <div className="grid grid-cols-2 gap-1.5 text-[11px] text-zinc-400 light:text-slate-600">
-                    <div className="p-1.5 rounded-lg bg-zinc-900/60 light:bg-slate-100 border border-zinc-800/80 light:border-slate-200">
+                  <div className="grid grid-cols-2 gap-1.5 text-[11px] text-zinc-300 light:text-slate-700">
+                    <div className="p-1.5 rounded-lg bg-zinc-900/60 light:bg-slate-100 border border-zinc-700/80 light:border-slate-300">
                       <span className="font-bold text-emerald-400 light:text-emerald-600">Risposte:</span> "Uno", "Due", "Tre"
                     </div>
-                    <div className="p-1.5 rounded-lg bg-zinc-900/60 light:bg-slate-100 border border-zinc-800/80 light:border-slate-200">
+                    <div className="p-1.5 rounded-lg bg-zinc-900/60 light:bg-slate-100 border border-zinc-700/80 light:border-slate-300">
                       <span className="font-bold text-amber-400 light:text-amber-600">Scorri:</span> "Avanti", "Indietro"
                     </div>
-                    <div className="p-1.5 rounded-lg bg-zinc-900/60 light:bg-slate-100 border border-zinc-800/80 light:border-slate-200">
+                    <div className="p-1.5 rounded-lg bg-zinc-900/60 light:bg-slate-100 border border-zinc-700/80 light:border-slate-300">
                       <span className="font-bold text-amber-400 light:text-amber-600">Audio:</span> "Ripeti", "Pausa"
                     </div>
-                    <div className="p-1.5 rounded-lg bg-zinc-900/60 light:bg-slate-100 border border-zinc-800/80 light:border-slate-200">
+                    <div className="p-1.5 rounded-lg bg-zinc-900/60 light:bg-slate-100 border border-zinc-700/80 light:border-slate-300">
                       <span className="font-bold text-indigo-400 light:text-indigo-600">Assistente:</span> "Aiuto", "Bandiera"
                     </div>
                   </div>
@@ -1254,17 +1254,17 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                 </div>
 
                 {/* Modalità Audio Output / Microfono (Altoparlante vs Cuffie) */}
-                <div className="p-2.5 rounded-xl border border-zinc-800 bg-zinc-950/60 light:bg-slate-50 light:border-slate-200 space-y-2">
+                <div className="p-2.5 rounded-xl border border-zinc-700 bg-zinc-950/60 light:bg-slate-50 light:border-slate-300 space-y-2">
                   <div className="flex justify-between items-center">
                     <div>
                       <span className="text-zinc-300 light:text-slate-700 font-medium block">
                         Dispositivo di Ascolto
                       </span>
-                      <span className="text-[11px] text-zinc-500">
+                      <span className="text-[11px] text-zinc-400 light:text-slate-600">
                         Gestione anti-eco del microfono per i comandi vocali
                       </span>
                     </div>
-                    <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded bg-zinc-800 text-zinc-300 light:bg-slate-200 light:text-slate-700">
+                    <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded bg-zinc-800 text-zinc-300 light:bg-slate-200 light:text-slate-700 border border-zinc-700/60 light:border-slate-300">
                       {settings.driveModeAudioOutput === 'headphones' ? 'CUFFIE' : 'ALTOPARLANTE'}
                     </span>
                   </div>
@@ -1276,14 +1276,14 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                       className={`p-2.5 rounded-lg border text-left text-xs transition-all cursor-pointer active:scale-98 touch-manipulation ${
                         (settings.driveModeAudioOutput || 'speaker') === 'speaker'
                           ? 'bg-amber-950/70 border-amber-500 text-amber-200 font-bold light:bg-amber-100 light:border-amber-500 light:text-amber-900'
-                          : 'bg-zinc-900/60 border-zinc-800 text-zinc-400 hover:text-zinc-200 light:bg-white light:border-slate-200 light:text-slate-700'
+                          : 'bg-zinc-900/60 border-zinc-700 text-zinc-300 hover:text-white light:bg-white light:border-slate-300 light:text-slate-700'
                       }`}
                     >
                       <div className="flex items-center gap-1.5 font-bold mb-0.5">
                         <Volume2 className="w-3.5 h-3.5 text-amber-400" />
                         <span>Altoparlante (Anti-Eco)</span>
                       </div>
-                      <p className="text-[10px] text-zinc-400 light:text-slate-500 leading-tight">
+                      <p className="text-[10px] text-zinc-400 light:text-slate-600 leading-tight">
                         Microfono attivo solo a fine lettura o in pausa. Elimina l'eco dell'altoparlante.
                       </p>
                     </button>
@@ -1294,21 +1294,21 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                       className={`p-2.5 rounded-lg border text-left text-xs transition-all cursor-pointer active:scale-98 touch-manipulation ${
                         settings.driveModeAudioOutput === 'headphones'
                           ? 'bg-indigo-950/70 border-indigo-500 text-indigo-200 font-bold light:bg-indigo-100 light:border-indigo-500 light:text-indigo-900'
-                          : 'bg-zinc-900/60 border-zinc-800 text-zinc-400 hover:text-zinc-200 light:bg-white light:border-slate-200 light:text-slate-700'
+                          : 'bg-zinc-900/60 border-zinc-700 text-zinc-300 hover:text-white light:bg-white light:border-slate-300 light:text-slate-700'
                       }`}
                     >
                       <div className="flex items-center gap-1.5 font-bold mb-0.5">
                         <Headphones className="w-3.5 h-3.5 text-indigo-400" />
                         <span>Cuffie con Mic</span>
                       </div>
-                      <p className="text-[10px] text-zinc-400 light:text-slate-500 leading-tight">
+                      <p className="text-[10px] text-zinc-400 light:text-slate-600 leading-tight">
                         Microfono sempre attivo. Permette di interrompere il parlato in qualsiasi momento.
                       </p>
                     </button>
                   </div>
                 </div>
 
-                <div className="p-2.5 rounded-xl border border-zinc-800 bg-zinc-950/60 light:bg-slate-50 light:border-slate-200 space-y-1.5">
+                <div className="p-2.5 rounded-xl border border-zinc-700 bg-zinc-950/60 light:bg-slate-50 light:border-slate-300 space-y-1.5">
                   <div className="flex justify-between items-center">
                     <span className="text-zinc-300 light:text-slate-700 font-medium">
                       Tempo per Pensare alla Risposta
@@ -1336,13 +1336,13 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                 </div>
 
                 {/* Spiegazione Vocale Iniziale */}
-                <div className="p-2.5 rounded-xl border border-zinc-800 bg-zinc-950/60 light:bg-slate-50 light:border-slate-200 space-y-2">
+                <div className="p-2.5 rounded-xl border border-zinc-700 bg-zinc-950/60 light:bg-slate-50 light:border-slate-300 space-y-2">
                   <div className="flex items-center justify-between">
                     <div>
                       <span className="text-zinc-300 light:text-slate-700 font-medium block">
                         Spiegazione Vocale Iniziale
                       </span>
-                      <span className="text-[11px] text-zinc-500">
+                      <span className="text-[11px] text-zinc-400 light:text-slate-600">
                         {settings.driveModeIntroPlayed
                           ? 'Completata (non si ripeterà all\'avvio)'
                           : "Verrà riprodotta all'apertura della modalità mani libere"}
@@ -1350,7 +1350,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                     </div>
                     <span className={`text-[10px] font-bold px-2 py-0.5 rounded-md ${
                       settings.driveModeIntroPlayed
-                        ? 'bg-zinc-800 text-zinc-400 light:bg-slate-200 light:text-slate-600'
+                        ? 'bg-zinc-800 text-zinc-300 light:bg-slate-200 light:text-slate-700 border border-zinc-700 light:border-slate-300'
                         : 'bg-amber-500/20 text-amber-300 border border-amber-500/40'
                     }`}>
                       {settings.driveModeIntroPlayed ? 'Completata' : 'All\'avvio'}
@@ -1403,17 +1403,17 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
           >
             <div className="space-y-3.5">
               <div className="space-y-2.5">
-                <label className="text-xs font-bold text-zinc-400 uppercase tracking-wider block">
+                <label className="text-xs font-bold text-zinc-400 light:text-slate-600 uppercase tracking-wider block">
                   Sincronizzazione Cloud Google
                 </label>
 
                 {/* Toggle Sincronizzazione Automatica */}
-                <label className="flex items-center justify-between p-3 rounded-xl border border-zinc-800 bg-zinc-950/60 light:bg-slate-50 light:border-slate-200 cursor-pointer select-none active:scale-[0.99] touch-manipulation transition-all">
+                <label className="flex items-center justify-between p-3 rounded-xl border border-zinc-700 bg-zinc-950/60 light:bg-slate-50 light:border-slate-300 cursor-pointer select-none active:scale-[0.99] touch-manipulation transition-all">
                   <div className="pr-3">
                     <span className="text-zinc-200 light:text-slate-800 font-semibold block text-xs">
                       Sincronizzazione Automatica (Auto-Sync)
                     </span>
-                    <span className="text-[11px] text-zinc-400 light:text-slate-500 block leading-tight pt-0.5">
+                    <span className="text-[11px] text-zinc-400 light:text-slate-600 block leading-tight pt-0.5">
                       Salva e sincronizza i progressi in background tra i tuoi dispositivi (PC, telefono)
                     </span>
                   </div>
@@ -1437,7 +1437,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
 
                 {/* Barra di Stato Sincronizzazione */}
                 {settings.autoSyncDrive && (
-                  <div className="p-2.5 rounded-xl border border-zinc-800/80 bg-zinc-950/40 light:bg-slate-100/60 light:border-slate-200 text-xs flex items-center justify-between">
+                  <div className="p-2.5 rounded-xl border border-zinc-700/80 bg-zinc-950/40 light:bg-slate-100/60 light:border-slate-300 text-xs flex items-center justify-between">
                     <div className="flex items-center gap-2">
                       <div className={`w-2 h-2 rounded-full ${
                         syncState.status === 'syncing' ? 'bg-amber-400 animate-pulse' :
@@ -1453,7 +1453,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                       </span>
                     </div>
 
-                    <span className="text-[11px] text-zinc-500 font-mono">
+                    <span className="text-[11px] text-zinc-400 light:text-slate-600 font-mono">
                       {syncState.lastSyncedAt
                         ? `Ultimo: ${new Date(syncState.lastSyncedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`
                         : 'Mai salvato'}
@@ -1476,7 +1476,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                     id="btn-drive-download"
                     onClick={handleRestoreFromDrive}
                     disabled={isProcessing}
-                    className="py-2.5 px-3 rounded-xl border border-zinc-800 bg-zinc-950 hover:bg-zinc-800 text-zinc-300 light:bg-slate-50 light:border-slate-200 light:text-slate-700 font-semibold text-xs flex items-center justify-center gap-1.5 transition-all disabled:opacity-50 cursor-pointer active:scale-95 touch-manipulation"
+                    className="py-2.5 px-3 rounded-xl border border-zinc-700 bg-zinc-950 hover:bg-zinc-800 text-zinc-300 light:bg-white light:border-slate-300 light:text-slate-700 font-semibold text-xs flex items-center justify-center gap-1.5 transition-all disabled:opacity-50 cursor-pointer active:scale-95 touch-manipulation shadow-sm"
                   >
                     <Download className="w-3.5 h-3.5" />
                     <span>Unisci dati (Merge)</span>
@@ -1484,26 +1484,26 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                 </div>
 
                 {syncStatus && (
-                  <div className="text-[11px] p-2 rounded-lg bg-zinc-950/80 border border-zinc-800 text-amber-300 light:bg-amber-50 light:border-amber-200 light:text-amber-800 animate-in fade-in">
+                  <div className="text-[11px] p-2 rounded-lg bg-zinc-950/80 border border-zinc-700 text-amber-300 light:bg-amber-50 light:border-amber-200 light:text-amber-800 animate-in fade-in">
                     {syncStatus}
                   </div>
                 )}
               </div>
 
-              <div className="space-y-2 pt-2 border-t border-zinc-800/80 light:border-slate-100">
-                <label className="text-xs font-bold text-zinc-400 uppercase tracking-wider block">
+              <div className="space-y-2 pt-2 border-t border-zinc-700/80 light:border-slate-200">
+                <label className="text-xs font-bold text-zinc-400 light:text-slate-600 uppercase tracking-wider block">
                   Copia Locale su File (.json)
                 </label>
                 <div className="grid grid-cols-2 gap-2">
                   <button
                     onClick={handleExportLocalJson}
-                    className="py-2 px-3 rounded-xl border border-zinc-800 bg-zinc-950 hover:bg-zinc-800 text-zinc-300 light:bg-slate-50 light:border-slate-200 light:text-slate-700 text-xs font-medium flex items-center justify-center gap-1.5 cursor-pointer active:scale-95 touch-manipulation"
+                    className="py-2 px-3 rounded-xl border border-zinc-700 bg-zinc-950 hover:bg-zinc-800 text-zinc-300 light:bg-white light:border-slate-300 light:text-slate-700 text-xs font-medium flex items-center justify-center gap-1.5 cursor-pointer active:scale-95 touch-manipulation shadow-sm"
                   >
                     <Download className="w-3.5 h-3.5" />
                     <span>Scarica copia</span>
                   </button>
 
-                  <label className="py-2 px-3 rounded-xl border border-zinc-800 bg-zinc-950 hover:bg-zinc-800 text-zinc-300 light:bg-slate-50 light:border-slate-200 light:text-slate-700 text-xs font-medium flex items-center justify-center gap-1.5 cursor-pointer active:scale-95 touch-manipulation">
+                  <label className="py-2 px-3 rounded-xl border border-zinc-700 bg-zinc-950 hover:bg-zinc-800 text-zinc-300 light:bg-white light:border-slate-300 light:text-slate-700 text-xs font-medium flex items-center justify-center gap-1.5 cursor-pointer active:scale-95 touch-manipulation shadow-sm">
                     <Upload className="w-3.5 h-3.5" />
                     <span>Carica copia</span>
                     <input
@@ -1532,24 +1532,24 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
             }}
           >
             <div className="space-y-3.5">
-              <div className="p-3.5 rounded-xl border border-zinc-800 bg-zinc-950/60 light:bg-slate-50 light:border-slate-200 space-y-1.5">
+              <div className="p-3.5 rounded-xl border border-zinc-700 bg-zinc-950/60 light:bg-slate-50 light:border-slate-300 space-y-1.5">
                 <div className="text-xs font-bold text-zinc-200 light:text-slate-800 flex items-center justify-between">
                   <span>Archivio Locale IndexedDB</span>
                   <span className="text-[10px] text-amber-400 font-mono px-2 py-0.5 rounded-md bg-amber-500/10 border border-amber-500/20">Dexie SSOT</span>
                 </div>
-                <p className="text-[11px] text-zinc-400 light:text-slate-500 leading-relaxed">
+                <p className="text-[11px] text-zinc-400 light:text-slate-600 leading-relaxed">
                   Tutti i progressi, le sessioni d'esame, gli errori, le note e le impostazioni sono salvati in locale nel database del tuo browser (nessun dato inviato a server esterni).
                 </p>
-                <div className="text-[10px] text-zinc-500 font-mono pt-1">
-                  Database: <span className="text-zinc-400 light:text-slate-600">VDSQuizDB</span> · Versione: <span className="text-zinc-400 light:text-slate-600">1</span> · Quiz: <span className="text-zinc-400 light:text-slate-600">504 AeCI</span>
+                <div className="text-[10px] text-zinc-400 light:text-slate-600 font-mono pt-1">
+                  Database: <span className="text-zinc-300 light:text-slate-700">VDSQuizDB</span> · Versione: <span className="text-zinc-300 light:text-slate-700">1</span> · Quiz: <span className="text-zinc-300 light:text-slate-700">504 AeCI</span>
                 </div>
               </div>
 
-              <div className="pt-2 border-t border-zinc-800/80 light:border-slate-100 space-y-2">
-                <label className="text-xs font-bold text-zinc-400 uppercase tracking-wider block">
+              <div className="pt-2 border-t border-zinc-700/80 light:border-slate-200 space-y-2">
+                <label className="text-xs font-bold text-zinc-400 light:text-slate-600 uppercase tracking-wider block">
                   Area Reset
                 </label>
-                <p className="text-[11px] text-zinc-400 light:text-slate-500">
+                <p className="text-[11px] text-zinc-400 light:text-slate-600">
                   Azzera lo storico delle simulazioni, il quaderno errori e le note per ricominciare la preparazione da zero.
                 </p>
                 <button
@@ -1613,8 +1613,8 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
               </div>
 
               {/* Identificativo Release & PWA */}
-              <div className="p-3 rounded-xl border border-zinc-800 bg-zinc-950/60 light:bg-slate-50 light:border-slate-200 space-y-2.5 text-xs">
-                <div className="flex items-center justify-between border-b border-zinc-800/80 light:border-slate-200 pb-2">
+              <div className="p-3 rounded-xl border border-zinc-700 bg-zinc-950/60 light:bg-slate-50 light:border-slate-300 space-y-2.5 text-xs">
+                <div className="flex items-center justify-between border-b border-zinc-700/80 light:border-slate-300 pb-2">
                   <span className="font-bold text-zinc-200 light:text-slate-800 flex items-center gap-1.5 text-xs">
                     <Tag className="w-3.5 h-3.5 text-amber-400" />
                     <span>Release & Dettagli Build</span>
@@ -1624,16 +1624,16 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                   </span>
                 </div>
                 <div className="grid grid-cols-2 gap-2 text-[11px]">
-                  <div className="p-2 rounded-lg bg-zinc-900/80 border border-zinc-800/80 light:bg-white light:border-slate-200">
-                    <span className="text-[10px] text-zinc-500 block">Numero Build</span>
+                  <div className="p-2 rounded-lg bg-zinc-900/80 border border-zinc-700/80 light:bg-white light:border-slate-300 light:shadow-sm">
+                    <span className="text-[10px] text-zinc-400 light:text-slate-600 block">Numero Build</span>
                     <span className="font-mono font-bold text-amber-400 light:text-amber-700">#{buildInfo.buildNumber}</span>
                   </div>
-                  <div className="p-2 rounded-lg bg-zinc-900/80 border border-zinc-800/80 light:bg-white light:border-slate-200">
-                    <span className="text-[10px] text-zinc-500 block">Commit Git</span>
+                  <div className="p-2 rounded-lg bg-zinc-900/80 border border-zinc-700/80 light:bg-white light:border-slate-300 light:shadow-sm">
+                    <span className="text-[10px] text-zinc-400 light:text-slate-600 block">Commit Git</span>
                     <span className="font-mono font-bold text-sky-400 light:text-sky-700">{buildInfo.commitHash}</span>
                   </div>
-                  <div className="col-span-2 p-2 rounded-lg bg-zinc-900/80 border border-zinc-800/80 light:bg-white light:border-slate-200">
-                    <span className="text-[10px] text-zinc-500 block">Data/Ora Compilazione</span>
+                  <div className="col-span-2 p-2 rounded-lg bg-zinc-900/80 border border-zinc-700/80 light:bg-white light:border-slate-300 light:shadow-sm">
+                    <span className="text-[10px] text-zinc-400 light:text-slate-600 block">Data/Ora Compilazione</span>
                     <span className="font-mono text-zinc-300 light:text-slate-700">{formatBuildDate(buildInfo.buildTime)}</span>
                   </div>
                 </div>
@@ -1649,30 +1649,30 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
 
               {/* Riferimenti Normativi AeCI & D.P.R. 133/2010 */}
               <div className="space-y-2">
-                <label className="text-xs font-bold text-zinc-400 uppercase tracking-wider flex items-center gap-1.5">
+                <label className="text-xs font-bold text-zinc-400 light:text-slate-600 uppercase tracking-wider flex items-center gap-1.5">
                   <Award className="w-3.5 h-3.5 text-amber-400" />
                   <span>Conformità Esame Ufficiale AeCI</span>
                 </label>
-                <div className="p-3 rounded-xl border border-zinc-800 bg-zinc-950/60 light:bg-slate-50 light:border-slate-200 space-y-2 text-[11px]">
+                <div className="p-3 rounded-xl border border-zinc-700 bg-zinc-950/60 light:bg-slate-50 light:border-slate-300 space-y-2 text-[11px]">
                   <div className="grid grid-cols-2 gap-2 text-zinc-300 light:text-slate-700">
-                    <div className="p-2 rounded-lg bg-zinc-900/80 border border-zinc-800/80 light:bg-white light:border-slate-200">
-                      <span className="text-[10px] text-zinc-500 block">Norma di Legge</span>
+                    <div className="p-2 rounded-lg bg-zinc-900/80 border border-zinc-700/80 light:bg-white light:border-slate-300">
+                      <span className="text-[10px] text-zinc-400 light:text-slate-600 block">Norma di Legge</span>
                       <span className="font-semibold text-zinc-200 light:text-slate-800">D.P.R. 133/2010</span>
                     </div>
-                    <div className="p-2 rounded-lg bg-zinc-900/80 border border-zinc-800/80 light:bg-white light:border-slate-200">
-                      <span className="text-[10px] text-zinc-500 block">Database Ufficiale</span>
+                    <div className="p-2 rounded-lg bg-zinc-900/80 border border-zinc-700/80 light:bg-white light:border-slate-300">
+                      <span className="text-[10px] text-zinc-400 light:text-slate-600 block">Database Ufficiale</span>
                       <span className="font-semibold text-zinc-200 light:text-slate-800">504 Quiz (Ed. 2017)</span>
                     </div>
-                    <div className="p-2 rounded-lg bg-zinc-900/80 border border-zinc-800/80 light:bg-white light:border-slate-200">
-                      <span className="text-[10px] text-zinc-500 block">Regola Esame</span>
+                    <div className="p-2 rounded-lg bg-zinc-900/80 border border-zinc-700/80 light:bg-white light:border-slate-300">
+                      <span className="text-[10px] text-zinc-400 light:text-slate-600 block">Regola Esame</span>
                       <span className="font-semibold text-zinc-200 light:text-slate-800">30 Quiz · 45 Minuti</span>
                     </div>
-                    <div className="p-2 rounded-lg bg-zinc-900/80 border border-zinc-800/80 light:bg-white light:border-slate-200">
-                      <span className="text-[10px] text-zinc-500 block">Soglia Idoneità</span>
+                    <div className="p-2 rounded-lg bg-zinc-900/80 border border-zinc-700/80 light:bg-white light:border-slate-300">
+                      <span className="text-[10px] text-zinc-400 light:text-slate-600 block">Soglia Idoneità</span>
                       <span className="font-semibold text-emerald-400 light:text-emerald-700">Max 3 errori (≥27/30)</span>
                     </div>
                   </div>
-                  <div className="text-[10px] text-zinc-400 light:text-slate-500 pt-1 border-t border-zinc-800/60 light:border-slate-200">
+                  <div className="text-[10px] text-zinc-400 light:text-slate-600 pt-1 border-t border-zinc-700/60 light:border-slate-300">
                     Quote canoniche per materia: Aerodinamica (9), Meteo (8), Tecnica (5), Normativa (2), Sicurezza (2), Primo Soccorso (1), Fisiopatologia (1), Strumenti (1), Materiali (1).
                   </div>
                 </div>
@@ -1680,11 +1680,11 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
 
               {/* Caratteristiche & Privacy */}
               <div className="space-y-2">
-                <label className="text-xs font-bold text-zinc-400 uppercase tracking-wider flex items-center gap-1.5">
+                <label className="text-xs font-bold text-zinc-400 light:text-slate-600 uppercase tracking-wider flex items-center gap-1.5">
                   <ShieldCheck className="w-3.5 h-3.5 text-amber-400" />
                   <span>Funzionalità & Privacy</span>
                 </label>
-                <div className="p-3 rounded-xl border border-zinc-800 bg-zinc-950/60 light:bg-slate-50 light:border-slate-200 space-y-2 text-[11px] text-zinc-300 light:text-slate-700">
+                <div className="p-3 rounded-xl border border-zinc-700 bg-zinc-950/60 light:bg-slate-50 light:border-slate-300 space-y-2 text-[11px] text-zinc-300 light:text-slate-700">
                   <div className="flex items-start gap-2">
                     <span className="w-1.5 h-1.5 rounded-full bg-amber-400 mt-1.5 flex-shrink-0" />
                     <span>
@@ -1719,8 +1719,8 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
               </div>
 
               {/* Dedica */}
-              <div className="p-3 rounded-xl border border-zinc-800/80 bg-zinc-900/40 light:bg-slate-50 light:border-slate-200 text-center">
-                <p className="text-[11px] text-zinc-400 light:text-slate-500">
+              <div className="p-3 rounded-xl border border-zinc-700/80 bg-zinc-900/40 light:bg-slate-50 light:border-slate-300 text-center">
+                <p className="text-[11px] text-zinc-400 light:text-slate-600">
                   Progettato per gli allievi piloti di Volo Libero italiani 🪂🦅
                 </p>
               </div>

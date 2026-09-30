@@ -43,7 +43,7 @@ export const AudioOfflinePromptModal: React.FC<AudioOfflinePromptModalProps> = (
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-fade-in">
       <div
-        className="w-full max-w-md bg-zinc-900 light:bg-white border border-zinc-800 light:border-slate-200 rounded-2xl shadow-2xl p-6 text-zinc-100 light:text-slate-900 animate-scale-up"
+        className="w-full max-w-md bg-zinc-900 light:bg-white border border-zinc-700 light:border-slate-300 light:shadow-xl rounded-2xl shadow-2xl p-6 text-zinc-100 light:text-slate-900 animate-scale-up"
         role="dialog"
         aria-modal="true"
         aria-labelledby="audio-offline-title"
@@ -58,14 +58,14 @@ export const AudioOfflinePromptModal: React.FC<AudioOfflinePromptModalProps> = (
               <h3 id="audio-offline-title" className="text-base font-bold text-zinc-100 light:text-slate-900">
                 Audio Offline per la Modalità Mani Libere
               </h3>
-              <p className="text-xs text-zinc-400 light:text-slate-500">
+              <p className="text-xs text-zinc-400 light:text-slate-600">
                 Preparazione all'ascolto senza connessione
               </p>
             </div>
           </div>
           <button
             onClick={handleDismiss}
-            className="p-1 text-zinc-400 hover:text-zinc-200 light:hover:text-slate-700 rounded-lg hover:bg-zinc-800 light:hover:bg-slate-100 transition-colors"
+            className="p-1 text-zinc-400 hover:text-zinc-200 light:text-slate-600 light:hover:text-slate-900 rounded-lg hover:bg-zinc-800 light:hover:bg-slate-100 transition-colors"
             title="Chiudi"
           >
             <X className="w-5 h-5" />
@@ -73,7 +73,7 @@ export const AudioOfflinePromptModal: React.FC<AudioOfflinePromptModalProps> = (
         </div>
 
         {/* Content Body */}
-        <p className="text-xs text-zinc-300 light:text-slate-600 leading-relaxed mb-5">
+        <p className="text-xs text-zinc-300 light:text-slate-700 leading-relaxed mb-5">
           In viaggio verso il decollo o in zone montane il segnale internet potrebbe non essere disponibile.
           Puoi salvare i file vocali nella memoria del browser per ascoltare tutti i 504 quiz senza consumare traffico.
         </p>
@@ -84,7 +84,7 @@ export const AudioOfflinePromptModal: React.FC<AudioOfflinePromptModalProps> = (
           <button
             id="btn-download-active-voice"
             onClick={handleDownloadSingle}
-            className="w-full text-left p-3.5 rounded-xl border border-amber-500/40 bg-amber-500/10 hover:bg-amber-500/20 light:bg-amber-50 light:border-amber-400 light:hover:bg-amber-100 transition-all flex items-center justify-between group"
+            className="w-full text-left p-3.5 rounded-xl border border-amber-500/50 bg-amber-500/10 hover:bg-amber-500/20 light:bg-amber-50 light:border-amber-400 light:hover:bg-amber-100 light:shadow-sm transition-all flex items-center justify-between group"
           >
             <div className="flex items-center gap-3">
               <div className="w-8 h-8 rounded-lg bg-amber-500/20 text-amber-400 light:text-amber-700 flex items-center justify-center shrink-0">
@@ -99,7 +99,7 @@ export const AudioOfflinePromptModal: React.FC<AudioOfflinePromptModalProps> = (
                     Consigliato
                   </span>
                 </div>
-                <p className="text-[11px] text-zinc-400 light:text-slate-500">
+                <p className="text-[11px] text-zinc-400 light:text-slate-600">
                   2.520 quesiti ({currentVoiceSize}) • Download non bloccante
                 </p>
               </div>
@@ -111,17 +111,17 @@ export const AudioOfflinePromptModal: React.FC<AudioOfflinePromptModalProps> = (
           <button
             id="btn-download-both-voices"
             onClick={handleDownloadBoth}
-            className="w-full text-left p-3 rounded-xl border border-zinc-800 light:border-slate-200 bg-zinc-950/60 light:bg-slate-50 hover:bg-zinc-800/80 light:hover:bg-slate-100 transition-all flex items-center justify-between group"
+            className="w-full text-left p-3 rounded-xl border border-zinc-700 light:border-slate-300 bg-zinc-950/60 light:bg-white light:shadow-sm hover:bg-zinc-800/80 light:hover:bg-slate-50 transition-all flex items-center justify-between group"
           >
             <div className="flex items-center gap-3">
-              <div className="w-8 h-8 rounded-lg bg-zinc-800 light:bg-slate-200 text-zinc-300 light:text-slate-700 flex items-center justify-center shrink-0">
+              <div className="w-8 h-8 rounded-lg bg-zinc-800 border border-zinc-700 light:bg-slate-100 light:border-slate-300 text-zinc-300 light:text-slate-700 flex items-center justify-center shrink-0">
                 <Volume2 className="w-4 h-4" />
               </div>
               <div>
-                <span className="text-xs font-medium text-zinc-200 light:text-slate-800">
+                <span className="text-xs font-semibold text-zinc-200 light:text-slate-800">
                   Scarica entrambe le voci (Giuseppe + Elsa)
                 </span>
-                <p className="text-[11px] text-zinc-500 light:text-slate-400">
+                <p className="text-[11px] text-zinc-400 light:text-slate-600">
                   5.040 quesiti totali (~302 MB)
                 </p>
               </div>
@@ -130,14 +130,14 @@ export const AudioOfflinePromptModal: React.FC<AudioOfflinePromptModalProps> = (
         </div>
 
         {/* Footer & Skip */}
-        <div className="flex items-center justify-between pt-3 border-t border-zinc-800 light:border-slate-200 text-xs">
-          <span className="text-[11px] text-zinc-500 light:text-slate-400">
+        <div className="flex items-center justify-between pt-3 border-t border-zinc-700 light:border-slate-300 text-xs">
+          <span className="text-[11px] text-zinc-400 light:text-slate-600">
             Modificabile sempre in Impostazioni &gt; Voce
           </span>
           <button
             id="btn-dismiss-audio-prompt"
             onClick={handleDismiss}
-            className="px-3 py-1.5 font-medium text-zinc-400 hover:text-zinc-200 light:hover:text-slate-800 transition-colors"
+            className="px-3 py-1.5 font-medium text-zinc-400 hover:text-zinc-200 light:text-slate-600 light:hover:text-slate-900 transition-colors"
           >
             Non ora
           </button>

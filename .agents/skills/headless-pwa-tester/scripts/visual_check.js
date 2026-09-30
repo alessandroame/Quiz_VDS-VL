@@ -166,11 +166,16 @@ async function runSingleViewportCheck(viewportName, options = {}) {
                 }
                 continue;
               }
-              const el = document.querySelector(sel);
+              let el = null;
+              for (let w = 0; w < 30; w++) {
+                el = document.querySelector(sel);
+                if (el) break;
+                await new Promise(r => setTimeout(r, 100));
+              }
               if (!el) return { success: false, reason: 'Elemento non trovato: ' + sel };
               el.scrollIntoView({ behavior: 'instant', block: 'center' });
               el.click();
-              await new Promise(r => setTimeout(r, 300));
+              await new Promise(r => setTimeout(r, 400));
             }
             return { success: true };
           })()

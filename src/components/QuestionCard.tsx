@@ -181,18 +181,18 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({
   };
 
   return (
-    <div className="w-full bg-zinc-900 border border-zinc-800 rounded-2xl p-3 sm:p-4 shadow-md dark:bg-zinc-900 dark:border-zinc-800 light:bg-white light:border-slate-200 light:shadow-sm transition-all">
+    <div className="w-full bg-zinc-900 border border-zinc-700 rounded-2xl p-3 sm:p-4 shadow-md dark:bg-zinc-900 dark:border-zinc-700 light:bg-white light:border-slate-300 light:shadow-sm transition-all">
       {/* Top Header Card */}
-      <div className="flex items-center justify-between gap-2 mb-2 pb-1.5 border-b border-zinc-800/80 light:border-slate-100 text-xs">
+      <div className="flex items-center justify-between gap-2 mb-2 pb-1.5 border-b border-zinc-700/60 light:border-slate-200 text-xs">
         <div className="flex items-center gap-2">
-          <span className="font-mono font-bold text-amber-400 light:text-amber-600 bg-amber-500/10 px-2 py-0.5 rounded">
+          <span className="font-mono font-bold text-amber-400 light:text-amber-600 bg-amber-500/10 px-2 py-0.5 rounded border border-amber-500/30">
             #{question.id}
           </span>
-          <span className="text-zinc-400 light:text-slate-500 truncate max-w-[150px] sm:max-w-xs font-medium">
+          <span className="text-zinc-300 light:text-slate-700 truncate max-w-[150px] sm:max-w-xs font-semibold">
             {question.subjectName}
           </span>
           {indexNumber !== undefined && totalNumber !== undefined && (
-            <span className="text-zinc-500 light:text-slate-400 hidden sm:inline">
+            <span className="text-zinc-400 light:text-slate-500 font-mono hidden sm:inline">
               ({indexNumber}/{totalNumber})
             </span>
           )}
@@ -463,7 +463,7 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({
           const isCurrentOptActive = isPartActive(`opt${optNum}` as any);
 
           // Stili in base al feedback immediato o selezione neutra
-          let btnStyle = 'border-zinc-800 hover:border-zinc-700 bg-zinc-950/60 light:border-slate-200 light:bg-slate-50 light:hover:bg-slate-100';
+          let btnStyle = 'border-zinc-700 hover:border-zinc-600 bg-zinc-950/80 light:border-slate-300 light:bg-slate-50/90 light:hover:bg-slate-100 light:hover:border-slate-400 shadow-sm';
 
           if (showFeedback && selectedAnswer) {
             if (isCorrectAnswer) {
@@ -471,7 +471,7 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({
             } else if (isSelected && !isCorrectAnswer) {
               btnStyle = 'border-rose-500/80 bg-rose-950/30 text-rose-200 light:border-rose-600 light:bg-rose-50 light:text-rose-900';
             } else {
-              btnStyle = 'opacity-50 border-zinc-800 bg-zinc-950/20 light:border-slate-200 light:bg-white';
+              btnStyle = 'opacity-50 border-zinc-700 bg-zinc-950/20 light:border-slate-300 light:bg-white';
             }
           } else if (isSelected) {
             btnStyle = 'border-amber-500 bg-amber-500/10 text-amber-100 light:border-amber-600 light:bg-amber-50 light:text-amber-950 font-medium ring-1 ring-amber-500';
@@ -594,7 +594,7 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({
 
       {/* Spiegazione Sintetica (visibile se feedback attivo e risposta data) */}
       {showFeedback && selectedAnswer && (
-        <div className="mt-2.5 pt-2 border-t border-zinc-800 light:border-slate-200 text-xs animate-in fade-in duration-150">
+        <div className="mt-2.5 pt-2 border-t border-zinc-700/60 light:border-slate-200 text-xs animate-in fade-in duration-150">
           <div className="flex items-center justify-between font-bold mb-1">
             <div className="flex items-center gap-1.5">
               {selectedAnswer === question.correctAnswer ? (
@@ -673,7 +673,7 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({
           <div
             lang="it"
             translate="no"
-            className="space-y-1 text-xs text-zinc-300 light:text-slate-700 bg-zinc-950/60 light:bg-slate-50 p-2 sm:p-2.5 rounded-lg border border-zinc-800/60 light:border-slate-200 leading-snug"
+            className="space-y-1 text-xs text-zinc-200 light:text-slate-800 bg-zinc-950/80 light:bg-slate-50 p-2 sm:p-2.5 rounded-lg border border-zinc-700/70 light:border-slate-300 leading-snug"
           >
             <div>
               <strong className="text-emerald-400 light:text-emerald-600">Regola: </strong>

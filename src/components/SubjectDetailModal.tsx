@@ -111,7 +111,7 @@ export const SubjectDetailModal: React.FC<SubjectDetailModalProps> = ({
       className="fixed inset-0 top-0 left-0 right-0 bottom-0 z-50 flex flex-col h-[100dvh] w-full !m-0 !p-0 bg-zinc-950 text-zinc-100 dark:bg-zinc-950 dark:text-zinc-100 light:bg-slate-50 light:text-slate-900 overflow-hidden font-sans animate-in fade-in duration-150"
     >
       {/* Top Header */}
-      <header className="sticky top-0 z-20 w-full border-b backdrop-blur bg-zinc-950/90 border-zinc-800 dark:bg-zinc-950/90 dark:border-zinc-800 light:bg-white/90 light:border-slate-200 transition-colors flex-shrink-0">
+      <header className="sticky top-0 z-20 w-full border-b backdrop-blur bg-zinc-950/90 border-zinc-700 dark:bg-zinc-950/90 dark:border-zinc-700 light:bg-white/90 light:border-slate-300 light:shadow-sm transition-colors flex-shrink-0">
         <div className="max-w-2xl mx-auto px-4 h-14 flex items-center justify-between gap-3">
           <div className="flex items-center gap-2 min-w-0">
             <button
@@ -125,7 +125,7 @@ export const SubjectDetailModal: React.FC<SubjectDetailModalProps> = ({
               <ArrowLeft className="w-5 h-5" />
               <span className="text-xs font-semibold hidden sm:inline">Statistiche</span>
             </button>
-            <div className="h-4 w-px bg-zinc-800 light:bg-slate-200 mx-1 hidden sm:block" />
+            <div className="h-4 w-px bg-zinc-700 light:bg-slate-300 mx-1 hidden sm:block" />
             <span className="px-2 py-0.5 rounded-md bg-amber-500/20 text-amber-400 light:bg-amber-100 light:text-amber-800 font-mono text-xs font-bold flex-shrink-0">
               {formatSubjectCode(subjectId)}
             </span>
@@ -154,10 +154,10 @@ export const SubjectDetailModal: React.FC<SubjectDetailModalProps> = ({
       <main className="flex-1 overflow-y-auto overscroll-contain">
         <div className="max-w-2xl mx-auto px-4 py-4 space-y-4 pb-24">
           {/* Dashboard Statistiche Materia */}
-          <div className="p-4 sm:p-5 rounded-2xl border border-zinc-800 bg-zinc-900/90 light:bg-white light:border-slate-200 space-y-3.5 shadow-sm">
+          <div className="p-4 sm:p-5 rounded-2xl border border-zinc-700 bg-zinc-900/90 light:bg-white light:border-slate-300 light:shadow-sm space-y-3.5 shadow-sm">
             <div className="flex items-center justify-between gap-4">
               <div className="space-y-0.5">
-                <span className="text-[10px] text-zinc-400 light:text-slate-500 uppercase tracking-wider font-semibold">
+                <span className="text-[10px] text-zinc-400 light:text-slate-600 uppercase tracking-wider font-semibold">
                   Accuratezza Risposte
                 </span>
                 <div
@@ -198,7 +198,7 @@ export const SubjectDetailModal: React.FC<SubjectDetailModalProps> = ({
                   {subjectMeta.seen} / {subjectMeta.total} ({coveragePercent}%)
                 </span>
               </div>
-              <div className="w-full bg-zinc-950 light:bg-slate-100 rounded-full h-2 overflow-hidden border border-zinc-800/80 light:border-slate-200">
+              <div className="w-full bg-zinc-950/80 rounded-full h-2 overflow-hidden border border-zinc-800 light:bg-slate-200 light:border-slate-300/60">
                 <div
                   className={`h-full rounded-full transition-all duration-300 ${
                     subjectMeta.accuracy >= 90
@@ -221,7 +221,7 @@ export const SubjectDetailModal: React.FC<SubjectDetailModalProps> = ({
                 className={`px-2.5 py-1 rounded-lg text-xs font-semibold whitespace-nowrap transition-colors border flex items-center gap-1.5 ${
                   filterMode === 'all'
                     ? 'bg-zinc-800 border-zinc-600 text-zinc-100 light:bg-slate-200 light:border-slate-400 light:text-slate-900'
-                    : 'bg-zinc-950/60 border-zinc-800/80 text-zinc-400 hover:text-zinc-200 light:bg-white light:border-slate-200 light:text-slate-600'
+                    : 'bg-zinc-950/60 border-zinc-700 text-zinc-300 hover:text-zinc-100 light:bg-white light:border-slate-300 light:text-slate-700'
                 }`}
               >
                 <span>Tutte</span>
@@ -229,7 +229,7 @@ export const SubjectDetailModal: React.FC<SubjectDetailModalProps> = ({
                   className={`px-1.5 py-0.2 rounded text-[10px] font-mono ${
                     filterMode === 'all'
                       ? 'bg-zinc-700 text-zinc-200 light:bg-slate-300 light:text-slate-800'
-                      : 'bg-zinc-800 text-zinc-400 light:bg-slate-100 light:text-slate-600'
+                      : 'bg-zinc-800 border border-zinc-700 text-zinc-300 light:bg-slate-100 light:border-slate-300 light:text-slate-700'
                   }`}
                 >
                   {subjectQuestions.length}
@@ -243,7 +243,7 @@ export const SubjectDetailModal: React.FC<SubjectDetailModalProps> = ({
                 className={`px-2.5 py-1 rounded-lg text-xs font-semibold whitespace-nowrap transition-colors border flex items-center gap-1.5 ${
                   filterMode === 'wrong'
                     ? 'bg-rose-500/20 border-rose-500/50 text-rose-300 light:bg-rose-50 light:border-rose-300 light:text-rose-800'
-                    : 'bg-zinc-950/60 border-zinc-800/80 text-zinc-400 hover:text-rose-400 light:bg-white light:border-slate-200 light:text-slate-600'
+                    : 'bg-zinc-950/60 border-zinc-700 text-zinc-300 hover:text-rose-400 light:bg-white light:border-slate-300 light:text-slate-700'
                 }`}
               >
                 <span>Errori</span>
@@ -251,7 +251,7 @@ export const SubjectDetailModal: React.FC<SubjectDetailModalProps> = ({
                   className={`px-1.5 py-0.2 rounded text-[10px] font-mono ${
                     filterMode === 'wrong'
                       ? 'bg-rose-500/30 text-rose-200 light:bg-rose-200 light:text-rose-900'
-                      : 'bg-zinc-800 text-zinc-400 light:bg-slate-100 light:text-slate-600'
+                      : 'bg-zinc-800 border border-zinc-700 text-zinc-300 light:bg-slate-100 light:border-slate-300 light:text-slate-700'
                   }`}
                 >
                   {wrongQuestions.length}
@@ -265,7 +265,7 @@ export const SubjectDetailModal: React.FC<SubjectDetailModalProps> = ({
                 className={`px-2.5 py-1 rounded-lg text-xs font-semibold whitespace-nowrap transition-colors border flex items-center gap-1.5 ${
                   filterMode === 'unseen'
                     ? 'bg-amber-500/20 border-amber-500/50 text-amber-300 light:bg-amber-50 light:border-amber-300 light:text-amber-800'
-                    : 'bg-zinc-950/60 border-zinc-800/80 text-zinc-400 hover:text-amber-400 light:bg-white light:border-slate-200 light:text-slate-600'
+                    : 'bg-zinc-950/60 border-zinc-700 text-zinc-300 hover:text-amber-400 light:bg-white light:border-slate-300 light:text-slate-700'
                 }`}
               >
                 <span>Non viste</span>
@@ -273,7 +273,7 @@ export const SubjectDetailModal: React.FC<SubjectDetailModalProps> = ({
                   className={`px-1.5 py-0.2 rounded text-[10px] font-mono ${
                     filterMode === 'unseen'
                       ? 'bg-amber-500/30 text-amber-200 light:bg-amber-200 light:text-amber-900'
-                      : 'bg-zinc-800 text-zinc-400 light:bg-slate-100 light:text-slate-600'
+                      : 'bg-zinc-800 border border-zinc-700 text-zinc-300 light:bg-slate-100 light:border-slate-300 light:text-slate-700'
                   }`}
                 >
                   {unseenQuestions.length}
@@ -287,7 +287,7 @@ export const SubjectDetailModal: React.FC<SubjectDetailModalProps> = ({
                 className={`px-2.5 py-1 rounded-lg text-xs font-semibold whitespace-nowrap transition-colors border flex items-center gap-1.5 ${
                   filterMode === 'correct'
                     ? 'bg-emerald-500/20 border-emerald-500/50 text-emerald-300 light:bg-emerald-50 light:border-emerald-300 light:text-emerald-800'
-                    : 'bg-zinc-950/60 border-zinc-800/80 text-zinc-400 hover:text-emerald-400 light:bg-white light:border-slate-200 light:text-slate-600'
+                    : 'bg-zinc-950/60 border-zinc-700 text-zinc-300 hover:text-emerald-400 light:bg-white light:border-slate-300 light:text-slate-700'
                 }`}
               >
                 <span>Corrette</span>
@@ -295,7 +295,7 @@ export const SubjectDetailModal: React.FC<SubjectDetailModalProps> = ({
                   className={`px-1.5 py-0.2 rounded text-[10px] font-mono ${
                     filterMode === 'correct'
                       ? 'bg-emerald-500/30 text-emerald-200 light:bg-emerald-200 light:text-emerald-900'
-                      : 'bg-zinc-800 text-zinc-400 light:bg-slate-100 light:text-slate-600'
+                      : 'bg-zinc-800 border border-zinc-700 text-zinc-300 light:bg-slate-100 light:border-slate-300 light:text-slate-700'
                   }`}
                 >
                   {correctQuestions.length}
@@ -307,8 +307,8 @@ export const SubjectDetailModal: React.FC<SubjectDetailModalProps> = ({
           {/* Scrollable Questions List */}
           <div className="space-y-2">
             {displayedQuestions.length === 0 ? (
-              <div className="py-12 text-center text-xs text-zinc-500 light:text-slate-500 space-y-2 p-6 rounded-2xl border border-zinc-800/80 bg-zinc-900/40 light:bg-white light:border-slate-200">
-                <HelpCircle className="w-7 h-7 mx-auto text-zinc-600 opacity-60" />
+              <div className="py-12 text-center text-xs text-zinc-400 light:text-slate-600 space-y-2 p-6 rounded-2xl border border-zinc-700 bg-zinc-900/60 light:bg-white light:border-slate-300 light:shadow-sm">
+                <HelpCircle className="w-7 h-7 mx-auto text-zinc-500 opacity-60" />
                 <p className="font-medium">Nessun quesito corrispondente al filtro selezionato.</p>
               </div>
             ) : (
@@ -323,7 +323,7 @@ export const SubjectDetailModal: React.FC<SubjectDetailModalProps> = ({
                     key={q.id}
                     id={`btn-subject-q-${q.id}`}
                     onClick={() => onSelectQuestion(q)}
-                    className="w-full text-left p-3 sm:p-3.5 rounded-xl border border-zinc-800/80 bg-zinc-900/60 hover:bg-zinc-800/60 hover:border-zinc-700 text-xs flex items-center justify-between gap-3 transition-all group light:bg-white light:border-slate-200 light:hover:bg-slate-50 cursor-pointer shadow-sm active:scale-[0.99]"
+                    className="w-full text-left p-3 sm:p-3.5 rounded-xl border border-zinc-700/80 bg-zinc-900/60 hover:bg-zinc-800/60 hover:border-zinc-600 text-xs flex items-center justify-between gap-3 transition-all group light:bg-white light:border-slate-300 light:hover:bg-slate-50 cursor-pointer light:shadow-sm active:scale-[0.99]"
                   >
                     <div className="flex items-center gap-2.5 min-w-0 flex-1">
                       {/* Status dot */}
@@ -353,7 +353,7 @@ export const SubjectDetailModal: React.FC<SubjectDetailModalProps> = ({
                       </span>
                     </div>
 
-                    <div className="flex items-center gap-2 flex-shrink-0 text-zinc-500 group-hover:text-zinc-300 light:group-hover:text-slate-700">
+                    <div className="flex items-center gap-2 flex-shrink-0 text-zinc-400 group-hover:text-zinc-200 light:text-slate-500 light:group-hover:text-slate-700">
                       {stat && stat.timesWrong > 0 && (
                         <span className="px-1.5 py-0.5 rounded text-[10px] font-bold bg-rose-500/15 text-rose-400 light:bg-rose-100 light:text-rose-700">
                           {stat.timesWrong} {stat.timesWrong === 1 ? 'err' : 'err'}

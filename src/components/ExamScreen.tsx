@@ -435,10 +435,10 @@ export const ExamScreen: React.FC<ExamScreenProps> = ({
       return (
         <div className="max-w-2xl mx-auto px-4 py-4 space-y-4">
           {/* Card Principale: Simulazione Didattica (Tutor) */}
-          <div className="p-5 sm:p-6 bg-zinc-900 border border-zinc-800 hover:border-emerald-500/80 rounded-2xl transition-all shadow-md light:bg-white light:border-slate-200 light:hover:border-emerald-500 space-y-4">
+          <div className="p-5 sm:p-6 bg-zinc-900 border border-zinc-700 hover:border-emerald-500/80 rounded-2xl transition-all shadow-md light:bg-white light:border-slate-300 light:shadow-sm light:hover:border-emerald-500 space-y-4">
             <div className="space-y-2">
               <div className="flex items-center justify-between gap-2">
-                <span className="px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 light:bg-emerald-100 light:text-emerald-800 text-[10px] font-bold uppercase tracking-wider font-mono">
+                <span className="px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 light:bg-emerald-100 light:text-emerald-800 text-[10px] font-bold uppercase tracking-wider font-mono border border-emerald-500/30">
                   Studio Guidato
                 </span>
                 <span className="text-[11px] font-mono text-zinc-400 light:text-slate-500">
@@ -454,7 +454,7 @@ export const ExamScreen: React.FC<ExamScreenProps> = ({
               </p>
             </div>
 
-            <div className="p-3.5 bg-zinc-950/60 light:bg-slate-50 border border-zinc-800 light:border-slate-200 rounded-xl space-y-2 text-xs text-zinc-300 light:text-slate-700">
+            <div className="p-3.5 bg-zinc-950/70 light:bg-slate-50 border border-zinc-700/70 light:border-slate-300 rounded-xl space-y-2 text-xs text-zinc-300 light:text-slate-700">
               <div className="font-semibold text-zinc-200 light:text-slate-800 flex items-center gap-1.5">
                 <CheckCircle2 className="w-4 h-4 text-emerald-400 flex-shrink-0" />
                 <span>Cosa prevede questa modalità:</span>
@@ -518,7 +518,7 @@ export const ExamScreen: React.FC<ExamScreenProps> = ({
             </p>
           </div>
 
-          <div className="p-3.5 bg-zinc-950/60 light:bg-slate-50 border border-zinc-800 light:border-slate-200 rounded-xl space-y-2 text-xs text-zinc-300 light:text-slate-700">
+          <div className="p-3.5 bg-zinc-950/70 light:bg-slate-50 border border-zinc-700/70 light:border-slate-300 rounded-xl space-y-2 text-xs text-zinc-300 light:text-slate-700">
             <div className="font-semibold text-zinc-200 light:text-slate-800 flex items-center gap-1.5">
               <CheckCircle2 className="w-4 h-4 text-sky-400 flex-shrink-0" />
               <span>Regolamento della sessione:</span>
@@ -542,7 +542,7 @@ export const ExamScreen: React.FC<ExamScreenProps> = ({
         </div>
 
         {/* Opzione Maratona Intensiva (Secondaria) */}
-        <div className="p-4 bg-zinc-900/60 border border-zinc-800 hover:border-zinc-700 rounded-2xl transition-all light:bg-slate-50 light:border-slate-200 flex items-center justify-between gap-3">
+        <div className="p-4 bg-zinc-900/80 border border-zinc-700 hover:border-zinc-600 rounded-2xl transition-all light:bg-white light:border-slate-300 light:shadow-sm flex items-center justify-between gap-3">
           <div className="space-y-0.5">
             <div className="text-xs font-bold text-zinc-200 light:text-slate-800 flex items-center gap-1.5">
               <ListFilter className="w-4 h-4 text-amber-400" />
@@ -625,8 +625,8 @@ export const ExamScreen: React.FC<ExamScreenProps> = ({
         </div>
 
         {/* Dettaglio Materie con Errori */}
-        <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-4 light:bg-white light:border-slate-200">
-          <h3 className="text-xs font-bold text-zinc-400 light:text-slate-600 uppercase tracking-wider mb-3">
+        <div className="bg-zinc-900 border border-zinc-700 rounded-xl p-4 light:bg-white light:border-slate-300 light:shadow-sm">
+          <h3 className="text-xs font-bold text-zinc-300 light:text-slate-700 uppercase tracking-wider mb-3">
             Ripartizione Materie
           </h3>
           <div className="space-y-2 text-xs">
@@ -637,8 +637,8 @@ export const ExamScreen: React.FC<ExamScreenProps> = ({
               const hasErrors = data.wrong > 0;
 
               return (
-                <div key={subId} className="flex items-center justify-between py-1 border-b border-zinc-800/60 light:border-slate-100 last:border-none">
-                  <span className="text-zinc-300 light:text-slate-700 font-medium truncate max-w-[200px]">
+                <div key={subId} className="flex items-center justify-between py-1 border-b border-zinc-700/60 light:border-slate-200 last:border-none">
+                  <span className="text-zinc-200 light:text-slate-800 font-medium truncate max-w-[200px]">
                     {subName}
                   </span>
                   <div className="flex items-center gap-2">
@@ -731,7 +731,7 @@ export const ExamScreen: React.FC<ExamScreenProps> = ({
   return (
     <div className="max-w-2xl mx-auto px-2.5 sm:px-4 py-2 sm:py-3 space-y-2.5 sm:space-y-3 pb-20 sm:pb-24">
       {/* Top Bar: Timer, Progresso, Consegna */}
-      <div className="flex items-center justify-between gap-2 p-2 sm:p-2.5 bg-zinc-900 border border-zinc-800 rounded-xl dark:bg-zinc-900 light:bg-white light:border-slate-200 shadow-sm sticky top-[48px] sm:top-[50px] z-20">
+      <div className="flex items-center justify-between gap-2 p-2 sm:p-2.5 bg-zinc-900 border border-zinc-700 rounded-xl dark:bg-zinc-900 light:bg-white light:border-slate-300 shadow-sm sticky top-[48px] sm:top-[50px] z-20">
         <div className="flex items-center gap-2">
           {examMode === 'tutor' ? (
             <div className="flex items-center gap-1.5 font-mono font-bold text-sm px-2.5 py-1 rounded-lg bg-zinc-950 text-zinc-100 light:bg-slate-100 light:text-slate-800 border border-emerald-500/30">
@@ -744,7 +744,7 @@ export const ExamScreen: React.FC<ExamScreenProps> = ({
               className={`flex items-center gap-1.5 font-mono font-bold text-sm px-2.5 py-1 rounded-lg ${
                 secondsRemaining < 300
                   ? 'bg-rose-500/20 text-rose-400 animate-pulse'
-                  : 'bg-zinc-950 text-zinc-100 light:bg-slate-100 light:text-slate-800'
+                  : 'bg-zinc-950 text-zinc-100 light:bg-slate-100 light:text-slate-800 border border-zinc-700/80 light:border-slate-300'
               }`}
             >
               <Timer className="w-4 h-4 text-amber-400" />
@@ -752,7 +752,7 @@ export const ExamScreen: React.FC<ExamScreenProps> = ({
             </div>
           )}
 
-          <div className="text-xs text-zinc-400 light:text-slate-600 font-medium flex items-center gap-1.5">
+          <div className="text-xs text-zinc-300 light:text-slate-700 font-medium flex items-center gap-1.5">
             <span>{answeredCount}/{totalCount}</span>
             {flaggedCount > 0 && (
               <span className="text-amber-400 font-medium">
@@ -763,9 +763,9 @@ export const ExamScreen: React.FC<ExamScreenProps> = ({
 
           {/* In modalità tutor mostra conteggio live corrette/errate */}
           {examMode === 'tutor' && answeredCount > 0 && (
-            <div className="hidden sm:flex items-center gap-1.5 text-xs font-mono font-bold px-2 py-0.5 rounded-md bg-zinc-950/80 border border-zinc-800/80 light:bg-slate-100 light:border-slate-200">
+            <div className="hidden sm:flex items-center gap-1.5 text-xs font-mono font-bold px-2 py-0.5 rounded-md bg-zinc-950/80 border border-zinc-700 light:bg-slate-100 light:border-slate-300">
               <span className="text-emerald-400 light:text-emerald-600">{tutorCorrectCount} ✓</span>
-              <span className="text-zinc-600 light:text-slate-400">/</span>
+              <span className="text-zinc-500 light:text-slate-400">/</span>
               <span className="text-rose-400 light:text-rose-600">{tutorWrongCount} ✗</span>
             </div>
           )}
@@ -881,7 +881,7 @@ export const ExamScreen: React.FC<ExamScreenProps> = ({
       {/* Modal di Conferma Consegna */}
       {showSubmitModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4 animate-in fade-in">
-          <div className="bg-zinc-900 border border-zinc-800 rounded-2xl p-6 max-w-sm w-full space-y-4 shadow-2xl light:bg-white light:border-slate-200">
+          <div className="bg-zinc-900 border border-zinc-700 rounded-2xl p-6 max-w-sm w-full space-y-4 shadow-2xl light:bg-white light:border-slate-300">
             <div className="flex items-center gap-2 text-amber-400">
               <AlertCircle className="w-6 h-6" />
               <h3 className="font-bold text-base text-zinc-100 light:text-slate-900">
@@ -908,7 +908,7 @@ export const ExamScreen: React.FC<ExamScreenProps> = ({
             <div className="flex gap-2 pt-2">
               <button
                 onClick={() => setShowSubmitModal(false)}
-                className="flex-1 py-2.5 rounded-xl border border-zinc-800 text-zinc-400 hover:text-zinc-200 light:border-slate-300 light:text-slate-700 text-xs font-medium"
+                className="flex-1 py-2.5 rounded-xl border border-zinc-700 text-zinc-300 hover:text-white light:border-slate-300 light:text-slate-700 text-xs font-medium"
               >
                 Continua
               </button>
@@ -931,7 +931,7 @@ export const ExamScreen: React.FC<ExamScreenProps> = ({
           onClick={() => setShowAbandonModal(false)}
         >
           <div
-            className="bg-zinc-900 border border-zinc-800 rounded-2xl p-6 max-w-sm w-full space-y-4 shadow-2xl dark:bg-zinc-900 dark:border-zinc-800 light:bg-white light:border-slate-200"
+            className="bg-zinc-900 border border-zinc-700 rounded-2xl p-6 max-w-sm w-full space-y-4 shadow-2xl dark:bg-zinc-900 dark:border-zinc-700 light:bg-white light:border-slate-300"
             onClick={e => e.stopPropagation()}
             role="dialog"
             aria-modal="true"

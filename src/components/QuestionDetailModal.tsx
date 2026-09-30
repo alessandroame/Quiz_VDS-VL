@@ -103,14 +103,14 @@ export const QuestionDetailModal: React.FC<QuestionDetailModalProps> = ({
         }
       }}
     >
-      <div className="w-full max-w-xl max-h-[90vh] bg-zinc-900 border border-zinc-800 rounded-2xl shadow-2xl flex flex-col overflow-hidden light:bg-white light:border-slate-200">
+      <div className="w-full max-w-xl max-h-[90vh] bg-zinc-900 border border-zinc-700 rounded-2xl shadow-2xl flex flex-col overflow-hidden light:bg-white light:border-slate-300 light:shadow-xl">
         {/* Header */}
-        <div className="p-3.5 sm:p-4 border-b border-zinc-800 flex items-center justify-between gap-2 flex-shrink-0 light:border-slate-200">
+        <div className="p-3.5 sm:p-4 border-b border-zinc-700 flex items-center justify-between gap-2 flex-shrink-0 light:border-slate-300">
           <div className="flex items-center gap-2 min-w-0">
-            <span className="px-2 py-0.5 rounded-md bg-zinc-800 text-zinc-300 font-mono text-xs font-bold light:bg-slate-100 light:text-slate-700 flex-shrink-0">
+            <span className="px-2 py-0.5 rounded-md bg-zinc-800 border border-zinc-700 text-zinc-200 font-mono text-xs font-bold light:bg-slate-100 light:border-slate-300 light:text-slate-800 flex-shrink-0">
               #{question.id}
             </span>
-            <span className="text-xs text-zinc-400 light:text-slate-500 truncate">
+            <span className="text-xs text-zinc-400 light:text-slate-600 truncate">
               {formatSubjectCode(question.subjectId)} {question.subjectName}
             </span>
             {isMistake ? (
@@ -126,7 +126,7 @@ export const QuestionDetailModal: React.FC<QuestionDetailModalProps> = ({
                 {stat.timesWrong} {stat.timesWrong === 1 ? 'errore' : 'errori'}
               </span>
             ) : (
-              <span className="px-1.5 py-0.5 rounded text-[10px] font-bold bg-zinc-800 text-zinc-500 light:bg-slate-100 light:text-slate-600 flex-shrink-0">
+              <span className="px-1.5 py-0.5 rounded text-[10px] font-bold bg-zinc-800 border border-zinc-700 text-zinc-400 light:bg-slate-100 light:border-slate-300 light:text-slate-700 flex-shrink-0">
                 Non vista
               </span>
             )}
@@ -140,7 +140,7 @@ export const QuestionDetailModal: React.FC<QuestionDetailModalProps> = ({
               className={`p-1.5 rounded-lg border transition-colors ${
                 isBookmarked
                   ? 'bg-amber-500/20 border-amber-500/40 text-amber-400'
-                  : 'bg-zinc-800/80 border-zinc-700/60 text-zinc-400 hover:text-white light:bg-slate-100 light:border-slate-300 light:text-slate-600'
+                  : 'bg-zinc-800/80 border-zinc-700 text-zinc-300 hover:text-white light:bg-slate-100 light:border-slate-300 light:text-slate-700'
               }`}
               title={isBookmarked ? 'Rimuovi dai preferiti' : 'Aggiungi ai preferiti'}
               aria-label={isBookmarked ? 'Rimuovi dai preferiti' : 'Aggiungi ai preferiti'}
@@ -155,7 +155,7 @@ export const QuestionDetailModal: React.FC<QuestionDetailModalProps> = ({
                 stop();
                 onClose();
               }}
-              className="p-1.5 rounded-lg bg-zinc-800/80 hover:bg-zinc-700 border border-zinc-700/60 text-zinc-400 hover:text-white light:bg-slate-100 light:hover:bg-slate-200 light:border-slate-300 light:text-slate-600 transition-colors"
+              className="p-1.5 rounded-lg bg-zinc-800/80 hover:bg-zinc-700 border border-zinc-700 text-zinc-300 hover:text-white light:bg-slate-100 light:hover:bg-slate-200 light:border-slate-300 light:text-slate-700 transition-colors"
               title="Chiudi"
               aria-label="Chiudi"
             >
@@ -166,10 +166,9 @@ export const QuestionDetailModal: React.FC<QuestionDetailModalProps> = ({
 
         {/* Scrollable Body */}
         <div className="flex-1 overflow-y-auto p-4 space-y-4 text-xs sm:text-sm">
-          {/* Audio Controls */}
           {settings.ttsEnabled && (
-            <div className="flex items-center justify-between p-2 rounded-xl bg-zinc-950/60 border border-zinc-800/80 light:bg-slate-50 light:border-slate-200">
-              <span className="text-[11px] text-zinc-400 font-medium">Ascolto Vocale</span>
+            <div className="flex items-center justify-between p-2 rounded-xl bg-zinc-950/60 border border-zinc-700/80 light:bg-slate-50 light:border-slate-300">
+              <span className="text-[11px] text-zinc-300 light:text-slate-700 font-medium">Ascolto Vocale</span>
               <div className="flex items-center gap-1.5">
                 <button
                   type="button"
@@ -220,14 +219,14 @@ export const QuestionDetailModal: React.FC<QuestionDetailModalProps> = ({
                   className={`p-3 rounded-xl border text-xs sm:text-sm flex items-start gap-2.5 transition-colors ${
                     isCorrect
                       ? 'bg-emerald-500/10 border-emerald-500/40 text-emerald-200 light:bg-emerald-50 light:border-emerald-300 light:text-emerald-950 font-medium'
-                      : 'bg-zinc-950/40 border-zinc-800/80 text-zinc-300 light:bg-slate-50 light:border-slate-200 light:text-slate-700'
+                      : 'bg-zinc-950/40 border-zinc-700/80 text-zinc-200 light:bg-white light:border-slate-300 light:shadow-sm light:text-slate-800'
                   }`}
                 >
                   <span
                     className={`w-5 h-5 rounded-md flex items-center justify-center font-bold text-xs flex-shrink-0 mt-0.5 ${
                       isCorrect
                         ? 'bg-emerald-500 text-zinc-950 font-black'
-                        : 'bg-zinc-800 text-zinc-400 light:bg-slate-200 light:text-slate-600'
+                        : 'bg-zinc-800 border border-zinc-700 text-zinc-300 light:bg-slate-100 light:border-slate-300 light:text-slate-700'
                     }`}
                   >
                     {optNum}
@@ -243,22 +242,22 @@ export const QuestionDetailModal: React.FC<QuestionDetailModalProps> = ({
 
           {/* Didactic Explanation */}
           {question.explanation && (
-            <div className="p-3.5 rounded-xl border border-zinc-800 bg-zinc-950/60 light:bg-slate-50 light:border-slate-200 space-y-2.5 text-xs">
+            <div className="p-3.5 rounded-xl border border-zinc-700 bg-zinc-950/80 light:bg-white light:border-slate-300 light:shadow-sm space-y-2.5 text-xs">
               <div>
                 <span className="font-bold text-emerald-400 light:text-emerald-700 uppercase tracking-wider text-[10px] block mb-0.5">
                   Regola Didattica
                 </span>
-                <p className="text-zinc-300 light:text-slate-700 leading-relaxed">
+                <p className="text-zinc-200 light:text-slate-800 leading-relaxed">
                   {question.explanation.rule}
                 </p>
               </div>
 
-              <div className="pt-2 border-t border-zinc-800/80 light:border-slate-200">
+              <div className="pt-2 border-t border-zinc-700/80 light:border-slate-200">
                 <span className="font-bold text-amber-400 light:text-amber-700 uppercase tracking-wider text-[10px] flex items-center gap-1 mb-0.5">
                   <AlertTriangle className="w-3 h-3 text-amber-400" />
                   <span>Tranello Comune</span>
                 </span>
-                <p className="text-zinc-300 light:text-slate-700 leading-relaxed">
+                <p className="text-zinc-200 light:text-slate-800 leading-relaxed">
                   {question.explanation.trap}
                 </p>
               </div>
@@ -266,9 +265,9 @@ export const QuestionDetailModal: React.FC<QuestionDetailModalProps> = ({
           )}
 
           {/* Personal Note */}
-          <div className="p-3 rounded-xl border border-zinc-800/80 bg-zinc-950/40 light:bg-slate-50 light:border-slate-200 space-y-2">
+          <div className="p-3 rounded-xl border border-zinc-700 bg-zinc-950/80 light:bg-white light:border-slate-300 light:shadow-sm space-y-2">
             <div className="flex items-center justify-between text-xs">
-              <span className="text-zinc-400 font-medium flex items-center gap-1.5">
+              <span className="text-zinc-300 light:text-slate-700 font-medium flex items-center gap-1.5">
                 <FileText className="w-3.5 h-3.5 text-amber-400" />
                 <span>Note Personali</span>
               </span>
@@ -310,7 +309,7 @@ export const QuestionDetailModal: React.FC<QuestionDetailModalProps> = ({
                       setNoteText(stat?.userNote || '');
                       setIsEditingNote(false);
                     }}
-                    className="px-2.5 py-1 rounded-lg border border-zinc-700 text-zinc-400 hover:bg-zinc-800 text-xs font-medium light:border-slate-300"
+                    className="px-2.5 py-1 rounded-lg border border-zinc-700 text-zinc-300 hover:bg-zinc-800 text-xs font-medium light:border-slate-300 light:text-slate-700 light:hover:bg-slate-100"
                   >
                     Annulla
                   </button>
@@ -325,11 +324,11 @@ export const QuestionDetailModal: React.FC<QuestionDetailModalProps> = ({
                 </div>
               </div>
             ) : stat?.userNote ? (
-              <p className="text-xs text-zinc-200 light:text-slate-800 italic bg-zinc-900/80 light:bg-white p-2.5 rounded-lg border border-zinc-800 light:border-slate-200">
+              <p className="text-xs text-zinc-200 light:text-slate-800 italic bg-zinc-900/80 light:bg-slate-50 p-2.5 rounded-lg border border-zinc-700 light:border-slate-300">
                 "{stat.userNote}"
               </p>
             ) : (
-              <p className="text-[11px] text-zinc-500 italic">
+              <p className="text-[11px] text-zinc-400 light:text-slate-600 italic">
                 Nessuna nota personale salvata per questo quesito.
               </p>
             )}
@@ -337,23 +336,23 @@ export const QuestionDetailModal: React.FC<QuestionDetailModalProps> = ({
         </div>
 
         {/* Telemetry Footer */}
-        <div className="p-3 border-t border-zinc-800 bg-zinc-950/80 light:bg-slate-100 light:border-slate-200 grid grid-cols-3 gap-2 text-center text-xs flex-shrink-0">
-          <div className="p-1.5 rounded-lg bg-zinc-900 light:bg-white border border-zinc-800 light:border-slate-200">
-            <span className="text-[10px] text-zinc-500 block">Visto</span>
+        <div className="p-3 border-t border-zinc-700 bg-zinc-950/80 light:bg-slate-100 light:border-slate-300 grid grid-cols-3 gap-2 text-center text-xs flex-shrink-0">
+          <div className="p-1.5 rounded-lg bg-zinc-900 light:bg-white border border-zinc-700 light:border-slate-300 light:shadow-sm">
+            <span className="text-[10px] text-zinc-400 light:text-slate-600 block">Visto</span>
             <span className="font-bold text-zinc-300 light:text-slate-800">
               {stat?.timesSeen || 0} {stat?.timesSeen === 1 ? 'volta' : 'volte'}
             </span>
           </div>
 
-          <div className="p-1.5 rounded-lg bg-zinc-900 light:bg-white border border-zinc-800 light:border-slate-200">
-            <span className="text-[10px] text-zinc-500 block">Errori</span>
+          <div className="p-1.5 rounded-lg bg-zinc-900 light:bg-white border border-zinc-700 light:border-slate-300 light:shadow-sm">
+            <span className="text-[10px] text-zinc-400 light:text-slate-600 block">Errori</span>
             <span className={`font-bold ${stat?.timesWrong ? 'text-rose-400' : 'text-zinc-400'}`}>
               {stat?.timesWrong || 0}
             </span>
           </div>
 
-          <div className="p-1.5 rounded-lg bg-zinc-900 light:bg-white border border-zinc-800 light:border-slate-200">
-            <span className="text-[10px] text-zinc-500 block">Consecutive OK</span>
+          <div className="p-1.5 rounded-lg bg-zinc-900 light:bg-white border border-zinc-700 light:border-slate-300 light:shadow-sm">
+            <span className="text-[10px] text-zinc-400 light:text-slate-600 block">Consecutive OK</span>
             <span className={`font-bold ${(stat?.consecutiveCorrect || 0) >= 2 ? 'text-emerald-400' : 'text-zinc-400'}`}>
               {stat?.consecutiveCorrect || 0} / 2
             </span>

@@ -68,7 +68,7 @@ export const QuestionNavigator: React.FC<QuestionNavigatorProps> = ({
     const isFlagged = flags[q.id] === true;
     const isCurrent = currentIndex === idx;
 
-    let baseStyle = 'border-zinc-700/70 bg-zinc-950/90 text-zinc-400 light:border-slate-300 light:bg-slate-100 light:text-slate-600';
+    let baseStyle = 'border-zinc-700 bg-zinc-950/90 text-zinc-300 light:border-slate-300 light:bg-slate-100 light:text-slate-700 font-medium';
     if (isAnswered) {
       if (examMode === 'tutor') {
         const isCorrect = answers[q.id] === q.correctAnswer;
@@ -84,7 +84,7 @@ export const QuestionNavigator: React.FC<QuestionNavigatorProps> = ({
   };
 
   return (
-    <div className="p-2 sm:p-2.5 bg-zinc-900/60 border border-zinc-800 rounded-xl light:bg-white light:border-slate-200 transition-all">
+    <div className="p-2 sm:p-2.5 bg-zinc-900/80 border border-zinc-700 rounded-xl light:bg-white light:border-slate-300 light:shadow-sm transition-all">
       {/* Header bar with counter, flag summary and expand/collapse toggle */}
       <div
         onClick={toggleCompressed}
