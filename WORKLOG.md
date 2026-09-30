@@ -14,6 +14,47 @@ Questo documento registra in ordine cronologico tutte le lavorazioni svolte nel 
 - **Impatto sul Desiderata**: <Come questo intervento contribuisce al desiderata (cfr. DESIDERATA.md) e indicazioni per il prossimo agente>
 ```
 
+### [2026-09-30] - Allineamento Terminologico Globale: Modalità a Mani Libere (Hands-Free Mode)
+
+- **Cosa abbiamo fatto**:
+  * **Bonifica Completa dei Testi Utente Residui legati alla "Guida"**:
+    - [src/components/SettingsModal.tsx](file:///c:/github/Quiz_VDS-VL/src/components/SettingsModal.tsx): corretto *"Supporto Vocale: Lettura audio dei quiz per lo studio e modalità alla guida a mani libere"* in *"Supporto Vocale: Lettura audio dei quiz per lo studio e modalità a mani libere"*.
+    - [src/components/VoiceQuickMenu.tsx](file:///c:/github/Quiz_VDS-VL/src/components/VoiceQuickMenu.tsx): corretto *"Tutor didattico alla guida"* in *"Tutor didattico a mani libere"*.
+    - [src/components/VoiceCommandsModal.tsx](file:///c:/github/Quiz_VDS-VL/src/components/VoiceCommandsModal.tsx):
+      * Sostituito *"Controlla l'app a voce senza distogliere lo sguardo dalla strada"* con *"Controlla l'app a voce senza dover toccare lo schermo"*.
+      * Sostituito *"Consigli per l'ascolto (Auto / Bici / Corsa)"* con *"Consigli per l'ascolto a mani libere (Bici / Corsa / Viaggi)"*.
+      * Sostituito *"vivavoce Bluetooth auto"* con *"vivavoce Bluetooth"*.
+    - [src/components/drive/DriveLauncher.tsx](file:///c:/github/Quiz_VDS-VL/src/components/drive/DriveLauncher.tsx):
+      * Sostituito *"Guida Vocale Iniziale"* con *"Briefing Vocale Iniziale"*.
+      * Sostituito *"Schermo sempre acceso durante la guida"* con *"Schermo sempre acceso a mani libere"*.
+    - [src/components/drive/DriveActiveHUD.tsx](file:///c:/github/Quiz_VDS-VL/src/components/drive/DriveActiveHUD.tsx):
+      * Sostituito *"Guida Vocale Iniziale"* con *"Briefing Vocale Iniziale"*.
+      * Sostituito tooltip *"Esci dalla Modalità Audio"* con *"Esci dalla Modalità Mani Libere"*.
+    - [src/components/drive/DriveDebriefing.tsx](file:///c:/github/Quiz_VDS-VL/src/components/drive/DriveDebriefing.tsx):
+      * Sostituito tooltip *"Esci dalla modalità guida"* con *"Esci dalla Modalità Mani Libere"*.
+      * Sostituito label pulsante *"Chiudi Modalità Audio"* con *"Chiudi Modalità Mani Libere"*.
+    - [src/services/voiceService.ts](file:///c:/github/Quiz_VDS-VL/src/services/voiceService.ts):
+      * Aggiornato MediaSession metadata: da *"Guida Vocale - Modalità Alla Guida"* a *"Briefing Vocale - Modalità Mani Libere"*.
+      * Aggiornato fallback `window.speechSynthesis`: da *"Benvenuto nella modalità alla guida. Lo schermo rimarrà sempre acceso sul tuo cruscotto."* a *"Benvenuto nella modalità a mani libere. Lo schermo rimarrà sempre acceso durante la sessione."*.
+    - [scripts/generate_drive_intro.py](file:///c:/github/Quiz_VDS-VL/scripts/generate_drive_intro.py):
+      * Aggiornato `INTRO_TEXT` con la dicitura *"Benvenuto nella modalità a mani libere. Lo schermo rimarrà sempre acceso durante la sessione."*.
+      * Rigenerati i file audio neurali MP3 per Giuseppe e Elsa (`public/audio/giuseppe/drive_intro.mp3` e `public/audio/elsa/drive_intro.mp3`) con Edge-TTS.
+    - [src/components/DriveModeScreen.tsx](file:///c:/github/Quiz_VDS-VL/src/components/DriveModeScreen.tsx):
+      * Aggiornato hint vocale da *"Dì 'Aiuto' o 'Comandi' per aprire la guida a voce"* a *"Dì 'Aiuto' o 'Comandi' per l'elenco comandi a voce"*.
+    - [src/hooks/useWakeLock.ts](file:///c:/github/Quiz_VDS-VL/src/hooks/useWakeLock.ts):
+      * Aggiornato JSDoc da *"Modalità Alla Guida"* a *"Modalità Mani Libere"*.
+    - [README.md](file:///c:/github/Quiz_VDS-VL/README.md), [DESIDERATA.md](file:///c:/github/Quiz_VDS-VL/DESIDERATA.md), [MEMORY.md](file:///c:/github/Quiz_VDS-VL/MEMORY.md):
+      * Allineate tutte le menzioni e descrizioni alla denominazione ufficiale *"Modalità Mani Libere (Hands-Free Mode)"*.
+
+- **Scelte architetturali & Rationale**:
+  * *Disambiguazione semantica completa*: La parola "guida" in italiano è polisemica ("condurre un veicolo" vs "manuale/istruzioni"). L'intervento elimina ogni riferimento alla guida automobilistica, alla strada o al cruscotto (ad eccezione della Home intesa come cockpit aeronautico), chiarendo che la modalità è pensata per l'ascolto hands-free ovunque (bici, corsa, camminata, relax a letto, viaggi). I comandi vocali mantengono la dicitura naturale "Guida Comandi" / "Istruzioni" per la documentazione d'uso.
+  * *Allineamento audio/testo a 360°*: Non ci siamo limitati ai testi a schermo, ma abbiamo rigenerato anche gli asset audio parlati con Edge-TTS per garantire assoluta coerenza tra ciò che l'utente legge e ciò che ascolta in cuffia o altoparlante.
+
+- **Impatto sul Desiderata**:
+  * Uniforma e pulisce completamente l'identità del prodotto, azzerando le incoerenze lessicali per gli allievi piloti VDS/VL.
+
+---
+
 ### [2026-09-30] - Avanzamento Automatico su Risposta Esatta (Auto-Advance) nello Studio Standard (v1.2.0)
 
 - **Cosa abbiamo fatto**:
