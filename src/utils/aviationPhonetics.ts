@@ -85,5 +85,5 @@ export function formatExplanationForSpeech(
     3: 'la tre'
   };
 
-  return `Risposta errata. La risposta esatta è ${ordinals[correctAnswer]}: ${normalizeAviationPhonetics(correctOptionText)}. Regola: ${normalizeAviationPhonetics(rule)}. Tranello: ${normalizeAviationPhonetics(trap)}.`;
+  return `La risposta esatta è ${ordinals[correctAnswer]}: ${normalizeAviationPhonetics(correctOptionText)}. Regola: ${normalizeAviationPhonetics(rule)}. Tranello: ${normalizeAviationPhonetics(trap)}.`;
 }

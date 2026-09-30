@@ -109,7 +109,7 @@ def build_segments(q: dict, part_filter: str = "all") -> list:
         rule = normalize_phonetics(q.get("explanation", {}).get("rule", ""))
         trap = normalize_phonetics(q.get("explanation", {}).get("trap", ""))
         ordinals = {1: "la uno", 2: "la due", 3: "la tre"}
-        explanation_text = f"Risposta errata. La risposta esatta è {ordinals[correct_idx]}: {correct_text}. Regola: {rule}. Tranello: {trap}."
+        explanation_text = f"La risposta esatta è {ordinals[correct_idx]}: {correct_text}. Regola: {rule}. Tranello: {trap}."
         segments.append((f"{qid}_e.mp3", explanation_text))
         
     return segments

@@ -56,14 +56,15 @@ describe('aviationPhonetics', () => {
   });
 
   describe('formatExplanationForSpeech', () => {
-    it('genera la frase didattica con risposta corretta, regola e tranello', () => {
+    it('genera la frase didattica neutrale con risposta corretta, regola e tranello senza prefissi di errore', () => {
       const text = formatExplanationForSpeech(
         2,
         'Attestato VDS valido.',
         'D.P.R. 133/2010 regola di precedenza.',
         'Non confondere con il volo commerciale.'
       );
-      expect(text).toContain('Risposta errata. La risposta esatta è la due: Attestato V D S valido..');
+      expect(text).toContain('La risposta esatta è la due: Attestato V D S valido..');
+      expect(text).not.toContain('Risposta errata');
       expect(text).toContain('Regola: Decreto del Presidente della Repubblica 133 del 2010');
       expect(text).toContain('Tranello: Non confondere con il volo commerciale.');
     });

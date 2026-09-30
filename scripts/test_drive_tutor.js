@@ -224,7 +224,8 @@ async function run() {
     console.log('Selezione Opzione per verificare Scheda Didattica (Regola e Tranello)...');
     await sendCDP('Runtime.evaluate', {
       expression: `(() => {
-        const opt = document.getElementById('btn-drive-opt-1');
+        // Clicca l'opzione 1 o l'opzione corretta disponibile
+        const opt = document.getElementById('btn-drive-opt-1') || document.getElementById('btn-drive-opt-2');
         if (opt) opt.click();
       })()`
     });

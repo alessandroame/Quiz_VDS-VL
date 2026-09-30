@@ -12,6 +12,44 @@ Questo documento registra in ordine cronologico tutte le lavorazioni svolte nel 
 - **Cosa abbiamo fatto**: <Sintesi oggettiva degli interventi effettuati, componenti creati o modificati>
 - **Scelte architetturali & Rationale**: <Decisioni tecniche, librerie o pattern adottati, alternative scartate e motivazioni>
 - **Impatto sul Desiderata**: <Come questo intervento contribuisce al desiderata (cfr. DESIDERATA.md) e indicazioni per il prossimo agente>
+```
+
+### [2026-09-30] - Risoluzione Falso Errore Vocale in Modalità Audio e Neutralizzazione Spiegazioni Didattiche
+
+- **Cosa abbiamo fatto**:
+  * **Analisi della causa radice (Root Cause Analysis)**:
+    - Identificato che nella pipeline di sintesi audio neurale ([scripts/generate_audio_database.py](file:///c:/github/Quiz_VDS-VL/scripts/generate_audio_database.py)) e nell'utility fonetica ([src/utils/aviationPhonetics.ts](file:///c:/github/Quiz_VDS-VL/src/utils/aviationPhonetics.ts)), tutte le spiegazioni didattiche dei quiz (`_e.mp3`) venivano storicamente generate con il prefisso rigido:
+      `explanation_text = f"Risposta errata. La risposta esatta è {ordinals[correct_idx]}: {correct_text}. Regola: {rule}. Tranello: {trap}."`
+    - Questo prefisso derivava dalla Fase 6 iniziale, quando la spiegazione audio era intesa esclusivamente per l'errore (`ttsAutoExplainOnMistake`).
+    - Con l'introduzione della Modalità Tutor nella Modalità Audio ([src/components/DriveModeScreen.tsx](file:///c:/github/Quiz_VDS-VL/src/components/DriveModeScreen.tsx)), l'audio della spiegazione viene riprodotto sia su risposta corretta che su errore per consentire lo studio hands-free. Di conseguenza, quando l'allievo rispondeva correttamente, l'audio suonava `{qid}_e.mp3` che iniziava dicendo *"Risposta errata."*, contraddicendo la risposta esatta dell'utente.
+  * **Perché i test non l'hanno rilevato**:
+    1. *Mock isolati in Vitest (`voiceService.test.ts`)*: `MockAudio` simulava solo la riproduzione HTML5 controllando il pattern degli URL (`audio.src`), senza mai validare il contenuto audio o il testo parlato associato alla risposta.
+    2. *SSR statico in `DriveTutorMode.test.ts`*: I test per la modalità Tutor utilizzavano `renderToString` su componenti statici (`DriveLauncher`, `DriveActiveHUD`), verificando la presenza delle card didattiche nel DOM ma passando dummy no-op per `onPlayExplanation`, senza simulare il flusso reale di selezione risposta.
+    3. *Test unitario convoluto in `aviationPhonetics.test.ts`*: Il test esistente `formatExplanationForSpeech` asseriva la presenza forzata di `"Risposta errata."`, sancendo come "corretto" un comportamento fallace a livello architetturale.
+    4. *Test CDP Headless ciechi (`test_drive_tutor.js`)*: I test CDP nel browser headless controllavano solo l'assenza di errori in `console.error` e selezionavano arbitrariamente l'opzione 1 (che su Q1001 era casualmente errata), senza testare la selezione della risposta corretta né analizzare il flusso vocale dell'elemento `<audio>`.
+    5. *Assenza di validazione semantica su `build_segments`*: Nessun test verificava che la funzione di costruzione della spiegazione producesse testo neutrale privo di assunzioni di fallimento.
+  * **Interventi applicativi e rigenerazione audio**:
+    - In [src/utils/aviationPhonetics.ts](file:///c:/github/Quiz_VDS-VL/src/utils/aviationPhonetics.ts) e [scripts/generate_audio_database.py](file:///c:/github/Quiz_VDS-VL/scripts/generate_audio_database.py), neutralizzata la formulazione eliminando `"Risposta errata."`:
+      `f"La risposta esatta è {ordinals[correct_idx]}: {correct_text}. Regola: {rule}. Tranello: {trap}."`
+    - Rigenerati al 100% tutti i 1.008 file audio di spiegazione didattica (`_e.mp3`) per entrambe le voci neurali (504 per `giuseppe` e 504 per `elsa`).
+    - Rigenerato il catalogo e gli indici hash MD5 in [public/audio/manifest.json](file:///c:/github/Quiz_VDS-VL/public/audio/manifest.json) per garantire l'invalidazione della cache offline differenziale nei client PWA.
+  * **Nuova copertura di test unitari ed E2E**:
+    - In [src/utils/aviationPhonetics.test.ts](file:///c:/github/Quiz_VDS-VL/src/utils/aviationPhonetics.test.ts), aggiornato il test per asserire che la frase didattica NON contenga mai `"Risposta errata"` e inizi con `"La risposta esatta è"`.
+    - In [src/data/questions.test.ts](file:///c:/github/Quiz_VDS-VL/src/data/questions.test.ts), aggiunto il test `DATA-10` che valida su tutti i 504 quiz del catalogo che nessuna spiegazione didattica contenga assunzioni di errore e includa sempre `"La risposta esatta è"`, `"Regola:"` e `"Tranello:"`.
+    - Creata la suite [src/components/drive/DriveAnswerFeedback.test.ts](file:///c:/github/Quiz_VDS-VL/src/components/drive/DriveAnswerFeedback.test.ts) (4 nuovi test unitari) che certifica lo stile di successo/errore nell'HUD della Modalità Audio e la neutralità dell'audio.
+    - Aggiornato lo script headless [scripts/test_drive_tutor.js](file:///c:/github/Quiz_VDS-VL/scripts/test_drive_tutor.js) verificando la selezione delle opzioni e la visualizzazione didattica a 0 errori console.
+
+- **Scelte architetturali & Rationale**:
+  * *Spiegazione didattica neutrale (Single Responsibility)*: Una spiegazione didattica deve spiegare la regola fisica/normativa e il tranello relativo al quesito, indipendentemente dal fatto che l'utente stia consultando l'archivio, abbia risposto correttamente in modalità Tutor, o stia ripassando un errore. Il feedback di esito (esatta/errata) compete ai segnali immediati (suono D5/A5 vs A3/E3, feedback aptico, badge visivi verdi/rossi) e non deve essere fuso nella traccia audio della spiegazione.
+  * *Piena compatibilità con l'archivio e il riascolto on-demand*: Rimuovere il prefisso "Risposta errata" risolve anche l'incoerenza che si verificava quando un allievo ascoltava la spiegazione di un quiz dall'Archivio o tramite il comando vocale "Spiega", dove l'audio affermava paradossalmente "Risposta errata" anche se non era stata data alcuna risposta.
+
+- **Impatto sul Desiderata**:
+  * Piena conformità al Principio Filosofico 1 e 4 di [DESIDERATA.md](file:///c:/github/Quiz_VDS-VL/DESIDERATA.md) (Zero Distrazioni, Apprendimento Deterministico & Anti-Frustrazione).
+  * 25 suite su 25 superate al 100% con **217 test unitari verdi** in Vitest (`npm run test:unit`).
+  * Build di produzione PWA verificata a zero errori di tipo e zero warning rollup.
+
+---
+
 ### [2026-09-30] - Alleggerimento UI, Risoluzione Sovrapposizioni Pixel 7 e Progressive Disclosure per Scenari
 
 - **Cosa abbiamo fatto**:

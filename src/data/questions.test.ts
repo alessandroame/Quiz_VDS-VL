@@ -2,6 +2,7 @@ import { describe, it, expect } from 'vitest';
 import questionsData from './questions.json';
 import type { Question } from '../types/quiz';
 import { OFFICIAL_EXAM_QUOTAS, MARATHON_EXAM_QUOTAS } from '../utils/fairRandomizer';
+import { formatExplanationForSpeech } from '../utils/aviationPhonetics';
 
 describe('Suite 1: Integrità Dataset 504 Quiz AeCI (questions.json)', () => {
   const questions = questionsData as Question[];
@@ -172,5 +173,27 @@ describe('Suite 1: Integrità Dataset 504 Quiz AeCI (questions.json)', () => {
     expect(q8003?.explanation.rule).toContain('centro di pressione');
     expect(q8003?.explanation.rule).toContain('60-70%');
     expect(q8003?.explanation.trap).toContain('distribuzione uniforme');
+  });
+
+  it('DATA-10: tutte le 504 spiegazioni audio didattiche sono neutrali e prive di prefissi di errore ("Risposta errata")', () => {
+    for (const q of questions) {
+      const correctOptionText = q.options[q.correctAnswer - 1];
+      const speechText = formatExplanationForSpeech(
+        q.correctAnswer,
+        correctOptionText,
+        q.explanation.rule,
+        q.explanation.trap
+      );
+
+      // La spiegazione didattica NON deve mai contenere assunzioni di errore
+      expect(speechText).not.toContain('Risposta errata');
+      expect(speechText).not.toContain('risposta errata');
+      expect(speechText).not.toContain('risposta sbagliata');
+
+      // Deve presentare in modo chiaro la risposta corretta, la regola e il tranello
+      expect(speechText).toMatch(/^La risposta esatta è la (uno|due|tre):/);
+      expect(speechText).toContain('Regola:');
+      expect(speechText).toContain('Tranello:');
+    }
   });
 });
