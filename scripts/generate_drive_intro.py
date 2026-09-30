@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Generates the introductory audio briefing for Drive Mode ("Modalità Alla Guida").
+Generates the introductory audio briefing for Hands-Free Mode ("Modalità Mani Libere").
 Supports both Giuseppe and Elsa voices using Edge-TTS:
 - Giuseppe (it-IT-GiuseppeMultilingualNeural, rate=-5%, pitch=-5Hz) in public/audio/giuseppe/drive_intro.mp3
 - Elsa (it-IT-ElsaNeural, rate=-2%, pitch=+0Hz) in public/audio/elsa/drive_intro.mp3
@@ -12,8 +12,8 @@ import asyncio
 import edge_tts
 
 INTRO_TEXT = (
-    "Benvenuto nella modalità alla guida. "
-    "Lo schermo rimarrà sempre acceso sul tuo cruscotto. "
+    "Benvenuto nella modalità a mani libere. "
+    "Lo schermo rimarrà sempre acceso durante la sessione. "
     "Le domande e le opzioni verranno lette automaticamente. "
     "Puoi rispondere toccando i tre grandi pulsanti sullo schermo, "
     "oppure usando i comandi vocali pronunciando Uno, Due o Tre. "

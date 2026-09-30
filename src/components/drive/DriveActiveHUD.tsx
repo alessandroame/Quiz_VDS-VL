@@ -60,6 +60,8 @@ export interface DriveActiveHUDProps {
   onRestartCurrentOrSequence: () => void;
   onStopVoice: () => void;
   onPlayExplanation: () => void;
+  onPlayQuestion?: () => void;
+  onPlayOption?: (option: 1 | 2 | 3) => void;
   waitingCountdown: number | null;
   assimilationCountdown: number | null;
   voiceInterimTranscript: string;
@@ -112,6 +114,8 @@ export const DriveActiveHUD: React.FC<DriveActiveHUDProps> = ({
   onRestartCurrentOrSequence,
   onStopVoice,
   onPlayExplanation,
+  onPlayQuestion = () => {},
+  onPlayOption = () => {},
   waitingCountdown,
   assimilationCountdown,
   voiceInterimTranscript,
@@ -172,7 +176,7 @@ export const DriveActiveHUD: React.FC<DriveActiveHUDProps> = ({
                 ? 'bg-rose-500/10 border-rose-500/40 text-rose-400 hover:bg-rose-500/20 light:bg-rose-50 light:border-rose-300 light:text-rose-700'
                 : 'bg-zinc-900 border-zinc-800 text-zinc-300 hover:text-white light:bg-white light:border-slate-200 light:text-slate-700 light:hover:text-slate-900 light:shadow-sm'
             }`}
-            title={isExamSession ? "Interrompi la simulazione d'esame" : 'Esci dalla Modalità Audio'}
+            title={isExamSession ? "Interrompi la simulazione d'esame" : 'Esci dalla Modalità Mani Libere'}
           >
             <X className="w-4 h-4" />
             <span>{isExamSession ? 'Interrompi' : 'Esci'}</span>
@@ -341,7 +345,7 @@ export const DriveActiveHUD: React.FC<DriveActiveHUDProps> = ({
               </div>
               <div className="min-w-0">
                 <div className="text-xs font-black text-amber-200 light:text-amber-900 uppercase tracking-wider flex items-center gap-1.5">
-                  <span>Guida Vocale Iniziale</span>
+                  <span>Briefing Vocale Iniziale</span>
                   <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-300 light:bg-amber-200 light:text-amber-900 font-bold">AUDIO</span>
                 </div>
                 <p className="text-xs text-zinc-300 light:text-amber-900 mt-0.5 truncate sm:text-clip">
@@ -364,14 +368,37 @@ export const DriveActiveHUD: React.FC<DriveActiveHUDProps> = ({
 
       {/* Area Domanda (Zero Scroll) */}
       <div className="my-2 p-3 sm:p-4 rounded-2xl bg-zinc-900/90 border border-zinc-800/80 light:bg-white light:border-slate-200 light:shadow-sm flex items-start gap-3">
-        <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-2 mb-1">
-            <span className="font-mono text-xs font-bold text-amber-400 bg-amber-950 border border-amber-800/50 light:text-amber-700 light:bg-amber-100 light:border-amber-300 px-2 py-0.5 rounded">
-              #{currentQ.id}
-            </span>
-            <span className="text-xs text-zinc-400 light:text-slate-500 font-semibold truncate">
-              {currentQ.subjectName}
-            </span>
+        <div
+          className="flex-1 min-w-0 cursor-pointer active:opacity-85 select-none"
+          onClick={onPlayQuestion}
+          title="Tocca per riascoltare solo la domanda (Tasto Q)"
+        >
+          <div className="flex items-center justify-between gap-2 mb-1">
+            <div className="flex items-center gap-2">
+              <span className="font-mono text-xs font-bold text-amber-400 bg-amber-950 border border-amber-800/50 light:text-amber-700 light:bg-amber-100 light:border-amber-300 px-2 py-0.5 rounded">
+                #{currentQ.id}
+              </span>
+              <span className="text-xs text-zinc-400 light:text-slate-500 font-semibold truncate">
+                {currentQ.subjectName}
+              </span>
+            </div>
+            <button
+              type="button"
+              id="btn-drive-play-question"
+              onClick={(e) => {
+                e.stopPropagation();
+                onPlayQuestion();
+              }}
+              className={`px-2 py-0.5 rounded-lg text-xs font-bold border transition-colors flex items-center gap-1 ${
+                isPartPlaying('question')
+                  ? 'bg-amber-500/20 border-amber-500 text-amber-300 ring-1 ring-amber-400 light:bg-amber-100 light:border-amber-400 light:text-amber-800'
+                  : 'bg-zinc-800/80 border-zinc-700 text-zinc-300 hover:text-white hover:border-zinc-500 light:bg-slate-100 light:border-slate-300 light:text-slate-700'
+              }`}
+              title="Riascolta solo la domanda (Tasto Q)"
+            >
+              <Volume2 className={`w-3.5 h-3.5 ${isPartPlaying('question') ? 'text-amber-400 animate-pulse' : ''}`} />
+              <span className="hidden sm:inline">Solo Domanda</span>
+            </button>
           </div>
           <h2
             lang="it"
@@ -620,6 +647,37 @@ export const DriveActiveHUD: React.FC<DriveActiveHUDProps> = ({
                 >
                   {opt}
                 </div>
+
+                {/* Pulsante dedicato per riascolto isolato della singola opzione (senza selezionarla) */}
+                <span
+                  role="button"
+                  tabIndex={0}
+                  id={`btn-drive-opt-audio-${optNum}`}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onPlayOption(optNum);
+                  }}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      onPlayOption(optNum);
+                    }
+                  }}
+                  className={`flex items-center justify-center flex-shrink-0 transition-all border ${
+                    isCurrentRevealed
+                      ? 'w-7 h-7 sm:w-8 sm:h-8 rounded-lg text-xs'
+                      : 'w-11 h-11 sm:w-12 sm:h-12 rounded-xl'
+                  } ${
+                    isCurrentOptPlaying
+                      ? 'bg-amber-500/20 border-amber-500 text-amber-300 ring-2 ring-amber-400/50 shadow-sm light:bg-amber-100 light:border-amber-400 light:text-amber-800'
+                      : 'bg-zinc-800/80 hover:bg-zinc-700/80 border-zinc-700/60 text-zinc-400 hover:text-white light:bg-slate-100 light:hover:bg-slate-200 light:border-slate-300 light:text-slate-600'
+                  }`}
+                  title={`Riascolta solo opzione ${optNum} (Alt+${optNum})`}
+                  aria-label={`Riascolta solo opzione ${optNum}`}
+                >
+                  <Volume2 className={`${isCurrentRevealed ? 'w-3.5 h-3.5' : 'w-5 h-5'} ${isCurrentOptPlaying ? 'text-amber-400 animate-pulse' : ''}`} />
+                </span>
 
                 {isCurrentRevealed && isCorrectAnswer && (
                   <CheckCircle2 className={`${isCurrentRevealed ? 'w-5 h-5' : 'w-7 h-7'} text-emerald-400 flex-shrink-0`} />

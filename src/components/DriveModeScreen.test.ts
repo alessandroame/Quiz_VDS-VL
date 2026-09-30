@@ -5,6 +5,8 @@ import { createRoot } from 'react-dom/client';
 import type { Question } from '../types/quiz';
 
 const mockPlayExplanation = vi.fn();
+const mockPlayQuestion = vi.fn();
+const mockPlayOption = vi.fn();
 const mockStopVoice = vi.fn();
 const mockRecordAnswer = vi.fn();
 const mockUpdateSetting = vi.fn();
@@ -22,7 +24,8 @@ vi.mock('../context/QuizContext', () => ({
       driveModeTutor: true,
       driveModeAutoAdvanceSeconds: 5,
       ttsAutoExplainOnMistake: true,
-      driveModeIntroPlayed: true
+      driveModeIntroPlayed: true,
+      audioOfflinePromptDismissed: true
     },
     updateSetting: mockUpdateSetting,
     dismissActiveSession: vi.fn()
@@ -40,6 +43,8 @@ vi.mock('../hooks/useAviationVoice', () => ({
     togglePlayPause: vi.fn(),
     restartCurrentOrSequence: vi.fn(),
     playFullSequence: vi.fn(),
+    playQuestion: mockPlayQuestion,
+    playOption: mockPlayOption,
     playExplanation: mockPlayExplanation,
     playDriveIntro: vi.fn(),
     stopDriveIntro: vi.fn(),
@@ -192,5 +197,100 @@ describe('DriveModeScreen - Tutor Mode Explanation Playback Contract', () => {
     expect(handleAnswer).toHaveBeenCalledWith(1001, 1);
     // Poiché errata, playExplanation DEVE essere stata chiamata
     expect(mockPlayExplanation).toHaveBeenCalledTimes(1);
+  });
+
+  it('DRIVE-SELECTIVE-01: toccare il pulsante audio della domanda avvia la lettura isolata della domanda', async () => {
+    await act(async () => {
+      root.render(
+        React.createElement(DriveModeScreen, {
+          isOpen: true,
+          onClose: vi.fn(),
+          sessionContext: {
+            questions: [sampleQuestion],
+            currentIndex: 0,
+            answers: {},
+            flags: {},
+            onAnswer: vi.fn(),
+            onToggleFlag: vi.fn(),
+            onNavigateIndex: vi.fn()
+          }
+        })
+      );
+    });
+
+    const questionAudioBtn = container.querySelector('#btn-drive-play-question') as HTMLButtonElement;
+    expect(questionAudioBtn).not.toBeNull();
+
+    await act(async () => {
+      questionAudioBtn.click();
+    });
+
+    expect(mockPlayQuestion).toHaveBeenCalledTimes(1);
+  });
+
+  it('DRIVE-SELECTIVE-02: toccare il pulsante audio dell\'opzione 1 avvia solo l\'opzione 1 e NON sottomette la risposta', async () => {
+    const handleAnswer = vi.fn();
+
+    await act(async () => {
+      root.render(
+        React.createElement(DriveModeScreen, {
+          isOpen: true,
+          onClose: vi.fn(),
+          sessionContext: {
+            questions: [sampleQuestion],
+            currentIndex: 0,
+            answers: {},
+            flags: {},
+            onAnswer: handleAnswer,
+            onToggleFlag: vi.fn(),
+            onNavigateIndex: vi.fn()
+          }
+        })
+      );
+    });
+
+    const optAudioBtn = container.querySelector('#btn-drive-opt-audio-1') as HTMLButtonElement;
+    expect(optAudioBtn).not.toBeNull();
+
+    await act(async () => {
+      optAudioBtn.click();
+    });
+
+    // Deve aver chiamato playOption(1)
+    expect(mockPlayOption).toHaveBeenCalledWith(1);
+    // NON deve aver selezionato/sottomesso la risposta
+    expect(handleAnswer).not.toHaveBeenCalled();
+  });
+
+  it('DRIVE-SELECTIVE-03: le scorciatoie da tastiera Q e Alt+2 avviano la lettura isolata', async () => {
+    await act(async () => {
+      root.render(
+        React.createElement(DriveModeScreen, {
+          isOpen: true,
+          onClose: vi.fn(),
+          sessionContext: {
+            questions: [sampleQuestion],
+            currentIndex: 0,
+            answers: {},
+            flags: {},
+            onAnswer: vi.fn(),
+            onToggleFlag: vi.fn(),
+            onNavigateIndex: vi.fn()
+          }
+        })
+      );
+    });
+
+    // Tasto Q per domanda
+    await act(async () => {
+      window.dispatchEvent(new KeyboardEvent('keydown', { key: 'q' }));
+    });
+    expect(mockPlayQuestion).toHaveBeenCalled();
+
+    // Tasto Alt+2 per opzione 2
+    await act(async () => {
+      window.dispatchEvent(new KeyboardEvent('keydown', { key: '2', altKey: true }));
+    });
+    expect(mockPlayOption).toHaveBeenCalledWith(2);
   });
 });

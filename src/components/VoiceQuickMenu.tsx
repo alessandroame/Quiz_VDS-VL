@@ -319,7 +319,7 @@ export const VoiceQuickMenu: React.FC<VoiceQuickMenuProps> = ({
 
             <label className="flex items-center justify-between cursor-pointer py-0.5">
               <span className={forceDark ? 'text-zinc-300' : 'text-zinc-300 light:text-slate-700'}>
-                Tutor didattico alla guida
+                Tutor didattico a mani libere
               </span>
               <input
                 id="quick-menu-toggle-tutor"

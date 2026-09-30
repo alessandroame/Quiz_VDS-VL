@@ -51,11 +51,56 @@ describe('Suite: voiceCommandParser (Parser comandi vocali Modalità Guida)', ()
     expect(parseVoiceCommand('torna indietro')).toBe('prev');
   });
 
-  it('VC-03: riconosce comandi audio e ripetizione', () => {
+  it('VC-03: riconosce comandi audio e ripetizione generica', () => {
     expect(parseVoiceCommand('ripeti')).toBe('repeat');
     expect(parseVoiceCommand('ascolta')).toBe('repeat');
     expect(parseVoiceCommand('rileggi')).toBe('repeat');
     expect(parseVoiceCommand('ancora')).toBe('repeat');
+  });
+
+  it('VC-03b: riconosce ripetizione selettiva della sola domanda e delle singole risposte', () => {
+    // Solo Domanda
+    expect(parseVoiceCommand('ripeti domanda')).toBe('repeat_question');
+    expect(parseVoiceCommand('ripeti la domanda')).toBe('repeat_question');
+    expect(parseVoiceCommand('rileggi domanda')).toBe('repeat_question');
+    expect(parseVoiceCommand('solo domanda')).toBe('repeat_question');
+    expect(parseVoiceCommand('la domanda')).toBe('repeat_question');
+    expect(parseVoiceCommand('riascolta domanda')).toBe('repeat_question');
+    expect(parseVoiceCommand('ancora domanda')).toBe('repeat_question');
+    expect(parseVoiceCommand('ascolta la domanda')).toBe('repeat_question');
+
+    // Solo Opzione 1
+    expect(parseVoiceCommand('ripeti uno')).toBe('repeat_opt1');
+    expect(parseVoiceCommand('ripeti la uno')).toBe('repeat_opt1');
+    expect(parseVoiceCommand('ripeti prima')).toBe('repeat_opt1');
+    expect(parseVoiceCommand('ripeti opzione uno')).toBe('repeat_opt1');
+    expect(parseVoiceCommand('rileggi uno')).toBe('repeat_opt1');
+    expect(parseVoiceCommand('solo uno')).toBe('repeat_opt1');
+    expect(parseVoiceCommand('solo la uno')).toBe('repeat_opt1');
+    expect(parseVoiceCommand('riascolta uno')).toBe('repeat_opt1');
+    expect(parseVoiceCommand('ascolta prima')).toBe('repeat_opt1');
+
+    // Solo Opzione 2
+    expect(parseVoiceCommand('ripeti due')).toBe('repeat_opt2');
+    expect(parseVoiceCommand('ripeti la due')).toBe('repeat_opt2');
+    expect(parseVoiceCommand('ripeti seconda')).toBe('repeat_opt2');
+    expect(parseVoiceCommand('ripeti opzione due')).toBe('repeat_opt2');
+    expect(parseVoiceCommand('rileggi la due')).toBe('repeat_opt2');
+    expect(parseVoiceCommand('solo due')).toBe('repeat_opt2');
+    expect(parseVoiceCommand('solo la due')).toBe('repeat_opt2');
+    expect(parseVoiceCommand('riascolta due')).toBe('repeat_opt2');
+    expect(parseVoiceCommand('ascolta la due')).toBe('repeat_opt2');
+
+    // Solo Opzione 3
+    expect(parseVoiceCommand('ripeti tre')).toBe('repeat_opt3');
+    expect(parseVoiceCommand('ripeti la tre')).toBe('repeat_opt3');
+    expect(parseVoiceCommand('ripeti terza')).toBe('repeat_opt3');
+    expect(parseVoiceCommand('ripeti opzione 3')).toBe('repeat_opt3');
+    expect(parseVoiceCommand('rileggi tre')).toBe('repeat_opt3');
+    expect(parseVoiceCommand('solo tre')).toBe('repeat_opt3');
+    expect(parseVoiceCommand('solo la tre')).toBe('repeat_opt3');
+    expect(parseVoiceCommand('riascolta tre')).toBe('repeat_opt3');
+    expect(parseVoiceCommand('ascolta la tre')).toBe('repeat_opt3');
   });
 
   it('VC-04: riconosce contrassegno bandiera', () => {

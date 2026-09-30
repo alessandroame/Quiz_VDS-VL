@@ -1706,7 +1706,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                   <div className="flex items-start gap-2">
                     <span className="w-1.5 h-1.5 rounded-full bg-amber-400 mt-1.5 flex-shrink-0" />
                     <span>
-                      <strong className="text-zinc-200 light:text-slate-900">Supporto Vocale:</strong> Lettura audio dei quiz per lo studio e modalità alla guida a mani libere.
+                      <strong className="text-zinc-200 light:text-slate-900">Supporto Vocale:</strong> Lettura audio dei quiz per lo studio e modalità a mani libere.
                     </span>
                   </div>
                   <div className="flex items-start gap-2">

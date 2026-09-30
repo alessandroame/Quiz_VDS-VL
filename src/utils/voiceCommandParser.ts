@@ -2,6 +2,10 @@ export type VoiceCommand =
   | 'opt1'
   | 'opt2'
   | 'opt3'
+  | 'repeat_question'
+  | 'repeat_opt1'
+  | 'repeat_opt2'
+  | 'repeat_opt3'
   | 'next'
   | 'prev'
   | 'repeat'
@@ -33,7 +37,38 @@ export function parseVoiceCommand(raw: string): VoiceCommand | null {
 
   if (!clean) return null;
 
-  // 1. Answer Options (Highest priority)
+  // 1. Selective Repeat Commands (Highest priority to avoid mistaking "ripeti uno" for "uno")
+  // Repeat Question: "ripeti domanda", "ripeti la domanda", "rileggi domanda", "solo domanda", "la domanda", "ascolta domanda"
+  if (
+    /\b(ripeti|rileggi|riascolta|ascolta|ancora)\s+(la\s+)?domanda\b/i.test(clean) ||
+    /\b(solo\s+(la\s+)?domanda)\b/i.test(clean) ||
+    /^(la\s+)?domanda$/i.test(clean)
+  ) {
+    return 'repeat_question';
+  }
+
+  // Repeat Option 1: "ripeti uno", "ripeti la uno", "ripeti prima", "solo uno", "rileggi la uno", etc.
+  if (
+    /\b(ripeti|rileggi|riascolta|ascolta|ancora|solo)\s+(l[ao]\s+|il\s+)?(1|uno|prima|primo|opzione\s*(1|uno)|risposta\s*(1|uno))\b/i.test(clean)
+  ) {
+    return 'repeat_opt1';
+  }
+
+  // Repeat Option 2: "ripeti due", "ripeti la due", "ripeti seconda", "solo due", "rileggi la due", etc.
+  if (
+    /\b(ripeti|rileggi|riascolta|ascolta|ancora|solo)\s+(l[ao]\s+|il\s+)?(2|due|seconda|secondo|opzione\s*(2|due)|risposta\s*(2|due))\b/i.test(clean)
+  ) {
+    return 'repeat_opt2';
+  }
+
+  // Repeat Option 3: "ripeti tre", "ripeti la tre", "ripeti terza", "solo tre", "rileggi la tre", etc.
+  if (
+    /\b(ripeti|rileggi|riascolta|ascolta|ancora|solo)\s+(l[ao]\s+|il\s+)?(3|tre|terza|terzo|opzione\s*(3|tre)|risposta\s*(3|tre))\b/i.test(clean)
+  ) {
+    return 'repeat_opt3';
+  }
+
+  // 2. Answer Options (Direct Selection)
   // Matches: "uno", "1", "prima", "primo", "opzione uno", "scelgo la 1", "scelgo la prima", "la prima", "la uno", etc.
   if (
     /^(1|uno|prima|primo)\b/i.test(clean) ||

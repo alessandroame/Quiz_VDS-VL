@@ -51,7 +51,7 @@ const VOICE_HINTS = [
   'Dì "Avanti" o "Indietro" per scorrere i quesiti',
   'Dì "Pausa", "Stop" o "Continua" per l\'avanzamento automatico',
   'Dì "Bandiera" per contrassegnare il quiz',
-  'Dì "Aiuto" o "Comandi" per aprire la guida a voce'
+  'Dì "Aiuto" o "Comandi" per l\'elenco comandi a voce'
 ];
 
 export const DriveModeScreen: React.FC<DriveModeScreenProps> = ({

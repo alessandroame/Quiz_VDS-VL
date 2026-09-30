@@ -8,7 +8,7 @@ export interface UseWakeLockResult {
 
 /**
  * Hook per la gestione dello Screen Wake Lock API.
- * Mantiene lo schermo del dispositivo acceso durante la Modalità Alla Guida o sessioni d'esame.
+ * Mantiene lo schermo del dispositivo acceso durante la Modalità Mani Libere o sessioni d'esame.
  * Gestisce automaticamente il riaggancio del lock quando la pagina torna in primo piano (visibilitychange).
  */
 export function useWakeLock(enabled: boolean = true): UseWakeLockResult {

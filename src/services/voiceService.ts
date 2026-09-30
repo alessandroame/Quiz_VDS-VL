@@ -477,9 +477,9 @@ export class VoiceService {
       await this.audio.play();
       if (typeof navigator !== 'undefined' && 'mediaSession' in navigator && typeof MediaMetadata !== 'undefined') {
         navigator.mediaSession.metadata = new MediaMetadata({
-          title: 'Guida Vocale - Modalità Alla Guida',
+          title: 'Briefing Vocale - Modalità Mani Libere',
           artist: 'VDS-VL Quiz Master',
-          album: 'Guida Vocale'
+          album: 'Modalità Mani Libere'
         });
         navigator.mediaSession.playbackState = 'playing';
       }
@@ -555,7 +555,7 @@ export class VoiceService {
       try {
         window.speechSynthesis.cancel();
         const text =
-          "Benvenuto nella modalità alla guida. Lo schermo rimarrà sempre acceso sul tuo cruscotto. Le domande e le opzioni verranno lette automaticamente. Puoi rispondere toccando i tre grandi pulsanti sullo schermo, oppure usando i comandi vocali pronunciando Uno, Due o Tre. Puoi dire Ripeti per riascoltare, oppure Aiuto per l'elenco dei comandi. Tocca lo schermo per iniziare.";
+          "Benvenuto nella modalità a mani libere. Lo schermo rimarrà sempre acceso durante la sessione. Le domande e le opzioni verranno lette automaticamente. Puoi rispondere toccando i tre grandi pulsanti sullo schermo, oppure usando i comandi vocali pronunciando Uno, Due o Tre. Puoi dire Ripeti per riascoltare, oppure Aiuto per l'elenco dei comandi. Tocca lo schermo per iniziare.";
         const utterance = new SpeechSynthesisUtterance(text);
         utterance.lang = 'it-IT';
 

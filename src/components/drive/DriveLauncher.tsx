@@ -322,7 +322,7 @@ export const DriveLauncher: React.FC<DriveLauncherProps> = ({
               </div>
               <div className="min-w-0">
                 <div className="text-xs font-black text-amber-200 light:text-amber-900 uppercase tracking-wider flex items-center gap-1.5">
-                  <span>Guida Vocale Iniziale</span>
+                  <span>Briefing Vocale Iniziale</span>
                   <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-300 light:bg-amber-200 light:text-amber-900 font-bold">AUDIO</span>
                 </div>
                 <p className="text-[11px] text-zinc-300 light:text-amber-900 truncate">
@@ -452,7 +452,7 @@ export const DriveLauncher: React.FC<DriveLauncherProps> = ({
       <div className="pt-3 border-t border-zinc-900 light:border-slate-200 flex items-center justify-between text-xs text-zinc-500 light:text-slate-500">
         <div className="flex items-center gap-1.5">
           <Lightbulb className={`w-3.5 h-3.5 ${isWakeLockActive ? 'text-emerald-400' : 'text-zinc-600'}`} />
-          <span>{isWakeLockActive ? 'Schermo sempre acceso durante la guida' : 'Standby schermo attivo'}</span>
+          <span>{isWakeLockActive ? 'Schermo sempre acceso a mani libere' : 'Standby schermo attivo'}</span>
         </div>
         <span>VDS-VL 2017</span>
       </div>

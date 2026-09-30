@@ -73,9 +73,9 @@ export const VoiceCommandsModal: React.FC<VoiceCommandsModalProps> = ({
     {
       icon: <RotateCcw className="w-5 h-5 text-amber-400" />,
       title: 'Riascolta Audio',
-      primaryPhrase: '"Ripeti"',
-      alternatives: ['"Ascolta"', '"Rileggi"', '"Riparti"', '"Ancora"'],
-      description: 'Rilegge l\'elemento attivo (domanda o opzione corrente) proseguendo la sequenza.'
+      primaryPhrase: '"Ripeti" • "Ripeti Domanda"',
+      alternatives: ['"Ripeti uno / due / tre"', '"Rileggi domanda"', '"Solo la due"', '"Riascolta tre"'],
+      description: 'Rilegge la sequenza oppure isola selettivamente la sola domanda o una specifica risposta.'
     },
     {
       icon: <Flag className="w-5 h-5 text-purple-400" />,
@@ -142,7 +142,7 @@ export const VoiceCommandsModal: React.FC<VoiceCommandsModalProps> = ({
                 </span>
               </div>
               <p className="text-xs text-zinc-400 light:text-slate-500">
-                Controlla l'app a voce senza distogliere lo sguardo dalla strada
+                Controlla l'app a voce senza dover toccare lo schermo
               </p>
             </div>
           </div>
@@ -214,11 +214,11 @@ export const VoiceCommandsModal: React.FC<VoiceCommandsModalProps> = ({
           <div className="mt-3 p-3 rounded-xl bg-amber-950/30 border border-amber-800/40 light:bg-amber-50 light:border-amber-200 space-y-1.5">
             <div className="flex items-center gap-1.5 text-xs font-bold text-amber-300 light:text-amber-900">
               <Headphones className="w-4 h-4 text-amber-400" />
-              <span>Consigli per l'ascolto (Auto / Bici / Corsa)</span>
+              <span>Consigli per l'ascolto a mani libere (Bici / Corsa / Viaggi)</span>
             </div>
             <ul className="text-[11px] text-amber-200/80 light:text-amber-800 space-y-1 pl-5 list-disc">
               <li>
-                Compatibile con <strong>auricolari</strong>, vivavoce Bluetooth auto e caschi con interfono.
+                Compatibile con <strong>auricolari</strong>, vivavoce Bluetooth e caschi con interfono.
               </li>
               <li>
                 Parla con tono chiaro e naturale dopo che l'assistente vocale ha terminato di leggere.
