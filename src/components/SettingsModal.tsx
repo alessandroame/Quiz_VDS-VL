@@ -26,6 +26,7 @@ import {
   Minimize2,
   ChevronDown,
   RefreshCw,
+  Speech,
   Tag
 } from 'lucide-react';
 import { useTheme } from '../context/ThemeContext';
@@ -38,7 +39,7 @@ import { FONT_SIZE_OPTIONS, getFontSizeLabel } from '../utils/fontSize';
 import { VoiceCommandsModal } from './VoiceCommandsModal';
 import { BuildInfoModal } from './BuildInfoModal';
 import { getBuildInfo, formatBuildDate, forceReloadPWA } from '../utils/buildInfo';
-import { APP_ICON_URL, APP_FAVICON_URL } from '../utils/assets';
+import { getAppIconUrl, getAppFaviconUrl } from '../utils/assets';
 import {
   audioDownloadManager,
   VoiceName,
@@ -92,7 +93,7 @@ const AccordionCard: React.FC<AccordionCardProps> = ({
             className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 transition-colors ${
               isExpanded
                 ? 'bg-amber-500/20 text-amber-400 border border-amber-500/40 light:bg-amber-100 light:text-amber-800 light:border-amber-300'
-                : 'bg-zinc-800/80 text-zinc-400 border border-zinc-700/40 group-hover:text-zinc-200 group-hover:border-zinc-600 light:bg-slate-100 light:text-slate-600 light:border-slate-200'
+                : 'bg-zinc-800/80 text-zinc-400 border border-zinc-700/40 group-hover:text-zinc-200 group-hover:border-zinc-600 light:bg-white light:text-slate-700 light:border-slate-200 light:shadow-sm'
             }`}
           >
             <Icon className="w-4 h-4" />
@@ -158,7 +159,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
   onClose,
   defaultTab = null
 }) => {
-  const { theme, setTheme } = useTheme();
+  const { theme, setTheme, resolvedTheme } = useTheme();
   const { settings, updateSetting, syncState, syncNow } = useQuiz();
   const [openSection, setOpenSection] = useState<SettingsTab | null>(defaultTab);
 
@@ -321,7 +322,10 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
   };
 
   useEffect(() => {
-    if (!isOpen) return;
+    if (!isOpen) {
+      voiceService.stopDriveIntro();
+      return;
+    }
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
         onClose();
@@ -633,6 +637,24 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                     className="w-4 h-4 accent-amber-500 rounded cursor-pointer"
                   />
                 </label>
+
+                <label className="flex items-center justify-between p-3 rounded-xl border border-zinc-800 bg-zinc-950/60 light:bg-slate-50 light:border-slate-200 cursor-pointer select-none active:scale-[0.99] touch-manipulation transition-all">
+                  <div>
+                    <span className="text-zinc-300 light:text-slate-700 font-medium block text-xs">
+                      Avanzamento Automatico su Risposta Esatta
+                    </span>
+                    <span className="text-[11px] text-zinc-500 block">
+                      Passa da solo alla domanda successiva se indovini. In caso di errore si ferma per farti studiare Regola e Tranello.
+                    </span>
+                  </div>
+                  <input
+                    type="checkbox"
+                    id="setting-auto-advance-on-correct"
+                    checked={settings.autoAdvanceOnCorrect !== false}
+                    onChange={e => updateSetting('autoAdvanceOnCorrect', e.target.checked)}
+                    className="w-4 h-4 accent-amber-500 rounded cursor-pointer"
+                  />
+                </label>
               </div>
 
               {/* Opzione Schermo Intero Browser */}
@@ -684,7 +706,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
             label="Voce & Audio"
             description="Sintesi vocale quesiti, velocità di lettura e archivio offline PWA"
             summary={voiceSummary}
-            icon={Headphones}
+            icon={Speech}
             isExpanded={openSection === 'voice'}
             onToggle={() => toggleSection('voice')}
             cardRef={el => {
@@ -1562,11 +1584,12 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                   <div className="w-10 h-10 rounded-xl overflow-hidden border border-amber-500/40 flex items-center justify-center flex-shrink-0 shadow-inner bg-zinc-900 light:bg-white">
                     <img
                       id="settings-about-app-logo"
-                      src={APP_ICON_URL}
+                      src={getAppIconUrl(resolvedTheme)}
                       onError={(e) => {
                         const target = e.currentTarget;
-                        if (!target.src.endsWith('favicon.svg')) {
-                          target.src = APP_FAVICON_URL;
+                        const fallback = getAppFaviconUrl(resolvedTheme);
+                        if (target.src !== fallback) {
+                          target.src = fallback;
                         }
                       }}
                       alt="VDS-VL"

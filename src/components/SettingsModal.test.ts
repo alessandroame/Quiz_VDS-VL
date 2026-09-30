@@ -185,4 +185,103 @@ describe('SettingsModal Component (Accordion & Mobile Ergonomics)', () => {
     });
     container.remove();
   });
+
+  it('should render and toggle autoAdvanceOnCorrect in Appearance section', () => {
+    const container = document.createElement('div');
+    document.body.appendChild(container);
+    const root = createRoot(container);
+
+    const mockUpdateSetting = vi.fn();
+    mockUseQuiz.mockReturnValue({
+      settings: { ...defaultSettings, autoAdvanceOnCorrect: true },
+      updateSetting: mockUpdateSetting,
+      updateSettings: vi.fn(),
+      syncState: { isSyncing: false, lastSyncedAt: null, error: null },
+      syncNow: vi.fn(),
+      resetAllStats: vi.fn(),
+      resetAllData: vi.fn()
+    });
+
+    act(() => {
+      root.render(React.createElement(SettingsModal, { isOpen: true, onClose: () => {} }));
+    });
+
+    const appearanceHeader = container.querySelector('#tab-appearance') as HTMLButtonElement;
+    act(() => {
+      appearanceHeader.click();
+    });
+
+    const checkbox = container.querySelector('#setting-auto-advance-on-correct') as HTMLInputElement;
+    expect(checkbox).not.toBeNull();
+    expect(checkbox.checked).toBe(true);
+
+    act(() => {
+      checkbox.click();
+    });
+
+    expect(mockUpdateSetting).toHaveBeenCalledWith('autoAdvanceOnCorrect', false);
+
+    act(() => {
+      root.unmount();
+    });
+    container.remove();
+  });
+
+  it('should render distinct icons for Voce & Audio (Speech) and Modalita Mani Libere (Headphones)', () => {
+    const container = document.createElement('div');
+    document.body.appendChild(container);
+    const root = createRoot(container);
+
+    act(() => {
+      root.render(React.createElement(SettingsModal, { isOpen: true, onClose: () => {} }));
+    });
+
+    const voiceBtn = container.querySelector('#tab-voice');
+    const driveBtn = container.querySelector('#tab-drive');
+
+    expect(voiceBtn).not.toBeNull();
+    expect(driveBtn).not.toBeNull();
+
+    // Verify icons inside the button
+    const voiceSvg = voiceBtn?.querySelector('svg');
+    const driveSvg = driveBtn?.querySelector('svg');
+
+    expect(voiceSvg).not.toBeNull();
+    expect(driveSvg).not.toBeNull();
+
+    // The two SVGs must have different classes/markup (Speech vs Headphones)
+    expect(voiceSvg?.classList.contains('lucide-speech')).toBe(true);
+    expect(driveSvg?.classList.contains('lucide-headphones')).toBe(true);
+
+    act(() => {
+      root.unmount();
+    });
+    container.remove();
+  });
+
+  it('should display light theme app logo in About section when resolvedTheme is light', () => {
+    mockUseTheme.mockReturnValue({
+      theme: 'light',
+      setTheme: vi.fn(),
+      cycleTheme: vi.fn(),
+      resolvedTheme: 'light'
+    });
+
+    const container = document.createElement('div');
+    document.body.appendChild(container);
+    const root = createRoot(container);
+
+    act(() => {
+      root.render(React.createElement(SettingsModal, { isOpen: true, onClose: () => {}, defaultTab: 'about' }));
+    });
+
+    const aboutLogo = container.querySelector('#settings-about-app-logo') as HTMLImageElement;
+    expect(aboutLogo).not.toBeNull();
+    expect(aboutLogo.src).toContain('icon-light-192x192.png');
+
+    act(() => {
+      root.unmount();
+    });
+    container.remove();
+  });
 });

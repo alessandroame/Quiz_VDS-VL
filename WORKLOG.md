@@ -14,6 +14,46 @@ Questo documento registra in ordine cronologico tutte le lavorazioni svolte nel 
 - **Impatto sul Desiderata**: <Come questo intervento contribuisce al desiderata (cfr. DESIDERATA.md) e indicazioni per il prossimo agente>
 ```
 
+### [2026-09-30] - Icona a Sfondo Bianco per Tema Chiaro e Diversificazione Icone Impostazioni (Voce & Audio / Mani Libere)
+
+- **Cosa abbiamo fatto**:
+  * **Icona Ufficiale a Sfondo Bianco per il Tema Chiaro (Light Theme App Icon & Favicon)**:
+    - Generata la versione ufficiale master ad alto contrasto per tema chiaro del logo *Paraglider Question Mark* ([public/proposals/paraglider_question_icon_light_1790762286012.jpg](file:///c:/github/Quiz_VDS-VL/public/proposals/paraglider_question_icon_light_1790762286012.jpg)) con squircle a fondo bianco puro, contorno ardesia raffinato, cupola del parapendio ambra avionica lucente e pilota imbracato.
+    - Generati tramite headless Chrome CDP gli asset raster e vettoriali:
+      * [public/favicon-light.svg](file:///c:/github/Quiz_VDS-VL/public/favicon-light.svg) (SVG vettoriale per tema chiaro con supporto `prefers-color-scheme: light`)
+      * [public/icons/icon-light-192x192.png](file:///c:/github/Quiz_VDS-VL/public/icons/icon-light-192x192.png) (PNG PWA 192x192)
+      * [public/icons/icon-light-512x512.png](file:///c:/github/Quiz_VDS-VL/public/icons/icon-light-512x512.png) (PNG PWA 512x512)
+      * [public/apple-touch-icon-light.png](file:///c:/github/Quiz_VDS-VL/public/apple-touch-icon-light.png) (Apple Touch Icon)
+    - In [src/utils/assets.ts](file:///c:/github/Quiz_VDS-VL/src/utils/assets.ts):
+      * Aggiunte costanti `APP_ICON_LIGHT_URL` e `APP_FAVICON_LIGHT_URL`.
+      * Aggiunte le funzioni helper `getAppIconUrl(theme: 'dark' | 'light')` e `getAppFaviconUrl(theme: 'dark' | 'light')`.
+    - In [index.html](file:///c:/github/Quiz_VDS-VL/index.html):
+      * Aggiunto `<link rel="icon" type="image/svg+xml" href="/favicon-light.svg" media="(prefers-color-scheme: light)" />` con `id="app-favicon"` per switch reattivo del tab browser.
+    - In [src/context/ThemeContext.tsx](file:///c:/github/Quiz_VDS-VL/src/context/ThemeContext.tsx):
+      * Sincronizzazione dinamica al cambio tema: al passaggio tra scuro e chiaro, l'attributo `href` di `#app-favicon` viene aggiornato istantaneamente su `favicon-light.svg` o `favicon.svg`.
+    - In [src/components/Navbar.tsx](file:///c:/github/Quiz_VDS-VL/src/components/Navbar.tsx), [src/components/SettingsModal.tsx](file:///c:/github/Quiz_VDS-VL/src/components/SettingsModal.tsx) e [src/components/BuildInfoModal.tsx](file:///c:/github/Quiz_VDS-VL/src/components/BuildInfoModal.tsx):
+      * Il logo dell'app (`#navbar-app-logo`, `#settings-about-app-logo`, `#build-info-app-logo`) commuta automaticamente sull'icona a sfondo bianco quando il tema risolto è `light`, fondendosi armoniosamente con la barra e le card chiare senza il riquadro nero opaco.
+  * **Diversificazione Icone in Impostazioni ("Voce & Audio" vs "Modalità Mani Libere")**:
+    - Risolta l'ambiguità visiva e duplicazione della medesima icona `Headphones` (cuffie) presente in entrambe le sezioni dell'accordion:
+      * **Sezione 2 ("Voce & Audio")**: sostituita l'icona con `Speech` da `lucide-react` (silhouette stilizzata di una testa che parla con onde sonore emesse dalla bocca, esattamente come richiesto).
+      * **Sezione 3 ("Modalità Mani Libere")**: mantenuta l'icona `Headphones` (cuffie), rappresentante l'uso a mani libere per ascolto in mobilità o con auricolari.
+    - In [src/components/SettingsModal.tsx](file:///c:/github/Quiz_VDS-VL/src/components/SettingsModal.tsx) (`AccordionCard`):
+      * Nel tema chiaro, il contenitore delle icone dell'accordion adotta ora `light:bg-white light:border-slate-200 light:shadow-sm` al posto di `light:bg-slate-100`, conferendo a ciascuna icona il fondo bianco limpido richiesto.
+  * **Test Unitari & Di Regressione**:
+    - Esteso [src/utils/assets.test.ts](file:///c:/github/Quiz_VDS-VL/src/utils/assets.test.ts) (4 test) per verificare la validità dei percorsi e il corretto dispatching del logo in base al tema.
+    - Esteso [src/components/SettingsModal.test.ts](file:///c:/github/Quiz_VDS-VL/src/components/SettingsModal.test.ts) (7 test) con asserzioni dedicate per la diversificazione delle icone (`lucide-speech` per Voce & Audio, `lucide-headphones` per Mani Libere) e per il rendering dell'icona chiara in `SettingsModal`.
+    - Creato script di collaudo visivo CDP [scripts/test_light_theme_and_icons.cjs](file:///c:/github/Quiz_VDS-VL/scripts/test_light_theme_and_icons.cjs): verificati screenshot mobile 390x844 ([public/test_light_theme_navbar_screenshot.png](file:///c:/github/Quiz_VDS-VL/public/test_light_theme_navbar_screenshot.png) e [public/test_light_theme_settings_screenshot.png](file:///c:/github/Quiz_VDS-VL/public/test_light_theme_settings_screenshot.png)) con zero errori in console JavaScript e zero richieste HTTP fallite.
+    - Suite completa Vitest: 37 file di test superati al 100% (274 test su 274). Compilazione `tsc` e bundle di produzione Vite PWA completati con successo.
+
+- **Scelte architetturali & Rationale**:
+  * *Coerenza Tematica PWA & Visual Ergonomics*: Mostrare un'icona ad alto contrasto scuro su uno sfondo d'interfaccia bianco crea una "macchia" pesante che interrompe la gerarchia visiva. L'icona a sfondo bianco puro preserva lo stile iconico del parapendio-punto-interrogativo aumentando la leggibilità e l'armonia nel tema chiaro.
+  * *Disambiguazione Semantica*: Utilizzare `Speech` (testa che parla) per la sintesi vocale e `Headphones` (cuffie) per la modalità a mani libere offre un'immediata differenziazione visiva (affordance visiva 1-to-1) per l'allievo.
+
+- **Impatto sul Desiderata**:
+  * Allinea pienamente il sistema temi alla UX minimale ad alto contrasto e risponde puntualmente alla richiesta dell'utente.
+
+---
+
 ### [2026-09-30] - Riorganizzazione Gerarchica Comandi Vocali e Uscita Audio in DriveLauncher (Soluzione 1)
 
 - **Cosa abbiamo fatto**:

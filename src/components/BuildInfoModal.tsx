@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { X, RefreshCw, Copy, Check, GitCommit, Calendar, Tag, ShieldCheck } from 'lucide-react';
 import { getBuildInfo, formatBuildDate, forceReloadPWA } from '../utils/buildInfo';
-import { APP_ICON_URL, APP_FAVICON_URL } from '../utils/assets';
+import { getAppIconUrl, getAppFaviconUrl } from '../utils/assets';
+import { useTheme } from '../context/ThemeContext';
 
 interface BuildInfoModalProps {
   isOpen: boolean;
@@ -9,6 +10,7 @@ interface BuildInfoModalProps {
 }
 
 export const BuildInfoModal: React.FC<BuildInfoModalProps> = ({ isOpen, onClose }) => {
+  const { resolvedTheme } = useTheme();
   const [isCopied, setIsCopied] = useState(false);
   const [isReloading, setIsReloading] = useState(false);
 
@@ -60,11 +62,12 @@ export const BuildInfoModal: React.FC<BuildInfoModalProps> = ({ isOpen, onClose 
             <div className="w-8 h-8 rounded-lg overflow-hidden border border-amber-500/40 flex items-center justify-center flex-shrink-0 shadow-sm bg-zinc-900 light:bg-white">
               <img
                 id="build-info-app-logo"
-                src={APP_ICON_URL}
+                src={getAppIconUrl(resolvedTheme)}
                 onError={(e) => {
                   const target = e.currentTarget;
-                  if (!target.src.endsWith('favicon.svg')) {
-                    target.src = APP_FAVICON_URL;
+                  const fallback = getAppFaviconUrl(resolvedTheme);
+                  if (target.src !== fallback) {
+                    target.src = fallback;
                   }
                 }}
                 alt="VDS-VL"

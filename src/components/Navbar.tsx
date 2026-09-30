@@ -17,7 +17,7 @@ import { OfflineIndicator } from './OfflineIndicator';
 import { AudioDownloadBanner } from './AudioDownloadBanner';
 import { BuildInfoModal } from './BuildInfoModal';
 import { getBuildInfo } from '../utils/buildInfo';
-import { APP_ICON_URL, APP_FAVICON_URL } from '../utils/assets';
+import { getAppIconUrl, getAppFaviconUrl } from '../utils/assets';
 
 import { getHeaderTitle, type NavTab } from '../utils/navigation';
 
@@ -30,7 +30,7 @@ interface NavbarProps {
 }
 
 export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab, openSettings }) => {
-  const { theme, cycleTheme } = useTheme();
+  const { theme, cycleTheme, resolvedTheme } = useTheme();
   const { readinessScore, isExamRunning, activeSession, openDriveMode, settings, syncState } = useQuiz();
   const [isBuildInfoOpen, setIsBuildInfoOpen] = useState(false);
   const buildInfo = getBuildInfo();
@@ -159,11 +159,12 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab, openSet
           >
             <img
               id="navbar-app-logo"
-              src={APP_ICON_URL}
+              src={getAppIconUrl(resolvedTheme)}
               onError={(e) => {
                 const target = e.currentTarget;
-                if (!target.src.endsWith('favicon.svg')) {
-                  target.src = APP_FAVICON_URL;
+                const fallback = getAppFaviconUrl(resolvedTheme);
+                if (target.src !== fallback) {
+                  target.src = fallback;
                 }
               }}
               alt="VDS-VL"

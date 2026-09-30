@@ -9,4 +9,20 @@ export function getAssetUrl(path: string): string {
 }
 
 export const APP_ICON_URL = getAssetUrl('icons/icon-192x192.png');
+export const APP_ICON_LIGHT_URL = getAssetUrl('icons/icon-light-192x192.png');
 export const APP_FAVICON_URL = getAssetUrl('favicon.svg');
+export const APP_FAVICON_LIGHT_URL = getAssetUrl('favicon-light.svg');
+
+/**
+ * Returns the appropriate app icon URL matching the current active theme.
+ */
+export function getAppIconUrl(theme: 'dark' | 'light'): string {
+  return theme === 'light' ? APP_ICON_LIGHT_URL : APP_ICON_URL;
+}
+
+/**
+ * Returns the appropriate favicon URL matching the current active theme.
+ */
+export function getAppFaviconUrl(theme: 'dark' | 'light'): string {
+  return theme === 'light' ? APP_FAVICON_LIGHT_URL : APP_FAVICON_URL;
+}

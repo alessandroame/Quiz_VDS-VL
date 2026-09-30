@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import type { ThemeMode } from '../types/database';
 import { db, setSetting } from '../db';
+import { getAppFaviconUrl } from '../utils/assets';
 
 interface ThemeContextType {
   theme: ThemeMode;
@@ -52,6 +53,11 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       const metaTheme = document.querySelector("meta[name='theme-color']");
       if (metaTheme) {
         metaTheme.setAttribute('content', isDark ? '#09090b' : '#f8fafc');
+      }
+
+      const faviconLink = document.querySelector<HTMLLinkElement>("link[id='app-favicon']");
+      if (faviconLink) {
+        faviconLink.setAttribute('href', getAppFaviconUrl(active));
       }
     };
 
