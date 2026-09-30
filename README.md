@@ -107,11 +107,12 @@
 - **Pad Numerico Rapido #ID**: tastierino 4x3 a scomparsa (tasti 0-9, Backspace `⌫`, `VAI ⏎`) con feedback aptico per digitare direttamente l'identificativo ministeriale (#1001-#9045) e saltare al quiz desiderato con auto-espansione e smooth scroll, senza mai attivare la tastiera virtuale dello smartphone.
 - **Note Personali & Preferiti**: memorizzazione locale in Dexie IndexedDB con gestione note (aggiunta, modifica, eliminazione) e badge visivo.
 
-### 7. Statistiche Avanzate & Indice di Preparazione
+### 7. Statistiche Avanzate & Ispezione Interattiva (Drilldown Liste)
 - **Indice di Preparazione Esame**: percentuale calcolata sull'accuratezza globale e sulla copertura delle materie.
-- **Radar Chart delle 9 Materie**: visualizzazione grafica poligonale per identificare all'istante le materie forti e i punti deboli su cui concentrare lo studio.
+- **Ispezione Interattiva Materie (`SubjectDetailModal`)**: toccando qualsiasi materia nell'elenco si apre un cruscotto dedicato con percentuale di accuratezza, barra di copertura, pulsante rapido *"Allenati su questa materia"* (con salto istantaneo allo Studio Materie), filtri a 1 tocco (*Tutte*, *Errori*, *Non viste*, *Corrette*) ed elenco scorrevole dei singoli quesiti.
+- **Scheda Integrale Quesito (`QuestionDetailModal`)**: toccando un quesito (dalla scheda materia o direttamente dalla Top 10 degli errori) si accede alla scheda completa ad alta leggibilità: testo integrale della domanda AeCI, 3 opzioni con risposta esatta evidenziata in verde smeraldo, spiegazione didattica (*Regola* e *Tranello*), riproduzione vocale neurale, note personali, preferiti e telemetria dettagliata (volte vista, errori, risposte corrette consecutive).
+- **Top 10 Domande Più Ostiche**: graduatoria interattiva dei quesiti che hanno registrato il maggior numero di risposte errate, con apertura a singolo tocco della scheda del quesito.
 - **Registro Storico Sessioni**: cronologia delle simulazioni svolte con esito (`IDONEO` / `NON IDONEO`), punteggio e tempo impiegato.
-- **Top 10 Domande Più Ostiche**: graduatoria dei quesiti che hanno registrato il maggior numero di risposte errate.
 
 ### 8. Modalità Mani Libere (Hands-Free Outdoor & Macro-Target Bici/Corsa)
 - Pensata per lo studio in movimento a mani libere (in auto, furgone navetta, sui rulli in bici o durante la corsa all'aperto) con smartphone a braccio o su manubrio.

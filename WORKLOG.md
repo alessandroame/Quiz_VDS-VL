@@ -14,6 +14,40 @@ Questo documento registra in ordine cronologico tutte le lavorazioni svolte nel 
 - **Impatto sul Desiderata**: <Come questo intervento contribuisce al desiderata (cfr. DESIDERATA.md) e indicazioni per il prossimo agente>
 ```
 
+### [2026-09-30] - Interattività e Ispezione Liste nelle Statistiche (TODO-07 & v1.3.0)
+
+- **Cosa abbiamo fatto**:
+  * **Interattività Liste in StatsScreen**:
+    - In [src/components/StatsScreen.tsx](file:///c:/github/Quiz_VDS-VL/src/components/StatsScreen.tsx), trasformate le righe dell'elenco "Risposte Esatte per Materia" e della "Top 10 Domande con Più Errori" da semplici `div` statici in bottoni accessibili ed ergonomici con feedback visivo hover/touch e chevron indicatore (`ChevronRight`).
+  * **Nuovo Componente SubjectDetailModal**:
+    - Creato [src/components/SubjectDetailModal.tsx](file:///c:/github/Quiz_VDS-VL/src/components/SubjectDetailModal.tsx): modale touch-friendly per l'ispezione della materia selezionata con cruscotto accuratezza, barra grafica di copertura quesiti (visti su totali), pulsante di azione rapida "Allenati su questa materia", barra filtri a 1 tocco (`Tutte`, `Errori`, `Non viste`, `Corrette`) con badge di conteggio live, ed elenco scorrevole con anteprima e stato di ciascun quesito.
+  * **Nuovo Componente QuestionDetailModal**:
+    - Creato [src/components/QuestionDetailModal.tsx](file:///c:/github/Quiz_VDS-VL/src/components/QuestionDetailModal.tsx): scheda integrale ad alta leggibilità del singolo quesito (apribile sia dall'elenco materia sia direttamente dalla Top 10 errori) con badge materia e stato (Quaderno Errori / Corretta / Non vista), toggle preferiti (`Bookmark`), 3 opzioni ufficiali con risposta esatta evidenziata in verde smeraldo e checkmark, spiegazione didattica strutturata (Regola + Tranello), riproduzione vocale rapida (`useAviationVoice`), visualizzatore ed editor inline delle Note Personali, e footer con telemetria allievo (volte vista, errori, consecutive corrette).
+  * **Bridge di Navigazione Diretta verso lo Studio Materie**:
+    - In [src/components/TopicsScreen.tsx](file:///c:/github/Quiz_VDS-VL/src/components/TopicsScreen.tsx), introdotta la prop `initialSubjectId` per consentire l'avvio immediato di una sessione di studio tematica.
+    - In [src/App.tsx](file:///c:/github/Quiz_VDS-VL/src/App.tsx), collegato il callback `onTrainSubject` tra `StatsScreen` e `TopicsScreen`.
+  * **Sincronizzazione LIFO con Tasto Indietro Hardware**:
+    - Entrambi i modali sono integrati con `backNavigation.registerSubModal`: premendo il tasto Indietro dello smartphone o effettuando gesture laterale su mobile, l'app chiude prima il dettaglio domanda, poi il dettaglio materia, preservando lo stato della schermata statistiche.
+  * **Suite Test Unitari & Integrazione**:
+    - Creato [src/components/SubjectDetailModal.test.ts](file:///c:/github/Quiz_VDS-VL/src/components/SubjectDetailModal.test.ts) (5 test unitari).
+    - Creato [src/components/QuestionDetailModal.test.ts](file:///c:/github/Quiz_VDS-VL/src/components/QuestionDetailModal.test.ts) (4 test unitari).
+    - Creato [src/components/StatsScreen.test.ts](file:///c:/github/Quiz_VDS-VL/src/components/StatsScreen.test.ts) (5 test di integrazione per apertura a cascata, filtri e trigger allenamento).
+    - Suite Vitest totale: 41 file di test, 296 test passati con successo al 100%. Build Vite completata senza errori né warning.
+  * **Collaudo CDP Mobile & Desktop**:
+    - Verificata la resa pixel-perfect sia su desktop (1440x900) sia su viewport mobile (390x844) tramite Chrome DevTools MCP con zero errori in console.
+  * **Avanzamento Versione SemVer**:
+    - Avanzata versione semantica a `1.3.0` in [package.json](file:///c:/github/Quiz_VDS-VL/package.json).
+    - Aggiornati [DESIDERATA.md](file:///c:/github/Quiz_VDS-VL/DESIDERATA.md) e [README.md](file:///c:/github/Quiz_VDS-VL/README.md).
+
+- **Scelte architetturali & Rationale**:
+  * *Cascata LIFO non distruttiva*: L'apertura a cascata (Materia -> Domanda) con z-index progressivo (`z-50` per Materia, `z-[60]` per Domanda) consente all'allievo di esaminare un quesito senza perdere il contesto della materia o la posizione nella lista filtrata.
+  * *Zero Attrito tra Diagnostica e Azione*: Consentire l'avvio immediato dell'allenamento con "Allenati su questa materia" chiude il ciclo di feedback didattico: lo studente vede una materia con accuratezza bassa e con un solo tocco inizia a colmare le proprie lacune.
+
+- **Impatto sul Desiderata**:
+  * Soddisfa al 100% il requisito `TODO-07` della Roadmap V2, trasformando la schermata Statistiche da semplice report passivo a potente strumento di navigazione e recupero mirato.
+
+---
+
 ### [2026-09-30] - Allineamento Terminologico Globale: Modalità a Mani Libere (Hands-Free Mode)
 
 - **Cosa abbiamo fatto**:
