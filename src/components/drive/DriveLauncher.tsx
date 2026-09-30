@@ -26,6 +26,7 @@ export interface DriveLauncherProps {
   onToggleVoiceCommands: () => void;
   audioOutputMode: 'speaker' | 'headphones';
   onToggleAudioOutput: () => void;
+  onSetAudioOutputMode?: (mode: 'speaker' | 'headphones') => void;
   isTutorEnabled: boolean;
   onToggleTutor: () => void;
   isIntroActive: boolean;
@@ -49,6 +50,7 @@ export const DriveLauncher: React.FC<DriveLauncherProps> = ({
   onToggleVoiceCommands,
   audioOutputMode,
   onToggleAudioOutput,
+  onSetAudioOutputMode,
   isTutorEnabled,
   onToggleTutor,
   isIntroActive,
@@ -101,107 +103,208 @@ export const DriveLauncher: React.FC<DriveLauncherProps> = ({
 
       {/* Quick Settings Bar */}
       <div className="grid grid-cols-2 gap-2.5 py-3">
+        {/* Toggle Avanzamento Automatico */}
         <button
+          id="btn-drive-toggle-autopilot"
           onClick={onToggleAutopilot}
-          className={`p-3 rounded-xl border flex items-center gap-2 text-xs font-bold transition-all ${
+          className={`p-2.5 rounded-xl border flex items-center justify-between text-xs font-bold transition-all ${
             isAutopilotEnabled
               ? 'bg-amber-950/80 border-amber-500 text-amber-200 light:bg-amber-100 light:border-amber-500 light:text-amber-900'
               : 'bg-zinc-900 border-zinc-800 text-zinc-400 light:bg-white light:border-slate-200 light:text-slate-700 light:shadow-sm'
           }`}
+          title="Tocca per commutare avanzamento automatico tra le domande"
         >
-          <Radio className="w-4 h-4 flex-shrink-0" />
-          <div className="text-left">
-            <div className="text-[10px] text-zinc-400 light:text-slate-500 uppercase font-semibold">Avanzamento Automatico</div>
-            <div>{isAutopilotEnabled ? 'ATTIVO (Radio)' : 'Manuale'}</div>
+          <div className="flex items-center gap-2 min-w-0">
+            <Radio className="w-4 h-4 flex-shrink-0" />
+            <div className="text-left min-w-0">
+              <div className="text-[10px] text-zinc-400 light:text-slate-500 uppercase font-semibold truncate">
+                Avanzamento
+              </div>
+              <div className="truncate">
+                {isAutopilotEnabled ? 'ATTIVO (Radio)' : 'Manuale'}
+              </div>
+            </div>
           </div>
-        </button>
-
-        <button
-          id="btn-drive-toggle-voice-launcher"
-          onClick={onToggleVoiceCommands}
-          disabled={!isVoiceSupported}
-          className={`p-3 rounded-xl border flex items-center gap-2 text-xs font-bold transition-all ${
-            isVoiceCommandsEnabled
-              ? 'bg-emerald-950/80 border-emerald-500 text-emerald-200 shadow-[0_0_12px_rgba(16,185,129,0.2)] light:bg-emerald-100 light:border-emerald-500 light:text-emerald-900'
-              : 'bg-zinc-900 border-zinc-800 text-zinc-400 light:bg-white light:border-slate-200 light:text-slate-700 light:shadow-sm'
-          }`}
-        >
-          <div className="relative flex items-center justify-center flex-shrink-0">
-            {isVoiceCommandsEnabled ? (
-              <Mic className="w-4 h-4 text-emerald-400" />
-            ) : (
-              <MicOff className="w-4 h-4" />
-            )}
-          </div>
-          <div className="text-left">
-            <div className="text-[10px] text-zinc-400 light:text-slate-500 uppercase font-semibold">Comandi Vocali</div>
-            <div>{isVoiceSupported ? (isVoiceCommandsEnabled ? 'ATTIVO (in sessione)' : 'Spento') : 'Non supportato'}</div>
-          </div>
+          <span
+            className={`text-[9px] font-mono font-bold px-1.5 py-0.5 rounded-full flex-shrink-0 ${
+              isAutopilotEnabled
+                ? 'bg-amber-500 text-zinc-950 font-black'
+                : 'bg-zinc-800 text-zinc-400 light:bg-slate-200 light:text-slate-600'
+            }`}
+          >
+            {isAutopilotEnabled ? 'AUTO' : 'MAN'}
+          </span>
         </button>
 
         {/* Toggle Modalità Tutor Didattica nel Launcher */}
         <button
           id="btn-drive-toggle-tutor-launcher"
           onClick={onToggleTutor}
-          className={`col-span-2 p-2.5 rounded-xl border flex items-center justify-between text-xs font-bold transition-all ${
+          className={`p-2.5 rounded-xl border flex items-center justify-between text-xs font-bold transition-all ${
             isTutorEnabled
               ? 'bg-amber-950/80 border-amber-500 text-amber-200 ring-1 ring-amber-500/50 light:bg-amber-100 light:border-amber-500 light:text-amber-900'
               : 'bg-zinc-900 border-zinc-800 text-zinc-400 hover:text-zinc-200 light:bg-white light:border-slate-200 light:text-slate-700 light:hover:text-slate-900 light:shadow-sm'
           }`}
+          title="Tocca per commutare la modalità Tutor con spiegazioni didattiche"
         >
-          <div className="flex items-center gap-2">
-            <GraduationCap className={`w-4 h-4 flex-shrink-0 ${isTutorEnabled ? 'text-amber-400' : 'text-zinc-500'}`} />
-            <div className="text-left">
-              <div className="text-[10px] text-zinc-400 light:text-slate-500 uppercase font-semibold">Modalità Tutor Didattica</div>
-              <div className="text-xs font-medium">{isTutorEnabled ? 'ATTIVA (Regola + Tranello su errore)' : 'Disattivata (Avanzamento rapido)'}</div>
+          <div className="flex items-center gap-2 min-w-0">
+            <GraduationCap
+              className={`w-4 h-4 flex-shrink-0 ${isTutorEnabled ? 'text-amber-400' : 'text-zinc-500'}`}
+            />
+            <div className="text-left min-w-0">
+              <div className="text-[10px] text-zinc-400 light:text-slate-500 uppercase font-semibold truncate">
+                Tutor Didattico
+              </div>
+              <div
+                className="text-[11px] font-medium truncate"
+                title={isTutorEnabled ? 'ATTIVA (Regola + Tranello su errore)' : 'Disattivata (Avanzamento rapido)'}
+              >
+                {isTutorEnabled ? 'ATTIVA (Regola + Tranello su errore)' : 'Disattivata'}
+              </div>
             </div>
           </div>
-          <span className={`text-[10px] font-mono font-bold px-2 py-0.5 rounded-full ${isTutorEnabled ? 'bg-amber-500 text-zinc-950 font-black' : 'bg-zinc-800 text-zinc-400 light:bg-slate-200 light:text-slate-600'}`}>
+          <span
+            className={`text-[9px] font-mono font-bold px-1.5 py-0.5 rounded-full flex-shrink-0 ${
+              isTutorEnabled
+                ? 'bg-amber-500 text-zinc-950 font-black'
+                : 'bg-zinc-800 text-zinc-400 light:bg-slate-200 light:text-slate-600'
+            }`}
+          >
             {isTutorEnabled ? 'TUTOR ON' : 'OFF'}
           </span>
         </button>
 
-        {/* Toggle Altoparlante vs Cuffie per Comandi Vocali */}
+        {/* Scheda Unificata Comandi Vocali & Microfono (col-span-2) */}
         {isVoiceSupported && (
-          <button
-            id="btn-drive-toggle-audio-output"
-            onClick={onToggleAudioOutput}
-            className={`col-span-2 p-2.5 rounded-xl border flex items-center justify-between text-xs font-bold transition-all ${
-              audioOutputMode === 'speaker'
-                ? 'bg-zinc-900 border-zinc-800 text-zinc-300 light:bg-white light:border-slate-200 light:text-slate-800 light:shadow-sm'
-                : 'bg-indigo-950/70 border-indigo-500/70 text-indigo-200 light:bg-indigo-50 light:border-indigo-400 light:text-indigo-900'
+          <div
+            id="card-drive-voice-commands-unified"
+            className={`col-span-2 rounded-xl border transition-all overflow-hidden ${
+              isVoiceCommandsEnabled
+                ? 'bg-emerald-950/40 border-emerald-500/70 light:bg-emerald-50 light:border-emerald-400 shadow-sm'
+                : 'bg-zinc-900 border-zinc-800 text-zinc-400 light:bg-white light:border-slate-200 light:shadow-sm'
             }`}
-            title="Tocca per commutare tra Altoparlante (anti-eco) e Cuffie"
           >
-            <div className="flex items-center gap-2">
-              <div className="w-4 h-4 flex-shrink-0 flex items-center justify-center">
-                {audioOutputMode === 'speaker' ? (
-                  <Volume2 className="w-4 h-4 text-amber-400" />
-                ) : (
-                  <Headphones className="w-4 h-4 text-indigo-400" />
-                )}
-              </div>
-              <div className="text-left">
-                <div className="text-[10px] text-zinc-400 light:text-slate-500 uppercase font-semibold">
-                  Microfono & Uscita Audio
-                </div>
-                <div className="text-xs font-medium">
-                  {audioOutputMode === 'speaker'
-                    ? 'Altoparlante (mic attivo a fine lettura o in pausa)'
-                    : 'Cuffie con Mic (ascolto continuo, interrompi a voce)'}
-                </div>
-              </div>
-            </div>
-            <span
-              className={`text-[10px] font-mono font-bold px-2 py-0.5 rounded-full ${
-                audioOutputMode === 'speaker'
-                  ? 'bg-amber-500/20 text-amber-300 border border-amber-500/30 light:bg-amber-100 light:text-amber-800'
-                  : 'bg-indigo-500 text-white font-black'
-              }`}
+            {/* Header / Interruttore Principale Comandi Vocali */}
+            <button
+              type="button"
+              id="btn-drive-toggle-voice-launcher"
+              onClick={onToggleVoiceCommands}
+              className="w-full p-3 flex items-center justify-between text-xs font-bold transition-all cursor-pointer active:scale-99 text-left"
+              title={
+                isVoiceCommandsEnabled
+                  ? 'Comandi vocali attivi. Tocca per disattivare il microfono.'
+                  : 'Comandi vocali disattivati. Tocca per attivare il microfono.'
+              }
             >
-              {audioOutputMode === 'speaker' ? 'ALTOPARLANTE' : 'CUFFIE'}
-            </span>
-          </button>
+              <div className="flex items-center gap-2.5 min-w-0">
+                <div
+                  className={`w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0 ${
+                    isVoiceCommandsEnabled
+                      ? 'bg-emerald-500/20 text-emerald-400 light:bg-emerald-100 light:text-emerald-700'
+                      : 'bg-zinc-800 text-zinc-500 light:bg-slate-100 light:text-slate-500'
+                  }`}
+                >
+                  {isVoiceCommandsEnabled ? (
+                    <Mic className="w-4 h-4 text-emerald-400" />
+                  ) : (
+                    <MicOff className="w-4 h-4" />
+                  )}
+                </div>
+                <div className="min-w-0">
+                  <div className="text-[10px] text-zinc-400 light:text-slate-500 uppercase font-semibold">
+                    Comandi Vocali & Microfono
+                  </div>
+                  <div
+                    className={`text-xs font-bold truncate ${
+                      isVoiceCommandsEnabled
+                        ? 'text-emerald-300 light:text-emerald-900'
+                        : 'text-zinc-400 light:text-slate-600'
+                    }`}
+                  >
+                    {isVoiceCommandsEnabled ? 'ATTIVO (in sessione)' : 'Microfono Disattivato'}
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-1.5 flex-shrink-0">
+                <span
+                  className={`text-[10px] font-mono font-bold px-2 py-0.5 rounded-full ${
+                    isVoiceCommandsEnabled
+                      ? 'bg-emerald-500 text-zinc-950 font-black'
+                      : 'bg-zinc-800 text-zinc-400 light:bg-slate-200 light:text-slate-600'
+                  }`}
+                >
+                  {isVoiceCommandsEnabled ? 'VOCE ON' : 'SPENTO'}
+                </span>
+              </div>
+            </button>
+
+            {/* Sotto-sezione Modalità Microfono: visibile SOLO se i Comandi Vocali sono ATTIVI */}
+            {isVoiceCommandsEnabled && (
+              <div className="px-3 pb-3 pt-1.5 border-t border-emerald-500/20 light:border-emerald-200 animate-in fade-in slide-in-from-top-1">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-[10px] text-emerald-300/80 light:text-emerald-800 uppercase font-semibold">
+                    Modalità di Ascolto:
+                  </span>
+                  <span className="text-[9px] font-mono px-1.5 py-0.5 rounded bg-emerald-500/10 text-emerald-300 light:bg-emerald-100 light:text-emerald-800 font-bold">
+                    {audioOutputMode === 'speaker' ? 'ALTOPARLANTE' : 'CUFFIE'}
+                  </span>
+                </div>
+
+                <div className="grid grid-cols-2 gap-2">
+                  <button
+                    type="button"
+                    id="btn-drive-toggle-audio-output"
+                    onClick={() => {
+                      if (onSetAudioOutputMode) {
+                        onSetAudioOutputMode('speaker');
+                      } else if (audioOutputMode !== 'speaker') {
+                        onToggleAudioOutput();
+                      }
+                    }}
+                    className={`p-2 rounded-lg border text-left transition-all cursor-pointer active:scale-98 ${
+                      audioOutputMode === 'speaker'
+                        ? 'bg-amber-950/80 border-amber-500 text-amber-200 ring-1 ring-amber-500/60 light:bg-amber-100 light:border-amber-500 light:text-amber-900 font-bold'
+                        : 'bg-zinc-900/80 border-zinc-800 text-zinc-400 hover:text-zinc-200 light:bg-white light:border-slate-200 light:text-slate-700'
+                    }`}
+                  >
+                    <div className="flex items-center gap-1.5 mb-0.5">
+                      <Volume2 className="w-3.5 h-3.5 text-amber-400 flex-shrink-0" />
+                      <span className="text-xs font-bold">Altoparlante</span>
+                    </div>
+                    <p className="text-[10px] text-zinc-400 light:text-slate-500 leading-tight">
+                      Anti-eco: mic attivo a fine lettura o in pausa
+                    </p>
+                  </button>
+
+                  <button
+                    type="button"
+                    id="btn-drive-toggle-audio-output-headphones"
+                    onClick={() => {
+                      if (onSetAudioOutputMode) {
+                        onSetAudioOutputMode('headphones');
+                      } else if (audioOutputMode !== 'headphones') {
+                        onToggleAudioOutput();
+                      }
+                    }}
+                    className={`p-2 rounded-lg border text-left transition-all cursor-pointer active:scale-98 ${
+                      audioOutputMode === 'headphones'
+                        ? 'bg-indigo-950/80 border-indigo-500 text-indigo-200 ring-1 ring-indigo-500/60 light:bg-indigo-100 light:border-indigo-500 light:text-indigo-900 font-bold'
+                        : 'bg-zinc-900/80 border-zinc-800 text-zinc-400 hover:text-zinc-200 light:bg-white light:border-slate-200 light:text-slate-700'
+                    }`}
+                  >
+                    <div className="flex items-center gap-1.5 mb-0.5">
+                      <Headphones className="w-3.5 h-3.5 text-indigo-400 flex-shrink-0" />
+                      <span className="text-xs font-bold">Cuffie con Mic</span>
+                    </div>
+                    <p className="text-[10px] text-zinc-400 light:text-slate-500 leading-tight">
+                      Ascolto continuo: puoi interrompere a voce
+                    </p>
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
         )}
       </div>
 

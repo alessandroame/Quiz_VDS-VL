@@ -689,6 +689,16 @@ export const DriveModeScreen: React.FC<DriveModeScreenProps> = ({
     );
   };
 
+  const handleSetAudioOutput = (mode: 'speaker' | 'headphones') => {
+    if (audioOutputMode === mode) return;
+    updateSetting('driveModeAudioOutput', mode);
+    showToast(
+      mode === 'headphones'
+        ? '🎧 Cuffie: microfono sempre attivo'
+        : '🔊 Altoparlante: microfono attivo a fine parlato'
+    );
+  };
+
   // In speaker mode, suspend microphone during speech playback to prevent self-triggering from loudspeaker
   const shouldSuspendVoiceCommands = shouldSuspendVoiceMic(audioOutputMode, {
     isPlaying,
@@ -1002,6 +1012,7 @@ export const DriveModeScreen: React.FC<DriveModeScreenProps> = ({
           onToggleVoiceCommands={handleToggleVoiceCommands}
           audioOutputMode={audioOutputMode}
           onToggleAudioOutput={handleToggleAudioOutput}
+          onSetAudioOutputMode={handleSetAudioOutput}
           isTutorEnabled={isTutorEnabled}
           onToggleTutor={handleToggleTutor}
           isIntroActive={isIntroActive}

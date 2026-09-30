@@ -14,6 +14,32 @@ Questo documento registra in ordine cronologico tutte le lavorazioni svolte nel 
 - **Impatto sul Desiderata**: <Come questo intervento contribuisce al desiderata (cfr. DESIDERATA.md) e indicazioni per il prossimo agente>
 ```
 
+### [2026-09-30] - Riorganizzazione Gerarchica Comandi Vocali e Uscita Audio in DriveLauncher (Soluzione 1)
+
+- **Cosa abbiamo fatto**:
+  * **Scheda Unificata Gerarchica per Comandi Vocali & Uscita Audio**:
+    - In [src/components/drive/DriveLauncher.tsx](file:///c:/github/Quiz_VDS-VL/src/components/drive/DriveLauncher.tsx), eliminata la separazione disarticolata tra l'interruttore dei Comandi Vocali e il selettore Altoparlante/Cuffie che creava confusione visiva (indicando "mic attivo a fine lettura" anche con comandi vocali spenti).
+    - Creata una card unificata a due stati:
+      * **Stato Spento**: card compatta con icona `MicOff`, badge `SPENTO` e dicitura esplicita `Microfono Disattivato`. Nessun pulsante Altoparlante/Cuffie visibile, azzerando qualsiasi fraintendimento sull'effettivo stato del microfono.
+      * **Stato Attivo**: al tocco la card si espande mostrando l'icona verde smeraldo `Mic`, badge `VOCE ON` e una sezione interna dedicata `Modalità di Ascolto:` con pulsanti dedicati per commutare istantaneamente tra `[ 🔊 Altoparlante ]` (Anti-eco, mic attivo a fine lettura o in pausa) e `[ 🎧 Cuffie con Mic ]` (Ascolto continuo, puoi interrompere a voce).
+    - Riorganizzata la riga superiore con i due toggle rapidi compatti `Avanzamento (Auto/Man)` e `Tutor Didattico (On/Off)`, garantendo un perfetto equilibrio visivo e preservando la visualizzazione zero-scroll su viewport mobile 390x844.
+  * **Integrazione Prop & Handler Diretto in DriveModeScreen**:
+    - In [src/components/DriveModeScreen.tsx](file:///c:/github/Quiz_VDS-VL/src/components/DriveModeScreen.tsx), implementato l'handler `handleSetAudioOutput` e propagato tramite prop `onSetAudioOutputMode` a `DriveLauncher` per consentire la selezione esplicita e diretta della modalità di ascolto.
+  * **Test Unitari & Di Regressione**:
+    - Creato [src/components/drive/DriveLauncher.test.ts](file:///c:/github/Quiz_VDS-VL/src/components/drive/DriveLauncher.test.ts) (3 test) per verificare formalmente: 1) assenza totale di opzioni di output con comandi spenti; 2) corretta visualizzazione di entrambi i selettori di ascolto all'attivazione; 3) rendering corretto della modalità cuffie selezionata.
+    - Suite completa Vitest: 36 file di test, 261 test passati al 100%. Compilazione TypeScript/Vite completata senza alcun errore o warning.
+    - Verificata resa visiva responsive mobile 390x844 via Chrome DevTools MCP con zero errori in console.
+  * **Avanzamento Versione SemVer**:
+    - Aggiornato [package.json](file:///c:/github/Quiz_VDS-VL/package.json) alla versione `1.1.7`.
+
+- **Scelte architetturali & Rationale**:
+  * *Eliminazione delle false aspettative cognitive (Affordance & Feedback)*: Mostrare una dicitura come "mic attivo a fine lettura" in un pulsante indipendente induceva l'utente a ritenere che il microfono fosse abilitato pur avendo l'interruttore generale su "Spento". L'accorpamento gerarchico (card padre-figlio) rende lampante che la scelta tra altoparlante e cuffie è una modalità di funzionamento interna dei comandi vocali, visibile e configurabile solo quando l'ascolto è effettivamente attivo.
+
+- **Impatto sul Desiderata**:
+  * Allinea perfettamente l'interfaccia pre-sessione di Mani Libere alla UX minimale zero-distrazioni e risolve definitivamente il dubbio dell'allievo sull'attivazione del microfono.
+
+---
+
 ### [2026-09-30] - Spiegazione Vocale in Modalità Tutor Condizionata all'Errore
 
 - **Cosa abbiamo fatto**:
