@@ -118,7 +118,7 @@ export const SubjectDetailModal: React.FC<SubjectDetailModalProps> = ({
         {/* Header */}
         <div className="p-3.5 sm:p-4 border-b border-zinc-800 flex items-center justify-between gap-3 flex-shrink-0 light:border-slate-200">
           <div className="flex items-center gap-2 min-w-0">
-            <span className="px-2 py-0.5 rounded-md bg-amber-500/20 text-amber-400 font-mono text-xs font-bold flex-shrink-0">
+            <span className="px-2 py-0.5 rounded-md bg-amber-500/20 text-amber-400 light:bg-amber-100 light:text-amber-800 font-mono text-xs font-bold flex-shrink-0">
               {formatSubjectCode(subjectId)}
             </span>
             <h2
@@ -206,27 +206,42 @@ export const SubjectDetailModal: React.FC<SubjectDetailModalProps> = ({
               type="button"
               id="filter-chip-all"
               onClick={() => setFilterMode('all')}
-              className={`px-2.5 py-1 rounded-lg text-xs font-semibold whitespace-nowrap transition-colors border ${
+              className={`px-2.5 py-1 rounded-lg text-xs font-semibold whitespace-nowrap transition-colors border flex items-center gap-1.5 ${
                 filterMode === 'all'
                   ? 'bg-zinc-800 border-zinc-600 text-zinc-100 light:bg-slate-200 light:border-slate-400 light:text-slate-900'
                   : 'bg-zinc-950/60 border-zinc-800/80 text-zinc-400 hover:text-zinc-200 light:bg-white light:border-slate-200 light:text-slate-600'
               }`}
             >
-              Tutte ({subjectQuestions.length})
+              <span>Tutte</span>
+              <span
+                className={`px-1.5 py-0.2 rounded text-[10px] font-mono ${
+                  filterMode === 'all'
+                    ? 'bg-zinc-700 text-zinc-200 light:bg-slate-300 light:text-slate-800'
+                    : 'bg-zinc-800 text-zinc-400 light:bg-slate-100 light:text-slate-600'
+                }`}
+              >
+                {subjectQuestions.length}
+              </span>
             </button>
 
             <button
               type="button"
               id="filter-chip-wrong"
               onClick={() => setFilterMode('wrong')}
-              className={`px-2.5 py-1 rounded-lg text-xs font-semibold whitespace-nowrap transition-colors border flex items-center gap-1 ${
+              className={`px-2.5 py-1 rounded-lg text-xs font-semibold whitespace-nowrap transition-colors border flex items-center gap-1.5 ${
                 filterMode === 'wrong'
-                  ? 'bg-rose-500/20 border-rose-500/50 text-rose-300'
-                  : 'bg-zinc-950/60 border-zinc-800/80 text-zinc-400 hover:text-rose-400 light:bg-white light:border-slate-200'
+                  ? 'bg-rose-500/20 border-rose-500/50 text-rose-300 light:bg-rose-50 light:border-rose-300 light:text-rose-800'
+                  : 'bg-zinc-950/60 border-zinc-800/80 text-zinc-400 hover:text-rose-400 light:bg-white light:border-slate-200 light:text-slate-600'
               }`}
             >
               <span>Errori</span>
-              <span className={`px-1 py-0.2 rounded text-[10px] ${filterMode === 'wrong' ? 'bg-rose-500/30' : 'bg-zinc-800 text-zinc-400'}`}>
+              <span
+                className={`px-1.5 py-0.2 rounded text-[10px] font-mono ${
+                  filterMode === 'wrong'
+                    ? 'bg-rose-500/30 text-rose-200 light:bg-rose-200 light:text-rose-900'
+                    : 'bg-zinc-800 text-zinc-400 light:bg-slate-100 light:text-slate-600'
+                }`}
+              >
                 {wrongQuestions.length}
               </span>
             </button>
@@ -235,14 +250,20 @@ export const SubjectDetailModal: React.FC<SubjectDetailModalProps> = ({
               type="button"
               id="filter-chip-unseen"
               onClick={() => setFilterMode('unseen')}
-              className={`px-2.5 py-1 rounded-lg text-xs font-semibold whitespace-nowrap transition-colors border flex items-center gap-1 ${
+              className={`px-2.5 py-1 rounded-lg text-xs font-semibold whitespace-nowrap transition-colors border flex items-center gap-1.5 ${
                 filterMode === 'unseen'
-                  ? 'bg-amber-500/20 border-amber-500/50 text-amber-300'
-                  : 'bg-zinc-950/60 border-zinc-800/80 text-zinc-400 hover:text-amber-400 light:bg-white light:border-slate-200'
+                  ? 'bg-amber-500/20 border-amber-500/50 text-amber-300 light:bg-amber-50 light:border-amber-300 light:text-amber-800'
+                  : 'bg-zinc-950/60 border-zinc-800/80 text-zinc-400 hover:text-amber-400 light:bg-white light:border-slate-200 light:text-slate-600'
               }`}
             >
               <span>Non viste</span>
-              <span className={`px-1 py-0.2 rounded text-[10px] ${filterMode === 'unseen' ? 'bg-amber-500/30' : 'bg-zinc-800 text-zinc-400'}`}>
+              <span
+                className={`px-1.5 py-0.2 rounded text-[10px] font-mono ${
+                  filterMode === 'unseen'
+                    ? 'bg-amber-500/30 text-amber-200 light:bg-amber-200 light:text-amber-900'
+                    : 'bg-zinc-800 text-zinc-400 light:bg-slate-100 light:text-slate-600'
+                }`}
+              >
                 {unseenQuestions.length}
               </span>
             </button>
@@ -251,14 +272,20 @@ export const SubjectDetailModal: React.FC<SubjectDetailModalProps> = ({
               type="button"
               id="filter-chip-correct"
               onClick={() => setFilterMode('correct')}
-              className={`px-2.5 py-1 rounded-lg text-xs font-semibold whitespace-nowrap transition-colors border flex items-center gap-1 ${
+              className={`px-2.5 py-1 rounded-lg text-xs font-semibold whitespace-nowrap transition-colors border flex items-center gap-1.5 ${
                 filterMode === 'correct'
-                  ? 'bg-emerald-500/20 border-emerald-500/50 text-emerald-300'
-                  : 'bg-zinc-950/60 border-zinc-800/80 text-zinc-400 hover:text-emerald-400 light:bg-white light:border-slate-200'
+                  ? 'bg-emerald-500/20 border-emerald-500/50 text-emerald-300 light:bg-emerald-50 light:border-emerald-300 light:text-emerald-800'
+                  : 'bg-zinc-950/60 border-zinc-800/80 text-zinc-400 hover:text-emerald-400 light:bg-white light:border-slate-200 light:text-slate-600'
               }`}
             >
               <span>Corrette</span>
-              <span className={`px-1 py-0.2 rounded text-[10px] ${filterMode === 'correct' ? 'bg-emerald-500/30' : 'bg-zinc-800 text-zinc-400'}`}>
+              <span
+                className={`px-1.5 py-0.2 rounded text-[10px] font-mono ${
+                  filterMode === 'correct'
+                    ? 'bg-emerald-500/30 text-emerald-200 light:bg-emerald-200 light:text-emerald-900'
+                    : 'bg-zinc-800 text-zinc-400 light:bg-slate-100 light:text-slate-600'
+                }`}
+              >
                 {correctQuestions.length}
               </span>
             </button>
@@ -298,7 +325,7 @@ export const SubjectDetailModal: React.FC<SubjectDetailModalProps> = ({
                       }`}
                       title={
                         isMistake
-                          ? 'Presente nel Quaderno Errori'
+                          ? 'Errore da rivedere'
                           : isCorrect
                           ? 'Risposta corretta'
                           : 'Non ancora affrontata'
@@ -316,7 +343,7 @@ export const SubjectDetailModal: React.FC<SubjectDetailModalProps> = ({
 
                   <div className="flex items-center gap-2 flex-shrink-0 text-zinc-500 group-hover:text-zinc-300 light:group-hover:text-slate-700">
                     {stat && stat.timesWrong > 0 && (
-                      <span className="px-1.5 py-0.5 rounded text-[10px] font-bold bg-rose-500/15 text-rose-400">
+                      <span className="px-1.5 py-0.5 rounded text-[10px] font-bold bg-rose-500/15 text-rose-400 light:bg-rose-100 light:text-rose-700">
                         {stat.timesWrong} {stat.timesWrong === 1 ? 'err' : 'err'}
                       </span>
                     )}

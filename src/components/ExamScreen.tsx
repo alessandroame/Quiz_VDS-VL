@@ -435,11 +435,11 @@ export const ExamScreen: React.FC<ExamScreenProps> = ({
       return (
         <div className="max-w-2xl mx-auto px-4 py-4 space-y-4">
           {/* Card Principale: Simulazione Didattica (Tutor) */}
-          <div className="p-5 sm:p-6 bg-zinc-900 border-2 border-emerald-500/50 hover:border-emerald-500 rounded-2xl transition-all shadow-md light:bg-white light:border-emerald-500/60 space-y-4">
+          <div className="p-5 sm:p-6 bg-zinc-900 border border-zinc-800 hover:border-emerald-500/80 rounded-2xl transition-all shadow-md light:bg-white light:border-slate-200 light:hover:border-emerald-500 space-y-4">
             <div className="space-y-2">
               <div className="flex items-center justify-between gap-2">
                 <span className="px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 light:bg-emerald-100 light:text-emerald-800 text-[10px] font-bold uppercase tracking-wider font-mono">
-                  Consigliata per imparare
+                  Studio Guidato
                 </span>
                 <span className="text-[11px] font-mono text-zinc-400 light:text-slate-500">
                   30 Quiz • Senza limiti di tempo

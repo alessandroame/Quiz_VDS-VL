@@ -98,11 +98,11 @@ export const StatsScreen: React.FC<StatsScreenProps> = ({ onTrainSubject }) => {
           </div>
 
           <div className="p-2.5 rounded-xl bg-zinc-950/60 light:bg-slate-50 border border-zinc-800/80 light:border-slate-200">
-            <div className="text-zinc-400 light:text-slate-500 text-[10px]">Nel Quaderno</div>
+            <div className="text-zinc-400 light:text-slate-500 text-[10px]">Errori</div>
             <div className="font-bold text-rose-400 mt-0.5">
               {mistakesCount}
             </div>
-            <div className="text-[10px] text-zinc-500">errori da rivedere</div>
+            <div className="text-[10px] text-zinc-500 light:text-slate-500">da rivedere</div>
           </div>
 
           <div className="p-2.5 rounded-xl bg-zinc-950/60 light:bg-slate-50 border border-zinc-800/80 light:border-slate-200">
@@ -274,7 +274,7 @@ export const StatsScreen: React.FC<StatsScreenProps> = ({ onTrainSubject }) => {
                 </div>
 
                 <div className="flex items-center gap-2 flex-shrink-0">
-                  <span className="px-2 py-0.5 rounded bg-rose-500/20 text-rose-400 font-bold text-[10px]">
+                  <span className="px-2 py-0.5 rounded bg-rose-500/20 text-rose-400 light:bg-rose-100 light:text-rose-700 font-bold text-[10px]">
                     {item.timesWrong} {item.timesWrong === 1 ? 'errore' : 'errori'}
                   </span>
                   <ChevronRight className="w-3.5 h-3.5 text-zinc-500 group-hover:text-zinc-300 light:group-hover:text-slate-700 transition-transform group-hover:translate-x-0.5" />

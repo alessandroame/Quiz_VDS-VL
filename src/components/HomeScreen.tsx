@@ -93,7 +93,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectTab }) => {
               >
                 {mistakesCount}
               </span>
-              <span className="text-zinc-500 text-[11px] font-mono">nel quaderno</span>
+              <span className="text-zinc-500 text-[11px] font-mono">da rivedere</span>
             </div>
           </div>
         </div>
@@ -151,7 +151,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectTab }) => {
         <button
           id="btn-home-tutor"
           onClick={() => onSelectTab('tutor')}
-          className="group relative p-3.5 sm:p-4 rounded-xl bg-zinc-900 border-2 border-emerald-500/40 hover:border-emerald-500 text-left transition-all shadow-sm hover:shadow-emerald-950/20 light:bg-white light:border-emerald-500/50 light:hover:border-emerald-600 flex flex-col justify-between min-h-[105px] active:scale-[0.99]"
+          className="group relative p-3.5 sm:p-4 rounded-xl bg-zinc-900 border border-zinc-800 hover:border-emerald-500/80 text-left transition-all shadow-sm hover:shadow-emerald-950/20 light:bg-white light:border-slate-200 light:hover:border-emerald-500 flex flex-col justify-between min-h-[105px] active:scale-[0.99]"
         >
           <div className="space-y-1.5">
             <div className="flex items-center justify-between gap-2">
@@ -165,7 +165,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectTab }) => {
               </div>
               <div className="flex items-center gap-1.5">
                 <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 light:bg-emerald-100 light:text-emerald-800 uppercase tracking-wider font-mono">
-                  Consigliata
+                  Senza Limiti
                 </span>
                 <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-zinc-800 text-zinc-400 light:bg-slate-100 light:text-slate-500 hidden md:inline">
                   [1]

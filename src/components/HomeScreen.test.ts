@@ -42,7 +42,7 @@ describe('HomeScreen Component (Home Hub Contracts)', () => {
 
     expect(html).toContain('id="btn-home-tutor"');
     expect(html).toContain('Tutor Didattico');
-    expect(html).toContain('Consigliata');
+    expect(html).toContain('Senza Limiti');
 
     expect(html).toContain('id="btn-home-topics"');
     expect(html).toContain('Studio Materie');
@@ -73,7 +73,7 @@ describe('HomeScreen Component (Home Hub Contracts)', () => {
     expect(html).toContain('210');
     expect(html).toContain('474');
     expect(html).toContain('3');
-    expect(html).toContain('nel quaderno');
+    expect(html).toContain('da rivedere');
   });
 
   it('should display active session resumption banner when a session is in progress', () => {

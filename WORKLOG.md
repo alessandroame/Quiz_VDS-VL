@@ -14,6 +14,43 @@ Questo documento registra in ordine cronologico tutte le lavorazioni svolte nel 
 - **Impatto sul Desiderata**: <Come questo intervento contribuisce al desiderata (cfr. DESIDERATA.md) e indicazioni per il prossimo agente>
 ```
 
+### [2026-09-30] - Armonizzazione Tema Chiaro e Pulizia Microcopy (v1.3.1)
+
+- **Cosa abbiamo fatto**:
+  * **Risoluzione Icone Sbiadite e Bordi al Collasso Sezioni (SettingsModal)**:
+    - Risolto il bug per cui comprimendo una sezione dell'accordion nelle impostazioni (`AccordionCard` in [src/components/SettingsModal.tsx](file:///c:/github/Quiz_VDS-VL/src/components/SettingsModal.tsx)), l'icona e il titolo assumevano tonalità grigio chiarissimo / quasi bianco invisibile su sfondo chiaro a causa dell'override di specificità CSS di `.group:hover .group-hover:text-zinc-200` su `light:text-slate-700`.
+    - Aggiunte classi esplicite `light:group-hover:text-slate-900`, `light:group-hover:bg-slate-200` e `light:group-hover:border-slate-300`, e impostato il contenitore con sfondo neutro `light:bg-slate-100` e `transition-colors duration-150` anziché `transition-all duration-200` per eliminare qualsiasi residuo o lag visivo del bordo ambra.
+  * **Rimozione Terminologia Confusa "Nel Quaderno"**:
+    - In [src/components/StatsScreen.tsx](file:///c:/github/Quiz_VDS-VL/src/components/StatsScreen.tsx), sostituita l'etichetta grammaticalmente ambigua `"Nel Quaderno"` con `"Errori"` (sottotitolo `"da rivedere"`), armonizzando perfettamente la griglia delle metriche principali (`Quiz Visti`, `Errori`, `Simulazioni`).
+    - In [src/components/HomeScreen.tsx](file:///c:/github/Quiz_VDS-VL/src/components/HomeScreen.tsx), aggiornato il contatore rapido in `"X da rivedere"` anziché `"X nel quaderno"`.
+    - In [src/components/SubjectDetailModal.tsx](file:///c:/github/Quiz_VDS-VL/src/components/SubjectDetailModal.tsx), aggiornato il tooltip a `"Errore da rivedere"`.
+  * **Eliminazione Testi Promozionali Inutili ("Consigliata")**:
+    - In [src/components/HomeScreen.tsx](file:///c:/github/Quiz_VDS-VL/src/components/HomeScreen.tsx), rimosso il badge statico/arbitrario `"CONSIGLIATA"` su Tutor Didattico e sostituito con il descrittore oggettivo `"SENZA LIMITI"` (in perfetto contrasto con `"45 MINUTI"` dell'Esame Ufficiale e coerente con la Navbar).
+    - Normalizzato il bordo della card del Tutor Didattico (rimosso `border-2 border-emerald-500/40` preferenziale per uniformità geometrica con le altre card).
+    - In [src/components/ExamScreen.tsx](file:///c:/github/Quiz_VDS-VL/src/components/ExamScreen.tsx), aggiornato `"Consigliata per imparare"` a `"Studio Guidato"`.
+    - In [src/components/SettingsModal.tsx](file:///c:/github/Quiz_VDS-VL/src/components/SettingsModal.tsx), aggiornato `"Altoparlante (Consigliata)"` a `"Altoparlante (Anti-Eco)"`.
+  * **Armonizzazione Badge Contatori nel Tema Chiaro (SubjectDetailModal & QuestionDetailModal)**:
+    - In [src/components/SubjectDetailModal.tsx](file:///c:/github/Quiz_VDS-VL/src/components/SubjectDetailModal.tsx), uniformati i badge dei contatori dei 4 chip filtro (`Tutte`, `Errori`, `Non viste`, `Corrette`): nel tema chiaro adottano pill `light:bg-slate-100 light:text-slate-600` (inattivi) e colori semantici ad alto contrasto quando selezionati, eliminando i blocchi scuri `zinc-800`.
+    - Aggiunte varianti Light Mode al badge codice materia in intestazione (`light:bg-amber-100 light:text-amber-800`) e ai badge errore nella lista.
+    - In [src/components/QuestionDetailModal.tsx](file:///c:/github/Quiz_VDS-VL/src/components/QuestionDetailModal.tsx), aggiunte varianti Light Mode per i badge di stato della domanda.
+    - In [src/components/StatsScreen.tsx](file:///c:/github/Quiz_VDS-VL/src/components/StatsScreen.tsx), applicato `light:bg-rose-100 light:text-rose-700` ai badge conteggio errori della Top 10.
+  * **Validazione e Test**:
+    - Aggiornati i test unitari in [src/components/HomeScreen.test.ts](file:///c:/github/Quiz_VDS-VL/src/components/HomeScreen.test.ts).
+    - Suite completa Vitest: 41 file di test, 296 test passati con successo (100%).
+    - Typecheck `tsc --noEmit` e build di produzione `vite build` completati con successo.
+    - Collaudo visivo pixel-perfect confermato tramite Chrome DevTools in Light Mode sia per i chip del modale materia, sia per la schermata Home, sia per la chiusura dell'accordion impostazioni.
+  * **Avanzamento Versione**:
+    - Bump SemVer a `1.3.1` in [package.json](file:///c:/github/Quiz_VDS-VL/package.json).
+
+- **Scelte architetturali & Rationale**:
+  * *Microcopy Oggettivo e Zero Distrazioni*: L'app per la preparazione all'esame di volo deve offrire informazioni tecniche chiare, non slogan da marketing. Sostituire "Consigliata" con "Senza Limiti" e "Nel Quaderno" con "Errori" rende l'interfaccia immediatamente comprensibile per qualunque allievo pilota.
+  * *Specificità Tailwind e Robustezza Hover in Light Mode*: Nei componenti con classi `.group:hover`, definire sempre la controparte `light:group-hover:...` per evitare che la specificità degli pseudo-selettori applichi stili scuri inattesi sul tema chiaro, in particolare su dispositivi touch dove lo stato di hover persiste dopo il tocco.
+
+- **Impatto sul Desiderata**:
+  * Perfeziona la coerenza estetica e l'ergonomia del design system minimale (cfr. `minimal-ui-ux`), garantendo leggibilità e contrasto ideali in qualsiasi condizione di luce (studio indoor o outdoor).
+
+---
+
 ### [2026-09-30] - Interattività e Ispezione Liste nelle Statistiche (TODO-07 & v1.3.0)
 
 - **Cosa abbiamo fatto**:

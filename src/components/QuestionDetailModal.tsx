@@ -114,19 +114,19 @@ export const QuestionDetailModal: React.FC<QuestionDetailModalProps> = ({
               {formatSubjectCode(question.subjectId)} {question.subjectName}
             </span>
             {isMistake ? (
-              <span className="px-1.5 py-0.5 rounded text-[10px] font-bold bg-rose-500/20 text-rose-400 border border-rose-500/40 flex-shrink-0">
+              <span className="px-1.5 py-0.5 rounded text-[10px] font-bold bg-rose-500/20 text-rose-400 border border-rose-500/40 light:bg-rose-100 light:text-rose-800 light:border-rose-200 flex-shrink-0">
                 Quaderno Errori
               </span>
             ) : stat && stat.timesSeen > 0 && stat.timesWrong === 0 ? (
-              <span className="px-1.5 py-0.5 rounded text-[10px] font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 flex-shrink-0">
+              <span className="px-1.5 py-0.5 rounded text-[10px] font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 light:bg-emerald-100 light:text-emerald-800 light:border-emerald-200 flex-shrink-0">
                 Corretta
               </span>
             ) : stat && stat.timesWrong > 0 ? (
-              <span className="px-1.5 py-0.5 rounded text-[10px] font-bold bg-amber-500/20 text-amber-400 border border-amber-500/40 flex-shrink-0">
+              <span className="px-1.5 py-0.5 rounded text-[10px] font-bold bg-amber-500/20 text-amber-400 border border-amber-500/40 light:bg-amber-100 light:text-amber-800 light:border-amber-200 flex-shrink-0">
                 {stat.timesWrong} {stat.timesWrong === 1 ? 'errore' : 'errori'}
               </span>
             ) : (
-              <span className="px-1.5 py-0.5 rounded text-[10px] font-bold bg-zinc-800 text-zinc-500 flex-shrink-0">
+              <span className="px-1.5 py-0.5 rounded text-[10px] font-bold bg-zinc-800 text-zinc-500 light:bg-slate-100 light:text-slate-600 flex-shrink-0">
                 Non vista
               </span>
             )}

@@ -75,7 +75,7 @@ const AccordionCard: React.FC<AccordionCardProps> = ({
   return (
     <div
       ref={cardRef}
-      className={`rounded-2xl border transition-all duration-200 overflow-hidden ${
+      className={`rounded-2xl border transition-colors duration-150 overflow-hidden ${
         isExpanded
           ? 'border-amber-500/50 bg-zinc-900/80 shadow-md shadow-amber-500/5 light:border-amber-400 light:bg-white ring-1 ring-amber-500/20 light:ring-amber-400/20'
           : 'border-zinc-800/80 bg-zinc-900/40 hover:bg-zinc-900/70 hover:border-zinc-700/80 light:border-slate-200 light:bg-white light:hover:bg-slate-50'
@@ -93,7 +93,7 @@ const AccordionCard: React.FC<AccordionCardProps> = ({
             className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 transition-colors ${
               isExpanded
                 ? 'bg-amber-500/20 text-amber-400 border border-amber-500/40 light:bg-amber-100 light:text-amber-800 light:border-amber-300'
-                : 'bg-zinc-800/80 text-zinc-400 border border-zinc-700/40 group-hover:text-zinc-200 group-hover:border-zinc-600 light:bg-white light:text-slate-700 light:border-slate-200 light:shadow-sm'
+                : 'bg-zinc-800/80 text-zinc-400 border border-zinc-700/40 group-hover:text-zinc-200 group-hover:border-zinc-600 light:bg-slate-100 light:text-slate-700 light:border-slate-200 light:shadow-sm light:group-hover:bg-slate-200 light:group-hover:text-slate-900 light:group-hover:border-slate-300'
             }`}
           >
             <Icon className="w-4 h-4" />
@@ -105,7 +105,7 @@ const AccordionCard: React.FC<AccordionCardProps> = ({
                 className={`text-sm font-bold tracking-tight transition-colors ${
                   isExpanded
                     ? 'text-amber-400 light:text-amber-800'
-                    : 'text-zinc-200 group-hover:text-zinc-100 light:text-slate-800'
+                    : 'text-zinc-200 group-hover:text-zinc-100 light:text-slate-800 light:group-hover:text-slate-900'
                 }`}
               >
                 {label}
@@ -114,7 +114,7 @@ const AccordionCard: React.FC<AccordionCardProps> = ({
                 className={`text-[10px] sm:text-[11px] font-medium px-2 py-0.5 rounded-full border truncate max-w-[190px] sm:max-w-xs transition-colors ${
                   isExpanded
                     ? 'bg-amber-500/10 text-amber-300/90 border-amber-500/30 light:bg-amber-50 light:text-amber-700 light:border-amber-200'
-                    : 'bg-zinc-800/60 text-zinc-400 border-zinc-700/50 light:bg-slate-100 light:text-slate-600 light:border-slate-200'
+                    : 'bg-zinc-800/60 text-zinc-400 border-zinc-700/50 light:bg-slate-100 light:text-slate-600 light:border-slate-200 light:group-hover:text-slate-800'
                 }`}
               >
                 {summary}
@@ -1281,7 +1281,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                     >
                       <div className="flex items-center gap-1.5 font-bold mb-0.5">
                         <Volume2 className="w-3.5 h-3.5 text-amber-400" />
-                        <span>Altoparlante (Consigliata)</span>
+                        <span>Altoparlante (Anti-Eco)</span>
                       </div>
                       <p className="text-[10px] text-zinc-400 light:text-slate-500 leading-tight">
                         Microfono attivo solo a fine lettura o in pausa. Elimina l'eco dell'altoparlante.
