@@ -89,17 +89,17 @@ Questo file costituisce la **memoria tecnica permanente** del progetto. Raccogli
   - Pronuncia opzioni essenziale: *"Uno. [testo]"*, *"Due. [testo]"*, *"Tre. [testo]"*.
 - **Persistenza & Switch**: Selezione della voce salvata in Dexie (`settings.ttsVoice: 'giuseppe' | 'elsa'`) e commutabile istantaneamente dalle impostazioni.
 - **Gestione Offline & Fallback Intelligente (`src/services/audioDownloadManager.ts`)**:
-  - Prompt non invasivo al primo avvio della Modalità alla Guida (`AudioOfflinePromptModal`) con scelta a un tocco (voce attiva consigliata ~154 MB, entrambe ~302 MB, o skip "Non ora").
+  - Prompt non invasivo al primo avvio della Modalità Mani Libere (`AudioOfflinePromptModal`) con scelta a un tocco (voce attiva consigliata ~154 MB, entrambe ~302 MB, o skip "Non ora").
   - Download in background non bloccante via worker a pool concorrente (8 connessioni contemporanee) verso CacheStorage (`vds-audio-giuseppe` e `vds-audio-elsa`).
   - Banner di avanzamento download audio non invasivo agganciato in basso sopra la barra di navigazione (`AudioDownloadBanner`), con percentuale, conteggio file, barra di progresso e tasto annulla, prevenendo l'overflow orizzontale della UI su mobile.
   - Gestione granulare nelle Impostazioni (Voce): stato download, progress bar, storage size, pulsante scarica ed elimina per voce.
   - Fallback offline automatico in `voiceService`: se l'app è offline (`!navigator.onLine`) e la voce selezionata non è presente nella cache del dispositivo, il motore commuta in modo trasparente e immediato sull'altra voce scaricata con notifica discreta.
   - PWA Service Worker: regole Workbox dedicate con `rangeRequests: true` per garantire compatibilità con lo streaming audio su iOS Safari.
-- **Spiegazione Vocale Modalità Guida (`drive_intro.mp3`)**:
+- **Spiegazione Vocale Modalità Mani Libere (`drive_intro.mp3`)**:
   - Traccia audio di briefing in `public/audio/{voice}/drive_intro.mp3` generata con Edge-TTS (Giuseppe/Elsa) con fallback a `window.speechSynthesis`.
   - Riproduzione automatica al primo accesso (nel Launcher o all'avvio del quiz), con banner discreto e tasto `[Salta]`.
   - Logica run-once: una volta riprodotta o saltata, salva `driveModeIntroPlayed: true` in Dexie settings e non si ripete più automaticamente.
-  - Riascolto on-demand (Launcher `btn-replay-drive-intro`, modale comandi `VoiceCommandsModal`) e riattivazione all'avvio da `SettingsModal` (scheda Guida).
+  - Riascolto on-demand (Launcher `btn-replay-drive-intro`, modale comandi `VoiceCommandsModal`) e riattivazione all'avvio da `SettingsModal` (scheda Mani Libere).
 - **Gestione Microfono Anti-Eco & Gating Audio (`src/utils/audio.ts`, `src/hooks/useDriveVoiceCommands.ts`)**:
   - In modalità `'speaker'` (default senza cuffie), il microfono viene sospeso con abort immediato (`rec.abort()`) durante la riproduzione del parlato (domanda, opzioni, spiegazione didattica o intro).
   - Il microfono si attiva esclusivamente a fine parlato (durante il countdown di attesa risposta) o mentre la riproduzione è in pausa (`isPaused: true`).
