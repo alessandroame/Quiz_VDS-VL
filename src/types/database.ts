@@ -45,6 +45,7 @@ export interface AppSettings {
   fontSizePreference?: FontSizePreference;
   examTimerMinutes: number; // 45 standard
   immediateFeedbackInTopics: boolean;
+  autoAdvanceOnCorrect?: boolean;
   soundEnabled: boolean;
   hapticEnabled: boolean;
   googleClientId?: string;

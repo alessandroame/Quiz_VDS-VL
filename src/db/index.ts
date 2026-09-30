@@ -13,6 +13,7 @@ export const DEFAULT_SETTINGS: AppSettings = {
   fontSizePreference: 'normal',
   examTimerMinutes: 45,
   immediateFeedbackInTopics: true,
+  autoAdvanceOnCorrect: true,
   soundEnabled: true,
   hapticEnabled: true,
   googleClientId: '',
