@@ -14,6 +14,43 @@ Questo documento registra in ordine cronologico tutte le lavorazioni svolte nel 
 - **Impatto sul Desiderata**: <Come questo intervento contribuisce al desiderata (cfr. DESIDERATA.md) e indicazioni per il prossimo agente>
 ```
 
+### [2026-10-01] - Fasce Dinamiche 'Karaoke Accordion' & Espansione Testo Risposte in Modalità Mani Libere (v1.5.3)
+
+- **Cosa abbiamo fatto**:
+  * **Risoluzione Bug Sovrapposizione Testo Risposte in Modalità Mani Libere ([src/components/drive/DriveActiveHUD.tsx](file:///c:/github/Quiz_VDS-VL/src/components/drive/DriveActiveHUD.tsx))**:
+    - Identificata e risolta la causa radice della sovrapposizione visiva su quesiti con risposte estese (es. quesito #3003 di Pronto Soccorso, dove l'opzione 2 conta 198 caratteri su 8-9 righe):
+      * Nel layout fullscreen a viewport bloccato (100dvh), i 3 pulsanti risposta avevano `flex-1 min-h-[78px]`.
+      * Il container del testo non aveva né `line-clamp` né `overflow-hidden`. Poiché per default in CSS flexbox `overflow` è `visible`, il testo eccedente (~180px) sbordava fisicamente al di sotto del pulsante (~90px), stampandosi direttamente sopra le macro-fasce e i testi sottostanti.
+    - Implementato il pattern **"Karaoke Accordion"**:
+      * A riposo, le opzioni lunghe (>65 caratteri) sono elegantemente limitate a 2 righe con ellipsis (`line-clamp-2`), classe di sicurezza `overflow-hidden` sul pulsante e micro-badge dedicato `[▼ Leggi tutto]` / `[▲ Riduci]`.
+      * Durante la riproduzione vocale (`isPartPlaying('opt1' | 'opt2' | 'opt3')`), l'opzione attualmente pronunciata dalla sintesi si espande automaticamente a tutta altezza (`line-clamp-none` e `flex-none`), mentre le altre rimangono compatte a 2 righe (`flex-1`).
+      * In questo modo, lo spazio verticale totale per le 3 opzioni rimane rigorosamente limitato (~280px totali: due fasce compatte da 70px + una fascia espansa da 140px), azzerando le collisioni e garantendo che il testo pronunciato sia sempre leggibile all'istante dall'allievo.
+    - Introdotto il controllo manuale con `stopPropagation`:
+      * Toccando il micro-badge `[▼ Leggi tutto]` / `[▲ Riduci]`, l'utente può espandere o contrarre la singola opzione a vista senza selezionare la risposta (il tocco sul resto della macro-fascia continua ad agire come selezione risposta 1, 2 o 3).
+    - Esteso il pattern dinamico anche all'enunciato della domanda:
+      * La domanda si espande a testo intero (`line-clamp-none`) durante la lettura della domanda (`isPartPlaying('question')`) e offre il micro-badge `[Leggi tutto]` per quesiti lunghi (>80 caratteri).
+    - Introdotta la classe `overflow-y-auto custom-scrollbar` sul blocco fasce opzioni come paracadute di sicurezza per viewport estremi o orientamenti orizzontali.
+  * **Suite di Test Unitaria Vitest ([src/components/drive/DriveActiveHUD.test.ts](file:///c:/github/Quiz_VDS-VL/src/components/drive/DriveActiveHUD.test.ts))**:
+    - Creati 3 test mirati:
+      * `HUD-EXPAND-01`: verifica troncamento `line-clamp-2`, `overflow-hidden`, paracadute `overflow-y-auto custom-scrollbar` e presenza badge `[Leggi tutto]`.
+      * `HUD-EXPAND-02`: verifica espansione automatica `line-clamp-none` e comparsa `Riduci` sulla sola opzione pronunciata via audio (`opt2`), mantenendo le altre compresse.
+      * `HUD-EXPAND-03`: verifica espansione dinamica dell'enunciato domanda quando `isPartPlaying('question')` è attivo.
+  * **Collaudo Visivo Headless CDP**:
+    - Validata la resa visiva pixel-perfect tramite Chrome Headless emulando iPhone 390x844:
+      * Screenshot a riposo: opzioni lunghe troncate a 2 righe con badge `[▼ Leggi tutto]` in ambra e zero collisioni.
+      * Screenshot espanso: opzione 3 espansa a tutta altezza con badge `[▲ Riduci]` e perfetto adattamento fluido dell'intero HUD senza scorrimenti forzati.
+    - Verifica console browser: 0 errori runtime.
+  * **Aggiornamento Documentazione & Desiderata**:
+    - Censito il requisito e la specifica architetturale in [DESIDERATA.md](file:///c:/github/Quiz_VDS-VL/DESIDERATA.md) (Sezione 7).
+    - Avanzata la versione SemVer a `1.5.3` in [package.json](file:///c:/github/Quiz_VDS-VL/package.json).
+
+- **Scelte architetturali & Rationale**:
+  * *Karaoke Accordion (Mutua Esclusione Naturale)*: Permettere l'espansione simultanea di tutte le opzioni in modalità mani libere avrebbe rotto il vincolo cardine "Zero-Scroll a 100dvh", costringendo l'allievo in bicicletta o durante la corsa a scrollare continuamente. Espandere dinamicamente solo l'opzione letta dalla voce assicura che il 100% dell'attenzione visiva e uditiva converga sull'elemento attivo, mantenendo l'altezza complessiva sempre entro i limiti del display.
+  * *Micro-badge con stopPropagation*: Separare l'azione di espansione visiva dal tap sul macro-target evita selezioni involontarie quando l'allievo desidera unicamente rileggere con calma una risposta complessa.
+
+- **Impatto sul Desiderata**:
+  * Ottempera pienamente all'Obiettivo 7 (Modalità Mani Libere) del [DESIDERATA.md](file:///c:/github/Quiz_VDS-VL/DESIDERATA.md). Risolve definitivamente il bug di sovrapposizione segnalato su smartphone e arricchisce l'esperienza di studio outdoor con feedback visivo coordinato alla sintesi vocale.
+
 ### [2026-10-01] - Ottimizzazione Contrasto Elevato Opzioni Quiz & Audio in Modalità Chiara (v1.5.2)
 
 - **Cosa abbiamo fatto**:

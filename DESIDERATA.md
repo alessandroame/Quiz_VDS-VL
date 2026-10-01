@@ -78,6 +78,7 @@ Questo documento rappresenta la **bussola strategica e funzionale** del progetto
    - **Invalidazione & Aggiornamento Differenziale Audio Offline (Opzione A + Opzione 1)**: meccanismo intelligente per mantenere allineati i file audio MP3 salvati in `CacheStorage`. Manifest leggero con hash MD5 a 8 caratteri (`public/audio/manifest.json`), strategia Workbox `NetworkFirst`, download selettivo dei soli frammenti modificati senza riscaricare l'intero archivio da 150 MB, sincronizzazione automatica silenziosa all'avvio dell'app se connessi a Internet e soppressione del prompt di download in Modalità Guida se le voci sono già state salvate localmente.
 
 7. **Modalità Mani Libere (Hands-Free Mode)**:
+    - **Fasce Dinamiche "Karaoke Accordion" & Espansione Testo Risposte**: Prevenzione totale di sovrapposizioni su opzioni lunghe (es. quesito #3003 con 198 caratteri). Troncamento elegante a 2 righe con ellipsis (`line-clamp-2`), classe `overflow-hidden` protettiva e micro-badge `[Leggi tutto]` con `stopPropagation`. Durante la riproduzione vocale, l'opzione pronunciata si espande dinamicamente a testo intero (`line-clamp-none`) mentre le altre restano compatte, con paracadute `overflow-y-auto` per viewport ultra-compatti.
    - Vista a tutto schermo con viewport bloccato (`100dvh`) e zero-scroll.
    - Tre macro-fasce tattili ad altissima leggibilità e contrasto elevato (Fitts's Law estrema).
    - Screen Wake Lock API integrato per prevenire lo spegnimento dello schermo su supporto o a mani libere.

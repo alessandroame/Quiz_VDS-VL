@@ -17,7 +17,9 @@ import {
   HelpCircle,
   Square,
   GraduationCap,
-  Headphones
+  Headphones,
+  ChevronDown,
+  ChevronUp
 } from 'lucide-react';
 import type { Question } from '../../types/quiz';
 import { formatTime } from '../../utils/timer';
@@ -135,6 +137,31 @@ export const DriveActiveHUD: React.FC<DriveActiveHUDProps> = ({
   const isCurrentRevealed =
     revealedQuestionId === currentQ.id ||
     ((!isExamSession || isTutorEnabled) && answers[currentQ.id] !== undefined);
+
+  // Manual expansion state per option and question
+  const [manuallyExpandedOpts, setManuallyExpandedOpts] = React.useState<Record<number, boolean>>({});
+  const [isQuestionManuallyExpanded, setIsQuestionManuallyExpanded] = React.useState(false);
+
+  // Reset manual expansions on question change
+  React.useEffect(() => {
+    setManuallyExpandedOpts({});
+    setIsQuestionManuallyExpanded(false);
+  }, [currentQ.id]);
+
+  const toggleOptionExpansion = (optNum: 1 | 2 | 3, e: React.MouseEvent | React.KeyboardEvent) => {
+    e.stopPropagation();
+    setManuallyExpandedOpts((prev) => {
+      const isCurrentlyExpanded = prev[optNum] !== undefined ? prev[optNum] : isPartPlaying(`opt${optNum}` as any);
+      return {
+        ...prev,
+        [optNum]: !isCurrentlyExpanded
+      };
+    });
+  };
+
+  const isQuestionPlaying = isPartPlaying('question');
+  const isQuestionExpanded = isQuestionManuallyExpanded || isQuestionPlaying;
+  const isLongQuestion = currentQ.question.length > 80;
 
   return (
     <div className="flex-1 flex flex-col justify-between p-3 sm:p-5 max-w-2xl mx-auto w-full h-full overflow-hidden">
@@ -403,12 +430,49 @@ export const DriveActiveHUD: React.FC<DriveActiveHUDProps> = ({
           <h2
             lang="it"
             translate="no"
-            className={`text-base sm:text-xl font-bold leading-snug tracking-tight transition-colors line-clamp-3 sm:line-clamp-4 ${
-              isPartPlaying('question') ? 'text-amber-300 light:text-amber-600' : 'text-white light:text-slate-900'
+            className={`text-base sm:text-xl font-bold leading-snug tracking-tight transition-colors ${
+              isQuestionExpanded ? 'line-clamp-none' : 'line-clamp-3 sm:line-clamp-4'
+            } ${
+              isQuestionPlaying ? 'text-amber-300 light:text-amber-600' : 'text-white light:text-slate-900'
             }`}
           >
             {currentQ.question}
           </h2>
+          {isLongQuestion && (
+            <div className="mt-1 flex items-center">
+              <span
+                role="button"
+                tabIndex={0}
+                id="btn-drive-question-expand"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setIsQuestionManuallyExpanded((prev) => !prev);
+                }}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    setIsQuestionManuallyExpanded((prev) => !prev);
+                  }
+                }}
+                className="inline-flex items-center gap-1 text-[11px] font-bold text-zinc-400 hover:text-zinc-200 light:text-slate-600 light:hover:text-slate-900 bg-zinc-800/60 hover:bg-zinc-800 light:bg-slate-100 px-2 py-0.5 rounded-md border border-zinc-700/50 light:border-slate-300 transition-colors cursor-pointer select-none"
+                title={isQuestionExpanded ? 'Comprimi testo domanda' : 'Leggi domanda completa'}
+                aria-label={isQuestionExpanded ? 'Comprimi testo domanda' : 'Leggi domanda completa'}
+              >
+                {isQuestionExpanded ? (
+                  <>
+                    <ChevronUp className="w-3 h-3" />
+                    <span>Riduci</span>
+                  </>
+                ) : (
+                  <>
+                    <ChevronDown className="w-3 h-3" />
+                    <span>Leggi tutto</span>
+                  </>
+                )}
+              </span>
+            </div>
+          )}
         </div>
 
         <div className="flex flex-col gap-1.5 flex-shrink-0">
@@ -577,12 +641,16 @@ export const DriveActiveHUD: React.FC<DriveActiveHUDProps> = ({
 
       {/* 3 Macro-Fasce di Risposta & Card Didattica (Regola + Tranello) */}
       <div className="flex-1 flex flex-col gap-2.5 sm:gap-3.5 my-1 sm:my-2 min-h-0">
-        <div className={`flex flex-col gap-2.5 sm:gap-3.5 ${isCurrentRevealed ? 'flex-none' : 'flex-1'} min-h-0`}>
+        <div className={`flex flex-col gap-2.5 sm:gap-3.5 ${isCurrentRevealed ? 'flex-none' : 'flex-1'} min-h-0 overflow-y-auto custom-scrollbar`}>
           {currentQ.options.map((opt, idx) => {
             const optNum = (idx + 1) as 1 | 2 | 3;
             const isSelected = answers[currentQ.id] === optNum;
             const isCorrectAnswer = currentQ.correctAnswer === optNum;
             const isCurrentOptPlaying = isPartPlaying(`opt${optNum}` as any);
+            const isExpanded = manuallyExpandedOpts[optNum] !== undefined
+              ? manuallyExpandedOpts[optNum]
+              : isCurrentOptPlaying;
+            const isLongOption = opt.length > 65;
 
             let style =
               'bg-zinc-900/80 border-zinc-800 text-zinc-100 hover:border-zinc-700 active:scale-[0.99] light:bg-white light:border-slate-200 light:text-slate-900 light:hover:border-slate-300 light:shadow-sm';
@@ -613,10 +681,10 @@ export const DriveActiveHUD: React.FC<DriveActiveHUDProps> = ({
                 lang="it"
                 translate="no"
                 onClick={() => onSelectAnswer(optNum)}
-                className={`${
+                className={`overflow-hidden ${
                   isCurrentRevealed
                     ? 'w-full rounded-xl border p-2 sm:p-2.5 flex items-center gap-2.5 sm:gap-3 text-left transition-all'
-                    : 'flex-1 w-full min-h-[78px] sm:min-h-[85px] rounded-2xl border-2 p-3.5 sm:p-4 flex items-center gap-3.5 sm:gap-5 text-left transition-all shadow-md active:scale-[0.98]'
+                    : `${isExpanded ? 'flex-none' : 'flex-1'} w-full min-h-[74px] sm:min-h-[85px] rounded-2xl border-2 p-3 sm:p-4 flex items-center gap-3.5 sm:gap-5 text-left transition-all shadow-md active:scale-[0.98]`
                 } ${style}`}
               >
                 <div
@@ -637,15 +705,49 @@ export const DriveActiveHUD: React.FC<DriveActiveHUDProps> = ({
                   {optNum}
                 </div>
 
-                <div
-                  lang="it"
-                  className={`flex-1 ${
-                    isCurrentRevealed
-                      ? 'text-xs sm:text-sm font-medium leading-tight line-clamp-2'
-                      : 'text-base sm:text-xl font-semibold leading-snug'
-                  }`}
-                >
-                  {opt}
+                <div className="flex-1 min-w-0">
+                  <div
+                    lang="it"
+                    className={`break-words ${
+                      isCurrentRevealed
+                        ? `text-xs sm:text-sm font-medium leading-tight ${isExpanded ? 'line-clamp-none' : 'line-clamp-2'}`
+                        : `text-sm sm:text-base font-semibold leading-snug ${isExpanded ? 'line-clamp-none' : 'line-clamp-2'}`
+                    }`}
+                  >
+                    {opt}
+                  </div>
+                  {isLongOption && (
+                    <div className="mt-1 flex items-center">
+                      <span
+                        role="button"
+                        tabIndex={0}
+                        id={`btn-drive-opt-expand-${optNum}`}
+                        onClick={(e) => toggleOptionExpansion(optNum, e)}
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter' || e.key === ' ') {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            toggleOptionExpansion(optNum, e);
+                          }
+                        }}
+                        className="inline-flex items-center gap-1 text-[11px] font-bold text-amber-400 hover:text-amber-300 light:text-amber-700 light:hover:text-amber-800 bg-amber-500/10 hover:bg-amber-500/20 light:bg-amber-100/80 px-2 py-0.5 rounded-md border border-amber-500/30 transition-colors cursor-pointer select-none"
+                        title={isExpanded ? 'Comprimi risposta' : 'Leggi risposta completa'}
+                        aria-label={isExpanded ? `Comprimi risposta ${optNum}` : `Leggi risposta completa ${optNum}`}
+                      >
+                        {isExpanded ? (
+                          <>
+                            <ChevronUp className="w-3 h-3" />
+                            <span>Riduci</span>
+                          </>
+                        ) : (
+                          <>
+                            <ChevronDown className="w-3 h-3" />
+                            <span>Leggi tutto</span>
+                          </>
+                        )}
+                      </span>
+                    </div>
+                  )}
                 </div>
 
                 {/* Pulsante dedicato per riascolto isolato della singola opzione (senza selezionarla) */}
