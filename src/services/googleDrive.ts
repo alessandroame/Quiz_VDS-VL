@@ -37,10 +37,25 @@ export class GoogleDriveService {
         scope: 'https://www.googleapis.com/auth/drive.appdata https://www.googleapis.com/auth/drive.file',
         callback: (resp: any) => {
           if (resp.error) {
+            let errorMsg = resp.error;
+            const errStr = String(resp.error).toLowerCase();
+            const errDesc = String(resp.error_description || '').toLowerCase();
+            if (
+              errStr.includes('popup_blocked') ||
+              errDesc.includes('popup') ||
+              errStr.includes('blocked_by_browser') ||
+              errStr.includes('popup_failed')
+            ) {
+              errorMsg = 'popup_blocked_by_browser';
+            } else if (errStr.includes('popup_closed') || errStr.includes('closed_by_user')) {
+              errorMsg = 'popup_closed_by_user';
+            } else if (errStr.includes('access_denied')) {
+              errorMsg = 'access_denied';
+            }
             const pending = this.pendingTokenRequests;
             this.pendingTokenRequests = [];
             for (const req of pending) {
-              req.reject(new Error(resp.error));
+              req.reject(new Error(errorMsg));
             }
           } else if (resp.access_token) {
             this.accessToken = resp.access_token;
@@ -83,17 +98,22 @@ export class GoogleDriveService {
       throw new Error('Client Google non inizializzato. Riprova tra pochi istanti.');
     }
 
+    if (!interactive) {
+      throw new Error('Accesso Google richiesto: apri le impostazioni o tocca l\'icona cloud per collegare Google Drive');
+    }
+
     return new Promise((resolve, reject) => {
       this.pendingTokenRequests.push({ resolve, reject });
       try {
-        if (interactive) {
-          this.tokenClient.requestAccessToken();
-        } else {
-          this.tokenClient.requestAccessToken({ prompt: '' });
-        }
-      } catch (err) {
+        this.tokenClient.requestAccessToken();
+      } catch (err: any) {
         this.pendingTokenRequests = this.pendingTokenRequests.filter(r => r.resolve !== resolve);
-        reject(err);
+        const errMsg = String(err?.message || err).toLowerCase();
+        if (errMsg.includes('popup') || errMsg.includes('window.open') || errMsg.includes('blocked')) {
+          reject(new Error('popup_blocked_by_browser'));
+        } else {
+          reject(err);
+        }
       }
     });
   }

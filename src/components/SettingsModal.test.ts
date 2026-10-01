@@ -339,4 +339,43 @@ describe('SettingsModal Component (Accordion & Mobile Ergonomics)', () => {
     });
     container.remove();
   });
+
+  it('renders #cloud-popup-blocked-alert with retry button when syncState.isPopupBlocked is true', () => {
+    mockUseQuiz.mockReturnValue({
+      settings: { ...defaultSettings, autoSyncDrive: true },
+      updateSetting: vi.fn(),
+      updateSettings: vi.fn(),
+      syncState: {
+        status: 'needs_auth',
+        errorDetail: 'Popup bloccato dal browser',
+        lastSyncedAt: null,
+        isAutoSyncEnabled: true,
+        isPopupBlocked: true
+      },
+      syncNow: vi.fn(),
+      resetAllStats: vi.fn(),
+      resetAllData: vi.fn()
+    });
+
+    const container = document.createElement('div');
+    document.body.appendChild(container);
+    const root = createRoot(container);
+
+    act(() => {
+      root.render(React.createElement(SettingsModal, { isOpen: true, onClose: () => {}, defaultTab: 'cloud' }));
+    });
+
+    const popupAlert = container.querySelector('#cloud-popup-blocked-alert');
+    expect(popupAlert).not.toBeNull();
+    expect(popupAlert?.textContent).toContain('Finestra popup bloccata dal browser');
+    expect(popupAlert?.textContent).toContain('Consenti sempre popup e reindirizzamenti per questo sito');
+
+    const retryBtn = container.querySelector('#btn-retry-after-popup');
+    expect(retryBtn).not.toBeNull();
+
+    act(() => {
+      root.unmount();
+    });
+    container.remove();
+  });
 });

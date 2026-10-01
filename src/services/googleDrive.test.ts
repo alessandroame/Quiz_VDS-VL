@@ -191,4 +191,38 @@ describe('Suite 7: Google Drive Sync Service (src/services/googleDrive.ts)', () 
     expect(res.success).toBe(false);
     expect(res.message).toContain('Google Drive API non abilitata nel progetto Google Cloud');
   });
+
+  it('DRV-09: getAccessToken(false) rejects immediately without opening popup when token is missing', async () => {
+    // Arrange: tokenClient exists but no valid token
+    const mockRequestAccessToken = vi.fn();
+    (service as any).tokenClient = { requestAccessToken: mockRequestAccessToken };
+
+    // Act & Assert
+    await expect(service.getAccessToken(false)).rejects.toThrow('Accesso Google richiesto');
+    expect(mockRequestAccessToken).not.toHaveBeenCalled();
+  });
+
+  it('DRV-10: callback maps popup_blocked_by_browser error code properly', async () => {
+    let capturedCallback: any = null;
+    (globalThis as any).window = {
+      google: {
+        accounts: {
+          oauth2: {
+            initTokenClient: vi.fn((config: any) => {
+              capturedCallback = config.callback;
+              return { requestAccessToken: vi.fn() };
+            })
+          }
+        }
+      }
+    };
+
+    service.initTokenClient('test_client_id');
+    expect(capturedCallback).toBeDefined();
+
+    const tokenPromise = service.getAccessToken(true);
+    capturedCallback({ error: 'popup_blocked_by_browser' });
+
+    await expect(tokenPromise).rejects.toThrow('popup_blocked_by_browser');
+  });
 });

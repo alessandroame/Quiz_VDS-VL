@@ -47,8 +47,14 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab, openSet
       case 'offline':
         return 'Offline: i salvataggi verranno inviati appena torni online';
       case 'needs_auth':
+        if (syncState.isPopupBlocked || syncState.errorDetail?.toLowerCase().includes('popup')) {
+          return '⚠️ Popup bloccato dal browser: tocca per scoprire come abilitarlo';
+        }
         return 'Accesso Google richiesto: tocca per ri-autorizzare';
       case 'error':
+        if (syncState.isPopupBlocked || syncState.errorDetail?.toLowerCase().includes('popup')) {
+          return '⚠️ Popup bloccato dal browser: tocca per scoprire come abilitarlo';
+        }
         return `Errore sincronizzazione: ${syncState.errorDetail || 'controlla le impostazioni'}`;
       default:
         return 'Sincronizzazione Google Drive';

@@ -14,6 +14,43 @@ Questo documento registra in ordine cronologico tutte le lavorazioni svolte nel 
 - **Impatto sul Desiderata**: <Come questo intervento contribuisce al desiderata (cfr. DESIDERATA.md) e indicazioni per il prossimo agente>
 ```
 
+# Registro di Bordo (WORKLOG) - 2026-10-01: Gestione Blocco Popup OAuth Google Drive e Guida Utente
+
+## 1. Cosa abbiamo fatto
+- **Rilevamento e gestione proattiva del blocco popup Google OAuth (GIS)**:
+  - In [src/services/googleDrive.ts](file:///c:/github/Quiz_VDS-VL/src/services/googleDrive.ts):
+    1. Intercettato l'errore `popup_blocked_by_browser` (e messaggi correlati a finestre bloccate dal browser o `window.open` fallita) nella callback di Google Identity Services (`initTokenClient`) e nel `try/catch` di `requestAccessToken()`.
+    2. Protetto `getAccessToken(interactive)`: in modalità background (`interactive === false`), se non esiste un token valido in memoria, il metodo ora rifiuta immediatamente (`reject`) con messaggio diagnostico invece di invocare `requestAccessToken()`. Poiché GIS non supporta refresh silenziosi senza user gesture, questa modifica impedisce al browser di bloccare ripetutamente pop-up fantasma in background (`setTimeout`) e di inondare la console con warning `[GSI_LOGGER]: Failed to open popup window...`.
+  - In [src/services/syncEngine.ts](file:///c:/github/Quiz_VDS-VL/src/services/syncEngine.ts):
+    1. Aggiunto il flag `isPopupBlocked?: boolean` all'interfaccia `SyncEngineState` e alla classe `SyncEngine`.
+    2. Implementato `checkIsPopupBlocked` per classificare immediatamente gli errori dovuti al blocco popup in `pushNow()`, `pullNow()` e `fullSync()`, impostando lo stato a `'needs_auth'`, specificando `errorDetail` didattico e attivando `isPopupBlocked = true`.
+    3. All'acquisizione di un token valido o alla risoluzione del salvataggio, `isPopupBlocked` viene automaticamente resettato a `false`.
+- **Interfaccia Utente e Banner Guida di Sblocco**:
+  - In [src/components/SettingsModal.tsx](file:///c:/github/Quiz_VDS-VL/src/components/SettingsModal.tsx):
+    1. Aggiunto il banner di avviso `#cloud-popup-blocked-alert` in cima alla Sezione 4 ("Backup Cloud"), visibile quando `syncState.isPopupBlocked` è attivo.
+    2. Il banner spiega con chiarezza all'allievo pilota che il browser ha impedito l'apertura della finestra di accesso Google, fornendo i 3 passaggi guidati (icona blocco nella barra indirizzi/lucchetto, selezione "Consenti sempre popup e reindirizzamenti", e riprova).
+    3. Integrato nel banner il pulsante `#btn-retry-after-popup` ("Ho abilitato i popup: Riprova accesso") che rilancia direttamente `pushNow(true)` con user gesture attiva.
+    4. Aggiornati i messaggi di stato di `handleBackupToDrive`, `handleRestoreFromDrive`, `#toggle-auto-sync-drive` e `#btn-sync-now` per evidenziare immediatamente la guida quando un'operazione viene bloccata.
+  - In [src/components/Navbar.tsx](file:///c:/github/Quiz_VDS-VL/src/components/Navbar.tsx):
+    1. Aggiornato `getSyncTooltip()`: quando `syncState.isPopupBlocked` è `true`, il tooltip dell'icona cloud notifica chiaramente: `⚠️ Popup bloccato dal browser: tocca per scoprire come abilitarlo`. Il tap sull'icona apre direttamente le impostazioni con la sezione Backup Cloud già espansa.
+- **Suite di Test Unitari & Integrazione**:
+  - In [src/services/googleDrive.test.ts](file:///c:/github/Quiz_VDS-VL/src/services/googleDrive.test.ts): aggiunti i test `DRV-09` (protezione anti-popup in background quando manca il token) e `DRV-10` (mappatura corretta dell'errore `popup_blocked_by_browser`).
+  - In [src/services/syncEngine.test.ts](file:///c:/github/Quiz_VDS-VL/src/services/syncEngine.test.ts): aggiunti i test per la rilevazione di `isPopupBlocked = true` e il suo reset automatico al successo.
+  - In [src/components/SettingsModal.test.ts](file:///c:/github/Quiz_VDS-VL/src/components/SettingsModal.test.ts): aggiunto il test che valida il rendering di `#cloud-popup-blocked-alert` e la presenza del pulsante di retry.
+  - In [src/components/Navbar.test.ts](file:///c:/github/Quiz_VDS-VL/src/components/Navbar.test.ts): aggiunto il test per il tooltip dedicato al blocco popup su `#btn-cloud-sync`.
+- **Avanzamento Versione**:
+  - Incrementata la versione in [package.json](file:///c:/github/Quiz_VDS-VL/package.json) a `1.5.5`.
+
+## 2. Scelte Architetturali & Rationale
+- **Nessun tentativo di popup in background senza gesto utente**: I browser moderni (Chrome, Edge, Safari, Firefox) impongono policy di attivazione transitoria (`User Activation`) rigidissime: qualsiasi chiamata a `window.open` scatenata da un timer (`setTimeout` di `schedulePush`) viene categoricamente bloccata. Evitare la richiesta di token quando `interactive === false` e non vi è un token già valido previene l'emissione continua di errori console e avvisi intrusivi del browser all'utente mentre studia le domande.
+- **Guidance integrata direttamente nel contesto del problema**: Invece di limitarsi a un generico errore "Accesso fallito", il banner spiega esattamente dove cliccare nella barra degli indirizzi e fornisce un pulsante d'azione immediato.
+
+## 3. Impatto sul Desiderata
+- Piena conformità con i requisiti di affidabilità della sincronizzazione e trasparenza verso l'utente di [DESIDERATA.md](file:///c:/github/Quiz_VDS-VL/DESIDERATA.md).
+- Nessuna regressione sui 331 test esistenti.
+
+---
+
 ### [2026-10-01] - Misurazione DOM Reale e Azzeramento Falsi Positivi 'Leggi tutto' in Modalità Mani Libere (v1.5.4)
 
 - **Cosa abbiamo fatto**:

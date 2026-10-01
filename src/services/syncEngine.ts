@@ -8,6 +8,7 @@ export interface SyncEngineState {
   lastSyncedAt: number | null;
   errorDetail?: string;
   isAutoSyncEnabled: boolean;
+  isPopupBlocked?: boolean;
 }
 
 type SyncStateListener = (state: SyncEngineState) => void;
@@ -23,6 +24,7 @@ export class SyncEngine {
   private lastSyncedAt: number | null = null;
   private errorDetail: string | undefined = undefined;
   private isAutoSyncEnabled: boolean = false;
+  private isPopupBlocked: boolean = false;
   private debounceTimer: ReturnType<typeof setTimeout> | null = null;
   private listeners: Set<SyncStateListener> = new Set();
   private isInitialized: boolean = false;
@@ -40,7 +42,8 @@ export class SyncEngine {
       status: this.status,
       lastSyncedAt: this.lastSyncedAt,
       errorDetail: this.errorDetail,
-      isAutoSyncEnabled: this.isAutoSyncEnabled
+      isAutoSyncEnabled: this.isAutoSyncEnabled,
+      isPopupBlocked: this.isPopupBlocked
     };
   }
 
@@ -55,10 +58,26 @@ export class SyncEngine {
     }
   }
 
-  private setStatus(status: SyncStatus, errorDetail?: string): void {
+  private setStatus(status: SyncStatus, errorDetail?: string, isPopupBlocked?: boolean): void {
     this.status = status;
     this.errorDetail = errorDetail;
+    if (isPopupBlocked !== undefined) {
+      this.isPopupBlocked = isPopupBlocked;
+    } else if (status === 'synced' || status === 'idle') {
+      this.isPopupBlocked = false;
+    }
     this.notify();
+  }
+
+  private checkIsPopupBlocked(message?: string): boolean {
+    if (!message) return false;
+    const lower = message.toLowerCase();
+    return (
+      lower.includes('popup_blocked') ||
+      lower.includes('popup bloccato') ||
+      lower.includes('blocked_by_browser') ||
+      (lower.includes('popup') && lower.includes('block'))
+    );
   }
 
   public async init(clientId?: string): Promise<void> {
@@ -76,11 +95,12 @@ export class SyncEngine {
       googleDrive.initTokenClient(clientId);
       googleDrive.addTokenListener(() => {
         // Token received: clear needs_auth/error and auto-sync if enabled
+        this.isPopupBlocked = false;
         if (this.status === 'needs_auth' || this.status === 'error') {
           if (this.isAutoSyncEnabled && isDeviceOnline()) {
             this.fullSync().catch(console.error);
           } else {
-            this.setStatus('synced');
+            this.setStatus('synced', undefined, false);
           }
         }
       });
@@ -161,22 +181,42 @@ export class SyncEngine {
         const now = Date.now();
         this.lastSyncedAt = now;
         await setSetting('lastDriveSyncAt', now);
-        this.setStatus('synced');
+        this.setStatus('synced', undefined, false);
         return { success: true, message: 'Salvataggio completato' };
       } else {
-        if (res.message?.includes('token') || res.message?.includes('inizializzato') || res.message?.includes('403')) {
-          this.setStatus('needs_auth', res.message);
+        if (this.checkIsPopupBlocked(res.message)) {
+          this.setStatus(
+            'needs_auth',
+            'Popup bloccato dal browser: abilita i popup per questo sito per collegare Google Drive',
+            true
+          );
+          return {
+            success: false,
+            message: 'Popup bloccato dal browser: abilita i popup nella barra degli indirizzi e riprova'
+          };
+        } else if (res.message?.includes('token') || res.message?.includes('inizializzato') || res.message?.includes('403') || res.message?.includes('richiesto')) {
+          this.setStatus('needs_auth', res.message, false);
         } else {
-          this.setStatus('error', res.message);
+          this.setStatus('error', res.message, false);
         }
         return { success: false, message: res.message };
       }
     } catch (err: any) {
       const msg = err?.message || 'Errore sincronizzazione';
-      if (msg.includes('token') || msg.includes('inizializzato') || msg.includes('403')) {
-        this.setStatus('needs_auth', msg);
+      if (this.checkIsPopupBlocked(msg)) {
+        this.setStatus(
+          'needs_auth',
+          'Popup bloccato dal browser: abilita i popup per questo sito per collegare Google Drive',
+          true
+        );
+        return {
+          success: false,
+          message: 'Popup bloccato dal browser: abilita i popup nella barra degli indirizzi e riprova'
+        };
+      } else if (msg.includes('token') || msg.includes('inizializzato') || msg.includes('403') || msg.includes('richiesto')) {
+        this.setStatus('needs_auth', msg, false);
       } else {
-        this.setStatus('error', msg);
+        this.setStatus('error', msg, false);
       }
       return { success: false, message: msg };
     }
@@ -197,13 +237,23 @@ export class SyncEngine {
       const res = await googleDrive.downloadBackup(interactive);
       if (!res.success || !res.data) {
         if (res.message.includes('Nessun backup trovato')) {
-          this.setStatus('synced');
+          this.setStatus('synced', undefined, false);
           return { success: true, message: res.message };
         }
-        if (res.message?.includes('token') || res.message?.includes('inizializzato') || res.message?.includes('403')) {
-          this.setStatus('needs_auth', res.message);
+        if (this.checkIsPopupBlocked(res.message)) {
+          this.setStatus(
+            'needs_auth',
+            'Popup bloccato dal browser: abilita i popup per questo sito per collegare Google Drive',
+            true
+          );
+          return {
+            success: false,
+            message: 'Popup bloccato dal browser: abilita i popup nella barra degli indirizzi e riprova'
+          };
+        } else if (res.message?.includes('token') || res.message?.includes('inizializzato') || res.message?.includes('403') || res.message?.includes('richiesto')) {
+          this.setStatus('needs_auth', res.message, false);
         } else {
-          this.setStatus('error', res.message);
+          this.setStatus('error', res.message, false);
         }
         return { success: false, message: res.message };
       }
@@ -213,18 +263,28 @@ export class SyncEngine {
         const now = Date.now();
         this.lastSyncedAt = now;
         await setSetting('lastDriveSyncAt', now);
-        this.setStatus('synced');
+        this.setStatus('synced', undefined, false);
         return { success: true, message: importRes.message };
       } else {
-        this.setStatus('error', importRes.message);
+        this.setStatus('error', importRes.message, false);
         return { success: false, message: importRes.message };
       }
     } catch (err: any) {
       const msg = err?.message || 'Errore ripristino cloud';
-      if (msg.includes('token') || msg.includes('inizializzato') || msg.includes('403')) {
-        this.setStatus('needs_auth', msg);
+      if (this.checkIsPopupBlocked(msg)) {
+        this.setStatus(
+          'needs_auth',
+          'Popup bloccato dal browser: abilita i popup per questo sito per collegare Google Drive',
+          true
+        );
+        return {
+          success: false,
+          message: 'Popup bloccato dal browser: abilita i popup nella barra degli indirizzi e riprova'
+        };
+      } else if (msg.includes('token') || msg.includes('inizializzato') || msg.includes('403') || msg.includes('richiesto')) {
+        this.setStatus('needs_auth', msg, false);
       } else {
-        this.setStatus('error', msg);
+        this.setStatus('error', msg, false);
       }
       return { success: false, message: msg };
     }
@@ -248,10 +308,20 @@ export class SyncEngine {
       if (pullRes.success && pullRes.data) {
         await importDatabaseBackup(pullRes.data);
       } else if (!pullRes.success && !pullRes.message.includes('Nessun backup trovato')) {
-        if (pullRes.message?.includes('token') || pullRes.message?.includes('inizializzato') || pullRes.message?.includes('403')) {
-          this.setStatus('needs_auth', pullRes.message);
+        if (this.checkIsPopupBlocked(pullRes.message)) {
+          this.setStatus(
+            'needs_auth',
+            'Popup bloccato dal browser: abilita i popup per questo sito per collegare Google Drive',
+            true
+          );
+          return {
+            success: false,
+            message: 'Popup bloccato dal browser: abilita i popup nella barra degli indirizzi e riprova'
+          };
+        } else if (pullRes.message?.includes('token') || pullRes.message?.includes('inizializzato') || pullRes.message?.includes('403') || pullRes.message?.includes('richiesto')) {
+          this.setStatus('needs_auth', pullRes.message, false);
         } else {
-          this.setStatus('error', pullRes.message);
+          this.setStatus('error', pullRes.message, false);
         }
         return { success: false, message: pullRes.message };
       }
@@ -264,22 +334,42 @@ export class SyncEngine {
         const now = Date.now();
         this.lastSyncedAt = now;
         await setSetting('lastDriveSyncAt', now);
-        this.setStatus('synced');
+        this.setStatus('synced', undefined, false);
         return { success: true, message: 'Sincronizzazione completata con successo' };
       } else {
-        if (pushRes.message?.includes('token') || pushRes.message?.includes('inizializzato') || pushRes.message?.includes('403')) {
-          this.setStatus('needs_auth', pushRes.message);
+        if (this.checkIsPopupBlocked(pushRes.message)) {
+          this.setStatus(
+            'needs_auth',
+            'Popup bloccato dal browser: abilita i popup per questo sito per collegare Google Drive',
+            true
+          );
+          return {
+            success: false,
+            message: 'Popup bloccato dal browser: abilita i popup nella barra degli indirizzi e riprova'
+          };
+        } else if (pushRes.message?.includes('token') || pushRes.message?.includes('inizializzato') || pushRes.message?.includes('403') || pushRes.message?.includes('richiesto')) {
+          this.setStatus('needs_auth', pushRes.message, false);
         } else {
-          this.setStatus('error', pushRes.message);
+          this.setStatus('error', pushRes.message, false);
         }
         return { success: false, message: pushRes.message };
       }
     } catch (err: any) {
       const msg = err?.message || 'Errore sincronizzazione completa';
-      if (msg.includes('token') || msg.includes('inizializzato') || msg.includes('403')) {
-        this.setStatus('needs_auth', msg);
+      if (this.checkIsPopupBlocked(msg)) {
+        this.setStatus(
+          'needs_auth',
+          'Popup bloccato dal browser: abilita i popup per questo sito per collegare Google Drive',
+          true
+        );
+        return {
+          success: false,
+          message: 'Popup bloccato dal browser: abilita i popup nella barra degli indirizzi e riprova'
+        };
+      } else if (msg.includes('token') || msg.includes('inizializzato') || msg.includes('403') || msg.includes('richiesto')) {
+        this.setStatus('needs_auth', msg, false);
       } else {
-        this.setStatus('error', msg);
+        this.setStatus('error', msg, false);
       }
       return { success: false, message: msg };
     }

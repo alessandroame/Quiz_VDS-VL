@@ -182,4 +182,32 @@ describe('SyncEngine service', () => {
 
     expect(engine.getState().status).toBe('synced');
   });
+
+  it('should set isPopupBlocked to true and status to needs_auth when popup is blocked on pushNow', async () => {
+    vi.spyOn(googleDrive, 'uploadBackup').mockResolvedValueOnce({
+      success: false,
+      message: 'popup_blocked_by_browser'
+    });
+
+    const res = await engine.pushNow(true);
+    expect(res.success).toBe(false);
+    expect(engine.getState().status).toBe('needs_auth');
+    expect(engine.getState().isPopupBlocked).toBe(true);
+    expect(engine.getState().errorDetail).toContain('Popup bloccato dal browser');
+  });
+
+  it('should clear isPopupBlocked when pushNow succeeds', async () => {
+    (engine as any).isPopupBlocked = true;
+    (engine as any).status = 'needs_auth';
+
+    vi.spyOn(googleDrive, 'uploadBackup').mockResolvedValueOnce({
+      success: true,
+      message: 'Saved'
+    });
+
+    const res = await engine.pushNow(true);
+    expect(res.success).toBe(true);
+    expect(engine.getState().status).toBe('synced');
+    expect(engine.getState().isPopupBlocked).toBe(false);
+  });
 });

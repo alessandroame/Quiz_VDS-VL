@@ -29,7 +29,8 @@ import {
   Speech,
   Tag,
   BookOpen,
-  ExternalLink
+  ExternalLink,
+  AlertTriangle
 } from 'lucide-react';
 import { useTheme } from '../context/ThemeContext';
 import { useQuiz } from '../context/QuizContext';
@@ -367,10 +368,19 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
       if (res.success) {
         setSyncStatus('Salvataggio completato con successo!');
       } else {
-        setSyncStatus(`Attenzione: ${res.message}`);
+        if (res.message?.toLowerCase().includes('popup') || syncEngine.getState().isPopupBlocked) {
+          setSyncStatus('⚠️ Finestra popup bloccata dal browser! Abilita i popup nella barra degli indirizzi e riprova.');
+        } else {
+          setSyncStatus(`Attenzione: ${res.message}`);
+        }
       }
     } catch (err: any) {
-      setSyncStatus(`Accesso o salvataggio non riuscito (${err.message || 'operazione annullata'})`);
+      const msg = err?.message || 'operazione annullata';
+      if (msg.toLowerCase().includes('popup') || syncEngine.getState().isPopupBlocked) {
+        setSyncStatus('⚠️ Finestra popup bloccata dal browser! Abilita i popup nella barra degli indirizzi e riprova.');
+      } else {
+        setSyncStatus(`Accesso o salvataggio non riuscito (${msg})`);
+      }
     } finally {
       setIsProcessing(false);
     }
@@ -388,10 +398,19 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
       if (res.success) {
         setSyncStatus(res.message || 'Dati ripristinati con successo!');
       } else {
-        setSyncStatus(`Attenzione: ${res.message}`);
+        if (res.message?.toLowerCase().includes('popup') || syncEngine.getState().isPopupBlocked) {
+          setSyncStatus('⚠️ Finestra popup bloccata dal browser! Abilita i popup nella barra degli indirizzi e riprova.');
+        } else {
+          setSyncStatus(`Attenzione: ${res.message}`);
+        }
       }
     } catch (err: any) {
-      setSyncStatus(`Recupero non riuscito (${err.message || 'operazione annullata'})`);
+      const msg = err?.message || 'operazione annullata';
+      if (msg.toLowerCase().includes('popup') || syncEngine.getState().isPopupBlocked) {
+        setSyncStatus('⚠️ Finestra popup bloccata dal browser! Abilita i popup nella barra degli indirizzi e riprova.');
+      } else {
+        setSyncStatus(`Recupero non riuscito (${msg})`);
+      }
     } finally {
       setIsProcessing(false);
     }
@@ -1416,6 +1435,49 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                   Sincronizzazione Cloud Google
                 </label>
 
+                {/* Banner Finestra Popup Bloccata */}
+                {syncState.isPopupBlocked && (
+                  <div
+                    id="cloud-popup-blocked-alert"
+                    className="p-3.5 rounded-xl border border-amber-500/50 bg-amber-500/10 dark:bg-amber-950/40 light:bg-amber-50 light:border-amber-400 space-y-2.5 animate-in fade-in"
+                  >
+                    <div className="flex items-start gap-2.5">
+                      <AlertTriangle className="w-5 h-5 text-amber-400 flex-shrink-0 mt-0.5" />
+                      <div className="space-y-1 text-xs">
+                        <div className="font-bold text-amber-300 light:text-amber-800 text-xs">
+                          Finestra popup bloccata dal browser
+                        </div>
+                        <p className="text-zinc-300 light:text-slate-700 leading-relaxed text-[11px]">
+                          Il tuo browser ha bloccato l'apertura della finestra di accesso Google. Per consentire la sincronizzazione:
+                        </p>
+                        <ol className="list-decimal list-inside space-y-1 text-[11px] text-zinc-300 light:text-slate-700 font-medium pl-0.5">
+                          <li>
+                            Tocca l'icona del <strong>blocco popup</strong> nella barra degli indirizzi del browser (in alto o a sinistra dell'URL).
+                          </li>
+                          <li>
+                            Seleziona <strong>"Consenti sempre popup e reindirizzamenti per questo sito"</strong>.
+                          </li>
+                          <li>
+                            Tocca il pulsante qui sotto per riprovare.
+                          </li>
+                        </ol>
+                      </div>
+                    </div>
+                    <div className="pt-0.5 flex justify-end">
+                      <button
+                        type="button"
+                        id="btn-retry-after-popup"
+                        onClick={handleBackupToDrive}
+                        disabled={isProcessing}
+                        className="w-full sm:w-auto px-3.5 py-2 rounded-lg bg-amber-500 hover:bg-amber-400 text-zinc-950 font-bold text-xs flex items-center justify-center gap-1.5 transition-all cursor-pointer active:scale-95 disabled:opacity-50 shadow-sm"
+                      >
+                        <RefreshCw className={`w-3.5 h-3.5 ${isProcessing ? 'animate-spin' : ''}`} />
+                        <span>Ho abilitato i popup: Riprova accesso</span>
+                      </button>
+                    </div>
+                  </div>
+                )}
+
                 {/* Toggle Sincronizzazione Automatica */}
                 <label className="flex items-center justify-between p-3 rounded-xl border border-zinc-700 bg-zinc-950/60 light:bg-slate-50 light:border-slate-300 cursor-pointer select-none active:scale-[0.99] touch-manipulation transition-all">
                   <div className="pr-3">
@@ -1436,8 +1498,12 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                       if (val) {
                         googleDrive.initTokenClient(effectiveClientId);
                         setSyncStatus('Avvio sincronizzazione cloud...');
-                        const res = await syncNow();
-                        setSyncStatus(res.message);
+                        const res = await syncNow(true);
+                        if (!res.success && (res.message?.toLowerCase().includes('popup') || syncEngine.getState().isPopupBlocked)) {
+                          setSyncStatus('⚠️ Finestra popup bloccata dal browser! Abilita i popup nella barra degli indirizzi e riprova.');
+                        } else {
+                          setSyncStatus(res.message);
+                        }
                       }
                     }}
                     className="w-4 h-4 accent-amber-500 rounded flex-shrink-0 cursor-pointer"
@@ -1479,9 +1545,18 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                           try {
                             googleDrive.initTokenClient(effectiveClientId);
                             const res = await syncNow(true);
-                            setSyncStatus(res.message);
+                            if (!res.success && (res.message?.toLowerCase().includes('popup') || syncEngine.getState().isPopupBlocked)) {
+                              setSyncStatus('⚠️ Finestra popup bloccata dal browser! Abilita i popup nella barra degli indirizzi e riprova.');
+                            } else {
+                              setSyncStatus(res.message);
+                            }
                           } catch (err: any) {
-                            setSyncStatus(err?.message || 'Errore sincronizzazione');
+                            const msg = err?.message || 'Errore sincronizzazione';
+                            if (msg.toLowerCase().includes('popup') || syncEngine.getState().isPopupBlocked) {
+                              setSyncStatus('⚠️ Finestra popup bloccata dal browser! Abilita i popup nella barra degli indirizzi e riprova.');
+                            } else {
+                              setSyncStatus(msg);
+                            }
                           } finally {
                             setIsProcessing(false);
                           }

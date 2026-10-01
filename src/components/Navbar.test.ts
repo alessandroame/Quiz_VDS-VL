@@ -164,6 +164,46 @@ describe('Navbar Component (Top Bar & Mini-Header Disambiguation)', () => {
       container.remove();
     });
 
+    it('shows popup blocked tooltip on #btn-cloud-sync when isPopupBlocked is true', () => {
+      mockUseQuiz.mockReturnValue({
+        readinessScore: 85,
+        isExamRunning: false,
+        activeSession: null,
+        openDriveMode: vi.fn(),
+        settings: {
+          autoSyncDrive: true
+        },
+        syncState: {
+          status: 'needs_auth',
+          errorDetail: 'popup_blocked_by_browser',
+          isPopupBlocked: true
+        }
+      });
+
+      const container = document.createElement('div');
+      document.body.appendChild(container);
+      const root = createRoot(container);
+
+      act(() => {
+        root.render(
+          React.createElement(Navbar, {
+            activeTab: 'home',
+            setActiveTab: () => {},
+            openSettings: () => {}
+          })
+        );
+      });
+
+      const cloudBtn = container.querySelector('#btn-cloud-sync') as HTMLButtonElement;
+      expect(cloudBtn).not.toBeNull();
+      expect(cloudBtn.getAttribute('aria-label')).toContain('Popup bloccato dal browser');
+
+      act(() => {
+        root.unmount();
+      });
+      container.remove();
+    });
+
     it('calls openSettings() without tab argument when clicking regular settings button', () => {
       const openSettings = vi.fn();
       const container = document.createElement('div');
