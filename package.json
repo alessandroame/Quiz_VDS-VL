@@ -1,7 +1,7 @@
 {
   "name": "vds-vl-quiz-master",
   "private": true,
-  "version": "1.6.3",
+  "version": "1.6.4",
   "type": "module",
   "scripts": {
     "dev": "vite",
