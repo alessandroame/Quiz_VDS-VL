@@ -196,10 +196,17 @@ class TelemetryService {
 
   /**
    * Sanitizes payload properties by stripping any potential personal or sensitive keys.
+   * Preserves PostHog internal system properties (token, api_key, distinct_id, and $-prefixed properties)
+   * which are essential for authentication and delivery.
    */
   private sanitizePayload(props: Record<string, any>): Record<string, any> {
+    if (!props || typeof props !== 'object') return {};
     const clean: Record<string, any> = {};
     for (const [key, value] of Object.entries(props)) {
+      if (key === 'token' || key === 'api_key' || key === 'distinct_id' || key.startsWith('$')) {
+        clean[key] = value;
+        continue;
+      }
       const isSensitive = SENSITIVE_KEY_PATTERNS.some((pattern) => pattern.test(key));
       if (!isSensitive && value !== undefined) {
         clean[key] = value;

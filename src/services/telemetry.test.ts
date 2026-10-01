@@ -178,6 +178,32 @@ describe('TelemetryService', () => {
     });
   });
 
+  it('preserves PostHog internal system properties like token and $-prefixed keys during sanitization', async () => {
+    await telemetry.init({ apiKey: 'phc_test_key', enabled: true });
+
+    const initCall = mockPosthog.init.mock.calls[0];
+    const options = initCall[1];
+    expect(options.sanitize_properties).toBeDefined();
+
+    const sanitized = options.sanitize_properties({
+      token: 'phc_test_key',
+      distinct_id: 'anon_123',
+      $lib: 'web',
+      $browser: 'Chrome',
+      safe_metric: 42,
+      userNote: 'Secret note',
+      authToken: 'oauth_token_abc',
+    });
+
+    expect(sanitized).toEqual({
+      token: 'phc_test_key',
+      distinct_id: 'anon_123',
+      $lib: 'web',
+      $browser: 'Chrome',
+      safe_metric: 42,
+    });
+  });
+
   it('handles client errors gracefully without throwing exceptions to UI', async () => {
     mockPosthog.capture.mockImplementationOnce(() => {
       throw new Error('Network error or ad-blocker blocked request');
