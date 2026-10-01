@@ -1,3 +1,4 @@
+// @vitest-environment happy-dom
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { SyncEngine } from './syncEngine';
 import { googleDrive } from './googleDrive';
@@ -125,6 +126,60 @@ describe('SyncEngine service', () => {
     const result = await engine.fullSync();
     expect(result.success).toBe(true);
     expect(googleDrive.uploadBackup).toHaveBeenCalled();
+    expect(engine.getState().status).toBe('synced');
+  });
+
+  it('should transition from error/needs_auth to synced when pushNow resolves successfully', async () => {
+    // First simulate an error
+    vi.spyOn(googleDrive, 'uploadBackup').mockResolvedValueOnce({
+      success: false,
+      message: 'Network error 500'
+    });
+    await engine.pushNow();
+    expect(engine.getState().status).toBe('error');
+    expect(engine.getState().errorDetail).toBe('Network error 500');
+
+    // Next call succeeds (error resolved)
+    vi.spyOn(googleDrive, 'uploadBackup').mockResolvedValueOnce({
+      success: true,
+      message: 'Backup saved'
+    });
+    const recoveryResult = await engine.pushNow();
+    expect(recoveryResult.success).toBe(true);
+    expect(engine.getState().status).toBe('synced');
+    expect(engine.getState().errorDetail).toBeUndefined();
+  });
+
+  it('should transition from error to idle when autoSync is disabled', () => {
+    (engine as any).status = 'error';
+    (engine as any).errorDetail = 'Previous error';
+    engine.setAutoSyncEnabled(false);
+    expect(engine.getState().status).toBe('idle');
+  });
+
+  it('should auto-sync and become synced when valid token is received after needs_auth', async () => {
+    vi.mocked(dbModule.getSetting).mockImplementation(async (key: any) => {
+      if (key === 'autoSyncDrive') return true;
+      return undefined;
+    });
+
+    vi.spyOn(googleDrive, 'downloadBackup').mockResolvedValue({
+      success: true,
+      data: '{"version":2,"stats":[]}',
+      message: 'OK'
+    });
+    vi.spyOn(googleDrive, 'uploadBackup').mockResolvedValue({
+      success: true,
+      message: 'Saved'
+    });
+
+    await engine.init();
+    (engine as any).status = 'needs_auth';
+
+    // Trigger token listener directly
+    (googleDrive as any).tokenListeners.forEach((fn: any) => fn('new_token_123'));
+    await new Promise(r => setTimeout(r, 50));
+
     expect(engine.getState().status).toBe('synced');
   });
 });

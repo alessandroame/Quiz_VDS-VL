@@ -52,7 +52,7 @@ interface QuizContextType {
   persistActiveSession: (session: InProgressSession) => Promise<void>;
   dismissActiveSession: () => Promise<void>;
   syncState: SyncEngineState;
-  syncNow: () => Promise<{ success: boolean; message: string }>;
+  syncNow: (interactive?: boolean) => Promise<{ success: boolean; message: string }>;
   disciplineFilter: Discipline;
   setDisciplineFilter: (discipline: Discipline) => Promise<void>;
   filteredQuestions: Question[];
@@ -221,8 +221,8 @@ export const QuizProvider: React.FC<{ children: React.ReactNode }> = ({ children
     syncEngine.schedulePush();
   };
 
-  const syncNow = async () => {
-    return await syncEngine.fullSync();
+  const syncNow = async (interactive = true) => {
+    return await syncEngine.fullSync(interactive);
   };
 
   return (

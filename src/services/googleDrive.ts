@@ -12,12 +12,22 @@ export class GoogleDriveService {
   private tokenClient: any = null;
   private accessToken: string | null = null;
   private tokenExpiry: number = 0;
+  private tokenListeners: Set<(token: string) => void> = new Set();
+  private pendingTokenRequests: Array<{ resolve: (token: string) => void; reject: (err: any) => void }> = [];
 
   public isGisLoaded(): boolean {
     return typeof window !== 'undefined' && !!window.google?.accounts?.oauth2;
   }
 
+  public addTokenListener(listener: (token: string) => void): () => void {
+    this.tokenListeners.add(listener);
+    return () => this.tokenListeners.delete(listener);
+  }
+
   public initTokenClient(clientId?: string, onTokenReceived?: (token: string) => void): void {
+    if (onTokenReceived) {
+      this.addTokenListener(onTokenReceived);
+    }
     const effectiveId = clientId || (import.meta.env?.VITE_GOOGLE_CLIENT_ID as string) || '182413802928-q7sphls58ob60s2mu3fspbbkk9kq2am9.apps.googleusercontent.com';
     if (!this.isGisLoaded() || !effectiveId) return;
 
@@ -26,10 +36,27 @@ export class GoogleDriveService {
         client_id: effectiveId,
         scope: 'https://www.googleapis.com/auth/drive.appdata https://www.googleapis.com/auth/drive.file',
         callback: (resp: any) => {
-          if (resp.access_token) {
+          if (resp.error) {
+            const pending = this.pendingTokenRequests;
+            this.pendingTokenRequests = [];
+            for (const req of pending) {
+              req.reject(new Error(resp.error));
+            }
+          } else if (resp.access_token) {
             this.accessToken = resp.access_token;
             this.tokenExpiry = Date.now() + (resp.expires_in || 3600) * 1000;
-            if (onTokenReceived) onTokenReceived(resp.access_token);
+            const pending = this.pendingTokenRequests;
+            this.pendingTokenRequests = [];
+            for (const req of pending) {
+              req.resolve(resp.access_token);
+            }
+            for (const listener of this.tokenListeners) {
+              try {
+                listener(resp.access_token);
+              } catch (e) {
+                console.error('[GoogleDrive] Error in token listener:', e);
+              }
+            }
           }
         },
       });
@@ -47,7 +74,7 @@ export class GoogleDriveService {
     this.tokenExpiry = 0;
   }
 
-  public async getAccessToken(): Promise<string> {
+  public async getAccessToken(interactive = false): Promise<string> {
     if (this.hasValidToken() && this.accessToken) {
       return this.accessToken;
     }
@@ -57,16 +84,17 @@ export class GoogleDriveService {
     }
 
     return new Promise((resolve, reject) => {
-      this.tokenClient.callback = (resp: any) => {
-        if (resp.error) {
-          reject(new Error(resp.error));
-        } else if (resp.access_token) {
-          this.accessToken = resp.access_token;
-          this.tokenExpiry = Date.now() + (resp.expires_in || 3600) * 1000;
-          resolve(resp.access_token);
+      this.pendingTokenRequests.push({ resolve, reject });
+      try {
+        if (interactive) {
+          this.tokenClient.requestAccessToken();
+        } else {
+          this.tokenClient.requestAccessToken({ prompt: '' });
         }
-      };
-      this.tokenClient.requestAccessToken({ prompt: '' });
+      } catch (err) {
+        this.pendingTokenRequests = this.pendingTokenRequests.filter(r => r.resolve !== resolve);
+        reject(err);
+      }
     });
   }
 
@@ -98,9 +126,9 @@ export class GoogleDriveService {
     throw new Error(`${action} fallito (${res.status}): ${detail}`);
   }
 
-  public async uploadBackup(backupJson: string): Promise<{ success: boolean; message: string }> {
+  public async uploadBackup(backupJson: string, interactive = false): Promise<{ success: boolean; message: string }> {
     try {
-      const token = await this.getAccessToken();
+      const token = await this.getAccessToken(interactive);
 
       // Cerca se esiste già un backup precedente in appDataFolder
       const searchRes = await fetch(
@@ -161,9 +189,9 @@ export class GoogleDriveService {
     }
   }
 
-  public async downloadBackup(): Promise<{ success: boolean; data?: string; message: string }> {
+  public async downloadBackup(interactive = false): Promise<{ success: boolean; data?: string; message: string }> {
     try {
-      const token = await this.getAccessToken();
+      const token = await this.getAccessToken(interactive);
 
       const searchRes = await fetch(
         "https://www.googleapis.com/drive/v3/files?spaces=appDataFolder&q=name='" + BACKUP_FILENAME + "' and trashed=false",

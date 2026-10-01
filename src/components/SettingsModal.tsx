@@ -34,6 +34,7 @@ import {
 import { useTheme } from '../context/ThemeContext';
 import { useQuiz } from '../context/QuizContext';
 import { googleDrive } from '../services/googleDrive';
+import { syncEngine } from '../services/syncEngine';
 import { voiceService } from '../services/voiceService';
 import { exportDatabaseBackup, importDatabaseBackup, db } from '../db';
 import type { ThemeMode } from '../types/database';
@@ -359,14 +360,12 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
 
   const handleBackupToDrive = async () => {
     setIsProcessing(true);
-    setSyncStatus('Connessione a Google in corso...');
+    setSyncStatus('Connessione e salvataggio su Google Drive in corso...');
     try {
       googleDrive.initTokenClient(effectiveClientId);
-      const jsonStr = await exportDatabaseBackup();
-      const res = await googleDrive.uploadBackup(jsonStr);
+      const res = await syncEngine.pushNow(true);
       if (res.success) {
         setSyncStatus('Salvataggio completato con successo!');
-        await updateSetting('lastDriveSyncAt', Date.now());
       } else {
         setSyncStatus(`Attenzione: ${res.message}`);
       }
@@ -385,10 +384,9 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
     setSyncStatus('Recupero dati da Google in corso...');
     try {
       googleDrive.initTokenClient(effectiveClientId);
-      const res = await googleDrive.downloadBackup();
-      if (res.success && res.data) {
-        const importRes = await importDatabaseBackup(res.data);
-        setSyncStatus(importRes.message || 'Dati ripristinati con successo!');
+      const res = await syncEngine.pullNow(true);
+      if (res.success) {
+        setSyncStatus(res.message || 'Dati ripristinati con successo!');
       } else {
         setSyncStatus(`Attenzione: ${res.message}`);
       }
@@ -1449,26 +1447,53 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                 {/* Barra di Stato Sincronizzazione */}
                 {settings.autoSyncDrive && (
                   <div className="p-2.5 rounded-xl border border-zinc-700/80 bg-zinc-950/40 light:bg-slate-100/60 light:border-slate-300 text-xs flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <div className={`w-2 h-2 rounded-full ${
+                    <div className="flex items-center gap-2 min-w-0 pr-2">
+                      <div className={`w-2 h-2 rounded-full flex-shrink-0 ${
                         syncState.status === 'syncing' ? 'bg-amber-400 animate-pulse' :
                         syncState.status === 'offline' ? 'bg-zinc-500' :
                         syncState.status === 'needs_auth' ? 'bg-amber-400' :
+                        syncState.status === 'error' ? 'bg-rose-500' :
                         'bg-emerald-400'
                       }`} />
-                      <span className="text-zinc-300 light:text-slate-700 font-medium">
+                      <span className="text-zinc-300 light:text-slate-700 font-medium truncate">
                         {syncState.status === 'syncing' ? 'Sincronizzazione in corso...' :
                          syncState.status === 'offline' ? 'Dispositivo offline' :
-                         syncState.status === 'needs_auth' ? 'Accesso scaduto' :
+                         syncState.status === 'needs_auth' ? 'Accesso richiesto / scaduto' :
+                         syncState.status === 'error' ? (syncState.errorDetail || 'Errore sincronizzazione') :
                          'Connesso a Google Drive'}
                       </span>
                     </div>
 
-                    <span className="text-[11px] text-zinc-400 light:text-slate-600 font-mono">
-                      {syncState.lastSyncedAt
-                        ? `Ultimo: ${new Date(syncState.lastSyncedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`
-                        : 'Mai salvato'}
-                    </span>
+                    <div className="flex items-center gap-2 flex-shrink-0">
+                      <span className="text-[11px] text-zinc-400 light:text-slate-600 font-mono">
+                        {syncState.lastSyncedAt
+                          ? `Ultimo: ${new Date(syncState.lastSyncedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`
+                          : 'Mai salvato'}
+                      </span>
+                      <button
+                        type="button"
+                        id="btn-sync-now"
+                        onClick={async () => {
+                          setIsProcessing(true);
+                          setSyncStatus('Sincronizzazione in corso...');
+                          try {
+                            googleDrive.initTokenClient(effectiveClientId);
+                            const res = await syncNow(true);
+                            setSyncStatus(res.message);
+                          } catch (err: any) {
+                            setSyncStatus(err?.message || 'Errore sincronizzazione');
+                          } finally {
+                            setIsProcessing(false);
+                          }
+                        }}
+                        disabled={isProcessing || syncState.status === 'syncing'}
+                        title="Sincronizza adesso con Google Drive"
+                        aria-label="Sincronizza adesso con Google Drive"
+                        className="p-1 rounded-lg hover:bg-zinc-800 light:hover:bg-slate-200 text-zinc-300 hover:text-white light:text-slate-700 light:hover:text-slate-900 transition-colors cursor-pointer disabled:opacity-50"
+                      >
+                        <RefreshCw className={`w-3.5 h-3.5 ${syncState.status === 'syncing' ? 'animate-spin text-amber-400' : ''}`} />
+                      </button>
+                    </div>
                   </div>
                 )}
 

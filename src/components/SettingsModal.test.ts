@@ -304,4 +304,39 @@ describe('SettingsModal Component (Accordion & Mobile Ergonomics)', () => {
     });
     container.remove();
   });
+
+  it('calls syncNow(true) when clicking #btn-sync-now in Cloud section', async () => {
+    const mockSyncNow = vi.fn().mockResolvedValue({ success: true, message: 'Sincronizzazione completata' });
+    mockUseQuiz.mockReturnValue({
+      settings: { ...defaultSettings, autoSyncDrive: true },
+      updateSetting: vi.fn(),
+      updateSettings: vi.fn(),
+      syncState: { status: 'error', errorDetail: 'Errore di connessione', lastSyncedAt: null, isAutoSyncEnabled: true },
+      syncNow: mockSyncNow,
+      resetAllStats: vi.fn(),
+      resetAllData: vi.fn()
+    });
+
+    const container = document.createElement('div');
+    document.body.appendChild(container);
+    const root = createRoot(container);
+
+    act(() => {
+      root.render(React.createElement(SettingsModal, { isOpen: true, onClose: () => {}, defaultTab: 'cloud' }));
+    });
+
+    const syncNowBtn = container.querySelector('#btn-sync-now') as HTMLButtonElement;
+    expect(syncNowBtn).not.toBeNull();
+
+    await act(async () => {
+      syncNowBtn.click();
+    });
+
+    expect(mockSyncNow).toHaveBeenCalledWith(true);
+
+    act(() => {
+      root.unmount();
+    });
+    container.remove();
+  });
 });

@@ -14,6 +14,32 @@ Questo documento registra in ordine cronologico tutte le lavorazioni svolte nel 
 - **Impatto sul Desiderata**: <Come questo intervento contribuisce al desiderata (cfr. DESIDERATA.md) e indicazioni per il prossimo agente>
 ```
 
+### [2026-10-01] - Ripristino Reattivo Stato Cloud Synced e Risoluzione Icona Errore Bloccata
+
+- **Cosa abbiamo fatto**:
+  * **Risoluzione Icona Errore Bloccata su Cloud Sync ([src/services/syncEngine.ts](file:///c:/github/Quiz_VDS-VL/src/services/syncEngine.ts), [src/services/googleDrive.ts](file:///c:/github/Quiz_VDS-VL/src/services/googleDrive.ts))**:
+    - Risolto il difetto per cui, a seguito di un errore o scadenza token, anche risolvendo la sincronizzazione o ri-autenticandosi l'icona del cloud nella Navbar (`#btn-cloud-sync`) rimaneva color ambra con il punto esclamativo/dot di errore anziché tornare verde smeraldo (`text-emerald-400`).
+    - Identificate e rimosse 4 cause radice:
+      1. In [src/components/SettingsModal.tsx](file:///c:/github/Quiz_VDS-VL/src/components/SettingsModal.tsx), `handleBackupToDrive` e `handleRestoreFromDrive` chiamavano direttamente le API grezze di `googleDrive` anziché delegare a `syncEngine.pushNow(true)` e `syncEngine.pullNow(true)`, lasciando `syncEngine.status` bloccato su `'error'`/`'needs_auth'` anche dopo un salvataggio o ripristino riuscito.
+      2. In [src/services/googleDrive.ts](file:///c:/github/Quiz_VDS-VL/src/services/googleDrive.ts), la funzione `getAccessToken` sovrascriveva `this.tokenClient.callback` con una closure monouso, cancellando permanentemente il listener registrato da `SyncEngine.init()`.
+      3. Google Identity Services riceveva chiamate con `{ prompt: '' }` rigido; introdotto il flag `interactive = true` per le azioni utente esplicite ("Salva adesso", "Unisci dati", "Sincronizza subito") per consentire il login e il rilascio del token.
+      4. Introdotto in `GoogleDriveService` un sistema multi-listener (`addTokenListener`): all'arrivo di un nuovo token di accesso valido da Google, `SyncEngine` viene notificato all'istante ed esegue `fullSync()`, cancellando lo stato di errore e impostando immediatamente lo stato su `'synced'` (verde).
+  * **Pulsante Sincronizzazione Immediata & Diagnostica ([src/components/SettingsModal.tsx](file:///c:/github/Quiz_VDS-VL/src/components/SettingsModal.tsx))**:
+    - Aggiunto il pulsante `#btn-sync-now` con icona refresh animata direttamente all'interno della barra di stato del Backup Cloud nelle impostazioni per consentire la ri-sincronizzazione esplicita in 1 tocco.
+    - Aggiornata la barra di stato per gestire esplicitamente lo stato `'error'` con badge rosso tenue (`bg-rose-500`) e dettaglio dell'errore, oltre a `'needs_auth'`, `'offline'`, `'syncing'` e `'synced'`.
+  * **Copertura di Test ([src/services/syncEngine.test.ts](file:///c:/github/Quiz_VDS-VL/src/services/syncEngine.test.ts), [src/components/SettingsModal.test.ts](file:///c:/github/Quiz_VDS-VL/src/components/SettingsModal.test.ts))**:
+    - Aggiunti test in `syncEngine.test.ts` per verificare la transizione automatica da `error`/`needs_auth` a `synced` dopo un `pushNow()` riuscito, il ripristino a `idle` alla disattivazione dell'auto-sync, e il recupero reattivo quando viene ricevuto un token Google.
+    - Aggiunto test in `SettingsModal.test.ts` per validare l'invocazione di `syncNow(true)` tramite `#btn-sync-now`.
+
+- **Scelte architetturali & Rationale**:
+  * *Single Source of Truth per lo Stato di Sincronizzazione*: Centralizzare tutte le operazioni cloud ("Salva adesso", "Unisci dati", auto-sync background, ricezione token) all'interno di `syncEngine` garantisce che qualsiasi mutazione di stato si rifletta istantaneamente in tutta l'applicazione (`QuizContext` -> `Navbar` e `SettingsModal`), eliminando divergenze e icone bloccate.
+  * *Disaccoppiamento Token Listener*: Gestire un set di listener permanenti in `GoogleDriveService` anziché una singola callback volatile previene che chiamate concorrenti a `initTokenClient` cancellino i callback registrati da altri sottosistemi.
+
+- **Impatto sul Desiderata**:
+  * Fornisce all'allievo pilota un feedback visivo 100% veritiero e affidabile: quando la sincronizzazione ha successo, l'icona nella barra di navigazione torna immediatamente verde smeraldo, confermando senza ambiguità la sicurezza dei dati su Google Drive.
+
+---
+
 ### [2026-10-01] - Apertura Rapida e Auto-Espansione Backup Cloud dall'Icona Navbar
 
 - **Cosa abbiamo fatto**:

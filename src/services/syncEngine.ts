@@ -73,10 +73,15 @@ export class SyncEngine {
     }
 
     if (typeof window !== 'undefined') {
-      googleDrive.initTokenClient(clientId, () => {
-        // Token received
-        if (this.status === 'needs_auth') {
-          this.setStatus('idle');
+      googleDrive.initTokenClient(clientId);
+      googleDrive.addTokenListener(() => {
+        // Token received: clear needs_auth/error and auto-sync if enabled
+        if (this.status === 'needs_auth' || this.status === 'error') {
+          if (this.isAutoSyncEnabled && isDeviceOnline()) {
+            this.fullSync().catch(console.error);
+          } else {
+            this.setStatus('synced');
+          }
         }
       });
 
@@ -105,9 +110,12 @@ export class SyncEngine {
   public setAutoSyncEnabled(enabled: boolean, triggerImmediateSync = true): void {
     this.isAutoSyncEnabled = enabled;
     setSetting('autoSyncDrive', enabled);
+    if (!enabled && (this.status === 'error' || this.status === 'needs_auth')) {
+      this.setStatus('idle');
+    }
     this.notify();
     if (enabled && triggerImmediateSync && isDeviceOnline()) {
-      this.fullSync().catch(err => {
+      this.fullSync(true).catch(err => {
         console.warn('SyncEngine background fullSync error:', err);
       });
     }
@@ -137,7 +145,7 @@ export class SyncEngine {
   /**
    * Performs an immediate upload of the current database state to Google Drive.
    */
-  public async pushNow(): Promise<{ success: boolean; message: string }> {
+  public async pushNow(interactive = false): Promise<{ success: boolean; message: string }> {
     if (!isDeviceOnline()) {
       this.setStatus('offline');
       return { success: false, message: 'Dispositivo offline' };
@@ -147,7 +155,7 @@ export class SyncEngine {
 
     try {
       const jsonBackup = await exportDatabaseBackup();
-      const res = await googleDrive.uploadBackup(jsonBackup);
+      const res = await googleDrive.uploadBackup(jsonBackup, interactive);
 
       if (res.success) {
         const now = Date.now();
@@ -165,7 +173,11 @@ export class SyncEngine {
       }
     } catch (err: any) {
       const msg = err?.message || 'Errore sincronizzazione';
-      this.setStatus('needs_auth', msg);
+      if (msg.includes('token') || msg.includes('inizializzato') || msg.includes('403')) {
+        this.setStatus('needs_auth', msg);
+      } else {
+        this.setStatus('error', msg);
+      }
       return { success: false, message: msg };
     }
   }
@@ -173,7 +185,7 @@ export class SyncEngine {
   /**
    * Downloads latest backup from Google Drive and merges it into local Dexie database.
    */
-  public async pullNow(): Promise<{ success: boolean; message: string }> {
+  public async pullNow(interactive = false): Promise<{ success: boolean; message: string }> {
     if (!isDeviceOnline()) {
       this.setStatus('offline');
       return { success: false, message: 'Dispositivo offline' };
@@ -182,13 +194,17 @@ export class SyncEngine {
     this.setStatus('syncing');
 
     try {
-      const res = await googleDrive.downloadBackup();
+      const res = await googleDrive.downloadBackup(interactive);
       if (!res.success || !res.data) {
         if (res.message.includes('Nessun backup trovato')) {
           this.setStatus('synced');
           return { success: true, message: res.message };
         }
-        this.setStatus('error', res.message);
+        if (res.message?.includes('token') || res.message?.includes('inizializzato') || res.message?.includes('403')) {
+          this.setStatus('needs_auth', res.message);
+        } else {
+          this.setStatus('error', res.message);
+        }
         return { success: false, message: res.message };
       }
 
@@ -205,7 +221,11 @@ export class SyncEngine {
       }
     } catch (err: any) {
       const msg = err?.message || 'Errore ripristino cloud';
-      this.setStatus('needs_auth', msg);
+      if (msg.includes('token') || msg.includes('inizializzato') || msg.includes('403')) {
+        this.setStatus('needs_auth', msg);
+      } else {
+        this.setStatus('error', msg);
+      }
       return { success: false, message: msg };
     }
   }
@@ -214,7 +234,7 @@ export class SyncEngine {
    * Full bidirectional sync: pulls latest cloud changes, smart merges with local DB,
    * then pushes the unified result back to Google Drive so both are in complete parity.
    */
-  public async fullSync(): Promise<{ success: boolean; message: string }> {
+  public async fullSync(interactive = false): Promise<{ success: boolean; message: string }> {
     if (!isDeviceOnline()) {
       this.setStatus('offline');
       return { success: false, message: 'Dispositivo offline' };
@@ -224,14 +244,21 @@ export class SyncEngine {
 
     try {
       // 1. Pull & Merge
-      const pullRes = await googleDrive.downloadBackup();
+      const pullRes = await googleDrive.downloadBackup(interactive);
       if (pullRes.success && pullRes.data) {
         await importDatabaseBackup(pullRes.data);
+      } else if (!pullRes.success && !pullRes.message.includes('Nessun backup trovato')) {
+        if (pullRes.message?.includes('token') || pullRes.message?.includes('inizializzato') || pullRes.message?.includes('403')) {
+          this.setStatus('needs_auth', pullRes.message);
+        } else {
+          this.setStatus('error', pullRes.message);
+        }
+        return { success: false, message: pullRes.message };
       }
 
       // 2. Push merged state
       const mergedBackup = await exportDatabaseBackup();
-      const pushRes = await googleDrive.uploadBackup(mergedBackup);
+      const pushRes = await googleDrive.uploadBackup(mergedBackup, interactive);
 
       if (pushRes.success) {
         const now = Date.now();
@@ -240,12 +267,20 @@ export class SyncEngine {
         this.setStatus('synced');
         return { success: true, message: 'Sincronizzazione completata con successo' };
       } else {
-        this.setStatus('error', pushRes.message);
+        if (pushRes.message?.includes('token') || pushRes.message?.includes('inizializzato') || pushRes.message?.includes('403')) {
+          this.setStatus('needs_auth', pushRes.message);
+        } else {
+          this.setStatus('error', pushRes.message);
+        }
         return { success: false, message: pushRes.message };
       }
     } catch (err: any) {
       const msg = err?.message || 'Errore sincronizzazione completa';
-      this.setStatus('needs_auth', msg);
+      if (msg.includes('token') || msg.includes('inizializzato') || msg.includes('403')) {
+        this.setStatus('needs_auth', msg);
+      } else {
+        this.setStatus('error', msg);
+      }
       return { success: false, message: msg };
     }
   }
