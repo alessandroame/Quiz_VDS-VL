@@ -14,6 +14,30 @@ Questo documento registra in ordine cronologico tutte le lavorazioni svolte nel 
 - **Impatto sul Desiderata**: <Come questo intervento contribuisce al desiderata (cfr. DESIDERATA.md) e indicazioni per il prossimo agente>
 ```
 
+### [2026-10-01] - Unificazione Barra Navigazione Quiz e Risoluzione Overflow Mobile (v1.6.3)
+- **Cosa abbiamo fatto**:
+  - **Risoluzione Overflow Orizzontale Mobile**:
+    - Risolto il difetto per cui su schermi stretti (≤ 390px, es. iPhone SE/mini o Android compatti) il tasto di avanzamento sbordava fisicamente dal lato destro del display.
+    - Introdotta protezione Flexbox con `min-w-0`, `truncate` e dimensionamento `shrink-0` su tutti i pulsanti e contenitori di [src/components/QuizBottomBar.tsx](file:///c:/github/Quiz_VDS-VL/src/components/QuizBottomBar.tsx).
+  - **Unificazione Semantica del Tasto ("Successiva")**:
+    - Rimossa la stringa prolissa `"Prossima Domanda (m/n)"` che duplicava il contatore della domanda e creava confusione con il tasto `"Successiva"`.
+    - L'azione mantiene ora l'etichetta coerente `"Successiva"` sia prima che dopo la risposta in [src/components/ExamScreen.tsx](file:///c:/github/Quiz_VDS-VL/src/components/ExamScreen.tsx).
+    - In modalità Tutor, dopo la selezione della risposta il tasto si evidenzia in Aviation Amber (`bg-amber-600`) come Call to Action primaria col pollice, preservando la geometria e la posizione esatta senza generare layout shift.
+    - Sull'ultimo quesito della simulazione, commuta coerentemente su `"Completa"` (in Tutor) o `"Consegna"` (in Esame).
+  - **Permanenza del Contatore Centrale (`N / 30`)**:
+    - Il contatore centrale rimane sempre visibile e centrato anche quando l'azione primaria è attiva, fornendo continuo orientamento spaziale all'allievo.
+  - **Clearance Verticale Ottimizzata (Prevenzione Taglio Didattica)**:
+    - Incrementato il padding inferiore di [src/components/ExamScreen.tsx](file:///c:/github/Quiz_VDS-VL/src/components/ExamScreen.tsx), [src/components/TopicsScreen.tsx](file:///c:/github/Quiz_VDS-VL/src/components/TopicsScreen.tsx) e [src/components/MistakesScreen.tsx](file:///c:/github/Quiz_VDS-VL/src/components/MistakesScreen.tsx) a `pb-28 sm:pb-32`, garantendo che le spiegazioni didattiche (Regola e Tranello) siano visibili al 100% sopra la barra fissa.
+  - **Suite di Test & Collaudi Visivi**:
+    - Aggiunti test di stabilità contatore e classi anti-overflow in [src/components/QuizBottomBar.test.ts](file:///c:/github/Quiz_VDS-VL/src/components/QuizBottomBar.test.ts).
+    - Aggiornato [scripts/test_quiz_bottom_bar.cjs](file:///c:/github/Quiz_VDS-VL/scripts/test_quiz_bottom_bar.cjs) e generati screenshot ufficiali verificati su mobile (390x844) e desktop (1440x900) con 0 errori in console.
+    - Tutti i 361 test Vitest passano con successo (100% verdi).
+- **Scelte architetturali & Rationale**:
+  - *Principio di Coerenza Ergonomica (Zero Distrazioni)*: Avere due etichette distinte che compivano la stessa identica operazione (`currentIndex + 1`) ingenerava nell'utente il dubbio che una saltasse e l'altra convalidasse. L'unificazione rende l'interazione immediata e intuitiva.
+  - *Fitts's Law e Stabilità Tattile*: Mantenere il tasto fisso nella medesima posizione geometrica (senza farlo allargare o sparire) favorisce la memoria muscolare del pollice durante lo studio intensivo.
+- **Impatto sul Desiderata**:
+  - Piena conformità con i principi di ergonomia mobile e zero distrazioni di [DESIDERATA.md](file:///c:/github/Quiz_VDS-VL/DESIDERATA.md).
+
 ### [2026-10-01] - Visibilità Mobile del Pulsante Pausa e Integrazione Pausa nel Dialogo Concludi Esame
 - **Cosa abbiamo fatto**:
   - **Pulsante "Metti in Pausa" in `ExamSubmitModal`**:
