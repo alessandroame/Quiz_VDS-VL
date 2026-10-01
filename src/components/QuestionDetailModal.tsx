@@ -176,7 +176,7 @@ export const QuestionDetailModal: React.FC<QuestionDetailModalProps> = ({
                   onClick={() => playQuestion()}
                   className={`px-2 py-1 rounded text-xs font-semibold flex items-center gap-1 border transition-colors ${
                     isPartPlaying('question')
-                      ? 'bg-amber-500/20 border-amber-500 text-amber-300 ring-1 ring-amber-400/50'
+                      ? 'bg-amber-500/20 border-amber-500 text-amber-300 ring-1 ring-amber-400/50 light:bg-amber-100 light:border-amber-400 light:text-amber-800'
                       : 'bg-zinc-800 border-zinc-700 text-zinc-300 hover:text-white light:bg-white light:border-slate-300 light:text-slate-800'
                   }`}
                 >
@@ -189,7 +189,7 @@ export const QuestionDetailModal: React.FC<QuestionDetailModalProps> = ({
                   onClick={() => playExplanation()}
                   className={`px-2 py-1 rounded text-xs font-semibold flex items-center gap-1 border transition-colors ${
                     isPartPlaying('explanation')
-                      ? 'bg-amber-500/20 border-amber-500 text-amber-300 ring-1 ring-amber-400/50'
+                      ? 'bg-amber-500/20 border-amber-500 text-amber-300 ring-1 ring-amber-400/50 light:bg-amber-100 light:border-amber-400 light:text-amber-800'
                       : 'bg-zinc-800 border-zinc-700 text-zinc-300 hover:text-white light:bg-white light:border-slate-300 light:text-slate-800'
                   }`}
                 >

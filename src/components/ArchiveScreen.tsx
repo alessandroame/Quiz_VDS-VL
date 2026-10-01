@@ -90,15 +90,15 @@ const ArchiveItemExpandedContent: React.FC<ArchiveItemExpandedContentProps> = ({
                       onClick={() => playQuestion()}
                       className={`px-1.5 py-0.5 rounded flex items-center gap-1 font-semibold transition-colors ${
                         isPartPlaying('question')
-                          ? 'bg-amber-500/20 text-amber-400 ring-1 ring-amber-500/50'
-                          : 'bg-zinc-700/50 text-zinc-300 ring-1 ring-zinc-600'
+                          ? 'bg-amber-500/20 text-amber-400 ring-1 ring-amber-500/50 light:bg-amber-100 light:text-amber-800 light:ring-amber-400'
+                          : 'bg-zinc-700/50 text-zinc-300 ring-1 ring-zinc-600 light:bg-slate-200 light:text-slate-700'
                       }`}
                       title={isPartPlaying('question') ? 'Metti in pausa la lettura della domanda' : 'Riprendi lettura della domanda'}
                     >
                       {isPartPlaying('question') ? (
-                        <Pause className="w-2.5 h-2.5 animate-pulse text-amber-400" />
+                        <Pause className="w-2.5 h-2.5 animate-pulse text-amber-400 light:text-amber-700" />
                       ) : (
-                        <Play className="w-2.5 h-2.5 text-amber-400" />
+                        <Play className="w-2.5 h-2.5 text-amber-400 light:text-amber-700" />
                       )}
                       <span>Domanda</span>
                     </button>
@@ -191,15 +191,15 @@ const ArchiveItemExpandedContent: React.FC<ArchiveItemExpandedContentProps> = ({
                           onClick={() => playOption(optNum)}
                           className={`p-0.5 rounded transition-colors ${
                             isOptPlaying
-                              ? 'bg-amber-500/20 text-amber-400 ring-1 ring-amber-500/50'
-                              : 'bg-zinc-700/50 text-zinc-300 ring-1 ring-zinc-600'
+                              ? 'bg-amber-500/20 text-amber-400 ring-1 ring-amber-500/50 light:bg-amber-100 light:text-amber-800 light:ring-amber-400'
+                              : 'bg-zinc-700/50 text-zinc-300 ring-1 ring-zinc-600 light:bg-slate-100 light:text-slate-700'
                           }`}
                           title={isOptPlaying ? `Metti in pausa opzione ${optNum}` : `Riprendi ascolto opzione ${optNum}`}
                         >
                           {isOptPlaying ? (
-                            <Pause className="w-3 h-3 text-amber-400 animate-pulse" />
+                            <Pause className="w-3 h-3 text-amber-400 light:text-amber-700 animate-pulse" />
                           ) : (
-                            <Play className="w-3 h-3 text-amber-400" />
+                            <Play className="w-3 h-3 text-amber-400 light:text-amber-700" />
                           )}
                         </button>
                         <button
@@ -240,19 +240,19 @@ const ArchiveItemExpandedContent: React.FC<ArchiveItemExpandedContentProps> = ({
                       onClick={() => playExplanation()}
                       className={`px-1.5 py-0.5 rounded flex items-center gap-1 font-semibold transition-colors ${
                         isPartPlaying('explanation')
-                          ? 'bg-amber-500/20 text-amber-400 ring-1 ring-amber-500/50'
-                          : 'bg-zinc-700/50 text-zinc-300 ring-1 ring-zinc-600'
+                          ? 'bg-amber-500/20 text-amber-400 ring-1 ring-amber-500/50 light:bg-amber-100 light:text-amber-800 light:ring-amber-400'
+                          : 'bg-zinc-700/50 text-zinc-300 ring-1 ring-zinc-600 light:bg-slate-200 light:text-slate-700'
                       }`}
                       title={isPartPlaying('explanation') ? 'Metti in pausa la spiegazione' : 'Riprendi spiegazione'}
                     >
                       {isPartPlaying('explanation') ? (
                         <>
-                          <Pause className="w-2.5 h-2.5 animate-pulse text-amber-400" />
+                          <Pause className="w-2.5 h-2.5 animate-pulse text-amber-400 light:text-amber-700" />
                           <span>Pausa</span>
                         </>
                       ) : (
                         <>
-                          <Play className="w-2.5 h-2.5 text-amber-400" />
+                          <Play className="w-2.5 h-2.5 text-amber-400 light:text-amber-700" />
                           <span>Riprendi</span>
                         </>
                       )}

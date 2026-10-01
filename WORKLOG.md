@@ -14,6 +14,34 @@ Questo documento registra in ordine cronologico tutte le lavorazioni svolte nel 
 - **Impatto sul Desiderata**: <Come questo intervento contribuisce al desiderata (cfr. DESIDERATA.md) e indicazioni per il prossimo agente>
 ```
 
+### [2026-10-01] - Ottimizzazione Contrasto Elevato Opzioni Quiz & Audio in Modalità Chiara (v1.5.2)
+
+- **Cosa abbiamo fatto**:
+  * **Risoluzione Bug Contrasto Basso in Modalità Chiara ([src/components/QuestionCard.tsx](file:///c:/github/Quiz_VDS-VL/src/components/QuestionCard.tsx))**:
+    - Risolto il difetto di contrasto visivo segnalato dall'utente in modalità chiara: durante la riproduzione audio o la selezione neutra di un'opzione, il pulsante riceveva la classe scura `text-amber-200` (`#fde68a`, giallo chiaro) o `text-amber-200/80` senza alcun override per la modalità chiara. Su sfondo bianco/chiaro il contrasto crollava a ~1.25:1, rendendo il testo praticamente invisibile.
+    - Introdotte classi esplicite ad alto contrasto per la modalità chiara conformi a WCAG AAA:
+      * Opzione in ascolto attivo (`isCurrentOptPlaying`): `light:border-amber-500 light:bg-amber-50 light:text-amber-950 light:ring-amber-400 font-medium` (rapporto di contrasto > 14:1 con testo bruno intenso).
+      * Opzione in pausa (`isCurrentOptPaused`): `light:border-amber-400 light:bg-amber-50/60 light:text-amber-900 light:ring-amber-300 font-medium`.
+      * Opzione selezionata durante l'ascolto (`isSelected && isCurrentOptPlaying`): `light:border-amber-600 light:bg-amber-100 light:text-amber-950 light:ring-amber-500 font-medium`.
+      * Opzione selezionata neutra (`isSelected`): `light:border-amber-600 light:bg-amber-50 light:text-amber-950 light:ring-amber-400 font-medium`.
+    - Arricchito il badge circolare dell'opzione con `font-black` per massima leggibilità su smartphone e sole diretto.
+    - Sostituiti i `<button>` annidati all'interno del pulsante opzione per i controlli audio con `<span role="button" tabIndex={0} ...>` dotati di handler da tastiera (`Enter`/`Space`) per eliminare avvisi di idratazione e nesting HTML5 invalido.
+    - Aggiunte varianti ad alto contrasto in modalità chiara (`light:bg-amber-100 light:text-amber-800 light:ring-amber-400` e icone `light:text-amber-700`) ai controlli audio in [src/components/QuestionCard.tsx](file:///c:/github/Quiz_VDS-VL/src/components/QuestionCard.tsx), [src/components/QuestionDetailModal.tsx](file:///c:/github/Quiz_VDS-VL/src/components/QuestionDetailModal.tsx) e [src/components/ArchiveScreen.tsx](file:///c:/github/Quiz_VDS-VL/src/components/ArchiveScreen.tsx).
+  * **Suite di Test Dedicata ([src/components/QuestionCard.test.ts](file:///c:/github/Quiz_VDS-VL/src/components/QuestionCard.test.ts))**:
+    - Creata suite con 5 unit test mirati che verificano la presenza delle classi ad alto contrasto in modalità chiara per: opzione selezionata, opzione in ascolto attivo, opzione in pausa, opzione sia selezionata che in ascolto, e controlli audio nella testata della card.
+  * **Collaudo Visivo Headless CDP**:
+    - Eseguito visual check tramite `visual_check.js` sia in risoluzione mobile portrait (390x844) che desktop (1440x900) con esito 0 errori in console.
+  * **Avanzamento SemVer**:
+    - Bump versione a `1.5.2` in [package.json](file:///c:/github/Quiz_VDS-VL/package.json).
+
+- **Scelte architetturali & Rationale**:
+  * *Accento Caldo Ambra Scuro (`amber-950` / `#451a03`) vs Grigio Neutro (`slate-900`)*: Utilizzare `light:text-amber-950` per gli elementi selezionati/in ascolto conserva l'identità cromatica calda del design system (zero-blue ambra aeronautico) garantendo al contempo un rapporto di contrasto eccezionale (>14:1) su qualsiasi tonalità chiara (`bg-white` o `bg-amber-50`), pienamente conforme a WCAG AAA.
+
+- **Impatto sul Desiderata**:
+  * Elimina completamente il difetto visivo riscontrato dall'allievo pilota durante lo studio diurno o all'aperto, rendendo la lettura delle risposte istantanea e priva di affaticamento visivo.
+
+---
+
 ### [2026-09-30] - Trimming Silenzio di Coda Audio Neurale & Reattività Vocale (v1.5.1)
 
 - **Cosa abbiamo fatto**:

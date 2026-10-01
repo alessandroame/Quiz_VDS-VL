@@ -209,19 +209,19 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({
                   onClick={togglePlayPause}
                   className={`px-2 py-1 rounded-md text-xs flex items-center gap-1 font-semibold transition-colors ${
                     isPlaying
-                      ? 'bg-amber-500/20 text-amber-400 ring-1 ring-amber-500/50'
-                      : 'bg-zinc-700/50 text-zinc-300 ring-1 ring-zinc-600'
+                      ? 'bg-amber-500/20 text-amber-400 ring-1 ring-amber-500/50 light:bg-amber-100 light:text-amber-800 light:ring-amber-400'
+                      : 'bg-zinc-700/50 text-zinc-300 ring-1 ring-zinc-600 light:bg-slate-200 light:text-slate-700'
                   }`}
                   title={isPlaying ? 'Metti in pausa (Tasto V)' : 'Riprendi ascolto (Tasto V)'}
                 >
                   {isPlaying ? (
                     <>
-                      <Pause className="w-3.5 h-3.5 text-amber-400 animate-pulse" />
+                      <Pause className="w-3.5 h-3.5 text-amber-400 light:text-amber-700 animate-pulse" />
                       <span className="hidden sm:inline">Pausa</span>
                     </>
                   ) : (
                     <>
-                      <Play className="w-3.5 h-3.5 text-amber-400" />
+                      <Play className="w-3.5 h-3.5 text-amber-400 light:text-amber-700" />
                       <span className="hidden sm:inline">Riprendi</span>
                     </>
                   )}
@@ -417,15 +417,15 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({
                 onClick={() => playQuestion()}
                 className={`px-1.5 py-1 rounded-md text-xs flex items-center gap-1 font-semibold transition-colors ${
                   isPartPlaying('question')
-                    ? 'bg-amber-500/20 text-amber-400 ring-1 ring-amber-500/50'
-                    : 'bg-zinc-700/50 text-zinc-300 ring-1 ring-zinc-600'
+                    ? 'bg-amber-500/20 text-amber-400 ring-1 ring-amber-500/50 light:bg-amber-100 light:text-amber-800 light:ring-amber-400'
+                    : 'bg-zinc-700/50 text-zinc-300 ring-1 ring-zinc-600 light:bg-slate-200 light:text-slate-700'
                 }`}
                 title={isPartPlaying('question') ? 'Metti in pausa la domanda (Tasto Q)' : 'Riprendi lettura domanda (Tasto Q)'}
               >
                 {isPartPlaying('question') ? (
-                  <Pause className="w-3.5 h-3.5 text-amber-400 animate-pulse" />
+                  <Pause className="w-3.5 h-3.5 text-amber-400 light:text-amber-700 animate-pulse" />
                 ) : (
-                  <Play className="w-3.5 h-3.5 text-amber-400" />
+                  <Play className="w-3.5 h-3.5 text-amber-400 light:text-amber-700" />
                 )}
               </button>
 
@@ -463,7 +463,7 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({
           const isCurrentOptActive = isPartActive(`opt${optNum}` as any);
 
           // Stili in base al feedback immediato o selezione neutra
-          let btnStyle = 'border-zinc-700 hover:border-zinc-600 bg-zinc-950/80 light:border-slate-300 light:bg-slate-50/90 light:hover:bg-slate-100 light:hover:border-slate-400 shadow-sm';
+          let btnStyle = 'border-zinc-700 hover:border-zinc-600 bg-zinc-950/80 text-zinc-200 light:border-slate-300 light:bg-slate-50/90 light:text-slate-800 light:hover:bg-slate-100 light:hover:border-slate-400 shadow-sm';
 
           if (showFeedback && selectedAnswer) {
             if (isCorrectAnswer) {
@@ -471,14 +471,18 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({
             } else if (isSelected && !isCorrectAnswer) {
               btnStyle = 'border-rose-500/80 bg-rose-950/30 text-rose-200 light:border-rose-600 light:bg-rose-50 light:text-rose-900';
             } else {
-              btnStyle = 'opacity-50 border-zinc-700 bg-zinc-950/20 light:border-slate-300 light:bg-white';
+              btnStyle = 'opacity-50 border-zinc-700 bg-zinc-950/20 text-zinc-400 light:border-slate-300 light:bg-white light:text-slate-600';
             }
+          } else if (isSelected && isCurrentOptPlaying) {
+            btnStyle = 'border-amber-500 bg-amber-500/20 text-amber-100 ring-2 ring-amber-400 font-medium light:border-amber-600 light:bg-amber-100 light:text-amber-950 light:ring-amber-500';
+          } else if (isSelected && isCurrentOptPaused) {
+            btnStyle = 'border-amber-500 bg-amber-500/15 text-amber-100 ring-1 ring-amber-500 font-medium light:border-amber-600 light:bg-amber-50 light:text-amber-950 light:ring-amber-400';
           } else if (isSelected) {
-            btnStyle = 'border-amber-500 bg-amber-500/10 text-amber-100 light:border-amber-600 light:bg-amber-50 light:text-amber-950 font-medium ring-1 ring-amber-500';
+            btnStyle = 'border-amber-500 bg-amber-500/10 text-amber-100 ring-1 ring-amber-500 font-medium light:border-amber-600 light:bg-amber-50 light:text-amber-950 light:ring-amber-400';
           } else if (isCurrentOptPlaying) {
-            btnStyle = 'border-amber-500/60 bg-amber-500/10 text-amber-200 ring-1 ring-amber-500/30';
+            btnStyle = 'border-amber-500/60 bg-amber-500/10 text-amber-200 ring-1 ring-amber-500/30 font-medium light:border-amber-500 light:bg-amber-50 light:text-amber-950 light:ring-amber-400';
           } else if (isCurrentOptPaused) {
-            btnStyle = 'border-amber-500/40 bg-amber-500/5 text-amber-200/80 ring-1 ring-amber-500/20';
+            btnStyle = 'border-amber-500/40 bg-amber-500/5 text-amber-200/80 ring-1 ring-amber-500/20 font-medium light:border-amber-400 light:bg-amber-50/60 light:text-amber-900 light:ring-amber-300';
           }
 
           return (
@@ -500,11 +504,11 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({
                       ? 'bg-emerald-500 text-white'
                       : isSelected
                       ? 'bg-rose-500 text-white'
-                      : 'bg-zinc-800 light:bg-slate-200 text-zinc-400'
+                      : 'bg-zinc-800 light:bg-slate-200 text-zinc-400 light:text-slate-600'
                     : isSelected
-                    ? 'bg-amber-500 text-zinc-950'
+                    ? 'bg-amber-500 text-zinc-950 font-black'
                     : isCurrentOptPlaying || isCurrentOptPaused
-                    ? 'bg-amber-500 text-zinc-950'
+                    ? 'bg-amber-500 text-zinc-950 font-black'
                     : 'bg-zinc-800 light:bg-slate-200 text-zinc-300 light:text-slate-700'
                 }`}
               >
@@ -523,40 +527,54 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({
                     onClick={(e) => e.stopPropagation()}
                   >
                     {/* Toggle Play / Pause Opzione */}
-                    <button
-                      type="button"
+                    <span
+                      role="button"
+                      tabIndex={0}
                       id={`btn-tts-opt-${optNum}-toggle`}
                       onClick={(e) => {
                         e.stopPropagation();
                         playOption(optNum);
                       }}
-                      className={`p-1 rounded text-xs transition-colors ${
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter' || e.key === ' ') {
+                          e.stopPropagation();
+                          playOption(optNum);
+                        }
+                      }}
+                      className={`p-1 rounded text-xs transition-colors cursor-pointer ${
                         isCurrentOptPlaying
-                          ? 'bg-amber-500/20 text-amber-400 ring-1 ring-amber-500/50'
-                          : 'bg-zinc-700/50 text-zinc-300 ring-1 ring-zinc-600'
+                          ? 'bg-amber-500/20 text-amber-400 ring-1 ring-amber-500/50 light:bg-amber-100 light:text-amber-800 light:ring-amber-400'
+                          : 'bg-zinc-700/50 text-zinc-300 ring-1 ring-zinc-600 light:bg-slate-100 light:text-slate-700'
                       }`}
                       title={isCurrentOptPlaying ? `Metti in pausa opzione ${optNum} (Alt+${optNum})` : `Riprendi ascolto opzione ${optNum} (Alt+${optNum})`}
                     >
                       {isCurrentOptPlaying ? (
-                        <Pause className="w-3.5 h-3.5 text-amber-400 animate-pulse" />
+                        <Pause className="w-3.5 h-3.5 text-amber-400 light:text-amber-700 animate-pulse" />
                       ) : (
-                        <Play className="w-3.5 h-3.5 text-amber-400" />
+                        <Play className="w-3.5 h-3.5 text-amber-400 light:text-amber-700" />
                       )}
-                    </button>
+                    </span>
 
                     {/* Ricomincia opzione da capo */}
-                    <button
-                      type="button"
+                    <span
+                      role="button"
+                      tabIndex={0}
                       id={`btn-tts-opt-${optNum}-restart`}
                       onClick={(e) => {
                         e.stopPropagation();
                         restartOption(optNum);
                       }}
-                      className="p-1 rounded text-zinc-300 light:text-slate-700 hover:text-white light:hover:text-black hover:bg-zinc-700/60 light:hover:bg-slate-300 transition-colors"
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter' || e.key === ' ') {
+                          e.stopPropagation();
+                          restartOption(optNum);
+                        }
+                      }}
+                      className="p-1 rounded text-zinc-300 light:text-slate-700 hover:text-white light:hover:text-black hover:bg-zinc-700/60 light:hover:bg-slate-300 transition-colors cursor-pointer"
                       title={`Ricomincia opzione ${optNum} da capo (Alt+Shift+${optNum})`}
                     >
                       <RotateCcw className="w-3 h-3" />
-                    </button>
+                    </span>
                   </span>
                 ) : (
                   <span
@@ -617,19 +635,19 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({
                     onClick={() => playExplanation()}
                     className={`px-2 py-0.5 rounded-md flex items-center gap-1 font-semibold transition-colors ${
                       isPartPlaying('explanation')
-                        ? 'bg-amber-500/20 text-amber-400 ring-1 ring-amber-500/50'
-                        : 'bg-zinc-700/50 text-zinc-300 ring-1 ring-zinc-600'
+                        ? 'bg-amber-500/20 text-amber-400 ring-1 ring-amber-500/50 light:bg-amber-100 light:text-amber-800 light:ring-amber-400'
+                        : 'bg-zinc-700/50 text-zinc-300 ring-1 ring-zinc-600 light:bg-slate-200 light:text-slate-700'
                     }`}
                     title={isPartPlaying('explanation') ? 'Metti in pausa spiegazione (Tasto E)' : 'Riprendi spiegazione (Tasto E)'}
                   >
                     {isPartPlaying('explanation') ? (
                       <>
-                        <Pause className="w-3 h-3 text-amber-400 animate-pulse" />
+                        <Pause className="w-3 h-3 text-amber-400 light:text-amber-700 animate-pulse" />
                         <span>Pausa</span>
                       </>
                     ) : (
                       <>
-                        <Play className="w-3 h-3 text-amber-400" />
+                        <Play className="w-3 h-3 text-amber-400 light:text-amber-700" />
                         <span>Riprendi</span>
                       </>
                     )}
