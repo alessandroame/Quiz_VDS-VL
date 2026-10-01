@@ -1,7 +1,8 @@
 // @vitest-environment happy-dom
-import { describe, it, expect, vi, beforeEach } from 'vitest';
-import React from 'react';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import React, { act } from 'react';
 import { renderToString } from 'react-dom/server';
+import { createRoot } from 'react-dom/client';
 
 const mockUseQuiz = vi.fn();
 vi.mock('../context/QuizContext', () => ({
@@ -23,16 +24,31 @@ const mockQuestions: Question[] = Array.from({ length: 474 }, (_, i) => ({
 }));
 
 describe('HomeScreen Component (Home Hub Contracts)', () => {
+  let container: HTMLDivElement;
+  let root: any;
+
   beforeEach(() => {
     vi.restoreAllMocks();
+    container = document.createElement('div');
+    document.body.appendChild(container);
+    root = createRoot(container);
+
     mockUseQuiz.mockReturnValue({
       readinessScore: 82,
       mistakesCount: 3,
       totalSeen: 210,
       questions: mockQuestions,
       activeSession: null,
-      openDriveMode: vi.fn()
+      openDriveMode: vi.fn(),
+      dismissActiveSession: vi.fn()
     });
+  });
+
+  afterEach(() => {
+    act(() => {
+      root.unmount();
+    });
+    container.remove();
   });
 
   it('should render all 6 core scenario macro-buttons with unique IDs', () => {
@@ -93,7 +109,8 @@ describe('HomeScreen Component (Home Hub Contracts)', () => {
         startTime: Date.now(),
         lastActiveTime: Date.now()
       },
-      openDriveMode: vi.fn()
+      openDriveMode: vi.fn(),
+      dismissActiveSession: vi.fn()
     });
 
     const html = renderToString(
@@ -105,5 +122,130 @@ describe('HomeScreen Component (Home Hub Contracts)', () => {
     expect(html).toContain('Simulazione Esame');
     expect(html).toContain('risposte date');
     expect(html).toContain('Riprendi');
+    expect(html).toContain('id="btn-home-resume-session"');
+    expect(html).toContain('id="btn-home-discard-session"');
+  });
+
+  it('should display In Pausa badge in banner when activeSession has isPaused true', () => {
+    mockUseQuiz.mockReturnValue({
+      readinessScore: 82,
+      mistakesCount: 3,
+      totalSeen: 210,
+      questions: mockQuestions,
+      activeSession: {
+        id: 'exam-123',
+        type: 'exam',
+        examMode: 'tutor',
+        questionIds: [1, 2, 3],
+        currentIndex: 1,
+        answers: { 1: 2 },
+        isPaused: true,
+        flags: {},
+        startTime: Date.now(),
+        lastActiveTime: Date.now()
+      },
+      openDriveMode: vi.fn(),
+      dismissActiveSession: vi.fn()
+    });
+
+    const html = renderToString(
+      React.createElement(HomeScreen, { onSelectTab: () => {} })
+    );
+
+    expect(html).toContain('In Pausa');
+    expect(html).toContain('Sessione in Corso');
+  });
+
+  it('allows discarding an active session via the trash icon and confirmation dialog', async () => {
+    const mockDismiss = vi.fn();
+    mockUseQuiz.mockReturnValue({
+      readinessScore: 82,
+      mistakesCount: 3,
+      totalSeen: 210,
+      questions: mockQuestions,
+      activeSession: {
+        id: 'topic-1',
+        type: 'topic',
+        subjectId: 1,
+        subjectName: 'Normativa',
+        questionIds: [1, 2, 3],
+        currentIndex: 0,
+        answers: {},
+        updatedAt: Date.now()
+      },
+      openDriveMode: vi.fn(),
+      dismissActiveSession: mockDismiss
+    });
+
+    act(() => {
+      root.render(React.createElement(HomeScreen, { onSelectTab: () => {} }));
+    });
+
+    const discardBtn = container.querySelector('#btn-home-discard-session') as HTMLButtonElement;
+    expect(discardBtn).not.toBeNull();
+
+    await act(async () => {
+      discardBtn.click();
+    });
+
+    // Confirmation dialog should be displayed
+    expect(container.textContent).toContain('Elimina Sessione');
+    const confirmBtn = container.querySelector('#btn-home-confirm-discard') as HTMLButtonElement;
+    expect(confirmBtn).not.toBeNull();
+
+    await act(async () => {
+      confirmBtn.click();
+    });
+
+    expect(mockDismiss).toHaveBeenCalledTimes(1);
+  });
+
+  it('prompts SessionConflictModal when student launches a conflicting scenario while another session is in progress', async () => {
+    const mockSelectTab = vi.fn();
+    mockUseQuiz.mockReturnValue({
+      readinessScore: 82,
+      mistakesCount: 3,
+      totalSeen: 210,
+      questions: mockQuestions,
+      activeSession: {
+        id: 'topic-1',
+        type: 'topic',
+        subjectId: 1,
+        subjectName: 'Normativa',
+        questionIds: [1, 2, 3],
+        currentIndex: 0,
+        answers: {},
+        updatedAt: Date.now()
+      },
+      openDriveMode: vi.fn(),
+      dismissActiveSession: vi.fn()
+    });
+
+    act(() => {
+      root.render(React.createElement(HomeScreen, { onSelectTab: mockSelectTab }));
+    });
+
+    // Click on Esame Ufficiale (which conflicts with active topic session)
+    const examBtn = container.querySelector('#btn-home-exam') as HTMLButtonElement;
+    expect(examBtn).not.toBeNull();
+
+    await act(async () => {
+      examBtn.click();
+    });
+
+    // SessionConflictModal should open
+    expect(container.textContent).toContain('Sessione in Sospeso');
+    expect(container.textContent).toContain('Normativa');
+    expect(container.textContent).toContain('Esame Ufficiale');
+
+    // Clicking resume resumes the existing topic session
+    const resumeBtn = container.querySelector('#btn-conflict-resume') as HTMLButtonElement;
+    expect(resumeBtn).not.toBeNull();
+
+    await act(async () => {
+      resumeBtn.click();
+    });
+
+    expect(mockSelectTab).toHaveBeenCalledWith('topics');
   });
 });

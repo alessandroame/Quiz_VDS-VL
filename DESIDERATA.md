@@ -168,6 +168,7 @@ Questo documento rappresenta la **bussola strategica e funzionale** del progetto
 | Filtri Debriefing Esame & Quaderno Errori Interattivo | 🟢 Completato | Completato con TODO-09. Filtri di revisione post-esame (Solo Errori, Tutti, ⚑ Rivedi, Corretti) con salto automatico su errori e azione "Ripassa Ora in Tutor", interattività delle card nel Quaderno Errori con apertura di QuestionDetailModal e filtri rapidi per materia (01-09). |
 | Manuale Utente Illustrato & Pipeline Screenshot CDP | 🟢 Completato | Completato con TODO-10. Manuale completo in `docs/MANUALE_UTENTE.md`, 13 screenshot reali pixel-perfect in `docs/screenshots/`, script automatico `scripts/generate_manual_screenshots.cjs`, link hero in `README.md` e card integrata in `SettingsModal.tsx` (About). |
 | Telemetria di Prodotto PostHog (Opt-Out Trasparente) | 🟢 Completato | Modulo telemetria anonima in `src/services/telemetry.ts` con lazy load chunk `telemetry`, request batching per singola domanda (più viste, corrette, errate), tracciamento esami e download audio, toggle privacy opt-out in Impostazioni e fallback dummy no-op. |
+| Pulsante Unificato Interruzione & Pausa/Ripresa Sessione | 🟢 Completato | Pulsante unificato `[Interrompi]` in tutti i quiz con dialog `SessionInterruptModal` (Metti in Pausa, Termina ed Elimina, Rimani nel Quiz), persistenza `isPaused` e freeze timer in Dexie, banner Home con tag visibile `In Pausa` e cestino eliminazione, e risoluzione automatica conflitti (`SessionConflictModal`). |
 
 ---
 
@@ -223,6 +224,11 @@ Questa roadmap sintetizza il piano di riorganizzazione per massimizzare l'usabil
     - Creazione del manuale completo, sintetico e schematico in `docs/MANUALE_UTENTE.md` con 14 capitoli autoconsistenti.
     - Script automatico di cattura CDP headless `scripts/generate_manual_screenshots.cjs` (`npm run screenshots:manual`) con seed dati realistici Dexie e generazione di 13 screenshot mobile (390x844).
     - Collegamento visibile in `README.md` (banner hero e documentazione) e integrazione in `SettingsModal.tsx` (scheda About) con tasto rapido "Apri Guida".
+11. **TODO-11: Pulsante Unificato "Interrompi" & Gestione Pausa/Ripresa Sessione** `[COMPLETATO]`:
+    - Sostituzione di pulsanti separati o etichette eterogenee con un unico pulsante avionico ad alto contrasto `[Interrompi]` in `ExamScreen`, `TopicsScreen` e `MistakesScreen`.
+    - Finestra di dialogo unificata `SessionInterruptModal` che intercetta l'interruzione e offre scelta chiara: "Metti in Pausa" (salvataggio stato e freeze timer/countdown, ritorno a Home), "Termina ed Elimina" (`dismissActiveSession()` per ripartire puliti da zero) o "Rimani nel Quiz".
+    - Banner Home arricchito con badge `In Pausa`, tasto `[Riprendi]` e icona cestino per eliminare la sessione in sospeso direttamente dalla Home previa conferma.
+    - Dialog di risoluzione automatica conflitti `SessionConflictModal` per avvisi espliciti quando l'allievo tenta di avviare un nuovo scenario con una sessione incompiuta attiva.
 
 
 ---

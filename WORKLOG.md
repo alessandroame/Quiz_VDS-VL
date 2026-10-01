@@ -14,6 +14,40 @@ Questo documento registra in ordine cronologico tutte le lavorazioni svolte nel 
 - **Impatto sul Desiderata**: <Come questo intervento contribuisce al desiderata (cfr. DESIDERATA.md) e indicazioni per il prossimo agente>
 ```
 
+### [2026-10-01] - Pulsante Unificato "Interrompi" e Gestione Pausa/Ripresa Sessione Quiz (Cockpit V2)
+- **Cosa abbiamo fatto**:
+  - **Pulsante Unificato "Interrompi" nei Quiz**:
+    - Sostituiti pulsanti eterogenei o doppi con un unico pulsante avionico ad alto contrasto `[Interrompi]` (`XCircle`) in [src/components/ExamScreen.tsx](file:///c:/github/Quiz_VDS-VL/src/components/ExamScreen.tsx) (`#btn-abandon-exam`), [src/components/TopicsScreen.tsx](file:///c:/github/Quiz_VDS-VL/src/components/TopicsScreen.tsx) (`#btn-topics-interrupt`) e [src/components/MistakesScreen.tsx](file:///c:/github/Quiz_VDS-VL/src/components/MistakesScreen.tsx) (`#btn-mistakes-interrupt`).
+  - **Componente Dialogo Unificato `SessionInterruptModal`**:
+    - Creato il componente in [src/components/SessionInterruptModal.tsx](file:///c:/github/Quiz_VDS-VL/src/components/SessionInterruptModal.tsx) accessibile, con supporto dark/light, chiusura da tastiera (`Escape`) e sincronizzazione con `backNavigation.registerSubModal`.
+    - Offre tre opzioni chiare all'allievo:
+      1. `#btn-interrupt-pause` ("Metti in Pausa"): congela il countdown/tempo trascorso, salva lo stato in IndexedDB con `isPaused: true` e riconduce alla Home.
+      2. `#btn-interrupt-terminate` ("Termina ed Elimina"): cancella la sessione incompiuta (`dismissActiveSession()`) per consentire di avviare subito una nuova prova pulita.
+      3. `#btn-interrupt-resume` ("Rimani nel Quiz"): chiude il modale e prosegue l'esercitazione.
+  - **Sospensione e Congelamento Timer**:
+    - Aggiornato il tipo `InProgressSession` in [src/types/database.ts](file:///c:/github/Quiz_VDS-VL/src/types/database.ts) con i campi `isPaused?: boolean`, `pausedAt?: number` ed `elapsedSeconds?: number`.
+    - In [src/components/ExamScreen.tsx](file:///c:/github/Quiz_VDS-VL/src/components/ExamScreen.tsx), l'intervallo `setInterval` arresta il countdown o il conteggio quando `isPaused` è attivo, prevenendo discrepanze di tempo a sessione congelata.
+  - **Home Hub Banner Ripresa Rapida & Eliminazione Diretta**:
+    - In [src/components/HomeScreen.tsx](file:///c:/github/Quiz_VDS-VL/src/components/HomeScreen.tsx), aggiornato il banner con tag visibile `In Pausa`, pulsante `#btn-home-resume-session` ("Riprendi") e pulsante cestino `#btn-home-discard-session` ("Elimina") con modale di conferma per azzerare sessioni non più desiderate senza doverle riaprire.
+  - **Risoluzione Automatica dei Conflitti (`SessionConflictModal`)**:
+    - Creato il componente in [src/components/SessionConflictModal.tsx](file:///c:/github/Quiz_VDS-VL/src/components/SessionConflictModal.tsx) e integrato in [src/components/HomeScreen.tsx](file:///c:/github/Quiz_VDS-VL/src/components/HomeScreen.tsx), [src/components/ExamScreen.tsx](file:///c:/github/Quiz_VDS-VL/src/components/ExamScreen.tsx), [src/components/TopicsScreen.tsx](file:///c:/github/Quiz_VDS-VL/src/components/TopicsScreen.tsx) e [src/components/MistakesScreen.tsx](file:///c:/github/Quiz_VDS-VL/src/components/MistakesScreen.tsx).
+    - Se l'allievo seleziona un nuovo scenario incompatibile con la sessione in corso, l'app mostra lo stato in sospeso e consente di scegliere se riprenderla o abbandonarla e iniziare subito la nuova.
+  - **Navigazione da Tab Bar & [← Home] in `App.tsx`**:
+    - In [src/App.tsx](file:///c:/github/Quiz_VDS-VL/src/App.tsx), sostituito il vecchio dialog distruttivo con `SessionInterruptModal`, consentendo all'allievo che tocca un'altra sezione durante un esame attivo di metterlo in pausa mantenendo i progressi.
+  - **Suite di Test Unitari & SemVer**:
+    - Creati [src/components/SessionInterruptModal.test.ts](file:///c:/github/Quiz_VDS-VL/src/components/SessionInterruptModal.test.ts) (6 test) e [src/components/SessionConflictModal.test.ts](file:///c:/github/Quiz_VDS-VL/src/components/SessionConflictModal.test.ts) (6 test).
+    - Aggiornati [src/components/HomeScreen.test.ts](file:///c:/github/Quiz_VDS-VL/src/components/HomeScreen.test.ts) (6 test) e [src/components/VoiceAutoStop.test.ts](file:///c:/github/Quiz_VDS-VL/src/components/VoiceAutoStop.test.ts).
+    - Tutti i 354 test unitari (50 suite) passano con successo (100% verdi).
+    - Avanzata la versione in [package.json](file:///c:/github/Quiz_VDS-VL/package.json) a `1.6.0`.
+- **Scelte architetturali & Rationale**:
+  - **Pulsante Unico "Interrompi"**: Risolve la potenziale confusione cognitiva di avere due pulsanti concorrenti ("Pausa" vs "Abbandona") nell'header compatto. L'intenzione dell'allievo è "fermarsi", e il dialogo contestuale gli offre la scelta appropriata.
+  - **Ripristino Immediato in `useState`**: Inizializzazione diretta dello stato da `activeSession` al mount per azzerare qualsiasi flash/flicker visivo nei componenti quiz.
+  - **Back Navigation Coordinator**: Sia `SessionInterruptModal` che `SessionConflictModal` registrano la propria chiusura con `registerSubModal`, garantendo che il tasto indietro hardware dello smartphone o la gesture di sistema chiudano il modale prima di compiere qualsiasi altra azione.
+- **Impatto sul Desiderata**:
+  - Soddisfa pienamente i requisiti del TODO-11 e la richiesta dell'allievo di poter mettere in pausa una sessione per riprenderla in seguito o abbandonarla in modo pulito.
+
+---
+
 ### [2026-10-01] - Integrazione Telemetria di Prodotto PostHog con Statistiche Domande e Opt-Out Trasparente
 - **Cosa abbiamo fatto**:
   - **Integrazione Client PostHog (`posthog-js`) con Chunk Isolato**:

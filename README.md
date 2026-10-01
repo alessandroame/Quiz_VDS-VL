@@ -47,12 +47,19 @@
   - 6 macro-pulsanti tattili dedicati ai flussi principali: `TUTOR` (apprendimento guidato), `MATERIE` (studio 01-09), `ESAME` (prova ufficiale AeCI), `ERRORI` (quaderno Leitner), `CERCA` (archivio completo) e `STATS` (telemetria e radar).
   - Indicatori sintetici in tempo reale (quiz visti, accuratezza, errori attivi, indice di prontezza esame).
   - **Banner Ripresa Rapida**: rilevamento automatico di qualsiasi sessione di studio o esame interrotta, con ripresa istantanea a 1 tocco (`Riprendi Sessione`).
-- **Mini-Header Compatto nei Quiz (~48px)**:
+- **Mini-Header Compatto nei Quiz (~48px) & Pulsante Unificato "Interrompi"**:
   - Nelle schermate interne di simulazione ed esercitazione, la barra secondaria a schede viene completamente rimossa per recuperare oltre 50px di spazio verticale utile.
-  - Sostituita da una mini-header minimalista con pulsante `[← Home]`, indicatore del contesto e pulsante rapido `AUDIO` per lo switch hands-free.
-  - **Salvaguardia Abbandono Esame**: modale di conferma per prevenire perdite involontarie di progresso se l'allievo preme `[← Home]` durante una prova d'esame in corso.
+  - Sostituita da una mini-header minimalista con pulsante unificato `[Interrompi]` (con icona avionica `XCircle`), indicatore del contesto e pulsante rapido `AUDIO` per lo switch hands-free.
+  - **Dialogo Unificato di Interruzione (`SessionInterruptModal`)**: un unico pulsante `[Interrompi]` apre un dialog contestuale ergonomico che consente all'allievo di:
+    1. **Metti in Pausa**: congela il timer o il tempo trascorso, salva lo stato completo in IndexedDB con tag `In Pausa` e torna alla Home Hub, consentendo di riprendere in qualsiasi momento.
+    2. **Termina ed Elimina**: rimuove in modo pulito la prova in corso da IndexedDB (`dismissActiveSession()`), consentendo di avviarne subito un'altra da zero.
+    3. **Rimani nel Quiz**: chiude il dialogo e prosegue l'esercitazione senza interruzioni.
+  - **Banner Ripresa Rapida & Eliminazione Diretta in Home**:
+    - Mostra lo stato in tempo reale con badge visibile `In Pausa`, domanda corrente e risposte date, con tasto `[Riprendi]` e icona cestino `[🗑️]` per eliminare la sessione direttamente dal cruscotto principale previa conferma.
+  - **Risoluzione Automatica dei Conflitti (`SessionConflictModal`)**:
+    - Se l'allievo tenta di avviare una materia o una modalità differente mentre una sessione è ancora in sospeso, un dialog avionico permette di scegliere all'istante se riprendere la prova in sospeso oppure abbandonarla e iniziare la nuova.
 - **Sincronizzazione Tasto Indietro Smartphone (Hardware & Gestures Back Coordinator)**:
-  - Il tasto fisico o le gesture di swipe indietro di Android e iOS eseguono sempre l'esatta azione del pulsante grafico visibile a schermo (chiusura del tastierino rapido nell'Archivio, chiusura dei fogli comandi, annullamento della modale di guardia esame, chiusura della Modalità Mani Libere o Impostazioni e ritorno al cruscotto Home).
+  - Il tasto fisico o le gesture di swipe indietro di Android e iOS eseguono sempre l'esatta azione del pulsante grafico visibile a schermo (chiusura delle modali di interruzione/conflitto, chiusura del tastierino rapido nell'Archivio, chiusura dei fogli comandi, chiusura della Modalità Mani Libere o Impostazioni e ritorno al cruscotto Home).
   - All'interno dei quiz di studio materie, il comando indietro riporta direttamente al cruscotto Home garantendo linearità d'uso e azzerando le chiusure accidentali della PWA.
 
 ### 3. Simulatore d'Esame & Simulazione Didattica (Tutor)
