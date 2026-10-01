@@ -14,6 +14,22 @@ Questo documento registra in ordine cronologico tutte le lavorazioni svolte nel 
 - **Impatto sul Desiderata**: <Come questo intervento contribuisce al desiderata (cfr. DESIDERATA.md) e indicazioni per il prossimo agente>
 ```
 
+### [2026-10-01] - Risoluzione Errore HTTP 400 Bad Request PostHog e Preservazione Proprietà di Sistema
+- **Cosa abbiamo fatto**:
+  - **Identificato e Risolto il Root Cause dell'Errore 400 su `/e/`**:
+    - Nel servizio di telemetria [src/services/telemetry.ts](file:///c:/github/Quiz_VDS-VL/src/services/telemetry.ts), la callback `sanitize_properties` passata a `posthog.init` filtrava tutte le proprietà degli eventi tramite `sanitizePayload`.
+    - Poiché `SENSITIVE_KEY_PATTERNS` conteneva `/token/i` (destinato a bloccare token sensibili come OAuth Google Drive), l'ispezione regex eliminava anche la proprietà fondamentale `token` iniettata internamente da PostHog contenente l'API Key del progetto.
+    - I payload inviati all'endpoint `/e/` arrivavano quindi privi di chiave, causando l'errore `POST https://us.i.posthog.com/e/ 400 (Bad Request)` nel browser.
+  - **Eccezione Esplicita per Proprietà di Sistema PostHog**:
+    - Aggiornato `sanitizePayload` in [src/services/telemetry.ts](file:///c:/github/Quiz_VDS-VL/src/services/telemetry.ts) per preservare tassativamente `token`, `api_key`, `distinct_id` e tutte le chiavi che iniziano con `$` (proprietà di sistema PostHog). Le chiavi utente contenenti token o note personali (es. `userToken`, `authToken`, `userNote`) continuano a essere rigorosamente rimosse.
+  - **Test Unitari Specifici**:
+    - Aggiunto test in [src/services/telemetry.test.ts](file:///c:/github/Quiz_VDS-VL/src/services/telemetry.test.ts) per verificare che `sanitize_properties` preservi `token`, `distinct_id` e prefissi `$*` bloccando contestualmente campi sensibili.
+    - Tutti i 359 test unitari passano al 100%.
+- **Scelte architetturali & Rationale**:
+  - **Defense-in-depth con Whitelist di Sistema**: Invece di disattivare la sanificazione, abbiamo introdotto una regola che tutela i metadati di routing e autenticazione della libreria garantendo contemporaneamente il rispetto del principio zero-PII sui dati applicativi.
+- **Impatto sul Desiderata**:
+  - Sblocca l'acquisizione in tempo reale degli eventi in PostHog su cloud US, consentendo la generazione di statistiche aggregate e dashboard per l'istruttore/allievo.
+
 ### [2026-10-01] - Correzione Esecuzione Istantanea al Primo Clic di "Metti in Pausa" e "Termina" nei Quiz
 - **Cosa abbiamo fatto**:
   - **Risolto il problema del doppio clic su "Metti in Pausa" / "Termina ed Elimina"**:
