@@ -167,6 +167,7 @@ Questo documento rappresenta la **bussola strategica e funzionale** del progetto
 | Armonizzazione UI/UX & Disambiguazione Stati Top Bar | 🟢 Completato | Completato con TODO-08. Disambiguazione pulsante Modalità Audio (Headphones neutro su Home e mini-header), VoiceQuickMenu neutro coordinato alla testata senza pillola ambra ingannevole, ChevronLeft neutra su ritorno Home e badge 2017 zinc-800. |
 | Filtri Debriefing Esame & Quaderno Errori Interattivo | 🟢 Completato | Completato con TODO-09. Filtri di revisione post-esame (Solo Errori, Tutti, ⚑ Rivedi, Corretti) con salto automatico su errori e azione "Ripassa Ora in Tutor", interattività delle card nel Quaderno Errori con apertura di QuestionDetailModal e filtri rapidi per materia (01-09). |
 | Manuale Utente Illustrato & Pipeline Screenshot CDP | 🟢 Completato | Completato con TODO-10. Manuale completo in `docs/MANUALE_UTENTE.md`, 13 screenshot reali pixel-perfect in `docs/screenshots/`, script automatico `scripts/generate_manual_screenshots.cjs`, link hero in `README.md` e card integrata in `SettingsModal.tsx` (About). |
+| Telemetria di Prodotto PostHog (Opt-Out Trasparente) | 🟢 Completato | Modulo telemetria anonima in `src/services/telemetry.ts` con lazy load chunk `telemetry`, request batching per singola domanda (più viste, corrette, errate), tracciamento esami e download audio, toggle privacy opt-out in Impostazioni e fallback dummy no-op. |
 
 ---
 

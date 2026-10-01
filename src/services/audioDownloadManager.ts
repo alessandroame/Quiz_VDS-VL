@@ -10,6 +10,7 @@ import type {
   InstalledVoiceMetadata
 } from '../types/audio';
 import { db } from '../db';
+import { telemetry } from './telemetry';
 
 export type { VoiceName, AudioManifest, VoiceUpdateDetail, AudioUpdateCheckResult, InstalledVoiceMetadata };
 
@@ -196,6 +197,7 @@ export class AudioDownloadManager {
     const { signal } = abortController;
 
     const promise = (async () => {
+      const startTime = Date.now();
       try {
         const cacheName = this.getCacheName(voice);
         const cache = await window.caches.open(cacheName);
@@ -318,16 +320,33 @@ export class AudioDownloadManager {
           error: null
         };
         this.notify();
+
+        telemetry.trackAudioDownloadResult({
+          voice,
+          status: isComplete ? 'success' : 'failed',
+          duration_seconds: Math.round((Date.now() - startTime) / 1000),
+        });
       } catch (err: any) {
         if (signal.aborted) {
           this.statuses[voice].isDownloading = false;
           this.notify();
+          telemetry.trackAudioDownloadResult({
+            voice,
+            status: 'aborted',
+            duration_seconds: Math.round((Date.now() - startTime) / 1000),
+          });
           return;
         }
         console.error(`Error in audio download for ${voice}:`, err);
         this.statuses[voice].isDownloading = false;
         this.statuses[voice].error = err?.message || 'Download error';
         this.notify();
+        telemetry.trackAudioDownloadResult({
+          voice,
+          status: 'failed',
+          duration_seconds: Math.round((Date.now() - startTime) / 1000),
+          error_code: err?.message,
+        });
       } finally {
         delete this.abortControllers[voice];
         delete this.activePromises[voice];

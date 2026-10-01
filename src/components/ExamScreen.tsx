@@ -22,6 +22,8 @@ import { QuestionNavigator } from './QuestionNavigator';
 import { voiceService } from '../services/voiceService';
 import { QuizBottomBar } from './QuizBottomBar';
 import { backNavigation } from '../utils/backNavigation';
+import { SessionInterruptModal } from './SessionInterruptModal';
+import { SessionConflictModal } from './SessionConflictModal';
 
 interface ExamScreenProps {
   initialMode?: ExamModeType;
@@ -60,7 +62,9 @@ export const ExamScreen: React.FC<ExamScreenProps> = ({
   const [startTime, setStartTime] = useState(0);
   const [isMarathon, setIsMarathon] = useState(false);
   const [showSubmitModal, setShowSubmitModal] = useState(false);
-  const [showAbandonModal, setShowAbandonModal] = useState(false);
+  const [showInterruptModal, setShowInterruptModal] = useState(false);
+  const [isPaused, setIsPaused] = useState(false);
+  const [conflictPendingMode, setConflictPendingMode] = useState<ExamModeType | null>(null);
   const [completedSession, setCompletedSession] = useState<ExamSession | null>(null);
   const [reviewFilter, setReviewFilter] = useState<'all' | 'wrong' | 'flagged' | 'correct'>('all');
 
@@ -95,20 +99,19 @@ export const ExamScreen: React.FC<ExamScreenProps> = ({
     };
   }, [setIsExamRunning]);
 
-  // Gestione tasto Escape per chiudere le modali di conferma esame
+  // Gestione tasto Escape per chiudere la modale di consegna esame
   useEffect(() => {
-    if (!showAbandonModal && !showSubmitModal) return;
+    if (!showSubmitModal) return;
     const handleModalKey = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
-        setShowAbandonModal(false);
         setShowSubmitModal(false);
       }
     };
     window.addEventListener('keydown', handleModalKey);
     return () => window.removeEventListener('keydown', handleModalKey);
-  }, [showAbandonModal, showSubmitModal]);
+  }, [showSubmitModal]);
 
-  // Registra le modali di conferma con il coordinatore back navigation
+  // Registra la modale di consegna con il coordinatore back navigation
   useEffect(() => {
     if (!showSubmitModal) return;
     const unregister = backNavigation.registerSubModal('exam-submit-modal', () => {
@@ -116,14 +119,6 @@ export const ExamScreen: React.FC<ExamScreenProps> = ({
     });
     return () => unregister();
   }, [showSubmitModal]);
-
-  useEffect(() => {
-    if (!showAbandonModal) return;
-    const unregister = backNavigation.registerSubModal('exam-abandon-modal', () => {
-      setShowAbandonModal(false);
-    });
-    return () => unregister();
-  }, [showAbandonModal]);
 
   // Auto-resume active exam if present
   useEffect(() => {
@@ -142,12 +137,13 @@ export const ExamScreen: React.FC<ExamScreenProps> = ({
         setAnswers(resumedAnswers);
         setFlags(activeSession.flags || {});
         if (mode === 'tutor') {
-          setElapsedSeconds(activeSession.secondsRemaining || 0);
+          setElapsedSeconds(activeSession.elapsedSeconds || activeSession.secondsRemaining || 0);
         } else {
           setSecondsRemaining(activeSession.secondsRemaining || 45 * 60);
         }
         setStartTime(activeSession.startTime || Date.now());
         setIsMarathon(mode === 'marathon');
+        setIsPaused(false);
         recordedQuestionIds.current = new Set(Object.keys(resumedAnswers).map(Number));
         setExamState('running');
       }
@@ -172,6 +168,7 @@ export const ExamScreen: React.FC<ExamScreenProps> = ({
     const now = Date.now();
     setStartTime(now);
     setCompletedSession(null);
+    setIsPaused(false);
     setExamState('running');
 
     persistActiveSession({
@@ -182,15 +179,25 @@ export const ExamScreen: React.FC<ExamScreenProps> = ({
       answers: {},
       flags: {},
       secondsRemaining: mode === 'tutor' ? 0 : initialSeconds,
+      elapsedSeconds: 0,
       startTime: now,
       isMarathon: marathon,
+      isPaused: false,
       updatedAt: now
     });
   };
 
+  const handleRequestStartExam = (mode: ExamModeType = 'tutor') => {
+    if (activeSession && activeSession.questionIds?.length > 0 && !isDismissedRef.current) {
+      setConflictPendingMode(mode);
+    } else {
+      startExam(mode);
+    }
+  };
+
   // Timer interval: count up for tutor mode (no time limit), countdown for official/marathon
   useEffect(() => {
-    if (examState !== 'running') return;
+    if (examState !== 'running' || isPaused) return;
 
     if (examMode === 'tutor') {
       const interval = setInterval(() => {
@@ -210,7 +217,7 @@ export const ExamScreen: React.FC<ExamScreenProps> = ({
       }, 1000);
       return () => clearInterval(interval);
     }
-  }, [examState, examMode]);
+  }, [examState, examMode, isPaused]);
 
   const currentQuestion = examQuestions[currentIndex];
   const totalCount = examQuestions.length;
@@ -507,7 +514,7 @@ export const ExamScreen: React.FC<ExamScreenProps> = ({
 
             <button
               id="btn-start-tutor-exam"
-              onClick={() => startExam('tutor')}
+              onClick={() => handleRequestStartExam('tutor')}
               className="w-full py-3.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-sm shadow-lg shadow-emerald-950/40 flex items-center justify-center gap-2 transition-all active:scale-[0.99]"
             >
               <span>Avvia Simulazione Didattica (30 Quiz)</span>
@@ -571,7 +578,7 @@ export const ExamScreen: React.FC<ExamScreenProps> = ({
 
           <button
             id="btn-start-exam"
-            onClick={() => startExam('official')}
+            onClick={() => handleRequestStartExam('official')}
             className="w-full py-3.5 rounded-xl bg-sky-600 hover:bg-sky-500 text-white font-bold text-sm shadow-lg shadow-sky-950/40 flex items-center justify-center gap-2 transition-all active:scale-[0.99] light:bg-sky-600 light:hover:bg-sky-700"
           >
             <Timer className="w-4 h-4" />
@@ -592,7 +599,7 @@ export const ExamScreen: React.FC<ExamScreenProps> = ({
           </div>
           <button
             id="btn-start-marathon"
-            onClick={() => startExam('marathon')}
+            onClick={() => handleRequestStartExam('marathon')}
             className="px-3.5 py-2 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-zinc-200 light:bg-slate-200 light:text-slate-800 light:hover:bg-slate-300 font-semibold text-xs whitespace-nowrap transition-colors flex-shrink-0"
           >
             Avvia Maratona
@@ -918,10 +925,11 @@ export const ExamScreen: React.FC<ExamScreenProps> = ({
             id="btn-abandon-exam"
             onClick={() => {
               voiceService.stop();
-              setShowAbandonModal(true);
+              setIsPaused(true);
+              setShowInterruptModal(true);
             }}
-            className="p-1.5 sm:px-2.5 sm:py-1.5 rounded-lg border border-rose-500/40 hover:border-rose-500 bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 hover:text-rose-300 light:border-rose-200 light:bg-rose-50 light:text-rose-700 light:hover:bg-rose-100 text-xs font-semibold transition-colors flex items-center gap-1"
-            title="Interrompi la simulazione"
+            className="p-1.5 sm:px-2.5 sm:py-1.5 rounded-lg border border-amber-500/40 hover:border-amber-500 bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 hover:text-amber-300 light:border-amber-200 light:bg-amber-50 light:text-amber-700 light:hover:bg-amber-100 text-xs font-semibold transition-colors flex items-center gap-1"
+            title="Interrompi la sessione"
           >
             <XCircle className="w-3.5 h-3.5" />
             <span className="hidden sm:inline">Interrompi</span>
@@ -1066,73 +1074,128 @@ export const ExamScreen: React.FC<ExamScreenProps> = ({
         </div>
       )}
 
-      {/* Modal di Conferma Interruzione Esame */}
-      {showAbandonModal && (
-        <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/75 backdrop-blur-sm p-4 animate-in fade-in"
-          onClick={() => setShowAbandonModal(false)}
-        >
-          <div
-            className="bg-zinc-900 border border-zinc-700 rounded-2xl p-6 max-w-sm w-full space-y-4 shadow-2xl dark:bg-zinc-900 dark:border-zinc-700 light:bg-white light:border-slate-300"
-            onClick={e => e.stopPropagation()}
-            role="dialog"
-            aria-modal="true"
-            aria-labelledby="abandon-modal-title"
-          >
-            <div className="flex items-center gap-2.5 text-rose-400 light:text-rose-600">
-              <AlertCircle className="w-6 h-6 flex-shrink-0" />
-              <h3 id="abandon-modal-title" className="font-bold text-base text-zinc-100 dark:text-zinc-100 light:text-slate-900">
-                Interrompere la Simulazione?
-              </h3>
-            </div>
+      {/* Modale Unificata Interruzione Sessione (Pausa o Termina) */}
+      <SessionInterruptModal
+        isOpen={showInterruptModal}
+        onClose={() => {
+          setIsPaused(false);
+          setShowInterruptModal(false);
+        }}
+        onPause={async () => {
+          voiceService.stop();
+          if (autoAdvanceTimerRef.current) {
+            clearTimeout(autoAdvanceTimerRef.current);
+            autoAdvanceTimerRef.current = null;
+          }
+          await persistActiveSession({
+            type: 'exam',
+            examMode,
+            questionIds: examQuestions.map(q => q.id),
+            currentIndex,
+            answers,
+            flags,
+            secondsRemaining: examMode === 'tutor' ? 0 : secondsRemaining,
+            elapsedSeconds: examMode === 'tutor' ? elapsedSeconds : 0,
+            startTime,
+            isMarathon,
+            isPaused: true,
+            pausedAt: Date.now(),
+            updatedAt: Date.now()
+          });
+          setIsExamRunning(false);
+          setShowInterruptModal(false);
+          if (onNavigateHome) {
+            onNavigateHome();
+          }
+        }}
+        onTerminate={async () => {
+          voiceService.stop();
+          if (autoAdvanceTimerRef.current) {
+            clearTimeout(autoAdvanceTimerRef.current);
+            autoAdvanceTimerRef.current = null;
+          }
+          isDismissedRef.current = true;
+          setShowInterruptModal(false);
+          setIsExamRunning(false);
+          setExamQuestions([]);
+          setAnswers({});
+          setFlags({});
+          setCurrentIndex(0);
+          setExamState('idle');
+          await dismissActiveSession();
+        }}
+        sessionTitle={
+          examMode === 'tutor'
+            ? 'Simulazione Didattica (Tutor)'
+            : isMarathon
+            ? 'Maratona 60 Quiz'
+            : 'Simulazione Esame Ufficiale'
+        }
+        currentIndex={currentIndex}
+        totalQuestions={totalCount}
+        answeredCount={answeredCount}
+        timeDisplay={
+          examMode === 'tutor'
+            ? `${formatTime(elapsedSeconds)} trascorsi`
+            : `${formatTime(secondsRemaining)} rimanenti`
+        }
+      />
 
-            <div className="text-xs text-zinc-300 dark:text-zinc-300 light:text-slate-600 space-y-2">
-              <p>
-                Sei sicuro di voler interrompere la prova in corso?
-              </p>
-              <p className="text-amber-400 dark:text-amber-400 light:text-amber-700 font-medium">
-                {examMode === 'tutor'
-                  ? 'Le risposte verificate finora rimangono registrate nel tuo studio, ma la sessione d\'esame verrà chiusa.'
-                  : answeredCount > 0
-                  ? `Le ${answeredCount} risposte fornite finora andranno perse e la scheda non verrà conteggiata.`
-                  : 'La simulazione verrà annullata senza registrare alcuna risposta.'}
-              </p>
-            </div>
-
-            <div className="flex gap-2 pt-2">
-              <button
-                id="btn-cancel-abandon"
-                onClick={() => setShowAbandonModal(false)}
-                className="flex-1 py-2.5 rounded-xl bg-amber-600 hover:bg-amber-500 text-white text-xs font-bold shadow-md transition-colors"
-              >
-                Rimani
-              </button>
-              <button
-                id="btn-confirm-abandon-exam"
-                onClick={async () => {
-                  if (autoAdvanceTimerRef.current) {
-                    clearTimeout(autoAdvanceTimerRef.current);
-                    autoAdvanceTimerRef.current = null;
-                  }
-                  isDismissedRef.current = true;
-                  voiceService.stop();
-                  setShowAbandonModal(false);
-                  setIsExamRunning(false);
-                  setExamQuestions([]);
-                  setAnswers({});
-                  setFlags({});
-                  setCurrentIndex(0);
-                  setExamState('idle');
-                  await dismissActiveSession();
-                }}
-                className="flex-1 py-2.5 rounded-xl border border-rose-500/60 text-rose-400 hover:bg-rose-500/10 light:text-rose-600 light:border-rose-300 text-xs font-medium transition-colors"
-              >
-                Interrompi
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      {/* Modale Conflitto Sessione in Sospeso per Avvio Nuova Prova */}
+      <SessionConflictModal
+        isOpen={conflictPendingMode !== null}
+        onClose={() => setConflictPendingMode(null)}
+        onResumeExisting={() => {
+          setConflictPendingMode(null);
+          if (activeSession) {
+            isDismissedRef.current = false;
+            const ordered = activeSession.questionIds
+              .map(id => questions.find(q => q.id === id))
+              .filter((q): q is Question => Boolean(q));
+            if (ordered.length > 0) {
+              const resMode = activeSession.examMode || (activeSession.isMarathon ? 'marathon' : 'official');
+              setExamQuestions(ordered);
+              setExamMode(resMode);
+              setCurrentIndex(Math.min(activeSession.currentIndex || 0, ordered.length - 1));
+              setAnswers(activeSession.answers || {});
+              setFlags(activeSession.flags || {});
+              if (resMode === 'tutor') {
+                setElapsedSeconds(activeSession.elapsedSeconds || activeSession.secondsRemaining || 0);
+              } else {
+                setSecondsRemaining(activeSession.secondsRemaining || 45 * 60);
+              }
+              setStartTime(activeSession.startTime || Date.now());
+              setIsMarathon(resMode === 'marathon');
+              setIsPaused(false);
+              setExamState('running');
+            }
+          }
+        }}
+        onDiscardAndStartNew={async () => {
+          const mode = conflictPendingMode || 'tutor';
+          setConflictPendingMode(null);
+          await dismissActiveSession();
+          startExam(mode);
+        }}
+        existingTitle={
+          activeSession?.subjectName ||
+          (activeSession?.type === 'exam'
+            ? activeSession.examMode === 'tutor'
+              ? 'Simulazione Didattica (Tutor)'
+              : 'Esame Ufficiale'
+            : 'Sessione di Studio')
+        }
+        existingProgress={`Domanda ${(activeSession?.currentIndex || 0) + 1} di ${
+          activeSession?.questionIds?.length || 0
+        } • ${activeSession?.answers ? Object.keys(activeSession.answers).length : 0} risposte date`}
+        newSessionTitle={
+          conflictPendingMode === 'tutor'
+            ? 'Nuova Simulazione Didattica'
+            : conflictPendingMode === 'marathon'
+            ? 'Nuova Maratona 60 Quiz'
+            : 'Nuova Simulazione Esame Ufficiale'
+        }
+      />
     </div>
   );
 };

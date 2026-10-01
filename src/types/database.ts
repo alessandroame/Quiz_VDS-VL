@@ -67,6 +67,7 @@ export interface AppSettings {
   disciplineOnboardingDone?: boolean;
   audioAutoUpdateOnline?: boolean;
   lastAudioCheckAt?: number;
+  telemetryEnabled?: boolean;
 }
 
 export interface InProgressSession {
@@ -79,9 +80,12 @@ export interface InProgressSession {
   answers: Record<number, 1 | 2 | 3>;
   flags?: Record<number, boolean>;
   secondsRemaining?: number;
+  elapsedSeconds?: number;
   startTime?: number;
   isMarathon?: boolean;
   examMode?: ExamModeType;
+  isPaused?: boolean;
+  pausedAt?: number;
   updatedAt: number;
 }
 

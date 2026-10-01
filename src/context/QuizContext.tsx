@@ -22,6 +22,8 @@ import {
   calculateSubjectAnalytics,
   calculateReadinessScore
 } from '../utils/analytics';
+import { telemetry } from '../services/telemetry';
+import type { StudyModeType } from '../types/telemetry';
 
 export type { SubjectAnalytics };
 
@@ -39,7 +41,12 @@ interface QuizContextType {
   openDriveMode: (context?: DriveModeSessionContext) => void;
   closeDriveMode: () => void;
   updateSetting: <K extends keyof AppSettings>(key: K, value: AppSettings[K]) => Promise<void>;
-  recordAnswer: (questionId: number, isCorrect: boolean) => Promise<void>;
+  recordAnswer: (
+    questionId: number,
+    isCorrect: boolean,
+    selectedOption?: 1 | 2 | 3,
+    mode?: StudyModeType
+  ) => Promise<void>;
   toggleBookmark: (questionId: number) => Promise<boolean>;
   saveNote: (questionId: number, note: string) => Promise<void>;
   saveExam: (session: ExamSession) => Promise<number>;
@@ -79,6 +86,7 @@ export const QuizProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const targetContext = context ?? activeAudioSessionContextRef.current;
     setDriveSessionContext(targetContext || null);
     setIsDriveModeOpen(true);
+    telemetry.trackStudyModeEntered({ mode: 'audio_mode' });
   }, []);
 
   const closeDriveMode = useCallback(() => {
@@ -183,9 +191,27 @@ export const QuizProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
-  const recordAnswer = async (questionId: number, isCorrect: boolean) => {
+  const recordAnswer = async (
+    questionId: number,
+    isCorrect: boolean,
+    selectedOption?: 1 | 2 | 3,
+    mode?: StudyModeType
+  ) => {
     await recordQuestionAnswer(questionId, isCorrect);
     syncEngine.schedulePush();
+
+    const q = questions.find(item => item.id === questionId);
+    if (q) {
+      telemetry.trackQuestionAnswered({
+        question_id: questionId,
+        subject_id: q.subjectId,
+        subject_name: q.subjectName,
+        is_correct: isCorrect,
+        selected_option: selectedOption || (isCorrect ? q.correctAnswer : (((q.correctAnswer % 3) + 1) as 1 | 2 | 3)),
+        correct_option: q.correctAnswer,
+        mode: mode || 'topics'
+      });
+    }
   };
 
   const toggleBookmark = async (questionId: number) => {
@@ -205,6 +231,56 @@ export const QuizProvider: React.FC<{ children: React.ReactNode }> = ({ children
     if (syncEngine.getState().isAutoSyncEnabled) {
       syncEngine.pushNow().catch(() => {});
     }
+
+    // Telemetry: macro exam outcome
+    let worstSubjectId: number | undefined;
+    let worstSubjectName: string | undefined;
+    let worstAccuracy = 1.0;
+    if (session.subjectBreakdown) {
+      for (const [subjIdStr, data] of Object.entries(session.subjectBreakdown)) {
+        if (data.total > 0) {
+          const acc = data.correct / data.total;
+          if (acc < worstAccuracy) {
+            worstAccuracy = acc;
+            worstSubjectId = Number(subjIdStr);
+          }
+        }
+      }
+    }
+    if (worstSubjectId) {
+      const q = questions.find(item => item.subjectId === worstSubjectId);
+      worstSubjectName = q?.subjectName;
+    }
+
+    telemetry.trackExamCompleted({
+      mode: session.examMode || (session.isMarathon ? 'marathon' : 'official'),
+      is_passed: session.isPassed,
+      score: session.correctAnswers,
+      errors_count: session.wrongAnswers,
+      duration_seconds: session.durationSeconds,
+      worst_subject_id: worstSubjectId,
+      worst_subject_name: worstSubjectName,
+      is_marathon: session.isMarathon
+    });
+
+    // Telemetry: individual question answers for exam mode
+    for (const snap of session.snapshots) {
+      if (snap.userAnswer !== undefined) {
+        const q = questions.find(item => item.id === snap.questionId);
+        if (q) {
+          telemetry.trackQuestionAnswered({
+            question_id: snap.questionId,
+            subject_id: q.subjectId,
+            subject_name: q.subjectName,
+            is_correct: snap.isCorrect,
+            selected_option: snap.userAnswer,
+            correct_option: snap.correctAnswer,
+            mode: session.examMode === 'tutor' ? 'tutor_exam' : 'official_exam'
+          });
+        }
+      }
+    }
+
     return id;
   };
 

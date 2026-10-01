@@ -33,6 +33,7 @@ export const DEFAULT_SETTINGS: AppSettings = {
   disciplinePreference: 'paraglider',
   disciplineOnboardingDone: true,
   audioAutoUpdateOnline: true,
+  telemetryEnabled: true,
 };
 
 export class VdsQuizDatabase extends Dexie {

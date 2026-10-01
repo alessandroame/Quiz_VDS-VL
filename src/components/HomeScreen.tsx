@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   BookOpen,
   Compass,
@@ -7,11 +7,16 @@ import {
   Search,
   BarChart3,
   Play,
-  ArrowRight
+  ArrowRight,
+  Trash2,
+  AlertCircle
 } from 'lucide-react';
 import type { NavTab } from './Navbar';
 import { getScenarioByShortcut } from '../utils/navigation';
 import { useQuiz } from '../context/QuizContext';
+import { telemetry } from '../services/telemetry';
+import { SessionConflictModal } from './SessionConflictModal';
+import { backNavigation } from '../utils/backNavigation';
 
 interface HomeScreenProps {
   onSelectTab: (tab: NavTab) => void;
@@ -23,10 +28,59 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectTab }) => {
     mistakesCount,
     totalSeen,
     questions,
-    activeSession
+    activeSession,
+    dismissActiveSession
   } = useQuiz();
 
+  const [showConfirmDiscard, setShowConfirmDiscard] = useState(false);
+  const [conflictTargetTab, setConflictTargetTab] = useState<NavTab | null>(null);
+
   const totalQuestions = questions.length; // 474 quiz
+
+  // Submodal back-navigation registration for discard modal
+  useEffect(() => {
+    if (!showConfirmDiscard) return;
+    const unregister = backNavigation.registerSubModal('home-discard-modal', () => {
+      setShowConfirmDiscard(false);
+    });
+    return () => unregister();
+  }, [showConfirmDiscard]);
+
+  const handleResumeSession = () => {
+    if (!activeSession) return;
+    if (activeSession.type === 'exam') {
+      onSelectTab(activeSession.examMode === 'tutor' ? 'tutor' : 'exam');
+    } else if (activeSession.type === 'topic') {
+      onSelectTab('topics');
+    } else if (activeSession.type === 'mistakes') {
+      onSelectTab('mistakes');
+    }
+  };
+
+  const handleSelectScenario = (tab: NavTab) => {
+    if (tab === 'topics' || tab === 'mistakes' || tab === 'archive') {
+      telemetry.trackStudyModeEntered({ mode: tab });
+    }
+
+    if (!activeSession || !activeSession.questionIds?.length) {
+      onSelectTab(tab);
+      return;
+    }
+
+    const isMatchingSession =
+      (tab === 'tutor' && activeSession.type === 'exam' && activeSession.examMode === 'tutor') ||
+      (tab === 'exam' && activeSession.type === 'exam' && activeSession.examMode !== 'tutor') ||
+      (tab === 'topics' && activeSession.type === 'topic') ||
+      (tab === 'mistakes' && activeSession.type === 'mistakes');
+
+    if (isMatchingSession) {
+      handleResumeSession();
+    } else if (tab === 'archive' || tab === 'stats') {
+      onSelectTab(tab);
+    } else {
+      setConflictTargetTab(tab);
+    }
+  };
 
   // Navigazione rapida da tastiera: 1..6
   useEffect(() => {
@@ -36,13 +90,13 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectTab }) => {
       }
       const scenario = getScenarioByShortcut(e.key);
       if (scenario) {
-        onSelectTab(scenario.id);
+        handleSelectScenario(scenario.id);
       }
     };
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [onSelectTab]);
+  }, [onSelectTab, activeSession]);
 
   return (
     <div className="max-w-4xl mx-auto px-3 sm:px-4 py-4 space-y-4 animate-in fade-in">
@@ -110,24 +164,25 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectTab }) => {
       {/* Banner Ripresa Rapida Sessione (se presente in Dexie) */}
       {activeSession && (
         <div
-          onClick={() => {
-            if (activeSession.type === 'exam') {
-              onSelectTab(activeSession.examMode === 'tutor' ? 'tutor' : 'exam');
-            } else if (activeSession.type === 'topic') {
-              onSelectTab('topics');
-            } else if (activeSession.type === 'mistakes') {
-              onSelectTab('mistakes');
-            }
-          }}
-          className="p-3 sm:p-3.5 bg-amber-950/30 border-2 border-amber-500/50 hover:border-amber-500 rounded-xl flex items-center justify-between gap-3 cursor-pointer shadow-md light:bg-amber-50 light:border-amber-400 transition-all group"
+          className="p-3 sm:p-3.5 bg-amber-950/30 border-2 border-amber-500/50 hover:border-amber-500 rounded-xl flex items-center justify-between gap-3 shadow-md light:bg-amber-50 light:border-amber-400 transition-all group"
         >
-          <div className="flex items-center gap-2.5 min-w-0">
+          <div
+            onClick={handleResumeSession}
+            className="flex items-center gap-2.5 min-w-0 cursor-pointer flex-1"
+          >
             <div className="w-8 h-8 rounded-lg bg-amber-500/20 text-amber-400 light:bg-amber-100 light:text-amber-800 flex items-center justify-center flex-shrink-0 group-hover:scale-105 transition-transform">
               <Play className="w-4 h-4 fill-current" />
             </div>
             <div className="min-w-0">
-              <div className="text-[10px] font-mono font-bold uppercase tracking-wider text-amber-400 light:text-amber-700">
-                Sessione in Corso
+              <div className="flex items-center gap-2">
+                <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-amber-400 light:text-amber-700">
+                  Sessione in Corso
+                </span>
+                {activeSession.isPaused && (
+                  <span className="text-[9px] font-mono font-bold uppercase px-1.5 py-0.2 rounded bg-amber-500/30 text-amber-300 light:bg-amber-200 light:text-amber-800 border border-amber-500/40">
+                    In Pausa
+                  </span>
+                )}
               </div>
               <div className="font-bold text-xs sm:text-sm text-zinc-100 light:text-slate-900 truncate">
                 {activeSession.subjectName || (activeSession.type === 'exam' ? 'Simulazione Esame' : 'Quaderno Errori')}
@@ -138,9 +193,27 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectTab }) => {
             </div>
           </div>
 
-          <div className="flex items-center gap-1 text-amber-400 light:text-amber-700 text-xs font-bold group-hover:translate-x-0.5 transition-transform flex-shrink-0">
-            <span className="hidden sm:inline">Riprendi</span>
-            <ArrowRight className="w-4 h-4" />
+          <div className="flex items-center gap-2 flex-shrink-0">
+            <button
+              id="btn-home-resume-session"
+              onClick={handleResumeSession}
+              className="px-3 py-1.5 rounded-lg bg-amber-600 hover:bg-amber-500 text-white font-bold text-xs flex items-center gap-1 shadow-sm transition-colors"
+            >
+              <span>Riprendi</span>
+              <ArrowRight className="w-3.5 h-3.5" />
+            </button>
+            <button
+              id="btn-home-discard-session"
+              onClick={(e) => {
+                e.stopPropagation();
+                setShowConfirmDiscard(true);
+              }}
+              className="p-1.5 rounded-lg text-zinc-400 hover:text-rose-400 hover:bg-rose-500/10 light:text-slate-500 light:hover:text-rose-600 light:hover:bg-rose-50 transition-colors"
+              title="Elimina sessione"
+              aria-label="Elimina sessione"
+            >
+              <Trash2 className="w-4 h-4" />
+            </button>
           </div>
         </div>
       )}
@@ -150,7 +223,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectTab }) => {
         {/* 1. TUTOR DIDATTICO */}
         <button
           id="btn-home-tutor"
-          onClick={() => onSelectTab('tutor')}
+          onClick={() => handleSelectScenario('tutor')}
           className="group relative p-3.5 sm:p-4 rounded-xl bg-zinc-900 border border-zinc-700 hover:border-emerald-500/80 text-left transition-all shadow-sm hover:shadow-emerald-950/20 light:bg-white light:border-slate-300 light:shadow-sm light:hover:border-emerald-500 flex flex-col justify-between min-h-[105px] active:scale-[0.99]"
         >
           <div className="space-y-1.5">
@@ -182,7 +255,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectTab }) => {
         {/* 2. STUDIO PER MATERIE */}
         <button
           id="btn-home-topics"
-          onClick={() => onSelectTab('topics')}
+          onClick={() => handleSelectScenario('topics')}
           className="group relative p-3.5 sm:p-4 rounded-xl bg-zinc-900 border border-zinc-700 hover:border-amber-500/80 text-left transition-all shadow-sm light:bg-white light:border-slate-300 light:shadow-sm light:hover:border-amber-500 flex flex-col justify-between min-h-[105px] active:scale-[0.99]"
         >
           <div className="space-y-1.5">
@@ -214,7 +287,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectTab }) => {
         {/* 3. ESAME UFFICIALE AECI */}
         <button
           id="btn-home-exam"
-          onClick={() => onSelectTab('exam')}
+          onClick={() => handleSelectScenario('exam')}
           className="group relative p-3.5 sm:p-4 rounded-xl bg-zinc-900 border border-zinc-700 hover:border-sky-500/80 text-left transition-all shadow-sm light:bg-white light:border-slate-300 light:shadow-sm light:hover:border-sky-500 flex flex-col justify-between min-h-[105px] active:scale-[0.99]"
         >
           <div className="space-y-1.5">
@@ -246,7 +319,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectTab }) => {
         {/* 4. QUADERNO ERRORI */}
         <button
           id="btn-home-mistakes"
-          onClick={() => onSelectTab('mistakes')}
+          onClick={() => handleSelectScenario('mistakes')}
           className="group relative p-3.5 sm:p-4 rounded-xl bg-zinc-900 border border-zinc-700 hover:border-rose-500/80 text-left transition-all shadow-sm light:bg-white light:border-slate-300 light:shadow-sm light:hover:border-rose-500 flex flex-col justify-between min-h-[105px] active:scale-[0.99]"
         >
           <div className="space-y-1.5">
@@ -345,6 +418,88 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectTab }) => {
           </div>
         </button>
       </div>
+
+      {/* Modal di Conferma Eliminazione Sessione dalla Home */}
+      {showConfirmDiscard && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/75 backdrop-blur-sm p-4 animate-in fade-in"
+          onClick={() => setShowConfirmDiscard(false)}
+        >
+          <div
+            className="bg-zinc-900 border border-zinc-700 rounded-2xl p-5 sm:p-6 max-w-sm w-full space-y-4 shadow-2xl dark:bg-zinc-900 dark:border-zinc-700 light:bg-white light:border-slate-300"
+            onClick={e => e.stopPropagation()}
+            role="dialog"
+            aria-modal="true"
+          >
+            <div className="flex items-center gap-2.5 text-rose-400 light:text-rose-600">
+              <AlertCircle className="w-6 h-6 flex-shrink-0" />
+              <h3 className="font-bold text-base text-zinc-100 dark:text-zinc-100 light:text-slate-900">
+                Elimina Sessione
+              </h3>
+            </div>
+            <p className="text-xs text-zinc-300 dark:text-zinc-300 light:text-slate-600 leading-relaxed">
+              Vuoi davvero eliminare la sessione in corso? Tutti i progressi di questa prova non salvata andranno persi.
+            </p>
+            <div className="flex gap-2 pt-1">
+              <button
+                id="btn-home-cancel-discard"
+                onClick={() => setShowConfirmDiscard(false)}
+                className="flex-1 py-2.5 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-zinc-200 light:bg-slate-100 light:hover:bg-slate-200 light:text-slate-800 text-xs font-semibold transition-colors"
+              >
+                Annulla
+              </button>
+              <button
+                id="btn-home-confirm-discard"
+                onClick={() => {
+                  dismissActiveSession();
+                  setShowConfirmDiscard(false);
+                }}
+                className="flex-1 py-2.5 rounded-xl bg-rose-600 hover:bg-rose-500 text-white text-xs font-bold shadow-md transition-colors"
+              >
+                Elimina
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Session Conflict Modal */}
+      {conflictTargetTab && activeSession && (
+        <SessionConflictModal
+          isOpen={Boolean(conflictTargetTab)}
+          onClose={() => setConflictTargetTab(null)}
+          onResumeExisting={() => {
+            setConflictTargetTab(null);
+            handleResumeSession();
+          }}
+          onDiscardAndStartNew={() => {
+            const target = conflictTargetTab;
+            setConflictTargetTab(null);
+            dismissActiveSession();
+            if (target) onSelectTab(target);
+          }}
+          existingTitle={
+            activeSession.subjectName ||
+            (activeSession.type === 'exam'
+              ? (activeSession.examMode === 'tutor' ? 'Tutor Didattico' : 'Simulazione Esame')
+              : 'Quaderno Errori')
+          }
+          existingProgress={`Domanda ${(activeSession.currentIndex || 0) + 1} di ${
+            activeSession.questionIds?.length || 0
+          } • ${Object.keys(activeSession.answers || {}).length} risposte date`}
+          newSessionTitle={
+            conflictTargetTab === 'tutor'
+              ? 'Tutor Didattico'
+              : conflictTargetTab === 'topics'
+              ? 'Studio Materie'
+              : conflictTargetTab === 'exam'
+              ? 'Esame Ufficiale'
+              : conflictTargetTab === 'mistakes'
+              ? 'Quaderno Errori'
+              : 'Nuova Sessione'
+          }
+        />
+      )}
     </div>
   );
 };

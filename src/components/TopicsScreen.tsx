@@ -1,14 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import {
   ArrowRight,
-  ArrowLeft,
-  CheckCircle2
+  CheckCircle2,
+  XCircle
 } from 'lucide-react';
 import type { Question } from '../types/quiz';
 import { useQuiz } from '../context/QuizContext';
 import { QuestionCard } from './QuestionCard';
 import { QuizBottomBar } from './QuizBottomBar';
 import { voiceService } from '../services/voiceService';
+import { SessionInterruptModal } from './SessionInterruptModal';
+import { SessionConflictModal } from './SessionConflictModal';
 
 export interface TopicsScreenProps {
   initialSubjectId?: number | null;
@@ -36,6 +38,8 @@ export const TopicsScreen: React.FC<TopicsScreenProps> = ({
   const [sessionQuestions, setSessionQuestions] = useState<Question[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [sessionAnswers, setSessionAnswers] = useState<Record<number, 1 | 2 | 3>>({});
+  const [showInterruptModal, setShowInterruptModal] = useState(false);
+  const [conflictSub, setConflictSub] = useState<{ id: number; mode: 'all' | 'unseen' | 'wrong' } | null>(null);
 
   // Stop any voice playback on component unmount
   useEffect(() => {
@@ -79,8 +83,17 @@ export const TopicsScreen: React.FC<TopicsScreenProps> = ({
       questionIds: list.map(q => q.id),
       currentIndex: 0,
       answers: {},
+      isPaused: false,
       updatedAt: Date.now()
     });
+  };
+
+  const handleRequestStartTopic = (subId: number, mode: 'all' | 'unseen' | 'wrong' = 'all') => {
+    if (activeSession && activeSession.questionIds?.length > 0 && (activeSession.type !== 'topic' || activeSession.subjectId !== subId)) {
+      setConflictSub({ id: subId, mode });
+    } else {
+      startTopicSession(subId, mode);
+    }
   };
 
   // Launch initial subject session if triggered from external drilldown (e.g. StatsScreen)
@@ -212,19 +225,19 @@ export const TopicsScreen: React.FC<TopicsScreenProps> = ({
         {/* Top bar sessione */}
         <div className="flex items-center justify-between p-2 sm:p-2.5 bg-zinc-900 border border-zinc-700 rounded-xl light:bg-white light:border-slate-300 light:shadow-sm">
           <button
+            id="btn-topics-interrupt"
             onClick={() => {
               voiceService.stop();
               if (autoAdvanceTimerRef.current) {
                 clearTimeout(autoAdvanceTimerRef.current);
                 autoAdvanceTimerRef.current = null;
               }
-              setActiveSubjectId(null);
-              dismissActiveSession();
+              setShowInterruptModal(true);
             }}
             className="text-xs text-zinc-400 hover:text-zinc-200 light:text-slate-600 flex items-center gap-1 font-medium"
           >
-            <ArrowLeft className="w-4 h-4" />
-            <span>Esci</span>
+            <XCircle className="w-4 h-4" />
+            <span>Interrompi</span>
           </button>
 
           <div className="text-xs font-bold text-zinc-200 light:text-slate-800 truncate max-w-[180px]">
@@ -279,6 +292,43 @@ export const TopicsScreen: React.FC<TopicsScreenProps> = ({
                 }
               : undefined
           }
+        />
+
+        {/* Modale Interruzione Sessione Materia */}
+        <SessionInterruptModal
+          isOpen={showInterruptModal}
+          onClose={() => {
+            setShowInterruptModal(false);
+          }}
+          onPause={async () => {
+            voiceService.stop();
+            if (activeSubjectId !== null) {
+              const currentSubjectMeta = subjectsAnalytics.find(s => s.id === activeSubjectId);
+              await persistActiveSession({
+                type: 'topic',
+                subjectId: activeSubjectId,
+                subjectName: currentSubjectMeta?.name,
+                questionIds: sessionQuestions.map(q => q.id),
+                currentIndex,
+                answers: sessionAnswers,
+                isPaused: true,
+                pausedAt: Date.now(),
+                updatedAt: Date.now()
+              });
+            }
+            setActiveSubjectId(null);
+            setShowInterruptModal(false);
+          }}
+          onTerminate={async () => {
+            voiceService.stop();
+            setActiveSubjectId(null);
+            setShowInterruptModal(false);
+            await dismissActiveSession();
+          }}
+          sessionTitle={`Studio Materia: ${currentSubjectMeta?.name || 'Materia'}`}
+          currentIndex={currentIndex}
+          totalQuestions={sessionQuestions.length}
+          answeredCount={answeredCount}
         />
       </div>
     );
@@ -346,7 +396,7 @@ export const TopicsScreen: React.FC<TopicsScreenProps> = ({
               <div className="flex items-center gap-2 pt-1 text-xs">
                 <button
                   id={`btn-topic-all-${sub.id}`}
-                  onClick={() => startTopicSession(sub.id, 'all')}
+                  onClick={() => handleRequestStartTopic(sub.id, 'all')}
                   className="flex-1 py-2 rounded-lg bg-amber-600 hover:bg-amber-500 text-white font-semibold flex items-center justify-center gap-1 transition-colors"
                 >
                   <span>Tutte ({sub.total})</span>
@@ -355,7 +405,7 @@ export const TopicsScreen: React.FC<TopicsScreenProps> = ({
 
                 {sub.total - sub.seen > 0 && (
                   <button
-                    onClick={() => startTopicSession(sub.id, 'unseen')}
+                    onClick={() => handleRequestStartTopic(sub.id, 'unseen')}
                     className="py-2 px-3 rounded-lg border border-zinc-700 bg-zinc-950 hover:bg-zinc-800 text-zinc-300 light:bg-slate-50 light:border-slate-300 light:text-slate-700 text-xs font-medium"
                     title="Solo domande mai viste"
                   >
@@ -367,6 +417,40 @@ export const TopicsScreen: React.FC<TopicsScreenProps> = ({
           );
         })}
       </div>
+
+      {/* Modale Conflitto Sessione per Materie */}
+      <SessionConflictModal
+        isOpen={conflictSub !== null}
+        onClose={() => setConflictSub(null)}
+        onResumeExisting={() => {
+          setConflictSub(null);
+          if (activeSession?.subjectId) {
+            setActiveSubjectId(activeSession.subjectId);
+          }
+        }}
+        onDiscardAndStartNew={async () => {
+          const target = conflictSub;
+          setConflictSub(null);
+          await dismissActiveSession();
+          if (target) {
+            startTopicSession(target.id, target.mode);
+          }
+        }}
+        existingTitle={
+          activeSession?.subjectName ||
+          (activeSession?.type === 'exam'
+            ? activeSession.examMode === 'tutor'
+              ? 'Simulazione Didattica (Tutor)'
+              : 'Esame Ufficiale'
+            : 'Sessione di Studio')
+        }
+        existingProgress={`Domanda ${(activeSession?.currentIndex || 0) + 1} di ${
+          activeSession?.questionIds?.length || 0
+        } • ${activeSession?.answers ? Object.keys(activeSession.answers).length : 0} risposte date`}
+        newSessionTitle={`Nuovo Studio: ${
+          subjectsAnalytics.find(s => s.id === conflictSub?.id)?.name || 'Materia'
+        }`}
+      />
     </div>
   );
 };

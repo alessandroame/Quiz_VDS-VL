@@ -34,6 +34,7 @@
     "dexie": "^4.0.11",
     "dexie-react-hooks": "^1.1.7",
     "lucide-react": "^1.16.0",
+    "posthog-js": "^1.435.5",
     "react": "^19.0.0",
     "react-dom": "^19.0.0"
   },

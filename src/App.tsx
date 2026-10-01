@@ -3,13 +3,14 @@ import { ThemeProvider } from './context/ThemeContext';
 import { QuizProvider, useQuiz } from './context/QuizContext';
 import { Navbar, type NavTab } from './components/Navbar';
 import { HomeScreen } from './components/HomeScreen';
-import { getTabLabel } from './utils/navigation';
 import { ExamScreen } from './components/ExamScreen';
 import { OfflineBanner } from './components/OfflineIndicator';
-import { Download, AlertTriangle, Play, ArrowRight, X } from 'lucide-react';
+import { Download, Play, ArrowRight, X } from 'lucide-react';
 import { voiceService } from './services/voiceService';
 import { audioDownloadManager } from './services/audioDownloadManager';
+import { telemetry } from './services/telemetry';
 import { applyFontSizePreference } from './utils/fontSize';
+import { SessionInterruptModal } from './components/SessionInterruptModal';
 import {
   backNavigation,
   executeBackAction,
@@ -40,6 +41,7 @@ function AppContent() {
     driveSessionContext,
     activeSession,
     dismissActiveSession,
+    persistActiveSession,
     settings,
     isSettingsLoaded
   } = useQuiz();
@@ -173,6 +175,26 @@ function AppContent() {
     return () => window.removeEventListener('beforeunload', handleBeforeUnload);
   }, [isExamRunning]);
 
+  // Initialize anonymous telemetry with opt-out respect once settings are loaded
+  useEffect(() => {
+    if (!isSettingsLoaded) return;
+    const isPwa = typeof window !== 'undefined' && window.matchMedia('(display-mode: standalone)').matches;
+    telemetry
+      .init({
+        enabled: settings.telemetryEnabled ?? true,
+      })
+      .then(() => {
+        telemetry.trackAppSessionStarted({
+          version: typeof __APP_VERSION__ !== 'undefined' ? __APP_VERSION__ : '1.0.0',
+          build_number: typeof __APP_BUILD_NUMBER__ !== 'undefined' ? __APP_BUILD_NUMBER__ : '0',
+          is_standalone_pwa: isPwa,
+          theme: settings.theme,
+          font_scale: settings.fontSizePreference,
+        });
+      })
+      .catch(() => {});
+  }, [isSettingsLoaded]);
+
   // Intercetta l'evento di installazione PWA
   useEffect(() => {
     const handler = (e: Event) => {
@@ -187,6 +209,7 @@ function AppContent() {
     if (!deferredPrompt) return;
     deferredPrompt.prompt();
     const { outcome } = await deferredPrompt.userChoice;
+    telemetry.trackPwaInstallPrompt({ outcome });
     if (outcome === 'accepted') {
       setDeferredPrompt(null);
     }
@@ -243,6 +266,26 @@ function AppContent() {
       }
     }
     setActiveTab(tab);
+  };
+
+  const pauseAndNavigate = async () => {
+    if (pendingTab) {
+      setIsExamRunning(false);
+      voiceService.stop();
+      if (activeSession) {
+        await persistActiveSession({
+          ...activeSession,
+          isPaused: true,
+          pausedAt: Date.now()
+        });
+      }
+      setActiveTab(pendingTab);
+      setPendingTab(null);
+      backNavigation.resetDepth();
+      if (typeof window !== 'undefined' && window.history) {
+        window.history.replaceState({ appDepth: 0 }, '');
+      }
+    }
   };
 
   const confirmAbandonAndNavigate = () => {
@@ -415,46 +458,21 @@ function AppContent() {
 
       {/* Modal di Avviso Cambio Pagina durante Esame Attivo */}
       {pendingTab && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/75 p-4 animate-in fade-in">
-          <div className="bg-zinc-900 border border-zinc-800 rounded-2xl p-6 max-w-sm w-full space-y-4 shadow-2xl dark:bg-zinc-900 dark:border-zinc-800 light:bg-white light:border-slate-200">
-            <div className="flex items-center gap-2.5 text-amber-400 light:text-amber-600">
-              <AlertTriangle className="w-6 h-6 flex-shrink-0" />
-              <h3 className="font-bold text-base text-zinc-100 dark:text-zinc-100 light:text-slate-900">
-                Simulazione in Corso
-              </h3>
-            </div>
-
-            <div className="text-xs text-zinc-300 dark:text-zinc-300 light:text-slate-600 space-y-2">
-              <p>
-                Hai una sessione d'esame attiva. Se ti sposti alla sezione{' '}
-                <strong className="text-amber-400 light:text-amber-700 font-bold">
-                  "{getTabLabel(pendingTab)}"
-                </strong>
-                , la simulazione in corso verrà interrotta e tutti i progressi andranno persi.
-              </p>
-              <p className="text-rose-400 light:text-rose-600 font-semibold">
-                Vuoi davvero abbandonare l'esame?
-              </p>
-            </div>
-
-            <div className="flex gap-2 pt-2">
-              <button
-                id="btn-abandon-cancel-nav"
-                onClick={cancelNavigation}
-                className="flex-1 py-2.5 rounded-xl bg-amber-600 hover:bg-amber-500 text-white text-xs font-bold shadow-md transition-colors"
-              >
-                Rimani nell'Esame
-              </button>
-              <button
-                id="btn-abandon-confirm-nav"
-                onClick={confirmAbandonAndNavigate}
-                className="flex-1 py-2.5 rounded-xl border border-rose-500/60 text-rose-400 hover:bg-rose-500/10 light:text-rose-600 light:border-rose-300 text-xs font-medium transition-colors"
-              >
-                Interrompi ed Esci
-              </button>
-            </div>
-          </div>
-        </div>
+        <SessionInterruptModal
+          isOpen={Boolean(pendingTab)}
+          onClose={cancelNavigation}
+          onPause={pauseAndNavigate}
+          onTerminate={confirmAbandonAndNavigate}
+          sessionTitle={
+            activeSession?.subjectName ||
+            (activeSession?.type === 'exam'
+              ? (activeSession.examMode === 'tutor' ? 'Tutor Didattico' : 'Simulazione Esame')
+              : 'Quaderno Errori')
+          }
+          currentIndex={activeSession?.currentIndex || 0}
+          totalQuestions={activeSession?.questionIds?.length || 30}
+          answeredCount={activeSession?.answers ? Object.keys(activeSession.answers).length : 0}
+        />
       )}
     </div>
   );

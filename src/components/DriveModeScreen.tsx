@@ -570,7 +570,7 @@ export const DriveModeScreen: React.FC<DriveModeScreenProps> = ({
     if (!isExamSession || isTutorEnabled) {
       setRevealedQuestionId(currentQ.id);
       if (!sessionContext && !isExamSession) {
-        await recordAnswer(currentQ.id, isCorrect);
+        await recordAnswer(currentQ.id, isCorrect, ans, 'audio_mode');
       }
 
       if (!isCorrect && (isTutorEnabled || settings.ttsAutoExplainOnMistake)) {

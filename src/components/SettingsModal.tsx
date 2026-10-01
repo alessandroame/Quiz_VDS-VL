@@ -30,13 +30,15 @@ import {
   Tag,
   BookOpen,
   ExternalLink,
-  AlertTriangle
+  AlertTriangle,
+  Activity
 } from 'lucide-react';
 import { useTheme } from '../context/ThemeContext';
 import { useQuiz } from '../context/QuizContext';
 import { googleDrive } from '../services/googleDrive';
 import { syncEngine } from '../services/syncEngine';
 import { voiceService } from '../services/voiceService';
+import { telemetry } from '../services/telemetry';
 import { exportDatabaseBackup, importDatabaseBackup, db } from '../db';
 import type { ThemeMode } from '../types/database';
 import { FONT_SIZE_OPTIONS, getFontSizeLabel } from '../utils/fontSize';
@@ -1653,6 +1655,38 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                 </p>
                 <div className="text-[10px] text-zinc-400 light:text-slate-600 font-mono pt-1">
                   Database: <span className="text-zinc-300 light:text-slate-700">VDSQuizDB</span> · Versione: <span className="text-zinc-300 light:text-slate-700">1</span> · Quiz: <span className="text-zinc-300 light:text-slate-700">504 AeCI</span>
+                </div>
+              </div>
+
+              {/* Telemetria e Statistiche Anonime */}
+              <div className="p-3.5 rounded-xl border border-zinc-700 bg-zinc-950/60 light:bg-slate-50 light:border-slate-300 space-y-2">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <Activity className="w-4 h-4 text-amber-400" />
+                    <span className="text-xs font-bold text-zinc-200 light:text-slate-800">
+                      Statistiche d'Uso Anonime
+                    </span>
+                  </div>
+                  <label className="relative inline-flex items-center cursor-pointer">
+                    <input
+                      id="toggle-telemetry"
+                      type="checkbox"
+                      checked={settings.telemetryEnabled ?? true}
+                      onChange={e => {
+                        const enabled = e.target.checked;
+                        updateSetting('telemetryEnabled', enabled);
+                        telemetry.setOptOut(!enabled);
+                      }}
+                      className="sr-only peer"
+                    />
+                    <div className="w-9 h-5 bg-zinc-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-zinc-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-amber-500"></div>
+                  </label>
+                </div>
+                <p className="text-[11px] text-zinc-400 light:text-slate-600 leading-relaxed">
+                  Contribuisci al miglioramento dell'app inviando statistiche aggregate e anonime sulle domande più sbagliate e sul superamento degli esami. Nessun dato personale, nota privata o comando vocale viene mai trasmesso.
+                </p>
+                <div className="text-[10px] text-zinc-400 light:text-slate-600 font-mono">
+                  Stato: <span className={settings.telemetryEnabled ?? true ? 'text-emerald-400 font-semibold' : 'text-zinc-400'}>{settings.telemetryEnabled ?? true ? 'Attivo (Opt-Out)' : 'Disattivato'}</span>
                 </div>
               </div>
 

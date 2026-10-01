@@ -14,7 +14,33 @@ Questo documento registra in ordine cronologico tutte le lavorazioni svolte nel 
 - **Impatto sul Desiderata**: <Come questo intervento contribuisce al desiderata (cfr. DESIDERATA.md) e indicazioni per il prossimo agente>
 ```
 
-# Registro di Bordo (WORKLOG) - 2026-10-01: Gestione Blocco Popup OAuth Google Drive e Guida Utente
+### [2026-10-01] - Integrazione Telemetria di Prodotto PostHog con Statistiche Domande e Opt-Out Trasparente
+- **Cosa abbiamo fatto**:
+  - **Integrazione Client PostHog (`posthog-js`) con Chunk Isolato**:
+    - Installato `posthog-js` e configurato chunk separato `telemetry` in [vite.config.ts](file:///c:/github/Quiz_VDS-VL/vite.config.ts) (`manualChunks`), azzerando l'impatto sul vendor bundle iniziale.
+    - Implementato il modulo Facade singleton in [src/services/telemetry.ts](file:///c:/github/Quiz_VDS-VL/src/services/telemetry.ts) con dynamic lazy import (`import('posthog-js')`), esecuzione in silent no-op se `VITE_POSTHOG_KEY` non è configurata e isolamento totale da errori di rete / ad-blocker.
+    - Definite interfacce tipizzate in [src/types/telemetry.ts](file:///c:/github/Quiz_VDS-VL/src/types/telemetry.ts) per `question_answered`, `exam_completed`, `study_mode_entered`, `audio_download_result`, `app_session_started` e `pwa_install_prompt_outcome`.
+  - **Telemetria Granulare per Singola Domanda & Request Batching**:
+    - Tracciamento di ogni quesito risposto con `question_id`, `subject_id`, `is_correct`, `selected_option`, `correct_option` e `mode` in [src/context/QuizContext.tsx](file:///c:/github/Quiz_VDS-VL/src/context/QuizContext.tsx), [src/components/ExamScreen.tsx](file:///c:/github/Quiz_VDS-VL/src/components/ExamScreen.tsx), [src/components/TopicsScreen.tsx](file:///c:/github/Quiz_VDS-VL/src/components/TopicsScreen.tsx), [src/components/MistakesScreen.tsx](file:///c:/github/Quiz_VDS-VL/src/components/MistakesScreen.tsx) e [src/components/DriveModeScreen.tsx](file:///c:/github/Quiz_VDS-VL/src/components/DriveModeScreen.tsx).
+    - Abilitato `request_batching: true` con payload compressi raggruppati ogni 3-5 secondi per minimizzare il consumo di banda e batteria.
+  - **Privacy & Opt-Out Trasparente**:
+    - Aggiunto `telemetryEnabled?: boolean` (default `true`) ad `AppSettings` in [src/types/database.ts](file:///c:/github/Quiz_VDS-VL/src/types/database.ts) e [src/db/index.ts](file:///c:/github/Quiz_VDS-VL/src/db/index.ts).
+    - Inserita la card con toggle dedicato in [src/components/SettingsModal.tsx](file:///c:/github/Quiz_VDS-VL/src/components/SettingsModal.tsx) ("Statistiche d'Uso Anonime"), consentendo la disattivazione istantanea con 1 tocco (`telemetry.setOptOut(!enabled)`).
+    - Session recording e autocapture disattivati; sanitizzazione automatica attiva per escludere categoricamente note personali, token e dati sensibili.
+  - **Documentazione Variabili d'Ambiente**:
+    - Aggiornato [.env.example](file:///c:/github/Quiz_VDS-VL/.env.example) con `VITE_POSTHOG_KEY` e `VITE_POSTHOG_HOST=https://eu.i.posthog.com`.
+  - **Test Suite Vitest**:
+    - Creata la suite [src/services/telemetry.test.ts](file:///c:/github/Quiz_VDS-VL/src/services/telemetry.test.ts) (8 test unitari completi). Tutti i 339 test attivi passano con successo (100% verdi).
+- **Scelte architetturali & Rationale**:
+  - **Dynamic Lazy Loading & Chunk Separation**: L'SDK di PostHog non deve rallentare l'avvio della PWA né essere scaricato se la chiave non è configurata.
+  - **Request Batching**: Raggruppare le risposte a livello di rete previene picchi di connessione su smartphone in volo o in zone a bassa copertura.
+  - **Zero PII & Sanitizer**: Conformità GDPR assoluta senza compromettere l'utilità analitica per identificare le domande più difficili del catalogo AeCI.
+- **Impatto sul Desiderata**:
+  - Realizza il monitoraggio aggregato anonimo mantenendo inalterata la promessa di sovranità dei dati e funzionamento 100% offline.
+
+---
+
+### [2026-10-01] - Gestione Blocco Popup OAuth Google Drive e Guida Utente
 
 ## 1. Cosa abbiamo fatto
 - **Rilevamento e gestione proattiva del blocco popup Google OAuth (GIS)**:

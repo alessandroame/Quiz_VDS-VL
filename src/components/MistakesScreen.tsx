@@ -2,10 +2,10 @@ import React, { useState, useEffect, useMemo } from 'react';
 import {
   RotateCcw,
   CheckCircle2,
-  ArrowLeft,
   Flame,
   FileText,
-  ChevronRight
+  ChevronRight,
+  XCircle
 } from 'lucide-react';
 import type { Question } from '../types/quiz';
 import { useQuiz } from '../context/QuizContext';
@@ -13,6 +13,8 @@ import { QuestionCard } from './QuestionCard';
 import { QuizBottomBar } from './QuizBottomBar';
 import { voiceService } from '../services/voiceService';
 import { QuestionDetailModal } from './QuestionDetailModal';
+import { SessionInterruptModal } from './SessionInterruptModal';
+import { SessionConflictModal } from './SessionConflictModal';
 
 export const MistakesScreen: React.FC = () => {
   const {
@@ -31,6 +33,8 @@ export const MistakesScreen: React.FC = () => {
   const [reviewQuestions, setReviewQuestions] = useState<Question[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [reviewAnswers, setReviewAnswers] = useState<Record<number, 1 | 2 | 3>>({});
+  const [showInterruptModal, setShowInterruptModal] = useState(false);
+  const [conflictPendingPool, setConflictPendingPool] = useState<Question[] | null>(null);
 
   const [selectedSubjectId, setSelectedSubjectId] = useState<number | null>(null);
   const [selectedQuestionForModal, setSelectedQuestionForModal] = useState<Question | null>(null);
@@ -115,8 +119,18 @@ export const MistakesScreen: React.FC = () => {
       questionIds: targetPool.map(q => q.id),
       currentIndex: 0,
       answers: {},
+      isPaused: false,
       updatedAt: Date.now()
     });
+  };
+
+  const handleRequestStartReview = (poolToUse?: Question[]) => {
+    const targetPool = poolToUse ?? displayedMistakeQuestions;
+    if (activeSession && activeSession.questionIds?.length > 0 && activeSession.type !== 'mistakes') {
+      setConflictPendingPool(targetPool);
+    } else {
+      startReviewSession(targetPool);
+    }
   };
 
   const currentQ = reviewQuestions[currentIndex];
@@ -215,19 +229,19 @@ export const MistakesScreen: React.FC = () => {
         {/* Top bar ripasso */}
         <div className="flex items-center justify-between p-2 sm:p-2.5 bg-zinc-900 border border-zinc-700 rounded-xl light:bg-white light:border-slate-300 light:shadow-sm">
           <button
+            id="btn-mistakes-interrupt"
             onClick={() => {
               voiceService.stop();
               if (autoAdvanceTimerRef.current) {
                 clearTimeout(autoAdvanceTimerRef.current);
                 autoAdvanceTimerRef.current = null;
               }
-              setIsReviewing(false);
-              dismissActiveSession();
+              setShowInterruptModal(true);
             }}
             className="text-xs text-zinc-400 hover:text-zinc-200 light:text-slate-600 flex items-center gap-1 font-medium"
           >
-            <ArrowLeft className="w-4 h-4" />
-            <span>Esci</span>
+            <XCircle className="w-4 h-4" />
+            <span>Interrompi</span>
           </button>
 
           <div className="text-xs font-bold text-rose-400 flex items-center gap-1">
@@ -291,6 +305,39 @@ export const MistakesScreen: React.FC = () => {
                 }
               : undefined
           }
+        />
+
+        {/* Modale Interruzione Ripasso Errori */}
+        <SessionInterruptModal
+          isOpen={showInterruptModal}
+          onClose={() => {
+            setShowInterruptModal(false);
+          }}
+          onPause={async () => {
+            voiceService.stop();
+            await persistActiveSession({
+              type: 'mistakes',
+              subjectName: 'Quaderno Errori',
+              questionIds: reviewQuestions.map(q => q.id),
+              currentIndex,
+              answers: reviewAnswers,
+              isPaused: true,
+              pausedAt: Date.now(),
+              updatedAt: Date.now()
+            });
+            setIsReviewing(false);
+            setShowInterruptModal(false);
+          }}
+          onTerminate={async () => {
+            voiceService.stop();
+            setIsReviewing(false);
+            setShowInterruptModal(false);
+            await dismissActiveSession();
+          }}
+          sessionTitle="Ripasso Quaderno Errori"
+          currentIndex={currentIndex}
+          totalQuestions={reviewQuestions.length}
+          answeredCount={Object.keys(reviewAnswers).length}
         />
       </div>
     );
@@ -360,7 +407,7 @@ export const MistakesScreen: React.FC = () => {
 
           <button
             id="btn-start-mistakes-review"
-            onClick={() => startReviewSession(displayedMistakeQuestions)}
+            onClick={() => handleRequestStartReview(displayedMistakeQuestions)}
             className="w-full py-3.5 sm:py-4 rounded-xl bg-rose-600 hover:bg-rose-500 text-white font-bold text-xs sm:text-sm shadow-lg shadow-rose-950/40 flex items-center justify-center gap-2 transition-all active:scale-[0.99] cursor-pointer"
           >
             <RotateCcw className="w-4 h-4" />
@@ -447,6 +494,33 @@ export const MistakesScreen: React.FC = () => {
           setIsDetailModalOpen(false);
           setSelectedQuestionForModal(null);
         }}
+      />
+
+      {/* Modale Conflitto Sessione in Sospeso per Ripasso Errori */}
+      <SessionConflictModal
+        isOpen={conflictPendingPool !== null}
+        onClose={() => setConflictPendingPool(null)}
+        onResumeExisting={() => {
+          setConflictPendingPool(null);
+        }}
+        onDiscardAndStartNew={async () => {
+          const pool = conflictPendingPool || displayedMistakeQuestions;
+          setConflictPendingPool(null);
+          await dismissActiveSession();
+          startReviewSession(pool);
+        }}
+        existingTitle={
+          activeSession?.subjectName ||
+          (activeSession?.type === 'exam'
+            ? activeSession.examMode === 'tutor'
+              ? 'Simulazione Didattica (Tutor)'
+              : 'Esame Ufficiale'
+            : 'Sessione di Studio')
+        }
+        existingProgress={`Domanda ${(activeSession?.currentIndex || 0) + 1} di ${
+          activeSession?.questionIds?.length || 0
+        } • ${activeSession?.answers ? Object.keys(activeSession.answers).length : 0} risposte date`}
+        newSessionTitle="Nuovo Ripasso Quaderno Errori"
       />
     </div>
   );
