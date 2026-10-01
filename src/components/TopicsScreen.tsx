@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import {
   ArrowRight,
   CheckCircle2,
-  XCircle
+  Pause
 } from 'lucide-react';
 import type { Question } from '../types/quiz';
 import { useQuiz } from '../context/QuizContext';
@@ -223,7 +223,7 @@ export const TopicsScreen: React.FC<TopicsScreenProps> = ({
     const answeredCount = Object.keys(sessionAnswers).length;
 
     return (
-      <div className="max-w-2xl mx-auto px-2.5 sm:px-4 py-2 sm:py-3 space-y-2.5 sm:space-y-3 pb-20 sm:pb-24">
+      <div className="max-w-2xl mx-auto px-2.5 sm:px-4 py-2 sm:py-3 space-y-2.5 sm:space-y-3 pb-28 sm:pb-32">
         {/* Top bar sessione */}
         <div className="flex items-center justify-between p-2 sm:p-2.5 bg-zinc-900 border border-zinc-700 rounded-xl light:bg-white light:border-slate-300 light:shadow-sm">
           <button
@@ -238,8 +238,8 @@ export const TopicsScreen: React.FC<TopicsScreenProps> = ({
             }}
             className="text-xs text-zinc-400 hover:text-zinc-200 light:text-slate-600 flex items-center gap-1 font-medium"
           >
-            <XCircle className="w-4 h-4" />
-            <span>Interrompi</span>
+            <Pause className="w-4 h-4" />
+            <span>Pausa</span>
           </button>
 
           <div className="text-xs font-bold text-zinc-200 light:text-slate-800 truncate max-w-[180px]">

@@ -9,7 +9,8 @@ import {
   RotateCcw,
   ListFilter,
   BookOpen,
-  Filter
+  Filter,
+  Pause
 } from 'lucide-react';
 import type { Question } from '../types/quiz';
 import type { ExamSession, ExamModeType } from '../types/database';
@@ -256,6 +257,35 @@ export const ExamScreen: React.FC<ExamScreenProps> = ({
         isMarathon,
         updatedAt: Date.now()
       });
+    }
+  };
+
+  const handlePauseExamSession = () => {
+    setShowInterruptModal(false);
+    setShowSubmitModal(false);
+    voiceService.stop();
+    if (autoAdvanceTimerRef.current) {
+      clearTimeout(autoAdvanceTimerRef.current);
+      autoAdvanceTimerRef.current = null;
+    }
+    setIsExamRunning(false);
+    persistActiveSession({
+      type: 'exam',
+      examMode,
+      questionIds: examQuestions.map(q => q.id),
+      currentIndex,
+      answers,
+      flags,
+      secondsRemaining: examMode === 'tutor' ? 0 : secondsRemaining,
+      elapsedSeconds: examMode === 'tutor' ? elapsedSeconds : 0,
+      startTime,
+      isMarathon,
+      isPaused: true,
+      pausedAt: Date.now(),
+      updatedAt: Date.now()
+    }).catch(console.error);
+    if (onNavigateHome) {
+      onNavigateHome();
     }
   };
 
@@ -928,11 +958,11 @@ export const ExamScreen: React.FC<ExamScreenProps> = ({
               setIsPaused(true);
               setShowInterruptModal(true);
             }}
-            className="p-1.5 sm:px-2.5 sm:py-1.5 rounded-lg border border-amber-500/40 hover:border-amber-500 bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 hover:text-amber-300 light:border-amber-200 light:bg-amber-50 light:text-amber-700 light:hover:bg-amber-100 text-xs font-semibold transition-colors flex items-center gap-1"
-            title="Interrompi la sessione"
+            className="px-2.5 py-1.5 rounded-lg border border-amber-500/40 hover:border-amber-500 bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 hover:text-amber-300 light:border-amber-300 light:bg-amber-50 light:text-amber-800 light:hover:bg-amber-100 text-xs font-semibold transition-colors flex items-center gap-1.5"
+            title="Pausa o Interrompi la sessione"
           >
-            <XCircle className="w-3.5 h-3.5" />
-            <span className="hidden sm:inline">Interrompi</span>
+            <Pause className="w-3.5 h-3.5" />
+            <span>Pausa</span>
           </button>
 
           <button
@@ -998,14 +1028,14 @@ export const ExamScreen: React.FC<ExamScreenProps> = ({
             ? (currentIndex < totalCount - 1
                 ? {
                     id: 'btn-tutor-next-question',
-                    label: `Prossima Domanda (${currentIndex + 2}/${totalCount})`,
+                    label: 'Successiva',
                     variant: 'amber',
                     icon: <ArrowRight className="w-4 h-4" />,
                     onClick: () => changeIndex(currentIndex + 1)
                   }
                 : {
                     id: 'btn-tutor-complete-exam',
-                    label: `Completa Simulazione (${answeredCount}/${totalCount})`,
+                    label: 'Completa',
                     variant: 'emerald',
                     icon: <CheckCircle2 className="w-4 h-4" />,
                     onClick: () => {
@@ -1016,7 +1046,7 @@ export const ExamScreen: React.FC<ExamScreenProps> = ({
             : (currentIndex === totalCount - 1
                 ? {
                     id: 'btn-submit-exam-bottom',
-                    label: `Consegna (${answeredCount}/${totalCount})`,
+                    label: 'Consegna',
                     variant: 'emerald',
                     icon: <CheckCircle2 className="w-4 h-4" />,
                     onClick: () => {
@@ -1055,19 +1085,31 @@ export const ExamScreen: React.FC<ExamScreenProps> = ({
               )}
             </div>
 
-            <div className="flex gap-2 pt-2">
+            <div className="space-y-2 pt-2">
+              <div className="flex gap-2">
+                <button
+                  onClick={() => setShowSubmitModal(false)}
+                  className="flex-1 py-2.5 rounded-xl border border-zinc-700 text-zinc-300 hover:text-white light:border-slate-300 light:text-slate-700 text-xs font-medium"
+                >
+                  Continua
+                </button>
+                <button
+                  id="btn-confirm-submit-exam"
+                  onClick={handleSubmitExam}
+                  className="flex-1 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold shadow-md"
+                >
+                  {examMode === 'tutor' ? 'Mostra Debriefing' : 'Conferma'}
+                </button>
+              </div>
+
+              {/* Tasto Metti in Pausa esplicito nel dialog di conclusione */}
               <button
-                onClick={() => setShowSubmitModal(false)}
-                className="flex-1 py-2.5 rounded-xl border border-zinc-700 text-zinc-300 hover:text-white light:border-slate-300 light:text-slate-700 text-xs font-medium"
+                id="btn-submit-modal-pause"
+                onClick={handlePauseExamSession}
+                className="w-full py-2.5 rounded-xl border border-amber-500/40 bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 hover:text-amber-200 light:bg-amber-50 light:border-amber-300 light:text-amber-800 text-xs font-bold flex items-center justify-center gap-2 transition-colors shadow-sm"
               >
-                Continua
-              </button>
-              <button
-                id="btn-confirm-submit-exam"
-                onClick={handleSubmitExam}
-                className="flex-1 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold shadow-md"
-              >
-                {examMode === 'tutor' ? 'Mostra Debriefing' : 'Conferma'}
+                <Pause className="w-3.5 h-3.5" />
+                <span>Metti in Pausa (Riprendi più tardi)</span>
               </button>
             </div>
           </div>
@@ -1081,33 +1123,7 @@ export const ExamScreen: React.FC<ExamScreenProps> = ({
           setIsPaused(false);
           setShowInterruptModal(false);
         }}
-        onPause={() => {
-          voiceService.stop();
-          if (autoAdvanceTimerRef.current) {
-            clearTimeout(autoAdvanceTimerRef.current);
-            autoAdvanceTimerRef.current = null;
-          }
-          setShowInterruptModal(false);
-          setIsExamRunning(false);
-          persistActiveSession({
-            type: 'exam',
-            examMode,
-            questionIds: examQuestions.map(q => q.id),
-            currentIndex,
-            answers,
-            flags,
-            secondsRemaining: examMode === 'tutor' ? 0 : secondsRemaining,
-            elapsedSeconds: examMode === 'tutor' ? elapsedSeconds : 0,
-            startTime,
-            isMarathon,
-            isPaused: true,
-            pausedAt: Date.now(),
-            updatedAt: Date.now()
-          }).catch(console.error);
-          if (onNavigateHome) {
-            onNavigateHome();
-          }
-        }}
+        onPause={handlePauseExamSession}
         onTerminate={async () => {
           voiceService.stop();
           if (autoAdvanceTimerRef.current) {

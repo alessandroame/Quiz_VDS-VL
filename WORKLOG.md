@@ -14,6 +14,22 @@ Questo documento registra in ordine cronologico tutte le lavorazioni svolte nel 
 - **Impatto sul Desiderata**: <Come questo intervento contribuisce al desiderata (cfr. DESIDERATA.md) e indicazioni per il prossimo agente>
 ```
 
+### [2026-10-01] - Visibilità Mobile del Pulsante Pausa e Integrazione Pausa nel Dialogo Concludi Esame
+- **Cosa abbiamo fatto**:
+  - **Pulsante "Metti in Pausa" in `ExamSubmitModal`**:
+    - Aggiunto il pulsante amber `#btn-submit-modal-pause` ("Metti in Pausa (Riprendi più tardi)") direttamente nel modal di conferma conclusione ([src/components/ExamScreen.tsx](file:///c:/github/Quiz_VDS-VL/src/components/ExamScreen.tsx)). Se un allievo tocca "Concludi" intendendo interrompere temporaneamente la simulazione, trova immediatamente l'opzione di congelamento e ripresa senza rischiare di terminare il test o perdere le risposte fornite.
+  - **Etichetta "Pausa" Sempre Visibile su Mobile (Top Bar)**:
+    - In [src/components/ExamScreen.tsx](file:///c:/github/Quiz_VDS-VL/src/components/ExamScreen.tsx), [src/components/TopicsScreen.tsx](file:///c:/github/Quiz_VDS-VL/src/components/TopicsScreen.tsx) e [src/components/MistakesScreen.tsx](file:///c:/github/Quiz_VDS-VL/src/components/MistakesScreen.tsx), sostituita l'icona generica con l'icona avionica `Pause` e rimossa la classe `hidden sm:inline` dall'etichetta di testo. Ora la dicitura `Pausa` è visibile e riconoscibile su qualsiasi dimensione di schermo (anche a 390px su smartphone).
+  - **Estensione della Suite di Test Unitari**:
+    - Aggiunto il test `ExamSubmitModal (opened via Concludi) displays Metti in Pausa button and pauses immediately` in [src/components/SessionInterruptNavigation.test.ts](file:///c:/github/Quiz_VDS-VL/src/components/SessionInterruptNavigation.test.ts).
+    - Aggiornati i test in [src/components/VoiceAutoStop.test.ts](file:///c:/github/Quiz_VDS-VL/src/components/VoiceAutoStop.test.ts) e gli script di test visivo per allineamento all'etichetta `Pausa`.
+    - Tutti i 361 test (51 suite) passano con successo (100% verdi).
+- **Scelte architetturali & Rationale**:
+  - **Zero Ambiguità Iconografica su Mobile**: L'icona generica con testo nascosto su viewport stretti generava confusione con l'azione di uscita definitiva e spingeva l'allievo a premere il ben più visibile tasto verde "Concludi". Rendere esplicita l'etichetta testuale `Pausa` tutela l'usabilità tattile in mobilità.
+  - **Ridondanza Ergonomica Intent-Driven**: L'inclusione di "Metti in Pausa" dentro `ExamSubmitModal` risolve l'eventuale errore di tapping dell'allievo che preme "Concludi" per sospendere il quiz.
+- **Impatto sul Desiderata**:
+  - Massimizza l'ergonomia su smartphone eliminando frizioni visive e garantendo che la sessione possa essere congelata da qualsiasi punto di contatto.
+
 ### [2026-10-01] - Risoluzione Errore HTTP 400 Bad Request PostHog e Preservazione Proprietà di Sistema
 - **Cosa abbiamo fatto**:
   - **Identificato e Risolto il Root Cause dell'Errore 400 su `/e/`**:

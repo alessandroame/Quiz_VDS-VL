@@ -76,5 +76,34 @@ describe('QuizBottomBar Component (Mobile Ergonomics)', () => {
     expect(html).toContain('Prossima Domanda');
     expect(html).toContain('bg-emerald-600');
     expect(html).not.toContain('id="btn-next-question"');
+    // Ensure counter remains visible with primary action
+    expect(html).toContain('3 / 30');
+  });
+
+  it('should maintain stable center counter and overflow protection classes', () => {
+    const html = renderToString(
+      React.createElement(QuizBottomBar, {
+        currentIndex: 5,
+        totalCount: 30,
+        onPrevious: () => {},
+        primaryAction: {
+          label: 'Successiva',
+          onClick: () => {},
+          id: 'btn-tutor-next-question',
+          variant: 'amber'
+        }
+      })
+    );
+
+    // Center counter
+    expect(html).toContain('6 / 30');
+    // Primary action
+    expect(html).toContain('id="btn-tutor-next-question"');
+    expect(html).toContain('Successiva');
+    expect(html).toContain('bg-amber-600');
+    // Anti-overflow classes
+    expect(html).toContain('min-w-0');
+    expect(html).toContain('truncate');
+    expect(html).toContain('shrink-0');
   });
 });

@@ -144,30 +144,44 @@ async function run() {
     await send('Page.navigate', { url: 'http://localhost:5173/' });
     await sleep(1500);
 
-    // Go to Exam Tab and start Tutor Exam
+    // Go to Tutor Mode and start Tutor Exam
     console.log('Starting Tutor Exam...');
-    await evalJs(`document.querySelector('#nav-exam')?.click()`);
-    await sleep(400);
-    await evalJs(`document.querySelector('#btn-start-tutor-exam')?.click()`);
-    await sleep(800);
+    console.log('Initial page buttons:', await evalJs(`JSON.stringify(Array.from(document.querySelectorAll('button')).map(b => b.id || b.innerText).slice(0, 10))`));
+    await evalJs(`document.querySelector('#btn-home-tutor')?.click() || document.querySelector('#nav-exam')?.click()`);
+    await sleep(600);
+    console.log('After tab click buttons:', await evalJs(`JSON.stringify(Array.from(document.querySelectorAll('button')).map(b => b.id || b.innerText).slice(0, 10))`));
+    // Wait for start button to appear
+    for (let i = 0; i < 20; i++) {
+      const hasStart = await evalJs(`Boolean(document.querySelector('#btn-start-tutor-exam'))`);
+      if (hasStart) {
+        await evalJs(`document.querySelector('#btn-start-tutor-exam')?.click()`);
+        break;
+      }
+      await sleep(200);
+    }
 
-    // Verify QuizBottomBar presence and fixed positioning
-    const barMetrics = await evalJs(`(() => {
-      const bar = document.querySelector('#quiz-bottom-bar');
-      if (!bar) return null;
-      const rect = bar.getBoundingClientRect();
-      const prevBtn = document.querySelector('#btn-prev-question');
-      const nextBtn = document.querySelector('#btn-next-question');
-      const flagBtn = document.querySelector('#btn-flag-question-bottom');
-      return {
-        bottom: Math.round(rect.bottom),
-        windowHeight: window.innerHeight,
-        hasPrev: Boolean(prevBtn),
-        isPrevDisabled: prevBtn?.disabled || false,
-        hasNext: Boolean(nextBtn),
-        hasFlag: Boolean(flagBtn)
-      };
-    })()`);
+    // Verify QuizBottomBar presence and fixed positioning with polling
+    let barMetrics = null;
+    for (let i = 0; i < 30; i++) {
+      barMetrics = await evalJs(`(() => {
+        const bar = document.querySelector('#quiz-bottom-bar');
+        if (!bar) return null;
+        const rect = bar.getBoundingClientRect();
+        const prevBtn = document.querySelector('#btn-prev-question');
+        const nextBtn = document.querySelector('#btn-next-question');
+        const flagBtn = document.querySelector('#btn-flag-question-bottom');
+        return {
+          bottom: Math.round(rect.bottom),
+          windowHeight: window.innerHeight,
+          hasPrev: Boolean(prevBtn),
+          isPrevDisabled: prevBtn?.disabled || false,
+          hasNext: Boolean(nextBtn),
+          hasFlag: Boolean(flagBtn)
+        };
+      })()`);
+      if (barMetrics) break;
+      await sleep(200);
+    }
 
     console.log('Bottom Bar metrics on Question 1:', barMetrics);
     if (!barMetrics) throw new Error('#quiz-bottom-bar not found in DOM!');

@@ -280,4 +280,50 @@ describe('Single-Click Session Pause & Interruption Navigation Contract', () => 
       })
     );
   });
+
+  it('ExamSubmitModal (opened via Concludi) displays Metti in Pausa button and pauses immediately', async () => {
+    const mockNavigateHome = vi.fn();
+
+    await act(async () => {
+      root.render(
+        React.createElement(ExamScreen, {
+          initialMode: 'tutor',
+          onNavigateHome: mockNavigateHome
+        })
+      );
+    });
+
+    // Start tutor exam
+    const startBtn = container.querySelector('#btn-start-tutor-exam') as HTMLButtonElement;
+    await act(async () => {
+      startBtn.click();
+    });
+
+    // Click Concludi button at the top
+    const submitTopBtn = container.querySelector('#btn-submit-exam-top') as HTMLButtonElement;
+    expect(submitTopBtn).not.toBeNull();
+    await act(async () => {
+      submitTopBtn.click();
+    });
+
+    // Verify Metti in Pausa button is present in the Concludi dialog
+    const pauseInSubmitModal = container.querySelector('#btn-submit-modal-pause') as HTMLButtonElement;
+    expect(pauseInSubmitModal).not.toBeNull();
+    expect(pauseInSubmitModal.textContent).toContain('Metti in Pausa');
+
+    // Click Metti in Pausa in submit modal
+    await act(async () => {
+      pauseInSubmitModal.click();
+    });
+
+    // Verify session paused and navigated home
+    expect(mockNavigateHome).toHaveBeenCalledTimes(1);
+    expect(mockPersistActiveSession).toHaveBeenCalledWith(
+      expect.objectContaining({
+        type: 'exam',
+        isPaused: true
+      })
+    );
+    expect(mockSetIsExamRunning).toHaveBeenCalledWith(false);
+  });
 });

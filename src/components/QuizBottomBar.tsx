@@ -88,7 +88,7 @@ export const QuizBottomBar: React.FC<QuizBottomBarProps> = ({
         <div className="flex-1 flex justify-center text-xs font-mono text-zinc-400 light:text-slate-600 truncate px-1 min-w-0">
           {centerContent || (
             <span className="font-semibold">
-              {currentIndex + 1} / {totalCount}
+              {`${currentIndex + 1} / ${totalCount}`}
             </span>
           )}
         </div>

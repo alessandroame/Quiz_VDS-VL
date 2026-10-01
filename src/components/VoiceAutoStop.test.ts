@@ -164,9 +164,9 @@ describe('Voice Auto-Stop on Back & Quiz Termination Contracts', () => {
       root.render(React.createElement(TopicsScreen));
     });
 
-    // Look for Esci button
+    // Look for Esci/Interrompi/Pausa button
     const buttons = Array.from(container.querySelectorAll('button'));
-    const esciBtn = buttons.find(b => b.textContent?.includes('Esci') || b.textContent?.includes('Interrompi'));
+    const esciBtn = buttons.find(b => b.id?.includes('interrupt') || b.textContent?.includes('Esci') || b.textContent?.includes('Interrompi') || b.textContent?.includes('Pausa'));
     expect(esciBtn).toBeDefined();
 
     mockStop.mockClear();
@@ -205,7 +205,7 @@ describe('Voice Auto-Stop on Back & Quiz Termination Contracts', () => {
     });
 
     const buttons = Array.from(container.querySelectorAll('button'));
-    const esciBtn = buttons.find(b => b.textContent?.includes('Esci') || b.textContent?.includes('Interrompi'));
+    const esciBtn = buttons.find(b => b.id?.includes('interrupt') || b.textContent?.includes('Esci') || b.textContent?.includes('Interrompi') || b.textContent?.includes('Pausa'));
     expect(esciBtn).toBeDefined();
 
     mockStop.mockClear();
