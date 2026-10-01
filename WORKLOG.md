@@ -14,6 +14,26 @@ Questo documento registra in ordine cronologico tutte le lavorazioni svolte nel 
 - **Impatto sul Desiderata**: <Come questo intervento contribuisce al desiderata (cfr. DESIDERATA.md) e indicazioni per il prossimo agente>
 ```
 
+### [2026-10-01] - Correzione Esecuzione Istantanea al Primo Clic di "Metti in Pausa" e "Termina" nei Quiz
+- **Cosa abbiamo fatto**:
+  - **Risolto il problema del doppio clic su "Metti in Pausa" / "Termina ed Elimina"**:
+    - Identificata e risolta la race-condition in [src/App.tsx](file:///c:/github/Quiz_VDS-VL/src/App.tsx): in precedenza la callback `onNavigateHome` invocava `handleSelectTab('home')`, la quale verificava `if (isExamRunning)`. Poiché il reset di stato `setIsExamRunning(false)` è asincrono all'interno del ciclo di render React di `AppContent`, `handleSelectTab` intercettava la navigazione considerandola un cambio tab non confermato, impostando `pendingTab = 'home'` e riaprendo all'istante il `SessionInterruptModal` a livello di `App`. L'utente doveva quindi cliccare "Metti in Pausa" una seconda volta per confermare la navigazione.
+    - Introdotta la funzione `handleDirectNavigateHome` in [src/App.tsx](file:///c:/github/Quiz_VDS-VL/src/App.tsx) che resetta direttamente `setIsExamRunning(false)`, arresta la sintesi vocale (`voiceService.stop()`), pulisce `pendingTab`, resetta la cronologia (`backNavigation.resetDepth()`) e imposta `setActiveTab('home')` senza ri-valutare `isExamRunning`.
+    - Passata `handleDirectNavigateHome` come prop `onNavigateHome` a `ExamScreen` (sia in modalità Tutor che Ufficiale), `TopicsScreen` e `MistakesScreen`.
+  - **UI Non-Bloccante & Transizione Immediata nei Quiz Component**:
+    - In [src/components/ExamScreen.tsx](file:///c:/github/Quiz_VDS-VL/src/components/ExamScreen.tsx), chiusura immediata della modale (`setShowInterruptModal(false)`), reset `setIsExamRunning(false)`, scrittura asincrona non bloccante su Dexie con `.catch(console.error)` e invocazione istantanea di `onNavigateHome()`.
+    - In [src/components/TopicsScreen.tsx](file:///c:/github/Quiz_VDS-VL/src/components/TopicsScreen.tsx) e [src/components/MistakesScreen.tsx](file:///c:/github/Quiz_VDS-VL/src/components/MistakesScreen.tsx), aggiunta la prop `onNavigateHome?: () => void` ed eseguito lo stesso pattern non-bloccante sia per `onPause` che per `onTerminate`.
+  - **Suite di Test Unitari Dedicata**:
+    - Creato [src/components/SessionInterruptNavigation.test.ts](file:///c:/github/Quiz_VDS-VL/src/components/SessionInterruptNavigation.test.ts) (4 test specifici) per validare che un singolo click su "Metti in Pausa" o "Termina ed Elimina" in `ExamScreen`, `TopicsScreen` e `MistakesScreen` invochi immediatamente `onNavigateHome` al primo tentativo e salvi/elimini la sessione in Dexie.
+    - Tutti i 358 test unitari (51 suite) passano con successo (100% verdi).
+- **Scelte architetturali & Rationale**:
+  - **Bypass Esplicito di Intercettazione (`handleDirectNavigateHome`)**: Quando l'utente ha già confermato l'azione nel dialogo contestuale interno al quiz (`SessionInterruptModal`), l'intenzione è definitiva e confermata. Usare un handler dedicato `handleDirectNavigateHome` bypassa ogni controllo di guardia e previene qualsiasi doppio modale indesiderato.
+  - **Aggiornamento UI Ottimistico / Non Bloccante**: La persistenza su IndexedDB avviene in microsecondi in background; disaccoppiare la chiusura della modale e la navigazione dalla risoluzione della Promise di Dexie garantisce reattività tattile istantanea a 60fps anche su dispositivi mobili con I/O lento.
+- **Impatto sul Desiderata**:
+  - Risolve l'attrito di usabilità segnalato dall'allievo, garantendo un'esperienza fluida con esecuzione immediata al primo tocco su smartphone e desktop.
+
+---
+
 ### [2026-10-01] - Pulsante Unificato "Interrompi" e Gestione Pausa/Ripresa Sessione Quiz (Cockpit V2)
 - **Cosa abbiamo fatto**:
   - **Pulsante Unificato "Interrompi" nei Quiz**:

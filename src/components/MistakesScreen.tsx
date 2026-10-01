@@ -16,7 +16,11 @@ import { QuestionDetailModal } from './QuestionDetailModal';
 import { SessionInterruptModal } from './SessionInterruptModal';
 import { SessionConflictModal } from './SessionConflictModal';
 
-export const MistakesScreen: React.FC = () => {
+export interface MistakesScreenProps {
+  onNavigateHome?: () => void;
+}
+
+export const MistakesScreen: React.FC<MistakesScreenProps> = ({ onNavigateHome }) => {
   const {
     questions,
     statsMap,
@@ -313,9 +317,9 @@ export const MistakesScreen: React.FC = () => {
           onClose={() => {
             setShowInterruptModal(false);
           }}
-          onPause={async () => {
+          onPause={() => {
             voiceService.stop();
-            await persistActiveSession({
+            persistActiveSession({
               type: 'mistakes',
               subjectName: 'Quaderno Errori',
               questionIds: reviewQuestions.map(q => q.id),
@@ -324,15 +328,21 @@ export const MistakesScreen: React.FC = () => {
               isPaused: true,
               pausedAt: Date.now(),
               updatedAt: Date.now()
-            });
+            }).catch(console.error);
             setIsReviewing(false);
             setShowInterruptModal(false);
+            if (onNavigateHome) {
+              onNavigateHome();
+            }
           }}
           onTerminate={async () => {
             voiceService.stop();
             setIsReviewing(false);
             setShowInterruptModal(false);
             await dismissActiveSession();
+            if (onNavigateHome) {
+              onNavigateHome();
+            }
           }}
           sessionTitle="Ripasso Quaderno Errori"
           currentIndex={currentIndex}

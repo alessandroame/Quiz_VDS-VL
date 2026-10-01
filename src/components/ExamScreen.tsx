@@ -1081,13 +1081,15 @@ export const ExamScreen: React.FC<ExamScreenProps> = ({
           setIsPaused(false);
           setShowInterruptModal(false);
         }}
-        onPause={async () => {
+        onPause={() => {
           voiceService.stop();
           if (autoAdvanceTimerRef.current) {
             clearTimeout(autoAdvanceTimerRef.current);
             autoAdvanceTimerRef.current = null;
           }
-          await persistActiveSession({
+          setShowInterruptModal(false);
+          setIsExamRunning(false);
+          persistActiveSession({
             type: 'exam',
             examMode,
             questionIds: examQuestions.map(q => q.id),
@@ -1101,9 +1103,7 @@ export const ExamScreen: React.FC<ExamScreenProps> = ({
             isPaused: true,
             pausedAt: Date.now(),
             updatedAt: Date.now()
-          });
-          setIsExamRunning(false);
-          setShowInterruptModal(false);
+          }).catch(console.error);
           if (onNavigateHome) {
             onNavigateHome();
           }
@@ -1123,6 +1123,9 @@ export const ExamScreen: React.FC<ExamScreenProps> = ({
           setCurrentIndex(0);
           setExamState('idle');
           await dismissActiveSession();
+          if (onNavigateHome) {
+            onNavigateHome();
+          }
         }}
         sessionTitle={
           examMode === 'tutor'

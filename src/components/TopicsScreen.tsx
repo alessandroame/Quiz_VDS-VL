@@ -15,11 +15,13 @@ import { SessionConflictModal } from './SessionConflictModal';
 export interface TopicsScreenProps {
   initialSubjectId?: number | null;
   onClearInitialSubjectId?: () => void;
+  onNavigateHome?: () => void;
 }
 
 export const TopicsScreen: React.FC<TopicsScreenProps> = ({
   initialSubjectId,
-  onClearInitialSubjectId
+  onClearInitialSubjectId,
+  onNavigateHome
 }) => {
   const {
     questions,
@@ -300,11 +302,11 @@ export const TopicsScreen: React.FC<TopicsScreenProps> = ({
           onClose={() => {
             setShowInterruptModal(false);
           }}
-          onPause={async () => {
+          onPause={() => {
             voiceService.stop();
             if (activeSubjectId !== null) {
               const currentSubjectMeta = subjectsAnalytics.find(s => s.id === activeSubjectId);
-              await persistActiveSession({
+              persistActiveSession({
                 type: 'topic',
                 subjectId: activeSubjectId,
                 subjectName: currentSubjectMeta?.name,
@@ -314,16 +316,22 @@ export const TopicsScreen: React.FC<TopicsScreenProps> = ({
                 isPaused: true,
                 pausedAt: Date.now(),
                 updatedAt: Date.now()
-              });
+              }).catch(console.error);
             }
             setActiveSubjectId(null);
             setShowInterruptModal(false);
+            if (onNavigateHome) {
+              onNavigateHome();
+            }
           }}
           onTerminate={async () => {
             voiceService.stop();
             setActiveSubjectId(null);
             setShowInterruptModal(false);
             await dismissActiveSession();
+            if (onNavigateHome) {
+              onNavigateHome();
+            }
           }}
           sessionTitle={`Studio Materia: ${currentSubjectMeta?.name || 'Materia'}`}
           currentIndex={currentIndex}

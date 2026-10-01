@@ -268,8 +268,22 @@ function AppContent() {
     setActiveTab(tab);
   };
 
+  // Navigazione diretta alla Home per azioni confermate di interruzione/fine esame (senza re-intercettazione)
+  const handleDirectNavigateHome = () => {
+    setIsExamRunning(false);
+    voiceService.stop();
+    setPendingTab(null);
+    backNavigation.resetDepth();
+    if (typeof window !== 'undefined' && window.history) {
+      window.history.replaceState({ appDepth: 0 }, '');
+    }
+    setActiveTab('home');
+  };
+
   const pauseAndNavigate = async () => {
     if (pendingTab) {
+      const destTab = pendingTab;
+      setPendingTab(null);
       setIsExamRunning(false);
       voiceService.stop();
       if (activeSession) {
@@ -279,8 +293,7 @@ function AppContent() {
           pausedAt: Date.now()
         });
       }
-      setActiveTab(pendingTab);
-      setPendingTab(null);
+      setActiveTab(destTab);
       backNavigation.resetDepth();
       if (typeof window !== 'undefined' && window.history) {
         window.history.replaceState({ appDepth: 0 }, '');
@@ -288,13 +301,14 @@ function AppContent() {
     }
   };
 
-  const confirmAbandonAndNavigate = () => {
+  const confirmAbandonAndNavigate = async () => {
     if (pendingTab) {
+      const destTab = pendingTab;
+      setPendingTab(null);
       setIsExamRunning(false);
       voiceService.stop();
-      dismissActiveSession();
-      setActiveTab(pendingTab);
-      setPendingTab(null);
+      await dismissActiveSession();
+      setActiveTab(destTab);
       backNavigation.resetDepth();
       if (typeof window !== 'undefined' && window.history) {
         window.history.replaceState({ appDepth: 0 }, '');
@@ -403,7 +417,7 @@ function AppContent() {
             <ExamScreen
               key="tutor"
               initialMode="tutor"
-              onNavigateHome={() => handleSelectTab('home')}
+              onNavigateHome={handleDirectNavigateHome}
               onSwitchMode={(mode) => handleSelectTab(mode === 'tutor' ? 'tutor' : 'exam')}
             />
           )}
@@ -411,7 +425,7 @@ function AppContent() {
             <ExamScreen
               key="exam"
               initialMode="official"
-              onNavigateHome={() => handleSelectTab('home')}
+              onNavigateHome={handleDirectNavigateHome}
               onSwitchMode={(mode) => handleSelectTab(mode === 'tutor' ? 'tutor' : 'exam')}
             />
           )}
@@ -419,9 +433,12 @@ function AppContent() {
             <TopicsScreen
               initialSubjectId={selectedTopicSubjectId}
               onClearInitialSubjectId={() => setSelectedTopicSubjectId(null)}
+              onNavigateHome={handleDirectNavigateHome}
             />
           )}
-          {activeTab === 'mistakes' && <MistakesScreen />}
+          {activeTab === 'mistakes' && (
+            <MistakesScreen onNavigateHome={handleDirectNavigateHome} />
+          )}
           {activeTab === 'archive' && <ArchiveScreen />}
           {activeTab === 'stats' && (
             <StatsScreen
