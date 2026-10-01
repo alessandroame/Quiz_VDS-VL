@@ -214,4 +214,99 @@ describe('Voice Auto-Stop on Back & Quiz Termination Contracts', () => {
     });
     expect(mockStop).toHaveBeenCalled();
   });
+
+  it('VOICE-STOP-07: onAbandonSession in ExamScreen stops voice and resets state', async () => {
+    let capturedCtx: any = null;
+    mockUseQuiz.mockReturnValue({
+      ...mockUseQuiz(),
+      registerAudioSessionContext: (ctx: any) => {
+        capturedCtx = ctx;
+      },
+      activeSession: {
+        type: 'exam',
+        examMode: 'tutor',
+        questionIds: [1001],
+        currentIndex: 0,
+        answers: {},
+        flags: {},
+        startTime: Date.now()
+      }
+    });
+
+    await act(async () => {
+      root.render(React.createElement(ExamScreen, { initialMode: 'tutor' }));
+    });
+
+    expect(capturedCtx).not.toBeNull();
+    expect(typeof capturedCtx.onAbandonSession).toBe('function');
+
+    mockStop.mockClear();
+    act(() => {
+      capturedCtx.onAbandonSession();
+    });
+
+    expect(mockStop).toHaveBeenCalled();
+  });
+
+  it('VOICE-STOP-08: onAbandonSession in TopicsScreen stops voice and resets subject', async () => {
+    let capturedCtx: any = null;
+    mockUseQuiz.mockReturnValue({
+      ...mockUseQuiz(),
+      registerAudioSessionContext: (ctx: any) => {
+        capturedCtx = ctx;
+      },
+      activeSession: {
+        type: 'topic',
+        subjectId: 1,
+        questionIds: [1001],
+        currentIndex: 0,
+        answers: {}
+      }
+    });
+
+    await act(async () => {
+      root.render(React.createElement(TopicsScreen));
+    });
+
+    expect(capturedCtx).not.toBeNull();
+    expect(typeof capturedCtx.onAbandonSession).toBe('function');
+
+    mockStop.mockClear();
+    act(() => {
+      capturedCtx.onAbandonSession();
+    });
+
+    expect(mockStop).toHaveBeenCalled();
+  });
+
+  it('VOICE-STOP-09: onAbandonSession in MistakesScreen stops voice and resets review state', async () => {
+    let capturedCtx: any = null;
+    mockUseQuiz.mockReturnValue({
+      ...mockUseQuiz(),
+      registerAudioSessionContext: (ctx: any) => {
+        capturedCtx = ctx;
+      },
+      activeSession: {
+        type: 'mistakes',
+        questionIds: [1001],
+        currentIndex: 0,
+        answers: {}
+      }
+    });
+
+    await act(async () => {
+      root.render(React.createElement(MistakesScreen));
+    });
+
+    expect(capturedCtx).not.toBeNull();
+    expect(typeof capturedCtx.onAbandonSession).toBe('function');
+
+    mockStop.mockClear();
+    act(() => {
+      capturedCtx.onAbandonSession();
+    });
+
+    expect(mockStop).toHaveBeenCalled();
+  });
 });
+

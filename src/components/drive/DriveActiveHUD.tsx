@@ -240,12 +240,12 @@ export const DriveActiveHUD: React.FC<DriveActiveHUDProps> = ({
         {sessionContext ? (
           <button
             id="btn-drive-exit"
-            onClick={onExecuteClose}
+            onClick={sessionContext.isExam ? onClose : onExecuteClose}
             className="px-3 py-1.5 rounded-xl border border-zinc-700 bg-zinc-900 text-zinc-200 hover:text-white hover:border-zinc-500 light:bg-white light:border-slate-300 light:text-slate-800 font-bold flex items-center gap-1.5 transition-all flex-shrink-0 shadow-sm active:scale-95"
-            title="Torna alla visualizzazione normale del quiz sullo schermo"
+            title={sessionContext.isExam ? "Opzioni di uscita o interruzione esame" : "Torna alla visualizzazione normale del quiz sullo schermo"}
           >
             <ArrowLeft className="w-4 h-4" />
-            <span>Torna al Quiz</span>
+            <span>{sessionContext.isExam ? "Esci" : "Torna al Quiz"}</span>
           </button>
         ) : (
           <button

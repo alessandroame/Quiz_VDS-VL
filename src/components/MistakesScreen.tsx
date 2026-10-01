@@ -215,6 +215,14 @@ export const MistakesScreen: React.FC<MistakesScreenProps> = ({ onNavigateHome }
       onToggleFlag: () => {},
       onNavigateIndex: (idx) => changeIndex(idx),
       isExam: false,
+      onAbandonSession: () => {
+        voiceService.stop();
+        if (autoAdvanceTimerRef.current) {
+          clearTimeout(autoAdvanceTimerRef.current);
+          autoAdvanceTimerRef.current = null;
+        }
+        setIsReviewing(false);
+      },
       title: 'Ripasso Errori'
     });
 

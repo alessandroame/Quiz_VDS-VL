@@ -32,15 +32,19 @@ const mockVoiceState = {
   activePart: null as string | null
 };
 
+const mockPlayFullSequence = vi.fn();
+const mockQuizSettings = {
+  ttsEnabled: true,
+  ttsPlaybackRate: 1.0,
+  ttsVoice: 'giuseppe',
+  soundEnabled: false,
+  ttsAutoPlayQuestion: false
+};
+
 vi.mock('../context/QuizContext', () => ({
   useQuiz: () => ({
     statsMap: new Map(),
-    settings: {
-      ttsEnabled: true,
-      ttsPlaybackRate: 1.0,
-      ttsVoice: 'giuseppe',
-      soundEnabled: false
-    },
+    settings: mockQuizSettings,
     toggleBookmark: vi.fn(),
     saveNote: vi.fn()
   })
@@ -56,7 +60,7 @@ vi.mock('../hooks/useAviationVoice', () => ({
     isPartActive: (part: string) => mockVoiceState.activePart === part || mockVoiceState.playingPart === part,
     togglePlayPause: vi.fn(),
     restartCurrentOrSequence: vi.fn(),
-    playFullSequence: vi.fn(),
+    playFullSequence: mockPlayFullSequence,
     playQuestion: vi.fn(),
     restartQuestion: vi.fn(),
     playOption: vi.fn(),
@@ -73,6 +77,7 @@ describe('QuestionCard Light Mode Contrast', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
+    mockQuizSettings.ttsAutoPlayQuestion = false;
     mockVoiceState.isPlaying = false;
     mockVoiceState.isPaused = false;
     mockVoiceState.isThisQuestionActive = false;
@@ -227,3 +232,75 @@ describe('QuestionCard Light Mode Contrast', () => {
     expect(explanationBtn.className).toContain('light:border-slate-300');
   });
 });
+
+describe('QuestionCard Autoplay Suppression in Debriefing and Review', () => {
+  let container: HTMLDivElement;
+  let root: any;
+
+  beforeEach(() => {
+    vi.clearAllMocks();
+    mockQuizSettings.ttsAutoPlayQuestion = true;
+    container = document.createElement('div');
+    document.body.appendChild(container);
+    root = createRoot(container);
+  });
+
+  afterEach(() => {
+    if (root) {
+      act(() => {
+        root.unmount();
+      });
+    }
+    if (container && container.parentNode) {
+      container.parentNode.removeChild(container);
+    }
+  });
+
+  it('triggers playFullSequence when ttsAutoPlayQuestion is enabled and card is in active quiz mode', async () => {
+    await act(async () => {
+      root.render(
+        React.createElement(QuestionCard, {
+          question: mockQuestion,
+          selectedAnswer: undefined,
+          showFeedback: false,
+          disableAutoPlay: false,
+          onSelectAnswer: vi.fn()
+        })
+      );
+    });
+
+    expect(mockPlayFullSequence).toHaveBeenCalledTimes(1);
+  });
+
+  it('suppresses playFullSequence when disableAutoPlay is true (e.g. debriefing list)', async () => {
+    await act(async () => {
+      root.render(
+        React.createElement(QuestionCard, {
+          question: mockQuestion,
+          selectedAnswer: 2,
+          showFeedback: true,
+          disableAutoPlay: true,
+          onSelectAnswer: vi.fn()
+        })
+      );
+    });
+
+    expect(mockPlayFullSequence).not.toHaveBeenCalled();
+  });
+
+  it('suppresses playFullSequence when showFeedback is true even if disableAutoPlay was omitted', async () => {
+    await act(async () => {
+      root.render(
+        React.createElement(QuestionCard, {
+          question: mockQuestion,
+          selectedAnswer: 1,
+          showFeedback: true,
+          onSelectAnswer: vi.fn()
+        })
+      );
+    });
+
+    expect(mockPlayFullSequence).not.toHaveBeenCalled();
+  });
+});
+

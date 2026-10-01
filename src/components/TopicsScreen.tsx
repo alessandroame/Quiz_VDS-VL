@@ -210,6 +210,14 @@ export const TopicsScreen: React.FC<TopicsScreenProps> = ({
       onToggleFlag: () => {},
       onNavigateIndex: (idx: number) => changeIndex(idx),
       isExam: false,
+      onAbandonSession: () => {
+        voiceService.stop();
+        if (autoAdvanceTimerRef.current) {
+          clearTimeout(autoAdvanceTimerRef.current);
+          autoAdvanceTimerRef.current = null;
+        }
+        setActiveSubjectId(null);
+      },
       title: currentSubjectMeta?.name || 'Materia'
     });
 

@@ -78,6 +78,13 @@ export const ExamScreen: React.FC<ExamScreenProps> = ({
     };
   }, []);
 
+  // Stop any voice playback when entering review/debriefing state
+  useEffect(() => {
+    if (examState === 'review') {
+      voiceService.stop();
+    }
+  }, [examState]);
+
   // Sync examMode with initialMode prop when in idle state
   useEffect(() => {
     if (examState === 'idle') {
@@ -487,6 +494,20 @@ export const ExamScreen: React.FC<ExamScreenProps> = ({
       isTutor: examMode === 'tutor',
       secondsRemaining: examMode === 'tutor' ? elapsedSeconds : secondsRemaining,
       onSubmitExam: handleSubmitExam,
+      onAbandonSession: () => {
+        voiceService.stop();
+        if (autoAdvanceTimerRef.current) {
+          clearTimeout(autoAdvanceTimerRef.current);
+          autoAdvanceTimerRef.current = null;
+        }
+        isDismissedRef.current = true;
+        setIsExamRunning(false);
+        setExamState('idle');
+        setExamQuestions([]);
+        setAnswers({});
+        setFlags({});
+        setCurrentIndex(0);
+      },
       title: examMode === 'tutor' ? 'Simulazione Didattica' : 'Esame Ufficiale'
     });
 
@@ -902,6 +923,7 @@ export const ExamScreen: React.FC<ExamScreenProps> = ({
                       selectedAnswer={item.snap?.userAnswer}
                       onSelectAnswer={() => {}}
                       showFeedback={true}
+                      disableAutoPlay={true}
                       indexNumber={item.idx + 1}
                       totalNumber={totalCount}
                     />
@@ -1142,11 +1164,11 @@ export const ExamScreen: React.FC<ExamScreenProps> = ({
           isDismissedRef.current = true;
           setShowInterruptModal(false);
           setIsExamRunning(false);
+          setExamState('idle');
           setExamQuestions([]);
           setAnswers({});
           setFlags({});
           setCurrentIndex(0);
-          setExamState('idle');
           await dismissActiveSession();
           if (onNavigateHome) {
             onNavigateHome();

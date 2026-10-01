@@ -22,6 +22,7 @@ export class VoiceService {
   private isDriveIntroPlaying: boolean = false;
   private sequenceTimeout: any = null;
   private isNotificationPending: boolean = false;
+  private sequenceGeneration: number = 0;
 
   constructor() {
     if (typeof Audio !== 'undefined') {
@@ -224,6 +225,7 @@ export class VoiceService {
       return;
     }
 
+    this.sequenceGeneration++;
     this.clearSequence();
     this.currentQuestionId = questionId;
     this.activePart = part;
@@ -253,6 +255,7 @@ export class VoiceService {
    */
   public async restartSinglePart(questionId: number, part: AudioPart): Promise<void> {
     const wasSequence = this.isSequencePlaying && this.currentQuestionId === questionId;
+    this.sequenceGeneration++;
     this.clearSequence();
     this.isPaused = false;
     this.pendingSequencePart = null;
@@ -347,7 +350,7 @@ export class VoiceService {
     if (this.pendingSequencePart && this.isSequencePlaying) {
       const next = this.pendingSequencePart;
       this.pendingSequencePart = null;
-      await this.stepSequence(next);
+      await this.stepSequence(next, this.sequenceGeneration);
       return;
     }
 
@@ -371,19 +374,23 @@ export class VoiceService {
    * Question -> Option 1 -> Option 2 -> Option 3
    */
   public async playFullSequence(questionId: number): Promise<void> {
+    this.sequenceGeneration++;
+    const gen = this.sequenceGeneration;
     this.clearSequence();
     this.isPaused = false;
     this.pendingSequencePart = null;
     this.currentQuestionId = questionId;
     this.effectiveVoice = this.resolveEffectiveVoice(this.voiceName);
     this.isSequencePlaying = true;
-    await this.stepSequence('question');
+    await this.stepSequence('question', gen);
   }
 
   /**
    * Restarts the full sequence from the very beginning while playing or paused.
    */
   public async restartFullSequence(questionId: number): Promise<void> {
+    this.sequenceGeneration++;
+    const gen = this.sequenceGeneration;
     this.clearSequence();
     this.isPaused = false;
     this.pendingSequencePart = null;
@@ -394,7 +401,7 @@ export class VoiceService {
     this.currentQuestionId = questionId;
     this.effectiveVoice = this.resolveEffectiveVoice(this.voiceName);
     this.isSequencePlaying = true;
-    await this.stepSequence('question');
+    await this.stepSequence('question', gen);
   }
 
   /**
@@ -416,7 +423,9 @@ export class VoiceService {
     }
   }
 
-  private async stepSequence(part: AudioPart): Promise<void> {
+  private async stepSequence(part: AudioPart, generation?: number): Promise<void> {
+    const gen = generation ?? this.sequenceGeneration;
+    if (gen !== this.sequenceGeneration) return;
     if (!this.isSequencePlaying || !this.audio || !this.currentQuestionId) return;
 
     this.activePart = part;
@@ -424,6 +433,9 @@ export class VoiceService {
       this.audio.src = this.getAudioUrl(this.currentQuestionId, part);
       this.audio.playbackRate = this.playbackRate;
       await this.audio.play();
+      if (gen !== this.sequenceGeneration || !this.isSequencePlaying) {
+        return;
+      }
       this.updateMediaSession(this.currentQuestionId, part.toUpperCase());
       this.notify();
     } catch (err: any) {
@@ -454,11 +466,14 @@ export class VoiceService {
     const next = nextStep[this.activePart || ''];
     if (next) {
       this.pendingSequencePart = next;
+      const gen = this.sequenceGeneration;
       // 350ms natural pause between question and options
       this.sequenceTimeout = setTimeout(() => {
         this.sequenceTimeout = null;
         this.pendingSequencePart = null;
-        this.stepSequence(next);
+        if (gen === this.sequenceGeneration && this.isSequencePlaying) {
+          this.stepSequence(next, gen);
+        }
       }, 350);
     } else {
       this.stop();
@@ -601,13 +616,16 @@ export class VoiceService {
       !this.isDriveIntroPlaying &&
       !this.isSequencePlaying &&
       !this.isPaused &&
-      (!this.audio || this.audio.paused);
+      this.sequenceTimeout === null &&
+      (!this.audio || (this.audio.paused && !this.audio.src));
 
     if (isAlreadyIdle) {
       return;
     }
 
+    this.sequenceGeneration++;
     this.clearSequence();
+
     if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
       try {
         window.speechSynthesis.cancel();
@@ -619,6 +637,14 @@ export class VoiceService {
     if (this.audio) {
       this.audio.pause();
       this.audio.currentTime = 0;
+      if (typeof this.audio.removeAttribute === 'function') {
+        this.audio.removeAttribute('src');
+      } else {
+        this.audio.src = '';
+      }
+      if (typeof this.audio.load === 'function') {
+        this.audio.load();
+      }
     }
     if (typeof navigator !== 'undefined' && 'mediaSession' in navigator) {
       navigator.mediaSession.playbackState = 'none';

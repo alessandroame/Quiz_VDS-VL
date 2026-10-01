@@ -34,6 +34,14 @@ class MockAudio {
     (this.listeners['ended'] || []).forEach(fn => fn());
   }
 
+  public removeAttribute(attr: string): void {
+    if (attr === 'src') this.src = '';
+  }
+
+  public load(): void {
+    // Mock load
+  }
+
   public triggerError(e: any): void {
     (this.listeners['error'] || []).forEach(fn => fn(e));
   }

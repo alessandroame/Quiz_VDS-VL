@@ -293,4 +293,85 @@ describe('DriveModeScreen - Tutor Mode Explanation Playback Contract', () => {
     });
     expect(mockPlayOption).toHaveBeenCalledWith(2);
   });
+
+  it('DRIVE-VOICE-STOP-01: submitting an exam calls stopVoice and invokes sessionContext.onSubmitExam', async () => {
+    const handleSubmit = vi.fn();
+    await act(async () => {
+      root.render(
+        React.createElement(DriveModeScreen, {
+          isOpen: true,
+          onClose: vi.fn(),
+          sessionContext: {
+            questions: [sampleQuestion],
+            currentIndex: 0,
+            answers: { 1001: 2 },
+            flags: {},
+            onAnswer: vi.fn(),
+            onToggleFlag: vi.fn(),
+            onNavigateIndex: vi.fn(),
+            isExam: true,
+            onSubmitExam: handleSubmit
+          }
+        })
+      );
+    });
+
+    const submitBtn = container.querySelector('#btn-drive-submit') as HTMLButtonElement;
+    expect(submitBtn).not.toBeNull();
+
+    mockStopVoice.mockClear();
+    await act(async () => {
+      submitBtn.click();
+    });
+
+    expect(mockStopVoice).toHaveBeenCalled();
+    expect(handleSubmit).toHaveBeenCalled();
+  });
+
+  it('DRIVE-VOICE-STOP-02: abandoning an exam calls sessionContext.onAbandonSession and stops voice', async () => {
+    const handleAbandon = vi.fn();
+    const handleClose = vi.fn();
+    await act(async () => {
+      root.render(
+        React.createElement(DriveModeScreen, {
+          isOpen: true,
+          onClose: handleClose,
+          sessionContext: {
+            questions: [sampleQuestion],
+            currentIndex: 0,
+            answers: {},
+            flags: {},
+            onAnswer: vi.fn(),
+            onToggleFlag: vi.fn(),
+            onNavigateIndex: vi.fn(),
+            isExam: true,
+            onAbandonSession: handleAbandon
+          }
+        })
+      );
+    });
+
+    // Click exit button to show abandon modal
+    const exitBtn = container.querySelector('#btn-drive-exit') as HTMLButtonElement;
+    expect(exitBtn).not.toBeNull();
+
+    await act(async () => {
+      exitBtn.click();
+    });
+
+
+    // Click confirm abandon button
+    const confirmAbandonBtn = container.querySelector('#btn-drive-confirm-abandon') as HTMLButtonElement;
+    expect(confirmAbandonBtn).not.toBeNull();
+
+    mockStopVoice.mockClear();
+    await act(async () => {
+      confirmAbandonBtn.click();
+    });
+
+    expect(mockStopVoice).toHaveBeenCalled();
+    expect(handleAbandon).toHaveBeenCalled();
+    expect(handleClose).toHaveBeenCalled();
+  });
 });
+

@@ -33,6 +33,7 @@ export interface DriveModeSessionContext {
   isTutor?: boolean;
   secondsRemaining?: number;
   onSubmitExam?: () => void;
+  onAbandonSession?: () => void;
   title?: string;
 }
 
@@ -198,10 +199,45 @@ export const DriveModeScreen: React.FC<DriveModeScreenProps> = ({
   }, [isOpen, internalMode, isVoiceCommandsEnabled]);
 
   const countdownTimerRef = useRef<any>(null);
+  const autopilotAdvanceTimerRef = useRef<any>(null);
+  const autoRevealTimerRef = useRef<any>(null);
+  const autoExplainTimerRef = useRef<any>(null);
+  const autoPlayTimerRef = useRef<any>(null);
   const handleNextQuestionRef = useRef<() => void>(() => {});
   const handleSubmitExamRef = useRef<() => Promise<void> | void>(() => {});
   const touchStartXRef = useRef<number | null>(null);
   const touchStartYRef = useRef<number | null>(null);
+
+  const clearAllDriveTimers = useCallback(() => {
+    if (countdownTimerRef.current) {
+      clearInterval(countdownTimerRef.current);
+      countdownTimerRef.current = null;
+    }
+    if (autopilotAdvanceTimerRef.current) {
+      clearTimeout(autopilotAdvanceTimerRef.current);
+      autopilotAdvanceTimerRef.current = null;
+    }
+    if (autoRevealTimerRef.current) {
+      clearTimeout(autoRevealTimerRef.current);
+      autoRevealTimerRef.current = null;
+    }
+    if (autoExplainTimerRef.current) {
+      clearTimeout(autoExplainTimerRef.current);
+      autoExplainTimerRef.current = null;
+    }
+    if (autoPlayTimerRef.current) {
+      clearTimeout(autoPlayTimerRef.current);
+      autoPlayTimerRef.current = null;
+    }
+    if (assimilationTimeoutRef.current) {
+      clearTimeout(assimilationTimeoutRef.current);
+      assimilationTimeoutRef.current = null;
+    }
+    setWaitingCountdown(null);
+    setAssimilationCountdown(null);
+    setIsWaitingForExplanationEnd(false);
+    isWaitingForExplanationEndRef.current = false;
+  }, []);
 
   // Sincronizza stato iniziale all'apertura o cambio di context
   useEffect(() => {
@@ -328,17 +364,26 @@ export const DriveModeScreen: React.FC<DriveModeScreenProps> = ({
 
     if (isAutopilotEnabled && autoPlayTriggeredForRef.current !== currentQ.id) {
       autoPlayTriggeredForRef.current = currentQ.id;
+      if (autoPlayTimerRef.current) clearTimeout(autoPlayTimerRef.current);
       // Breve delay di 250ms per transizione fluida
-      const t = setTimeout(() => {
-        playFullSequence();
+      autoPlayTimerRef.current = setTimeout(() => {
+        autoPlayTimerRef.current = null;
+        if (internalMode === 'running') {
+          playFullSequence();
+        }
       }, 250);
-      return () => clearTimeout(t);
+      return () => {
+        if (autoPlayTimerRef.current) {
+          clearTimeout(autoPlayTimerRef.current);
+          autoPlayTimerRef.current = null;
+        }
+      };
     }
   }, [isOpen, internalMode, currentQ?.id, isAutopilotEnabled, isIntroActive]);
 
   // Avvia il countdown di attesa risposta (default 5s)
   const startWaitingCountdown = useCallback(() => {
-    if (!currentQ) return;
+    if (!currentQ || internalMode !== 'running') return;
     const waitSeconds = settings.driveModeAutoAdvanceSeconds || 5;
     setWaitingCountdown(waitSeconds);
 
@@ -349,13 +394,15 @@ export const DriveModeScreen: React.FC<DriveModeScreenProps> = ({
         if (prev === null || prev <= 1) {
           clearInterval(countdownTimerRef.current);
           countdownTimerRef.current = null;
-          handleAutoRevealAndAdvance();
+          if (internalMode === 'running') {
+            handleAutoRevealAndAdvance();
+          }
           return null;
         }
         return prev - 1;
       });
     }, 1000);
-  }, [currentQ, settings.driveModeAutoAdvanceSeconds]);
+  }, [currentQ, internalMode, settings.driveModeAutoAdvanceSeconds]);
 
   // Gestione termine sequenza audio vocale o singolo frammento -> avvio countdown attesa risposta
   const prevSequencePlayingRef = useRef<boolean>(false);
@@ -417,19 +464,9 @@ export const DriveModeScreen: React.FC<DriveModeScreenProps> = ({
 
   // Navigazione tra le domande
   const handleNextQuestion = useCallback(() => {
+    if (internalMode !== 'running') return;
+    clearAllDriveTimers();
     stopVoice();
-    if (countdownTimerRef.current) {
-      clearInterval(countdownTimerRef.current);
-      countdownTimerRef.current = null;
-    }
-    if (assimilationTimeoutRef.current) {
-      clearTimeout(assimilationTimeoutRef.current);
-      assimilationTimeoutRef.current = null;
-    }
-    setWaitingCountdown(null);
-    setAssimilationCountdown(null);
-    setIsWaitingForExplanationEnd(false);
-    isWaitingForExplanationEndRef.current = false;
 
     if (currentIndex < totalCount - 1) {
       triggerHapticFeedback('tap');
@@ -439,24 +476,14 @@ export const DriveModeScreen: React.FC<DriveModeScreenProps> = ({
     } else if (isExamSession) {
       handleSubmitExamRef.current();
     }
-  }, [stopVoice, currentIndex, totalCount, sessionContext, isExamSession]);
+  }, [internalMode, clearAllDriveTimers, stopVoice, currentIndex, totalCount, sessionContext, isExamSession]);
 
   handleNextQuestionRef.current = handleNextQuestion;
 
   const handlePrevQuestion = useCallback(() => {
+    if (internalMode !== 'running') return;
+    clearAllDriveTimers();
     stopVoice();
-    if (countdownTimerRef.current) {
-      clearInterval(countdownTimerRef.current);
-      countdownTimerRef.current = null;
-    }
-    if (assimilationTimeoutRef.current) {
-      clearTimeout(assimilationTimeoutRef.current);
-      assimilationTimeoutRef.current = null;
-    }
-    setWaitingCountdown(null);
-    setAssimilationCountdown(null);
-    setIsWaitingForExplanationEnd(false);
-    isWaitingForExplanationEndRef.current = false;
 
     if (currentIndex > 0) {
       triggerHapticFeedback('tap');
@@ -464,7 +491,7 @@ export const DriveModeScreen: React.FC<DriveModeScreenProps> = ({
       setCurrentIndex(prevIdx);
       if (sessionContext) sessionContext.onNavigateIndex(prevIdx);
     }
-  }, [stopVoice, currentIndex, sessionContext]);
+  }, [internalMode, clearAllDriveTimers, stopVoice, currentIndex, sessionContext]);
 
   // Gestione audio spiegazione & pausa di assimilazione in Modalità Tutor
   const prevExplanationPlayingRef = useRef<boolean>(false);
@@ -475,9 +502,11 @@ export const DriveModeScreen: React.FC<DriveModeScreenProps> = ({
 
     assimilationTimeoutRef.current = setTimeout(() => {
       setAssimilationCountdown(null);
-      handleNextQuestionRef.current();
+      if (internalMode === 'running') {
+        handleNextQuestionRef.current();
+      }
     }, seconds * 1000);
-  }, []);
+  }, [internalMode]);
 
   // Rileva quando la spiegazione vocale didattica finisce di parlare
   useEffect(() => {
@@ -485,32 +514,32 @@ export const DriveModeScreen: React.FC<DriveModeScreenProps> = ({
       isWaitingForExplanationEndRef.current = false;
       setIsWaitingForExplanationEnd(false);
 
-      if (isAutopilotEnabled) {
+      if (isAutopilotEnabled && internalMode === 'running') {
         startAssimilationPause(2.5);
       }
     }
     prevExplanationPlayingRef.current = isExplanationPlaying;
-  }, [isExplanationPlaying, isAutopilotEnabled, startAssimilationPause]);
+  }, [isExplanationPlaying, isAutopilotEnabled, internalMode, startAssimilationPause]);
 
   // Safety guard se l'audio della spiegazione non parte o fallisce entro 4.5s
   useEffect(() => {
-    if (isWaitingForExplanationEnd) {
+    if (isWaitingForExplanationEnd && internalMode === 'running') {
       const guardTimer = setTimeout(() => {
         if (isWaitingForExplanationEndRef.current && !isExplanationPlaying) {
           isWaitingForExplanationEndRef.current = false;
           setIsWaitingForExplanationEnd(false);
-          if (isAutopilotEnabled) {
+          if (isAutopilotEnabled && internalMode === 'running') {
             handleNextQuestionRef.current();
           }
         }
       }, 4500);
       return () => clearTimeout(guardTimer);
     }
-  }, [isWaitingForExplanationEnd, isExplanationPlaying, isAutopilotEnabled]);
+  }, [isWaitingForExplanationEnd, isExplanationPlaying, isAutopilotEnabled, internalMode]);
 
   // Auto-rivelazione in modalità Pilota Automatico passivo (se l'utente non tocca nulla)
   const handleAutoRevealAndAdvance = useCallback(async () => {
-    if (!currentQ) return;
+    if (!currentQ || internalMode !== 'running') return;
     setRevealedQuestionId(currentQ.id);
 
     // Feedback sonoro didattico
@@ -523,6 +552,8 @@ export const DriveModeScreen: React.FC<DriveModeScreenProps> = ({
       await recordAnswer(currentQ.id, false);
     }
 
+    if (internalMode !== 'running') return;
+
     if (isTutorEnabled || settings.ttsAutoExplainOnMistake) {
       // MODALITÀ TUTOR o spiegazione automatica su errore (timeout mancata risposta):
       // avvia lettura integrale e attende il completamento naturale
@@ -531,27 +562,27 @@ export const DriveModeScreen: React.FC<DriveModeScreenProps> = ({
       playExplanation();
     } else {
       // MODALITÀ STANDARD: avanza dopo 3.5 secondi
-      setTimeout(() => {
-        handleNextQuestionRef.current();
+      if (autoRevealTimerRef.current) clearTimeout(autoRevealTimerRef.current);
+      autoRevealTimerRef.current = setTimeout(() => {
+        autoRevealTimerRef.current = null;
+        if (internalMode === 'running') {
+          handleNextQuestionRef.current();
+        }
       }, 3500);
     }
-  }, [currentQ, settings.soundEnabled, isTutorEnabled, settings.ttsAutoExplainOnMistake, playExplanation, recordAnswer, isExamSession, sessionContext]);
+  }, [currentQ, internalMode, settings.soundEnabled, isTutorEnabled, settings.ttsAutoExplainOnMistake, playExplanation, recordAnswer, isExamSession, sessionContext]);
 
   // Seleziona risposta
   const handleSelectAnswer = async (ans: 1 | 2 | 3) => {
-    if (!currentQ) return;
+    if (!currentQ || internalMode !== 'running') return;
 
     // Se l'esame è già terminato o la domanda è già rivelata
     if (answers[currentQ.id] !== undefined && (!isExamSession || isTutorEnabled)) return;
 
     triggerHapticFeedback('tap');
 
+    clearAllDriveTimers();
     stopVoice();
-    if (countdownTimerRef.current) {
-      clearInterval(countdownTimerRef.current);
-      countdownTimerRef.current = null;
-    }
-    setWaitingCountdown(null);
 
     const isCorrect = ans === currentQ.correctAnswer;
     triggerHapticFeedback(isCorrect ? 'success' : 'error');
@@ -578,17 +609,25 @@ export const DriveModeScreen: React.FC<DriveModeScreenProps> = ({
         // riproduce la spiegazione didattica (Regola + Tranello) e sincronizza l'autopilota
         isWaitingForExplanationEndRef.current = true;
         setIsWaitingForExplanationEnd(true);
-        setTimeout(() => {
-          playExplanation();
+        if (autoExplainTimerRef.current) clearTimeout(autoExplainTimerRef.current);
+        autoExplainTimerRef.current = setTimeout(() => {
+          autoExplainTimerRef.current = null;
+          if (internalMode === 'running') {
+            playExplanation();
+          }
         }, 300);
         return; // L'avanzamento avverrà al termine della lettura vocale + pausa di assimilazione
       }
     }
 
     // Se il pilota automatico è attivo (risposta corretta o modalità senza spiegazione), avanza dopo tempo standard
-    if (isAutopilotEnabled) {
-      setTimeout(() => {
-        handleNextQuestionRef.current();
+    if (isAutopilotEnabled && internalMode === 'running') {
+      if (autopilotAdvanceTimerRef.current) clearTimeout(autopilotAdvanceTimerRef.current);
+      autopilotAdvanceTimerRef.current = setTimeout(() => {
+        autopilotAdvanceTimerRef.current = null;
+        if (internalMode === 'running') {
+          handleNextQuestionRef.current();
+        }
       }, isCorrect ? 1800 : 3500);
     }
   };
@@ -799,15 +838,25 @@ export const DriveModeScreen: React.FC<DriveModeScreenProps> = ({
   // Clean up feedback timers and stop voice on unmount
   useEffect(() => {
     return () => {
+      clearAllDriveTimers();
       if (recognizedLabelTimerRef.current) clearTimeout(recognizedLabelTimerRef.current);
       if (unrecognizedTimerRef.current) clearTimeout(unrecognizedTimerRef.current);
       voiceService.stop();
       voiceService.stopDriveIntro();
     };
-  }, []);
+  }, [clearAllDriveTimers]);
+
+  // Stop voice and clear timers whenever debriefing is entered
+  useEffect(() => {
+    if (internalMode === 'debriefing') {
+      clearAllDriveTimers();
+      stopVoice();
+    }
+  }, [internalMode, clearAllDriveTimers, stopVoice]);
 
   // Consegna Esame
   const handleSubmitExam = async () => {
+    clearAllDriveTimers();
     stopVoice();
 
     // Se l'esame proviene da una sessione genitore (es. ExamScreen), deleghiamo il salvataggio
@@ -817,6 +866,7 @@ export const DriveModeScreen: React.FC<DriveModeScreenProps> = ({
       return;
     }
 
+    setInternalMode('debriefing');
     const durationSeconds = Math.round((Date.now() - startTime) / 1000);
 
     const session = evaluateExam({
@@ -835,7 +885,6 @@ export const DriveModeScreen: React.FC<DriveModeScreenProps> = ({
 
     await saveExam(session);
     setCompletedSession(session);
-    setInternalMode('debriefing');
   };
 
   handleSubmitExamRef.current = handleSubmitExam;
@@ -1020,6 +1069,7 @@ export const DriveModeScreen: React.FC<DriveModeScreenProps> = ({
   };
 
   const handleClose = () => {
+    clearAllDriveTimers();
     stopVoice();
     stopDriveIntro();
     if (internalMode === 'running' && (isExamSession || sessionContext?.isExam)) {
@@ -1030,30 +1080,27 @@ export const DriveModeScreen: React.FC<DriveModeScreenProps> = ({
   };
 
   const executeClose = () => {
+    clearAllDriveTimers();
     stopVoice();
     stopDriveIntro();
     setIsIntroActive(false);
-    if (countdownTimerRef.current) {
-      clearInterval(countdownTimerRef.current);
-      countdownTimerRef.current = null;
-    }
     onClose();
   };
 
   const handleConfirmAbandonExam = () => {
     setShowAbandonExamModal(false);
+    clearAllDriveTimers();
     stopVoice();
     stopDriveIntro();
     setIsIntroActive(false);
-    if (countdownTimerRef.current) {
-      clearInterval(countdownTimerRef.current);
-      countdownTimerRef.current = null;
-    }
     dismissActiveSession();
     setIsExamSession(false);
     setAnswers({});
     setFlags({});
     if (sessionContext) {
+      if (sessionContext.onAbandonSession) {
+        sessionContext.onAbandonSession();
+      }
       onClose();
     } else {
       setInternalMode('launcher');
