@@ -9,6 +9,7 @@ import { Download, Play, ArrowRight, X } from 'lucide-react';
 import { voiceService } from './services/voiceService';
 import { audioDownloadManager } from './services/audioDownloadManager';
 import { telemetry } from './services/telemetry';
+import { appTimeTracker } from './services/appTimeTracker';
 import { applyFontSizePreference } from './utils/fontSize';
 import { SessionInterruptModal } from './components/SessionInterruptModal';
 import {
@@ -43,7 +44,8 @@ function AppContent() {
     dismissActiveSession,
     persistActiveSession,
     settings,
-    isSettingsLoaded
+    isSettingsLoaded,
+    readinessScore
   } = useQuiz();
   const [activeTab, setActiveTab] = useState<NavTab>('home');
   const [pendingTab, setPendingTab] = useState<NavTab | null>(null);
@@ -190,10 +192,38 @@ function AppContent() {
           is_standalone_pwa: isPwa,
           theme: settings.theme,
           font_scale: settings.fontSizePreference,
+          readiness_score: readinessScore,
+        });
+
+        // Start active usage time tracking
+        appTimeTracker.start({
+          getScreen: () => {
+            if (isDriveModeOpen) return 'drive_mode';
+            if (isSettingsOpen) return 'settings';
+            return activeTab;
+          },
+          getReadinessScore: () => readinessScore,
+          isStandalonePwa: () => isPwa,
+          isAudioActive: () => voiceService.isPlaying(),
         });
       })
       .catch(() => {});
+
+    return () => {
+      appTimeTracker.stop();
+    };
   }, [isSettingsLoaded]);
+
+  // Synchronize screen transitions in appTimeTracker
+  useEffect(() => {
+    let currentScreen = activeTab as string;
+    if (isDriveModeOpen) {
+      currentScreen = 'drive_mode';
+    } else if (isSettingsOpen) {
+      currentScreen = 'settings';
+    }
+    appTimeTracker.setScreen(currentScreen);
+  }, [activeTab, isDriveModeOpen, isSettingsOpen]);
 
   // Intercetta l'evento di installazione PWA
   useEffect(() => {

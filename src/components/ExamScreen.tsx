@@ -25,6 +25,7 @@ import { QuizBottomBar } from './QuizBottomBar';
 import { backNavigation } from '../utils/backNavigation';
 import { SessionInterruptModal } from './SessionInterruptModal';
 import { SessionConflictModal } from './SessionConflictModal';
+import { telemetry } from '../services/telemetry';
 
 interface ExamScreenProps {
   initialMode?: ExamModeType;
@@ -48,7 +49,8 @@ export const ExamScreen: React.FC<ExamScreenProps> = ({
     registerAudioSessionContext,
     activeSession,
     persistActiveSession,
-    dismissActiveSession
+    dismissActiveSession,
+    readinessScore
   } = useQuiz();
 
   // Exam state
@@ -185,6 +187,13 @@ export const ExamScreen: React.FC<ExamScreenProps> = ({
       isMarathon: marathon,
       isPaused: false,
       updatedAt: now
+    });
+
+    telemetry.trackExamStarted({
+      mode,
+      is_marathon: marathon,
+      total_questions: generated.length,
+      readiness_score: readinessScore,
     });
   };
 

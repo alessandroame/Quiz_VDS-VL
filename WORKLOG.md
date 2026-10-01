@@ -14,6 +14,38 @@ Questo documento registra in ordine cronologico tutte le lavorazioni svolte nel 
 - **Impatto sul Desiderata**: <Come questo intervento contribuisce al desiderata (cfr. DESIDERATA.md) e indicazioni per il prossimo agente>
 ```
 
+### [2026-10-01] - Telemetria PostHog: Tracciamento Tempo di Utilizzo Attivo e Progressione Prontezza Esame (v1.6.4)
+- **Cosa abbiamo fatto**:
+  - **Motore di Tracciamento Tempo Attivo ([src/services/appTimeTracker.ts](file:///c:/github/Quiz_VDS-VL/src/services/appTimeTracker.ts))**:
+    - Implementato il servizio singleton `AppTimeTracker` per la misurazione accurata del tempo reale di utilizzo dell'applicazione.
+    - Gestione automatica del ciclo di vita PWA:
+      * Rilevamento dello stato di visibilità (`document.visibilityState === 'hidden'`) per sospendere il conteggio quando l'app è in background o la scheda è minimizzata.
+      * Rilevamento inattività/idle (timeout di 120s di assenza di interazioni tattili/mouse/tastiera/scroll), con override automatico quando la riproduzione vocale è attiva (`voiceService.isPlaying()`, ad es. in Modalità Mani Libere o durante la lettura dei quiz), garantendo che l'ascolto senza tocco venga conteggiato come tempo attivo.
+      * Heartbeat periodico (ogni 60s di tempo attivo) con emissione dell'evento PostHog `app_time_spent` contenente `duration_seconds`, `active_seconds`, `total_session_seconds`, `screen`, `readiness_score` e `is_standalone_pwa`.
+      * Flush istantaneo del tempo residuo su eventi `visibilitychange` (verso hidden), `pagehide` e `beforeunload`.
+      * Tracciamento navigazione schermate (`screen_viewed`) con calcolo dei secondi trascorsi sulla vista precedente (`duration_seconds`) al cambio scheda o apertura/chiusura modali (Home, Esame, Materie, Errori, Archivio, Stats, Mani Libere, Impostazioni).
+      * Emissione dell'evento di chiusura `app_session_ended` con `total_active_seconds`, `total_wall_seconds`, `screens_visited`, `primary_screen` (la schermata su cui è stato speso più tempo attivo), `readiness_score` e flag PWA.
+  - **Tracciamento Evoluzione Prontezza Esame & Metriche di Apprendimento**:
+    - Esteso [src/types/telemetry.ts](file:///c:/github/Quiz_VDS-VL/src/types/telemetry.ts) e [src/services/telemetry.ts](file:///c:/github/Quiz_VDS-VL/src/services/telemetry.ts) con le interfacce e i metodi per `app_time_spent`, `app_session_ended`, `screen_viewed`, `readiness_score_updated` ed `exam_started`.
+    - In [src/context/QuizContext.tsx](file:///c:/github/Quiz_VDS-VL/src/context/QuizContext.tsx), collegato un monitor reattivo sull'indice `readinessScore` che emette `readiness_score_updated` a fronte di ogni variazione di punteggio, includendo `previous_readiness_score`, `delta`, `coverage_pct`, `accuracy_pct`, `exam_pass_rate_pct`, `total_seen`, `total_catalog`, `total_mistakes` e `trigger` (`'exam_completed'` | `'question_answered'`).
+    - Integrata la proprietà `readiness_score` anche negli eventi `app_session_started`, `exam_started`, `exam_completed`, `app_time_spent` e `app_session_ended`.
+  - **Integrazione in [src/App.tsx](file:///c:/github/Quiz_VDS-VL/src/App.tsx) & [src/components/ExamScreen.tsx](file:///c:/github/Quiz_VDS-VL/src/components/ExamScreen.tsx)**:
+    - Avvio e stop automatico del tracker in `App.tsx` al caricamento delle impostazioni utente (rispettando il toggle opt-out di telemetria).
+    - Sincronizzazione automatica delle schermate attive (`activeTab`, `isDriveModeOpen`, `isSettingsOpen`).
+    - Emissione dell'evento `exam_started` all'avvio di qualsiasi simulazione didattica o ufficiale per abilitare il calcolo dell'abbandono / completamento funnel.
+  - **Suite di Test Unitari Completa**:
+    - Creato [src/services/appTimeTracker.test.ts](file:///c:/github/Quiz_VDS-VL/src/services/appTimeTracker.test.ts) (9 test unitari per verifica accumulo tick, heartbeat, stop tab nascoste, timeout inattività, override audio, cambi vista e session ended).
+    - Esteso [src/services/telemetry.test.ts](file:///c:/github/Quiz_VDS-VL/src/services/telemetry.test.ts) (14 test unitari per validare tutti i nuovi payload e le chiamate PostHog).
+    - Tutti i 375 test Vitest (52 suite) superati con successo (100% verdi).
+- **Scelte architetturali & Rationale**:
+  - *Heartbeat Periodico da 60 Secondi*: Evita il rischio di perdere l'intero tracciamento di una sessione di studio nel caso l'utente chiuda il browser o il sistema operativo termini il processo mobile in background prima del `beforeunload`. Con l'heartbeat, al massimo si perde una frazione dell'ultimo minuto.
+  - *Separazione tra Tempo Attivo e Tempo a Riposo (Zero Distorsioni)*: Tracciare semplicemente `Date.now() - sessionStart` avrebbe falsato gravemente le metriche su PWA mobile (es. lasciando l'app aperta la notte con schermo spento avrebbe registrato 8 ore di studio). Il filtro combinato `visibilityState` + idle timeout + audio speaking garantisce dati di utilizzo reali al 100%.
+  - *Preservazione Totale della Privacy (Zero PII)*: Tutti i dati continuano a fluire anonimi sotto identificatore anonimo di sessione, senza tracciare IP, nomi o contenuti delle note personali.
+- **Impatto sul Desiderata**:
+  - Soddisfa pienamente i requisiti di monitoraggio macro dell'efficacia didattica descritti in [DESIDERATA.md](file:///c:/github/Quiz_VDS-VL/DESIDERATA.md), consentendo di analizzare correlazioni tra tempo di studio, materie più frequentate e incremento della prontezza all'esame.
+
+---
+
 ### [2026-10-01] - Unificazione Barra Navigazione Quiz e Risoluzione Overflow Mobile (v1.6.3)
 - **Cosa abbiamo fatto**:
   - **Risoluzione Overflow Orizzontale Mobile**:

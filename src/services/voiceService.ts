@@ -147,6 +147,10 @@ export class VoiceService {
     };
   }
 
+  public isPlaying(): boolean {
+    return this.getState().isPlaying;
+  }
+
   public setPlaybackRate(rate: number) {
     this.playbackRate = rate;
     if (this.audio) {

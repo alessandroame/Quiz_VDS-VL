@@ -223,4 +223,114 @@ describe('TelemetryService', () => {
       });
     }).not.toThrow();
   });
+
+  it('tracks app_time_spent with active seconds, total session seconds and current screen', async () => {
+    await telemetry.init({ apiKey: 'phc_test_key', enabled: true });
+
+    telemetry.trackAppTimeSpent({
+      duration_seconds: 60,
+      active_seconds: 60,
+      total_session_seconds: 180,
+      screen: 'exam',
+      readiness_score: 75,
+      is_standalone_pwa: true,
+    });
+
+    expect(mockPosthog.capture).toHaveBeenCalledWith('app_time_spent', {
+      duration_seconds: 60,
+      active_seconds: 60,
+      total_session_seconds: 180,
+      screen: 'exam',
+      readiness_score: 75,
+      is_standalone_pwa: true,
+    });
+  });
+
+  it('tracks app_session_ended with total active/wall seconds and primary screen', async () => {
+    await telemetry.init({ apiKey: 'phc_test_key', enabled: true });
+
+    telemetry.trackAppSessionEnded({
+      total_active_seconds: 720,
+      total_wall_seconds: 900,
+      screens_visited: ['home', 'topics', 'exam'],
+      primary_screen: 'exam',
+      readiness_score: 82,
+      is_standalone_pwa: false,
+    });
+
+    expect(mockPosthog.capture).toHaveBeenCalledWith('app_session_ended', {
+      total_active_seconds: 720,
+      total_wall_seconds: 900,
+      screens_visited: ['home', 'topics', 'exam'],
+      primary_screen: 'exam',
+      readiness_score: 82,
+      is_standalone_pwa: false,
+    });
+  });
+
+  it('tracks screen_viewed with previous screen and duration on previous screen', async () => {
+    await telemetry.init({ apiKey: 'phc_test_key', enabled: true });
+
+    telemetry.trackScreenViewed({
+      screen: 'mistakes',
+      previous_screen: 'home',
+      duration_seconds: 45,
+      readiness_score: 70,
+    });
+
+    expect(mockPosthog.capture).toHaveBeenCalledWith('screen_viewed', {
+      screen: 'mistakes',
+      previous_screen: 'home',
+      duration_seconds: 45,
+      readiness_score: 70,
+    });
+  });
+
+  it('tracks readiness_score_updated with score, delta, coverage, accuracy, and trigger', async () => {
+    await telemetry.init({ apiKey: 'phc_test_key', enabled: true });
+
+    telemetry.trackReadinessScoreUpdated({
+      readiness_score: 84,
+      previous_readiness_score: 81,
+      delta: 3,
+      coverage_pct: 65,
+      accuracy_pct: 92,
+      exam_pass_rate_pct: 100,
+      total_seen: 328,
+      total_catalog: 504,
+      total_mistakes: 12,
+      trigger: 'exam_completed',
+    });
+
+    expect(mockPosthog.capture).toHaveBeenCalledWith('readiness_score_updated', {
+      readiness_score: 84,
+      previous_readiness_score: 81,
+      delta: 3,
+      coverage_pct: 65,
+      accuracy_pct: 92,
+      exam_pass_rate_pct: 100,
+      total_seen: 328,
+      total_catalog: 504,
+      total_mistakes: 12,
+      trigger: 'exam_completed',
+    });
+  });
+
+  it('tracks exam_started with mode, total questions, and readiness score', async () => {
+    await telemetry.init({ apiKey: 'phc_test_key', enabled: true });
+
+    telemetry.trackExamStarted({
+      mode: 'official',
+      is_marathon: false,
+      total_questions: 30,
+      readiness_score: 78,
+    });
+
+    expect(mockPosthog.capture).toHaveBeenCalledWith('exam_started', {
+      mode: 'official',
+      is_marathon: false,
+      total_questions: 30,
+      readiness_score: 78,
+    });
+  });
 });

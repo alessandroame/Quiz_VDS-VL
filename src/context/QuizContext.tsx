@@ -182,6 +182,41 @@ export const QuizProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return calculateReadinessScore(filteredQuestions.length, totalSeen, activeStats, sessions);
   }, [filteredQuestions.length, totalSeen, statsList, filteredQuestionIdSet, sessions]);
 
+  // Monitora e traccia l'evoluzione della prontezza all'esame
+  const prevReadinessRef = useRef<number | null>(null);
+  useEffect(() => {
+    if (prevReadinessRef.current === null) {
+      prevReadinessRef.current = readinessScore;
+      return;
+    }
+
+    if (prevReadinessRef.current !== readinessScore) {
+      const prev = prevReadinessRef.current;
+      const delta = readinessScore - prev;
+      prevReadinessRef.current = readinessScore;
+
+      const activeStats = statsList.filter(s => filteredQuestionIdSet.has(s.questionId));
+      const correctCount = activeStats.filter(s => s.lastResult === 'correct').length;
+      const accuracyPct = totalSeen > 0 ? Math.round((correctCount / totalSeen) * 100) : 0;
+      const coveragePct = filteredQuestions.length > 0 ? Math.round((totalSeen / filteredQuestions.length) * 100) : 0;
+      const recent = sessions.slice(0, 3);
+      const passRatePct = recent.length > 0 ? Math.round((recent.filter(s => s.isPassed).length / recent.length) * 100) : 0;
+
+      telemetry.trackReadinessScoreUpdated({
+        readiness_score: readinessScore,
+        previous_readiness_score: prev,
+        delta,
+        coverage_pct: coveragePct,
+        accuracy_pct: accuracyPct,
+        exam_pass_rate_pct: passRatePct,
+        total_seen: totalSeen,
+        total_catalog: filteredQuestions.length,
+        total_mistakes: mistakesCount,
+        trigger: isExamRunning ? 'exam_completed' : 'question_answered',
+      });
+    }
+  }, [readinessScore, totalSeen, filteredQuestions.length, mistakesCount, sessions, statsList, filteredQuestionIdSet, isExamRunning]);
+
   const updateSetting = async <K extends keyof AppSettings>(key: K, value: AppSettings[K]) => {
     await setSetting(key, value);
     if (key === 'autoSyncDrive') {
@@ -260,7 +295,8 @@ export const QuizProvider: React.FC<{ children: React.ReactNode }> = ({ children
       duration_seconds: session.durationSeconds,
       worst_subject_id: worstSubjectId,
       worst_subject_name: worstSubjectName,
-      is_marathon: session.isMarathon
+      is_marathon: session.isMarathon,
+      readiness_score: readinessScore,
     });
 
     // Telemetry: individual question answers for exam mode

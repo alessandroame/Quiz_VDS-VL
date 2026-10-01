@@ -1,8 +1,13 @@
 import type {
+  AppSessionEndedPayload,
   AppSessionStartedPayload,
+  AppTimeSpentPayload,
   AudioDownloadResultPayload,
   ExamCompletedPayload,
+  ExamStartedPayload,
   QuestionAnsweredPayload,
+  ReadinessScoreUpdatedPayload,
+  ScreenViewedPayload,
   StudyModeEnteredPayload,
   PwaInstallPromptOutcomePayload,
   TelemetryConfig,
@@ -118,6 +123,18 @@ class TelemetryService {
   }
 
   /**
+   * Tracks the start of an exam simulation.
+   */
+  trackExamStarted(payload: ExamStartedPayload): void {
+    this.capture('exam_started', {
+      mode: payload.mode,
+      is_marathon: payload.is_marathon ?? false,
+      total_questions: payload.total_questions,
+      readiness_score: payload.readiness_score,
+    });
+  }
+
+  /**
    * Tracks completed exam simulations.
    */
   trackExamCompleted(payload: ExamCompletedPayload): void {
@@ -130,6 +147,7 @@ class TelemetryService {
       worst_subject_id: payload.worst_subject_id,
       worst_subject_name: payload.worst_subject_name,
       is_marathon: payload.is_marathon ?? false,
+      readiness_score: payload.readiness_score,
     });
   }
 
@@ -166,6 +184,7 @@ class TelemetryService {
       is_standalone_pwa: payload.is_standalone_pwa,
       theme: payload.theme,
       font_scale: payload.font_scale,
+      readiness_score: payload.readiness_score,
     });
   }
 
@@ -175,6 +194,65 @@ class TelemetryService {
   trackPwaInstallPrompt(payload: PwaInstallPromptOutcomePayload): void {
     this.capture('pwa_install_prompt_outcome', {
       outcome: payload.outcome,
+    });
+  }
+
+  /**
+   * Tracks incremental active time spent on the app (heartbeat or upon leave/pause).
+   */
+  trackAppTimeSpent(payload: AppTimeSpentPayload): void {
+    this.capture('app_time_spent', {
+      duration_seconds: payload.duration_seconds,
+      active_seconds: payload.active_seconds,
+      total_session_seconds: payload.total_session_seconds,
+      screen: payload.screen,
+      subject_id: payload.subject_id,
+      readiness_score: payload.readiness_score,
+      is_standalone_pwa: payload.is_standalone_pwa,
+    });
+  }
+
+  /**
+   * Tracks summary metrics when an app session is closed, backgrounded or ended.
+   */
+  trackAppSessionEnded(payload: AppSessionEndedPayload): void {
+    this.capture('app_session_ended', {
+      total_active_seconds: payload.total_active_seconds,
+      total_wall_seconds: payload.total_wall_seconds,
+      screens_visited: payload.screens_visited,
+      primary_screen: payload.primary_screen,
+      readiness_score: payload.readiness_score,
+      is_standalone_pwa: payload.is_standalone_pwa,
+    });
+  }
+
+  /**
+   * Tracks user navigation across screens/sections.
+   */
+  trackScreenViewed(payload: ScreenViewedPayload): void {
+    this.capture('screen_viewed', {
+      screen: payload.screen,
+      previous_screen: payload.previous_screen,
+      duration_seconds: payload.duration_seconds,
+      readiness_score: payload.readiness_score,
+    });
+  }
+
+  /**
+   * Tracks changes and progression of the student's exam readiness index.
+   */
+  trackReadinessScoreUpdated(payload: ReadinessScoreUpdatedPayload): void {
+    this.capture('readiness_score_updated', {
+      readiness_score: payload.readiness_score,
+      previous_readiness_score: payload.previous_readiness_score,
+      delta: payload.delta,
+      coverage_pct: payload.coverage_pct,
+      accuracy_pct: payload.accuracy_pct,
+      exam_pass_rate_pct: payload.exam_pass_rate_pct,
+      total_seen: payload.total_seen,
+      total_catalog: payload.total_catalog,
+      total_mistakes: payload.total_mistakes,
+      trigger: payload.trigger,
     });
   }
 
