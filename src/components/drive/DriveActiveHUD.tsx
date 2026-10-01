@@ -138,6 +138,14 @@ export const DriveActiveHUD: React.FC<DriveActiveHUDProps> = ({
     revealedQuestionId === currentQ.id ||
     ((!isExamSession || isTutorEnabled) && answers[currentQ.id] !== undefined);
 
+  // DOM element refs for accurate overflow / truncation measurement
+  const questionTextRef = React.useRef<HTMLHeadingElement | null>(null);
+  const optionTextRefs = React.useRef<Record<number, HTMLDivElement | null>>({});
+
+  // Dynamic truncation flags based on actual DOM layout
+  const [truncatedOpts, setTruncatedOpts] = React.useState<Record<number, boolean>>({});
+  const [isQuestionTruncated, setIsQuestionTruncated] = React.useState<boolean | null>(null);
+
   // Manual expansion state per option and question
   const [manuallyExpandedOpts, setManuallyExpandedOpts] = React.useState<Record<number, boolean>>({});
   const [isQuestionManuallyExpanded, setIsQuestionManuallyExpanded] = React.useState(false);
@@ -147,6 +155,49 @@ export const DriveActiveHUD: React.FC<DriveActiveHUDProps> = ({
     setManuallyExpandedOpts({});
     setIsQuestionManuallyExpanded(false);
   }, [currentQ.id]);
+
+  const updateTruncation = React.useCallback(() => {
+    if (typeof window === 'undefined') return;
+
+    // Measure question
+    if (questionTextRef.current) {
+      const el = questionTextRef.current;
+      const computed = window.getComputedStyle(el);
+      const rawLh = parseFloat(computed.lineHeight);
+      const lh = !isNaN(rawLh) && rawLh > 0 ? rawLh : (parseFloat(computed.fontSize) * 1.375) || 22;
+      const isMobile = window.innerWidth < 640;
+      const maxLines = isMobile ? 3 : 4;
+      const isClampedNow = el.scrollHeight > el.clientHeight + 1;
+      const exceedsMaxLines = el.scrollHeight > (lh * maxLines) + 3;
+      setIsQuestionTruncated(isClampedNow || exceedsMaxLines);
+    }
+
+    // Measure options
+    const newTruncated: Record<number, boolean> = {};
+    ([1, 2, 3] as const).forEach((optNum) => {
+      const el = optionTextRefs.current[optNum];
+      if (el) {
+        const computed = window.getComputedStyle(el);
+        const rawLh = parseFloat(computed.lineHeight);
+        const lh = !isNaN(rawLh) && rawLh > 0 ? rawLh : (parseFloat(computed.fontSize) * 1.375) || 20;
+        const isClampedNow = el.scrollHeight > el.clientHeight + 1;
+        const exceeds2Lines = el.scrollHeight > (lh * 2) + 3;
+        newTruncated[optNum] = isClampedNow || exceeds2Lines;
+      }
+    });
+    setTruncatedOpts(newTruncated);
+  }, []);
+
+  React.useEffect(() => {
+    updateTruncation();
+    const rafId = requestAnimationFrame(updateTruncation);
+
+    window.addEventListener('resize', updateTruncation);
+    return () => {
+      cancelAnimationFrame(rafId);
+      window.removeEventListener('resize', updateTruncation);
+    };
+  }, [currentQ.id, currentQ.question, currentQ.options, isCurrentRevealed, updateTruncation]);
 
   const toggleOptionExpansion = (optNum: 1 | 2 | 3, e: React.MouseEvent | React.KeyboardEvent) => {
     e.stopPropagation();
@@ -161,7 +212,9 @@ export const DriveActiveHUD: React.FC<DriveActiveHUDProps> = ({
 
   const isQuestionPlaying = isPartPlaying('question');
   const isQuestionExpanded = isQuestionManuallyExpanded || isQuestionPlaying;
-  const isLongQuestion = currentQ.question.length > 80;
+  const isLongQuestion = isQuestionTruncated !== null
+    ? isQuestionTruncated
+    : currentQ.question.length > 105;
 
   return (
     <div className="flex-1 flex flex-col justify-between p-3 sm:p-5 max-w-2xl mx-auto w-full h-full overflow-hidden">
@@ -428,6 +481,7 @@ export const DriveActiveHUD: React.FC<DriveActiveHUDProps> = ({
             </button>
           </div>
           <h2
+            ref={questionTextRef}
             lang="it"
             translate="no"
             className={`text-base sm:text-xl font-bold leading-snug tracking-tight transition-colors ${
@@ -650,7 +704,9 @@ export const DriveActiveHUD: React.FC<DriveActiveHUDProps> = ({
             const isExpanded = manuallyExpandedOpts[optNum] !== undefined
               ? manuallyExpandedOpts[optNum]
               : isCurrentOptPlaying;
-            const isLongOption = opt.length > 65;
+            const isLongOption = truncatedOpts[optNum] !== undefined
+              ? truncatedOpts[optNum]
+              : opt.length > 95;
 
             let style =
               'bg-zinc-900/80 border-zinc-800 text-zinc-100 hover:border-zinc-700 active:scale-[0.99] light:bg-white light:border-slate-200 light:text-slate-900 light:hover:border-slate-300 light:shadow-sm';
@@ -707,6 +763,9 @@ export const DriveActiveHUD: React.FC<DriveActiveHUDProps> = ({
 
                 <div className="flex-1 min-w-0">
                   <div
+                    ref={(el) => {
+                      optionTextRefs.current[optNum] = el;
+                    }}
                     lang="it"
                     className={`break-words ${
                       isCurrentRevealed

@@ -212,4 +212,81 @@ describe('DriveActiveHUD - Karaoke Accordion & Long Text Expansion', () => {
     expect(html).toContain('line-clamp-none');
     expect(html).toContain('text-amber-300');
   });
+
+  it('HUD-EXPAND-04: does NOT render expand badges when option texts fit normally without truncation', () => {
+    const sampleShortQuestion: Question = {
+      id: 5051,
+      subjectId: 5,
+      subjectName: 'Meteorologia e Aerologia',
+      discipline: 'all',
+      question: "Quale effetto produce la presenza di rotori sottovento?",
+      options: [
+        "la curva o diagramma di stato dell'atmosfera di quella località a quell'ora.",
+        "l'adiabatica secca dell'atmosfera di quella località a quell'ora.",
+        "l'isoterma di quella località a quell'ora."
+      ],
+      correctAnswer: 1,
+      explanation: {
+        rule: "Riportando su un grafico cartesiano i valori di temperatura ambiente rilevati a varie quote si ottiene la curva o diagramma di stato dell'atmosfera locale.",
+        trap: "L'adiabatica è una curva teorica di raffreddamento di una particella in ascesa, non il rilievo effettivo dell'atmosfera reale."
+      }
+    };
+
+    const html = renderToString(
+      React.createElement(DriveActiveHUD, {
+        currentQ: sampleShortQuestion,
+        currentIndex: 0,
+        totalCount: 30,
+        isExamSession: true,
+        secondsRemaining: 200,
+        isIntroActive: false,
+        onDismissIntro: () => {},
+        onReplayIntro: () => {},
+        onOpenVoiceGuide: () => {},
+        setIsVoiceMenuOpen: () => {},
+        onClose: () => {},
+        onExecuteClose: () => {},
+        isAutopilotEnabled: true,
+        onToggleAutopilot: () => {},
+        isTutorEnabled: false,
+        onToggleTutor: () => {},
+        isVoiceSupported: true,
+        isVoiceCommandsEnabled: false,
+        voiceError: null,
+        isVoiceReceiving: false,
+        isVoiceListening: false,
+        onToggleVoiceCommands: () => {},
+        isPlaying: false,
+        isPaused: false,
+        isPartPlaying: () => false,
+        isExplanationPlaying: false,
+        onTogglePlayPause: () => {},
+        onRestartCurrentOrSequence: () => {},
+        onStopVoice: () => {},
+        onPlayExplanation: () => {},
+        waitingCountdown: null,
+        assimilationCountdown: null,
+        voiceInterimTranscript: '',
+        voiceLastTranscript: '',
+        lastRecognizedLabel: null,
+        unrecognizedSpeech: null,
+        voiceHint: '',
+        answers: {},
+        flags: {},
+        revealedQuestionId: null,
+        onSelectAnswer: () => {},
+        onPrevQuestion: () => {},
+        onNextQuestion: () => {},
+        onToggleFlag: () => {},
+        onSubmitExam: () => {}
+      })
+    );
+
+    // No expand buttons for these options because they fit without truncation
+    expect(html).not.toContain('id="btn-drive-opt-expand-1"');
+    expect(html).not.toContain('id="btn-drive-opt-expand-2"');
+    expect(html).not.toContain('id="btn-drive-opt-expand-3"');
+    expect(html).not.toContain('Leggi tutto');
+  });
 });
+

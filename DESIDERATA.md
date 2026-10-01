@@ -137,7 +137,7 @@ Questo documento rappresenta la **bussola strategica e funzionale** del progetto
 | Supporto Audio | 🟢 Completato | Sintesi vocale neurale con controlli Play/Pausa e Da Capo universali su domanda, singole opzioni e spiegazione; feedback Web Audio API e fonetica ICAO. |
 | Gestione Offline Audio & Fallback | 🟢 Completato | Download in background non bloccante via CacheStorage, prompt non invasivo al primo avvio Guida, gestione granulare Impostazioni, fallback automatico offline su voce scaricata e Range Requests Safari. |
 | Google Drive Cloud Sync | 🟢 Completato | Integrazione GIS con `appDataFolder` privata e fallback JSON export/import. |
-| Modalità Mani Libere | 🟢 Completato | Layout zero-scroll, Screen Wake Lock, Pilota Auto Radio Quiz, Speech Recognition, Quick Speech Menu integrato in tutti gli stati (Launcher, HUD quiz attivo, Debriefing) e pieno supporto Scuro / Chiaro. |
+| Modalità Mani Libere | 🟢 Completato | Layout zero-scroll, fasce dinamiche 'Karaoke Accordion' con espansione selettiva del testo su audio attivo o tocco utente, misurazione DOM reale anti-overflow, Screen Wake Lock, Pilota Auto Radio Quiz, Speech Recognition, Quick Speech Menu integrato e supporto Scuro / Chiaro. |
 | Quick Speech Menu (1-Click) | 🟢 Completato | Flyout compatto in Navbar e integrato a tutto schermo in Modalità Mani Libere per controllo vocale rapido a 1 tocco. |
 | Schermata Impostazioni Fullscreen & About | 🟢 Completato | Esperienza nativa a tutto schermo (mobile & desktop), segmented tabs per 6 argomenti con scheda About (normativa AeCI e D.P.R. 133/2010) e supporto Schermo Intero. |
 | Guida Contestuale Comandi Vocali | 🟢 Completato | HUD live rotativo, Cheat Sheet modale a 1 tocco, trigger 'Aiuto' e box in Impostazioni. |

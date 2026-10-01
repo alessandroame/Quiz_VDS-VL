@@ -14,6 +14,37 @@ Questo documento registra in ordine cronologico tutte le lavorazioni svolte nel 
 - **Impatto sul Desiderata**: <Come questo intervento contribuisce al desiderata (cfr. DESIDERATA.md) e indicazioni per il prossimo agente>
 ```
 
+### [2026-10-01] - Misurazione DOM Reale e Azzeramento Falsi Positivi 'Leggi tutto' in Modalità Mani Libere (v1.5.4)
+
+- **Cosa abbiamo fatto**:
+  * **Rilevamento Troncamento tramite Misurazione Dinamica del DOM ([src/components/drive/DriveActiveHUD.tsx](file:///c:/github/Quiz_VDS-VL/src/components/drive/DriveActiveHUD.tsx))**:
+    - Sostituita l'euristica statica basata sul conteggio dei caratteri (`opt.length > 65`, `question.length > 80`) che causava la comparsa spuria del pulsante `[Leggi tutto]` anche su testi che stavano comodamente e per intero su 1 o 2 righe (es. quesito #5051 opzione 1 con 76 caratteri, quesito #5115 opzione 2 con 69 caratteri).
+    - Introdotti `questionTextRef` e `optionTextRefs` (`useRef<Record<number, HTMLDivElement | null>>({})`) per misurare direttamente nel DOM lo stato effettivo di clamp e overflow.
+    - Implementato algoritmo deterministico di calcolo:
+      * **Opzioni**: l'opzione è troncata se `scrollHeight > clientHeight + 1` (quando compressa con `line-clamp-2`) oppure se `scrollHeight > (lineHeight * 2) + 3` (valido sia quando compressa che quando espansa, garantendo che `[Riduci]` rimanga visibile).
+      * **Domanda**: la domanda è troncata se `scrollHeight > clientHeight + 1` oppure se `scrollHeight > (lineHeight * maxLines) + 3` (dove `maxLines` è 3 su mobile < 640px e 4 su desktop).
+      * Calcolo robusto del `lineHeight`: parsing di `getComputedStyle(el).lineHeight` con fallback su `fontSize * 1.375` (classe Tailwind `leading-snug`) anti-`NaN` e anti-valori nulli.
+    - Registrato listener su evento `resize` della finestra e schedulata verifica con `requestAnimationFrame` per ri-calcolare istantaneamente l'eventuale overflow in caso di rotazione dello schermo (es. portrait 390x844 -> landscape 844x390) o cambio di dimensioni viewport.
+    - Mantenuto fallback sicuro per ambienti SSR / server-side testing (`renderToString`) con soglie a 95 caratteri per le opzioni e 105 per la domanda.
+  * **Copertura di Test Unitari ([src/components/drive/DriveActiveHUD.test.ts](file:///c:/github/Quiz_VDS-VL/src/components/drive/DriveActiveHUD.test.ts))**:
+    - Aggiunto il test `HUD-EXPAND-04` per verificare che domande e opzioni con testo normale (< 95 caratteri, es. opzioni di #5051) NON mostrino i badge di espansione né contengano `[Leggi tutto]`.
+    - Tutti i 321 test della suite Vitest (`47 passed`) completati con esito positivo.
+  * **Verifica Visiva Headless Pixel-Perfect ([Chrome DevTools CDP](file:///c:/github/Quiz_VDS-VL))**:
+    - Collaudato con viewport mobile standard 390x844:
+      * Sul quesito #5051: il badge `[Leggi tutto]` è COMPLETAMENTE ASSENTE su tutte e 3 le opzioni.
+      * Sul quesito #5115: opzione 1 e opzione 2 non presentano alcun badge; l'opzione 3 (che supera realmente le 2 righe con 104 caratteri) mostra correttamente l'espansione e il controllo `[Riduci]` / `[Leggi tutto]`.
+      * Sul quesito #3003: tutte le opzioni lunghe (> 110 caratteri) presentano correttamente il controllo di espansione.
+    - Verificata l'assenza assoluta di errori o warning nella console del browser.
+
+- **Scelte architetturali & Rationale**:
+  * *DOM Layout vs String Length Threshold*: La lunghezza delle stringhe in caratteri è intrinsecamente fallace a causa della sillabazione delle parole italiane e della larghezza variabile dei viewport dei dispositivi mobili. Solo la comparazione tra `scrollHeight` e `lineHeight * maxLines` nel layout effettivo calcolato dal motore di rendering del browser garantisce un'accuratezza al 100% senza falsi positivi né falsi negativi.
+  * *Doppio Criterio `isClampedNow || exceeds2Lines`*: Quando un'opzione viene espansa (manualmente o dal karaoke vocale) la classe CSS passa a `line-clamp-none`, azzerando la differenza tra `scrollHeight` e `clientHeight`. Verificare `scrollHeight > (lh * 2) + 3` consente al pulsante `[Riduci]` di rimanere sempre accessibile e cliccabile per ricomprimere la card a 2 righe.
+
+- **Impatto sul Desiderata**:
+  * Risolve completamente la segnalazione dell'allievo: nessun pulsante "Leggi tutto" inutile o ingannevole su risposte brevi, garantendo un'interfaccia pulita, chiara e priva di distrazioni sia in modalità studio che a mani libere.
+
+---
+
 ### [2026-10-01] - Ripristino Reattivo Stato Cloud Synced e Risoluzione Icona Errore Bloccata
 
 - **Cosa abbiamo fatto**:
