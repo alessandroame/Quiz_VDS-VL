@@ -1,6 +1,7 @@
 // @vitest-environment happy-dom
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import React from 'react';
+import React, { act } from 'react';
+import { createRoot } from 'react-dom/client';
 import { renderToString } from 'react-dom/server';
 
 const mockUseTheme = vi.fn();
@@ -114,6 +115,84 @@ describe('Navbar Component (Top Bar & Mini-Header Disambiguation)', () => {
       expect(html).toContain('2017');
       expect(html).toContain('bg-zinc-800/80 text-zinc-400');
       expect(html).not.toContain('bg-amber-500/20 text-amber-400 font-mono');
+    });
+  });
+
+  describe('Settings & Cloud Sync Navigation', () => {
+    it('calls openSettings("cloud") when clicking btn-cloud-sync', () => {
+      mockUseQuiz.mockReturnValue({
+        readinessScore: 85,
+        isExamRunning: false,
+        activeSession: null,
+        openDriveMode: vi.fn(),
+        settings: {
+          autoSyncDrive: true
+        },
+        syncState: {
+          status: 'needs_auth'
+        }
+      });
+
+      const openSettings = vi.fn();
+      const container = document.createElement('div');
+      document.body.appendChild(container);
+      const root = createRoot(container);
+
+      act(() => {
+        root.render(
+          React.createElement(Navbar, {
+            activeTab: 'home',
+            setActiveTab: () => {},
+            openSettings
+          })
+        );
+      });
+
+      const cloudBtn = container.querySelector('#btn-cloud-sync') as HTMLButtonElement;
+      expect(cloudBtn).not.toBeNull();
+      expect(cloudBtn.getAttribute('aria-label')).toBe('Accesso Google richiesto: tocca per ri-autorizzare');
+
+      act(() => {
+        cloudBtn.click();
+      });
+
+      expect(openSettings).toHaveBeenCalledWith('cloud');
+
+      act(() => {
+        root.unmount();
+      });
+      container.remove();
+    });
+
+    it('calls openSettings() without tab argument when clicking regular settings button', () => {
+      const openSettings = vi.fn();
+      const container = document.createElement('div');
+      document.body.appendChild(container);
+      const root = createRoot(container);
+
+      act(() => {
+        root.render(
+          React.createElement(Navbar, {
+            activeTab: 'home',
+            setActiveTab: () => {},
+            openSettings
+          })
+        );
+      });
+
+      const settingsBtn = container.querySelector('#btn-settings') as HTMLButtonElement;
+      expect(settingsBtn).not.toBeNull();
+
+      act(() => {
+        settingsBtn.click();
+      });
+
+      expect(openSettings).toHaveBeenCalledWith();
+
+      act(() => {
+        root.unmount();
+      });
+      container.remove();
     });
   });
 });

@@ -77,7 +77,7 @@ const AccordionCard: React.FC<AccordionCardProps> = ({
   return (
     <div
       ref={cardRef}
-      className={`rounded-2xl border transition-colors duration-150 overflow-hidden ${
+      className={`rounded-2xl border transition-colors duration-150 overflow-hidden scroll-mt-4 ${
         isExpanded
           ? 'border-amber-500/50 bg-zinc-900/80 shadow-md shadow-amber-500/5 light:border-amber-400 light:bg-white ring-1 ring-amber-500/20 light:ring-amber-400/20'
           : 'border-zinc-700/80 bg-zinc-900/50 hover:bg-zinc-900/80 hover:border-zinc-600 light:border-slate-300 light:bg-white light:shadow-sm light:hover:bg-slate-50'
@@ -256,6 +256,15 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
   useEffect(() => {
     if (isOpen) {
       setOpenSection(defaultTab);
+      if (defaultTab) {
+        const timer = setTimeout(() => {
+          const el = sectionRefs.current[defaultTab];
+          if (el && typeof el.scrollIntoView === 'function') {
+            el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          }
+        }, 120);
+        return () => clearTimeout(timer);
+      }
     }
   }, [isOpen, defaultTab]);
 

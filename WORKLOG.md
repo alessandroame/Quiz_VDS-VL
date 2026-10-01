@@ -14,6 +14,32 @@ Questo documento registra in ordine cronologico tutte le lavorazioni svolte nel 
 - **Impatto sul Desiderata**: <Come questo intervento contribuisce al desiderata (cfr. DESIDERATA.md) e indicazioni per il prossimo agente>
 ```
 
+### [2026-10-01] - Apertura Rapida e Auto-Espansione Backup Cloud dall'Icona Navbar
+
+- **Cosa abbiamo fatto**:
+  * **Navigazione Diretta alla Sezione Backup Cloud ([src/components/Navbar.tsx](file:///c:/github/Quiz_VDS-VL/src/components/Navbar.tsx))**:
+    - Aggiornata la prop `openSettings` dell'interfaccia `NavbarProps` per accettare un tab di destinazione opzionale (`tab?: SettingsTab`).
+    - Modificato il pulsante indicatore di sincronizzazione cloud (`#btn-cloud-sync`) per invocare `openSettings('cloud')` al click, includendo l'attributo accessibile `aria-label={getSyncTooltip()}`.
+    - Mantenuta l'apertura neutra (senza tab pre-selezionato) per il pulsante impostazioni standard (`#btn-settings` e `#btn-mini-settings`).
+  * **Routing dello Stato Modal in App Core ([src/App.tsx](file:///c:/github/Quiz_VDS-VL/src/App.tsx))**:
+    - Introdotto lo stato `settingsDefaultTab` (`SettingsTab | null`) per propagare reattivamente la richiesta della sezione da espandere a `<SettingsModal>`.
+    - Esteso l'handler `handleOpenSettings(defaultTab?: SettingsTab | null)` e garantito il reset dello stato a `null` sia in `handleCloseSettings` che all'interno di `navigationContextRef` (chiusura via tasto hardware back / gesture mobile).
+  * **Auto-Espansione & Smooth Scroll in SettingsModal ([src/components/SettingsModal.tsx](file:///c:/github/Quiz_VDS-VL/src/components/SettingsModal.tsx))**:
+    - Aggiunto timer reattivo in `useEffect([isOpen, defaultTab])` che, all'apertura con `defaultTab` specificato, individua l'elemento del pannello (`sectionRefs.current[defaultTab]`) ed esegue uno scorrimento fluido (`scrollIntoView({ behavior: 'smooth', block: 'start' })`).
+    - Applicata la classe di utilità `scroll-mt-4` ad `AccordionCard` per garantire un margine visivo confortevole rispetto alla testata sticky della finestra di dialogo.
+  * **Copertura di Test Unitari & Integrazione ([src/components/Navbar.test.ts](file:///c:/github/Quiz_VDS-VL/src/components/Navbar.test.ts), [src/components/SettingsModal.test.ts](file:///c:/github/Quiz_VDS-VL/src/components/SettingsModal.test.ts))**:
+    - Aggiunti test in `Navbar.test.ts` per validare l'invocazione di `openSettings('cloud')` con relativo `aria-label` al click su `#btn-cloud-sync`, e l'invocazione neutra `openSettings()` al click su `#btn-settings`.
+    - Aggiunto test in `SettingsModal.test.ts` per accertare che `defaultTab="cloud"` espanda immediatamente la card accordion del Backup Cloud (`#tab-cloud` con `aria-expanded="true"` e presenza del pannello Google Drive).
+
+- **Scelte architetturali & Rationale**:
+  * *Disaccoppiamento tramite Prop `defaultTab` vs Deep Linking URL*: Si è scelto di utilizzare la prop dichiarativa `defaultTab` già predisposta in `SettingsModal` anziché alterare la cronologia del browser con hash URL (es. `#settings-cloud`). Questo rispetta rigorosamente la gestione stack di navigazione PWA (Stack Router con popstate depth) e azzera il rischio di reload o salti di stato indesiderati.
+  * *Smooth Scroll con `scroll-mt-4`*: Poiché la sezione Backup Cloud è posizionata come 4° pannello (dopo Aspetto, Voce e Mani Libere), su smartphone (390px) risulterebbe parzialmente fuori dall'area visibile. Lo scorrimento automatico con margine superiore porta immediatamente sotto gli occhi dell'allievo lo stato del backup e i pulsanti di autorizzazione Google Drive.
+
+- **Impatto sul Desiderata**:
+  * Soddisfa pienamente l'esigenza dell'utente: un singolo tocco sull'icona di stato cloud in testata apre le impostazioni ed espande subito la sezione Backup Cloud per consentire la ri-autorizzazione o la consultazione immediata dei dettagli di sincronizzazione.
+
+---
+
 ### [2026-10-01] - Fasce Dinamiche 'Karaoke Accordion' & Espansione Testo Risposte in Modalità Mani Libere (v1.5.3)
 
 - **Cosa abbiamo fatto**:

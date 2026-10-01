@@ -284,4 +284,24 @@ describe('SettingsModal Component (Accordion & Mobile Ergonomics)', () => {
     });
     container.remove();
   });
+
+  it('expands Backup Cloud accordion section when defaultTab is "cloud"', () => {
+    const container = document.createElement('div');
+    document.body.appendChild(container);
+    const root = createRoot(container);
+
+    act(() => {
+      root.render(React.createElement(SettingsModal, { isOpen: true, onClose: () => {}, defaultTab: 'cloud' }));
+    });
+
+    const cloudCardTab = container.querySelector('#tab-cloud') as HTMLButtonElement;
+    expect(cloudCardTab).not.toBeNull();
+    expect(cloudCardTab.getAttribute('aria-expanded')).toBe('true');
+    expect(container.textContent).toContain('Sincronizzazione Cloud Google');
+
+    act(() => {
+      root.unmount();
+    });
+    container.remove();
+  });
 });

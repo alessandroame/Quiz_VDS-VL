@@ -20,13 +20,14 @@ import { getBuildInfo } from '../utils/buildInfo';
 import { getAppIconUrl, getAppFaviconUrl } from '../utils/assets';
 
 import { getHeaderTitle, type NavTab } from '../utils/navigation';
+import type { SettingsTab } from './SettingsModal';
 
 export type { NavTab };
 
 interface NavbarProps {
   activeTab: NavTab;
   setActiveTab: (tab: NavTab) => void;
-  openSettings: () => void;
+  openSettings: (tab?: SettingsTab) => void;
 }
 
 export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab, openSettings }) => {
@@ -128,7 +129,7 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab, openSet
               <button
                 id="btn-mini-settings"
                 aria-label="Impostazioni"
-                onClick={openSettings}
+                onClick={() => openSettings()}
                 title="Impostazioni"
                 className="p-1.5 rounded-lg text-zinc-400 hover:text-zinc-200 light:text-slate-600 light:hover:text-slate-900 hover:bg-zinc-800/60 light:hover:bg-slate-100 transition-colors"
               >
@@ -224,8 +225,9 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab, openSet
             {settings.autoSyncDrive && (
               <button
                 id="btn-cloud-sync"
-                onClick={openSettings}
+                onClick={() => openSettings('cloud')}
                 title={getSyncTooltip()}
+                aria-label={getSyncTooltip()}
                 className="p-1.5 sm:p-2 rounded-lg text-zinc-300 hover:text-white light:text-slate-700 light:hover:text-slate-900 border border-zinc-700 hover:border-zinc-600 light:border-slate-300 light:shadow-sm hover:bg-zinc-800/60 light:hover:bg-slate-100 transition-colors"
               >
                 {syncState.status === 'syncing' ? (
@@ -259,7 +261,7 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab, openSet
             <button
               id="btn-settings"
               aria-label="Impostazioni"
-              onClick={openSettings}
+              onClick={() => openSettings()}
               title="Impostazioni"
               className="p-1.5 sm:p-2 rounded-lg text-zinc-300 hover:text-white light:text-slate-700 light:hover:text-slate-900 border border-zinc-700 hover:border-zinc-600 light:border-slate-300 light:shadow-sm hover:bg-zinc-800/60 light:hover:bg-slate-100 transition-colors"
             >

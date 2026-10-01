@@ -23,6 +23,7 @@ const ArchiveScreen = lazy(() => import('./components/ArchiveScreen').then(m => 
 const StatsScreen = lazy(() => import('./components/StatsScreen').then(m => ({ default: m.StatsScreen })));
 const SettingsModal = lazy(() => import('./components/SettingsModal').then(m => ({ default: m.SettingsModal })));
 const DriveModeScreen = lazy(() => import('./components/DriveModeScreen').then(m => ({ default: m.DriveModeScreen })));
+import type { SettingsTab } from './components/SettingsModal';
 
 const ScreenFallback = () => (
   <div className="flex items-center justify-center p-16 text-zinc-500 text-xs">
@@ -45,6 +46,7 @@ function AppContent() {
   const [activeTab, setActiveTab] = useState<NavTab>('home');
   const [pendingTab, setPendingTab] = useState<NavTab | null>(null);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  const [settingsDefaultTab, setSettingsDefaultTab] = useState<SettingsTab | null>(null);
   const [selectedTopicSubjectId, setSelectedTopicSubjectId] = useState<number | null>(null);
   const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
   const [isAudioDownloading, setIsAudioDownloading] = useState(
@@ -58,7 +60,10 @@ function AppContent() {
     isSettingsOpen,
     isDriveModeOpen,
     pendingTab,
-    onCloseSettings: () => setIsSettingsOpen(false),
+    onCloseSettings: () => {
+      setIsSettingsOpen(false);
+      setSettingsDefaultTab(null);
+    },
     onCloseDriveMode: () => closeDriveMode(),
     onCancelPendingTab: () => setPendingTab(null),
     onNavigateHome: () => {
@@ -83,7 +88,10 @@ function AppContent() {
       isSettingsOpen,
       isDriveModeOpen,
       pendingTab,
-      onCloseSettings: () => setIsSettingsOpen(false),
+      onCloseSettings: () => {
+        setIsSettingsOpen(false);
+        setSettingsDefaultTab(null);
+      },
       onCloseDriveMode: () => closeDriveMode(),
       onCancelPendingTab: () => setPendingTab(null),
       onNavigateHome: () => {
@@ -184,7 +192,8 @@ function AppContent() {
     }
   };
 
-  const handleOpenSettings = () => {
+  const handleOpenSettings = (defaultTab?: SettingsTab | null) => {
+    setSettingsDefaultTab(defaultTab ?? null);
     setIsSettingsOpen(true);
     if (typeof window !== 'undefined' && window.history) {
       backNavigation.incrementDepth();
@@ -197,6 +206,7 @@ function AppContent() {
       window.history.back();
     } else {
       setIsSettingsOpen(false);
+      setSettingsDefaultTab(null);
     }
   };
 
@@ -387,6 +397,7 @@ function AppContent() {
           <SettingsModal
             isOpen={isSettingsOpen}
             onClose={handleCloseSettings}
+            defaultTab={settingsDefaultTab}
           />
         </Suspense>
       )}
