@@ -207,4 +207,23 @@ describe('QuestionCard Light Mode Contrast', () => {
     expect(playPauseBtn.className).toContain('light:bg-amber-100');
     expect(playPauseBtn.className).toContain('light:text-amber-800');
   });
+
+  it('renders explanation audio button with high-contrast light mode classes when feedback is shown', async () => {
+    await act(async () => {
+      root.render(
+        React.createElement(QuestionCard, {
+          question: mockQuestion,
+          selectedAnswer: 2,
+          showFeedback: true,
+          onSelectAnswer: vi.fn()
+        })
+      );
+    });
+
+    const explanationBtn = container.querySelector('#btn-tts-explanation') as HTMLButtonElement;
+    expect(explanationBtn).not.toBeNull();
+    expect(explanationBtn.className).toContain('light:bg-slate-100');
+    expect(explanationBtn.className).toContain('light:text-slate-700');
+    expect(explanationBtn.className).toContain('light:border-slate-300');
+  });
 });

@@ -11,6 +11,7 @@ interface QuestionCardProps {
   selectedAnswer?: 1 | 2 | 3;
   onSelectAnswer: (answer: 1 | 2 | 3) => void;
   showFeedback?: boolean; // Se true, mostra subito verde/rosso e spiegazione
+  disableAutoPlay?: boolean;
   isFlagged?: boolean;
   onToggleFlag?: () => void;
   indexNumber?: number; // es. "Domanda 4 di 30"
@@ -22,6 +23,7 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({
   selectedAnswer,
   onSelectAnswer,
   showFeedback = false,
+  disableAutoPlay = false,
   isFlagged = false,
   onToggleFlag,
   indexNumber,
@@ -65,8 +67,11 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({
     isThisQuestionActiveRef.current = isThisQuestionActive;
   }, [isThisQuestionActive]);
 
-  // Stops audio on question change, or starts autoplay if enabled
+  // Stops audio on question change, or starts autoplay if enabled (only during active quiz, never in debriefing / review)
   useEffect(() => {
+    if (disableAutoPlay || showFeedback) {
+      return;
+    }
     if (settings.ttsEnabled && settings.ttsAutoPlayQuestion) {
       playFullSequence();
     }
@@ -75,7 +80,7 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({
         stop();
       }
     };
-  }, [question.id, playFullSequence, stop, settings.ttsEnabled, settings.ttsAutoPlayQuestion]);
+  }, [question.id, playFullSequence, stop, settings.ttsEnabled, settings.ttsAutoPlayQuestion, disableAutoPlay, showFeedback]);
 
   // Speech keyboard shortcuts (V: Play/Pause sequence, R or Shift+V: Restart sequence, Q: Question toggle, Shift+Q: Restart question, Alt+1/2/3: Option toggle, Alt+Shift+1/2/3: Restart option, E: Explanation toggle, Shift+E: Restart explanation, Esc: Stop)
   useEffect(() => {
@@ -443,7 +448,7 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({
             <button
               id="btn-tts-question"
               onClick={() => playQuestion()}
-              className="p-1.5 rounded-lg flex-shrink-0 text-zinc-500 hover:text-zinc-300 light:hover:text-slate-700 transition-colors"
+              className="p-1.5 rounded-lg flex-shrink-0 text-zinc-500 hover:text-zinc-300 light:text-slate-400 light:hover:text-slate-700 transition-colors"
               title="Riascolta solo la domanda (Tasto Q)"
             >
               <Volume2 className="w-4 h-4" />
@@ -678,10 +683,10 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({
                 <button
                   id="btn-tts-explanation"
                   onClick={() => playExplanation()}
-                  className="px-2 py-1 rounded-lg text-[11px] flex items-center gap-1 text-zinc-400 hover:text-zinc-200 bg-zinc-800/50 hover:bg-zinc-800 transition-colors"
+                  className="px-2.5 py-1 rounded-lg text-[11px] font-semibold flex items-center gap-1.5 text-zinc-300 hover:text-white bg-zinc-800/80 hover:bg-zinc-700 border border-zinc-700/60 light:bg-slate-100 light:hover:bg-slate-200 light:text-slate-700 light:hover:text-slate-900 light:border-slate-300 transition-colors shadow-sm"
                   title="Ascolta spiegazione vocale della risposta corretta (Tasto E)"
                 >
-                  <Volume2 className="w-3 h-3" />
+                  <Volume2 className="w-3.5 h-3.5 text-zinc-400 light:text-slate-500" />
                   <span>Ascolta Spiegazione</span>
                 </button>
               )

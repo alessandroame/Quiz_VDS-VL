@@ -14,6 +14,33 @@ Questo documento registra in ordine cronologico tutte le lavorazioni svolte nel 
 - **Impatto sul Desiderata**: <Come questo intervento contribuisce al desiderata (cfr. DESIDERATA.md) e indicazioni per il prossimo agente>
 ```
 
+### [2026-10-01] - Risoluzione Contrasto e Leggibilità Pulsanti Audio Spiegazione in Light Mode (v1.6.5)
+- **Cosa abbiamo fatto**:
+  - **Risoluzione Difetto Contrasto Visivo (#btn-tts-explanation)**:
+    - Identificato e risolto il problema di contrasto e illeggibilità del pulsante `"Ascolta Spiegazione"` nel box spiegazione didattica (Regola e Tranello) segnalato dall'utente.
+    - In modalità chiara (Light Mode), il pulsante non disponeva di classi con prefisso `light:`, ereditando il background semi-trasparente scuro (`bg-zinc-800/50`) e il testo grigio tenue (`text-zinc-400`), risultando in un contrasto di appena 1.8:1, opaco e praticamente illeggibile su sfondo bianco.
+    - Aggiornato [src/components/QuestionCard.tsx](file:///c:/github/Quiz_VDS-VL/src/components/QuestionCard.tsx) introducendo stili Light Mode conformi al design system `minimal-ui-ux` e WCAG AAA:
+      * Sfondo: `light:bg-slate-100`, hover: `light:hover:bg-slate-200`.
+      * Bordo: `border border-zinc-700/60 light:border-slate-300`.
+      * Testo: `light:text-slate-700` (`#334155`), hover: `light:hover:text-slate-900`, con contrasto > 8:1.
+      * Icona: `text-zinc-400 light:text-slate-500` con spaziatura migliorata (`gap-1.5`) e tipografia nitida `font-semibold text-[11px]`.
+    - Applicato il medesimo allineamento cromatico anche a [src/components/ArchiveScreen.tsx](file:///c:/github/Quiz_VDS-VL/src/components/ArchiveScreen.tsx) per i comandi di riproduzione vocale (`Domanda`, `Tutto`, `Spiegazione Didattica`, pulsanti stop e play/pausa) garantendo coerenza estetica su tutta l'applicazione.
+  - **Suite di Test Unitari**:
+    - Esteso [src/components/QuestionCard.test.ts](file:///c:/github/Quiz_VDS-VL/src/components/QuestionCard.test.ts) con un test di asserzione dedicato alla presenza delle classi ad alto contrasto per il pulsante `#btn-tts-explanation` quando il feedback didattico è attivo in Light Mode.
+    - Tutte le 52 suite di test Vitest (376 test) superate con successo al 100%.
+  - **Collaudo Visivo Headless & Ispezione CDP**:
+    - Eseguita ispezione del componente rendered tramite Chrome DevTools su viewport reale in Light Mode.
+    - Verificati i valori computati di colore (`color: rgb(51, 65, 85)`, `backgroundColor: rgb(241, 245, 249)`).
+    - Acquisito e ispezionato lo screenshot di verifica confermando la perfetta leggibilità, nitidezza e assenza totale di errori in console JavaScript.
+- **Scelte architetturali & Rationale**:
+  - *Standardizzazione su Slate Palette per Light Mode*: L'impiego coordinato di `slate-100`, `slate-300` e `slate-700` mantiene un'elevata leggibilità all'aperto sotto la luce solare (WCAG AAA) senza generare contrasti stridenti o distrazioni cognitive per l'allievo pilota.
+- **Impatto sul Desiderata**:
+  - Piena aderenza ai principi di ergonomia visiva e design minimale senza distrazioni documentati in [DESIDERATA.md](file:///c:/github/Quiz_VDS-VL/DESIDERATA.md) e nella skill `minimal-ui-ux`.
+- **Istruzioni per il prossimo agente**:
+  - Quando si introducono nuovi bottoni o chip interattivi, accertarsi sempre di specificare esplicitamente sia gli stili per Dark Mode (`zinc-*`) che per Light Mode (`light:slate-*`).
+
+---
+
 ### [2026-10-01] - Telemetria PostHog: Tracciamento Tempo di Utilizzo Attivo e Progressione Prontezza Esame (v1.6.4)
 - **Cosa abbiamo fatto**:
   - **Motore di Tracciamento Tempo Attivo ([src/services/appTimeTracker.ts](file:///c:/github/Quiz_VDS-VL/src/services/appTimeTracker.ts))**:
