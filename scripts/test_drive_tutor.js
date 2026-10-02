@@ -198,7 +198,7 @@ async function run() {
     });
     await sleep(500);
 
-    // Verify HUD top bar Tutor button
+    // Verify HUD top bar Tutor button is removed
     const hudCheck = await sendCDP('Runtime.evaluate', {
       expression: `(() => {
         const topBarTutor = document.getElementById('btn-drive-tutor-toggle');
@@ -206,7 +206,6 @@ async function run() {
         const innerHeight = window.innerHeight;
         return {
           hasTopBarTutor: !!topBarTutor,
-          topBarTutorText: topBarTutor?.innerText,
           scrollHeight,
           innerHeight,
           isZeroScroll: scrollHeight <= innerHeight + 1

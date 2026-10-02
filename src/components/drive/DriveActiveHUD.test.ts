@@ -288,5 +288,59 @@ describe('DriveActiveHUD - Karaoke Accordion & Long Text Expansion', () => {
     expect(html).not.toContain('id="btn-drive-opt-expand-3"');
     expect(html).not.toContain('Leggi tutto');
   });
+
+  it('HUD-TOPBAR-01: does not render the tutor toggle button or icon in the top bar header to keep it uncluttered on mobile', () => {
+    const html = renderToString(
+      React.createElement(DriveActiveHUD, {
+        currentQ: sampleLongQuestion,
+        currentIndex: 0,
+        totalCount: 30,
+        isExamSession: true,
+        secondsRemaining: 200,
+        isIntroActive: false,
+        onDismissIntro: () => {},
+        onReplayIntro: () => {},
+        onOpenVoiceGuide: () => {},
+        setIsVoiceMenuOpen: () => {},
+        onClose: () => {},
+        onExecuteClose: () => {},
+        isAutopilotEnabled: true,
+        onToggleAutopilot: () => {},
+        isTutorEnabled: true,
+        isVoiceSupported: true,
+        isVoiceCommandsEnabled: false,
+        voiceError: null,
+        isVoiceReceiving: false,
+        isVoiceListening: false,
+        onToggleVoiceCommands: () => {},
+        isPlaying: false,
+        isPaused: false,
+        isPartPlaying: () => false,
+        isExplanationPlaying: false,
+        onTogglePlayPause: () => {},
+        onRestartCurrentOrSequence: () => {},
+        onStopVoice: () => {},
+        onPlayExplanation: () => {},
+        waitingCountdown: null,
+        assimilationCountdown: null,
+        voiceInterimTranscript: '',
+        voiceLastTranscript: '',
+        lastRecognizedLabel: null,
+        unrecognizedSpeech: null,
+        voiceHint: '',
+        answers: {},
+        flags: {},
+        revealedQuestionId: null,
+        onSelectAnswer: () => {},
+        onPrevQuestion: () => {},
+        onNextQuestion: () => {},
+        onToggleFlag: () => {},
+        onSubmitExam: () => {}
+      })
+    );
+
+    expect(html).not.toContain('id="btn-drive-tutor-toggle"');
+    expect(html).not.toContain('Tutor ON');
+  });
 });
 

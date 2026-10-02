@@ -128,8 +128,8 @@ describe('Drive Mode Tutor Integration', () => {
     // Timer badge indica tempo trascorso per tutor
     expect(html).toContain('title="Tempo trascorso (Tutor Didattico)"');
 
-    // Toggle button in HUD displays updated explanation on error title
-    expect(html).toContain('title="Modalità Tutor attiva (spiegazione vocale su errore)"');
+    // Tutor toggle button is removed from active HUD top bar to prevent clutter
+    expect(html).not.toContain('id="btn-drive-tutor-toggle"');
 
     // On correct answer, offer voluntary listen button without repeating
     expect(html).toContain('title="Ascolta spiegazione vocale"');

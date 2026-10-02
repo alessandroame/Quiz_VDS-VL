@@ -235,8 +235,7 @@ Questa sezione raccoglie le nuove funzionalità e i miglioramenti di interfaccia
 - [x] **Controlli Dedicati & Comandi Vocali**:
   - [x] Toggle rapido **[Tutor ON/OFF]** collocato:
     - Nel Launcher iniziale della Modalità Guida (`#btn-drive-toggle-tutor-launcher`);
-    - Nell'HUD superiore a 1 tocco durante la guida attiva (`#btn-drive-tutor-toggle`);
-    - Nel Quick Speech Menu della Navbar (`#quick-menu-toggle-tutor`) e nelle Impostazioni (scheda Guida: `#setting-drive-tutor-toggle`).
+    - Nel Quick Speech Menu (`#quick-menu-toggle-tutor`), nelle Impostazioni (scheda Guida: `#setting-drive-tutor-toggle`) e via comandi vocali hands-free (rimosso dall'HUD superiore per eliminare l'affollamento su mobile);
   - [x] Estensione del parser dei comandi vocali (`src/utils/voiceCommandParser.ts`):
     - Comando *"Spiega"*, *"Regola"*, *"Tranello"*, *"Perché"* per ascoltare la spiegazione on-demand anche con modalità tutor disattivata.
     - Comandi *"Attiva Tutor"* / *"Disattiva Tutor"* / *"Tutor"* per commutare al volo lo stato durante la guida.

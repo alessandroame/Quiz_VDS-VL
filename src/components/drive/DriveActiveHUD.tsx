@@ -44,7 +44,7 @@ export interface DriveActiveHUDProps {
   isAutopilotEnabled: boolean;
   onToggleAutopilot: () => void;
   isTutorEnabled: boolean;
-  onToggleTutor: () => void;
+  onToggleTutor?: () => void;
   isVoiceSupported: boolean;
   isVoiceCommandsEnabled: boolean;
   voiceError: string | null;
@@ -98,7 +98,6 @@ export const DriveActiveHUD: React.FC<DriveActiveHUDProps> = ({
   isAutopilotEnabled,
   onToggleAutopilot,
   isTutorEnabled,
-  onToggleTutor,
   isVoiceSupported,
   isVoiceCommandsEnabled,
   voiceError,
@@ -304,21 +303,6 @@ export const DriveActiveHUD: React.FC<DriveActiveHUDProps> = ({
           >
             {isAutopilotEnabled ? <Pause className="w-3.5 h-3.5" /> : <Play className="w-3.5 h-3.5" />}
             <span className="hidden sm:inline">{isAutopilotEnabled ? 'Auto ON' : 'Manuale'}</span>
-          </button>
-
-          {/* Toggle Modalità Tutor Didattica */}
-          <button
-            id="btn-drive-tutor-toggle"
-            onClick={onToggleTutor}
-            className={`p-1.5 rounded-lg text-xs font-bold flex items-center gap-1 transition-colors ${
-              isTutorEnabled
-                ? 'bg-amber-500/30 text-amber-300 ring-1 ring-amber-500/50 shadow-[0_0_10px_rgba(245,158,11,0.2)] light:bg-amber-100 light:text-amber-800 light:ring-amber-400'
-                : 'bg-zinc-900 text-zinc-500 border border-zinc-800 hover:text-zinc-300 light:bg-white light:text-slate-600 light:border-slate-200 light:hover:text-slate-900 light:shadow-sm'
-            }`}
-            title={isTutorEnabled ? 'Modalità Tutor attiva (spiegazione vocale su errore)' : 'Attiva modalità tutor (spiegazione su errore)'}
-          >
-            <GraduationCap className="w-3.5 h-3.5" />
-            <span className="hidden sm:inline">{isTutorEnabled ? 'Tutor ON' : 'Tutor'}</span>
           </button>
 
           {/* Toggle Comandi Vocali & Guida Rapida */}
