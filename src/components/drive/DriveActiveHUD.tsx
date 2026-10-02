@@ -1,6 +1,5 @@
 import React from 'react';
 import {
-  X,
   Volume2,
   Flag,
   ArrowRight,
@@ -87,13 +86,11 @@ export const DriveActiveHUD: React.FC<DriveActiveHUDProps> = ({
   totalCount,
   isExamSession,
   secondsRemaining,
-  sessionContext,
   isIntroActive,
   onDismissIntro,
   onReplayIntro,
   onOpenVoiceGuide,
   setIsVoiceMenuOpen,
-  onClose,
   onExecuteClose,
   isAutopilotEnabled,
   onToggleAutopilot,
@@ -236,31 +233,15 @@ export const DriveActiveHUD: React.FC<DriveActiveHUDProps> = ({
 
       {/* Top Bar HUD */}
       <div className="flex items-center justify-between gap-2 pb-2 border-b border-zinc-800/90 light:border-slate-200 text-xs">
-        {sessionContext ? (
-          <button
-            id="btn-drive-exit"
-            onClick={sessionContext.isExam ? onClose : onExecuteClose}
-            className="px-3 py-1.5 rounded-xl border border-zinc-700 bg-zinc-900 text-zinc-200 hover:text-white hover:border-zinc-500 light:bg-white light:border-slate-300 light:text-slate-800 font-bold flex items-center gap-1.5 transition-all flex-shrink-0 shadow-sm active:scale-95"
-            title={sessionContext.isExam ? "Opzioni di uscita o interruzione esame" : "Torna alla visualizzazione normale del quiz sullo schermo"}
-          >
-            <ArrowLeft className="w-4 h-4" />
-            <span>{sessionContext.isExam ? "Esci" : "Torna al Quiz"}</span>
-          </button>
-        ) : (
-          <button
-            id="btn-drive-exit"
-            onClick={onClose}
-            className={`px-3 py-1.5 rounded-xl border font-bold flex items-center gap-1 transition-colors flex-shrink-0 ${
-              isExamSession
-                ? 'bg-rose-500/10 border-rose-500/40 text-rose-400 hover:bg-rose-500/20 light:bg-rose-50 light:border-rose-300 light:text-rose-700'
-                : 'bg-zinc-900 border-zinc-800 text-zinc-300 hover:text-white light:bg-white light:border-slate-200 light:text-slate-700 light:hover:text-slate-900 light:shadow-sm'
-            }`}
-            title={isExamSession ? "Interrompi la simulazione d'esame" : 'Esci dalla Modalità Mani Libere'}
-          >
-            <X className="w-4 h-4" />
-            <span>{isExamSession ? 'Interrompi' : 'Esci'}</span>
-          </button>
-        )}
+        <button
+          id="btn-drive-exit"
+          onClick={onExecuteClose}
+          className="px-3 py-1.5 rounded-xl border border-zinc-700 bg-zinc-900 text-zinc-200 hover:text-white hover:border-zinc-500 light:bg-white light:border-slate-300 light:text-slate-800 font-bold flex items-center gap-1.5 transition-all flex-shrink-0 shadow-sm active:scale-95"
+          title="Torna alla vista normale del quiz"
+        >
+          <Headphones className="w-4 h-4 text-amber-400" />
+          <span>Vista Normale</span>
+        </button>
 
         <div className="flex items-center gap-2 font-mono flex-shrink-0">
           <span className="font-black text-sm text-amber-400 light:text-amber-600">

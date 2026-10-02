@@ -32,7 +32,7 @@ interface NavbarProps {
 
 export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab, openSettings }) => {
   const { theme, cycleTheme, resolvedTheme } = useTheme();
-  const { readinessScore, isExamRunning, activeSession, openDriveMode, settings, syncState } = useQuiz();
+  const { readinessScore, isExamRunning, activeSession, toggleDriveMode, isDriveModeOpen, settings, syncState } = useQuiz();
   const [isBuildInfoOpen, setIsBuildInfoOpen] = useState(false);
   const buildInfo = getBuildInfo();
 
@@ -108,11 +108,19 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab, openSet
               {/* Tasto Switch Rapido Modalità Mani Libere */}
               <button
                 id="btn-mini-audio"
-                onClick={() => openDriveMode()}
-                title="Passa all'ascolto hands-free (Modalità Mani Libere)"
-                className="group p-1.5 sm:px-2.5 sm:py-1.5 rounded-lg border border-zinc-800 bg-zinc-900/60 hover:bg-zinc-800 hover:border-zinc-700 text-zinc-300 hover:text-white light:bg-slate-100 light:border-slate-200 light:text-slate-700 light:hover:text-slate-900 flex items-center gap-1 text-xs font-semibold transition-all active:scale-95 shadow-sm"
+                onClick={() => toggleDriveMode()}
+                title={isDriveModeOpen ? 'Torna alla vista normale' : "Passa all'ascolto hands-free (Modalità Mani Libere)"}
+                className={`group p-1.5 sm:px-2.5 sm:py-1.5 rounded-lg border flex items-center gap-1 text-xs font-semibold transition-all active:scale-95 shadow-sm ${
+                  isDriveModeOpen
+                    ? 'border-amber-500 bg-amber-500/20 text-amber-300 light:bg-amber-100 light:border-amber-400 light:text-amber-800'
+                    : 'border-zinc-800 bg-zinc-900/60 hover:bg-zinc-800 hover:border-zinc-700 text-zinc-300 hover:text-white light:bg-slate-100 light:border-slate-200 light:text-slate-700 light:hover:text-slate-900'
+                }`}
               >
-                <Headphones className="w-3.5 h-3.5 text-zinc-400 group-hover:text-zinc-200 light:text-slate-500 light:group-hover:text-slate-800 transition-colors" />
+                <Headphones className={`w-3.5 h-3.5 transition-colors ${
+                  isDriveModeOpen
+                    ? 'text-amber-400 light:text-amber-700'
+                    : 'text-zinc-400 group-hover:text-zinc-200 light:text-slate-500 light:group-hover:text-slate-800'
+                }`} />
                 <span className="hidden sm:inline">Mani Libere</span>
               </button>
 
@@ -216,11 +224,19 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab, openSet
             {/* Modalità Mani Libere */}
             <button
               id="btn-drive-mode"
-              onClick={() => openDriveMode()}
-              title="Modalità Mani Libere (Macro-target & Hands-free)"
-              className="group p-1.5 sm:px-2.5 sm:py-1.5 rounded-lg border border-zinc-800 bg-zinc-900/60 hover:bg-zinc-800 hover:border-zinc-700 text-zinc-300 hover:text-white light:bg-slate-100 light:border-slate-200 light:text-slate-700 light:hover:text-slate-900 flex items-center gap-1.5 text-xs font-semibold transition-all active:scale-95 shadow-sm"
+              onClick={() => toggleDriveMode()}
+              title={isDriveModeOpen ? 'Torna alla vista normale' : 'Modalità Mani Libere (Macro-target & Hands-free)'}
+              className={`group p-1.5 sm:px-2.5 sm:py-1.5 rounded-lg border flex items-center gap-1.5 text-xs font-semibold transition-all active:scale-95 shadow-sm ${
+                isDriveModeOpen
+                  ? 'border-amber-500 bg-amber-500/20 text-amber-300 light:bg-amber-100 light:border-amber-400 light:text-amber-800'
+                  : 'border-zinc-800 bg-zinc-900/60 hover:bg-zinc-800 hover:border-zinc-700 text-zinc-300 hover:text-white light:bg-slate-100 light:border-slate-200 light:text-slate-700 light:hover:text-slate-900'
+              }`}
             >
-              <Headphones className="w-4 h-4 text-zinc-400 group-hover:text-zinc-200 light:text-slate-500 light:group-hover:text-slate-800 transition-colors" />
+              <Headphones className={`w-4 h-4 transition-colors ${
+                isDriveModeOpen
+                  ? 'text-amber-400 light:text-amber-700'
+                  : 'text-zinc-400 group-hover:text-zinc-200 light:text-slate-500 light:group-hover:text-slate-800'
+              }`} />
               <span className="hidden sm:inline">Mani Libere</span>
             </button>
 

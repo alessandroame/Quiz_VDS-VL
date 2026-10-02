@@ -327,7 +327,7 @@ describe('DriveModeScreen - Tutor Mode Explanation Playback Contract', () => {
     expect(handleSubmit).toHaveBeenCalled();
   });
 
-  it('DRIVE-VOICE-STOP-02: abandoning an exam calls sessionContext.onAbandonSession and stops voice', async () => {
+  it('DRIVE-VOICE-STOP-02: exiting hands-free view immediately returns to normal quiz, stops voice, and does not abandon exam session', async () => {
     const handleAbandon = vi.fn();
     const handleClose = vi.fn();
     await act(async () => {
@@ -350,27 +350,20 @@ describe('DriveModeScreen - Tutor Mode Explanation Playback Contract', () => {
       );
     });
 
-    // Click exit button to show abandon modal
+    // Find and click exit button ("Vista Normale")
     const exitBtn = container.querySelector('#btn-drive-exit') as HTMLButtonElement;
     expect(exitBtn).not.toBeNull();
 
+    mockStopVoice.mockClear();
     await act(async () => {
       exitBtn.click();
     });
 
-
-    // Click confirm abandon button
-    const confirmAbandonBtn = container.querySelector('#btn-drive-confirm-abandon') as HTMLButtonElement;
-    expect(confirmAbandonBtn).not.toBeNull();
-
-    mockStopVoice.mockClear();
-    await act(async () => {
-      confirmAbandonBtn.click();
-    });
-
+    // Exiting hands-free mode stops voice and triggers close without opening any abandon modal
     expect(mockStopVoice).toHaveBeenCalled();
-    expect(handleAbandon).toHaveBeenCalled();
     expect(handleClose).toHaveBeenCalled();
+    expect(handleAbandon).not.toHaveBeenCalled();
+    expect(container.querySelector('#btn-drive-confirm-abandon')).toBeNull();
   });
 
   it('DRIVE-UNHURRIED-01: does NOT start a countdown or auto-advance when thinking (unhurried study)', async () => {

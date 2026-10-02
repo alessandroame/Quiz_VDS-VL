@@ -40,6 +40,7 @@ interface QuizContextType {
   registerAudioSessionContext: (context: DriveModeSessionContext | null) => void;
   openDriveMode: (context?: DriveModeSessionContext) => void;
   closeDriveMode: () => void;
+  toggleDriveMode: (context?: DriveModeSessionContext) => void;
   updateSetting: <K extends keyof AppSettings>(key: K, value: AppSettings[K]) => Promise<void>;
   recordAnswer: (
     questionId: number,
@@ -93,6 +94,21 @@ export const QuizProvider: React.FC<{ children: React.ReactNode }> = ({ children
     voiceService.stop();
     setIsDriveModeOpen(false);
     setDriveSessionContext(null);
+  }, []);
+
+  const toggleDriveMode = useCallback((context?: DriveModeSessionContext) => {
+    setIsDriveModeOpen(prev => {
+      if (prev) {
+        voiceService.stop();
+        setDriveSessionContext(null);
+        return false;
+      } else {
+        const targetContext = context ?? activeAudioSessionContextRef.current;
+        setDriveSessionContext(targetContext || null);
+        telemetry.trackStudyModeEntered({ mode: 'audio_mode' });
+        return true;
+      }
+    });
   }, []);
 
   // Reattività istantanea con Dexie live queries
@@ -352,6 +368,7 @@ export const QuizProvider: React.FC<{ children: React.ReactNode }> = ({ children
         registerAudioSessionContext,
         openDriveMode,
         closeDriveMode,
+        toggleDriveMode,
         updateSetting,
         recordAnswer,
         toggleBookmark,

@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { XCircle } from 'lucide-react';
 import type { Question } from '../types/quiz';
 import type { ExamSession } from '../types/database';
 import { useQuiz } from '../context/QuizContext';
@@ -60,13 +59,10 @@ export const DriveModeScreen: React.FC<DriveModeScreenProps> = ({
   onClose,
   sessionContext
 }) => {
-  const { questions, statsMap, saveExam, recordAnswer, settings, updateSetting, dismissActiveSession } = useQuiz();
+  const { questions, statsMap, saveExam, recordAnswer, settings, updateSetting } = useQuiz();
 
   // Screen Wake Lock API sempre attivo in Modalità Guida
   const { isActive: isWakeLockActive } = useWakeLock(isOpen);
-
-  // Modale di conferma interruzione esame
-  const [showAbandonExamModal, setShowAbandonExamModal] = useState<boolean>(false);
 
   // Modalità sessione interna (se non viene fornito sessionContext da un esame esistente)
   const [internalMode, setInternalMode] = useState<'launcher' | 'running' | 'debriefing'>(
@@ -132,14 +128,6 @@ export const DriveModeScreen: React.FC<DriveModeScreenProps> = ({
   const unrecognizedTimerRef = useRef<any>(null);
 
   // Registra sub-modali interne con il coordinatore back navigation
-  useEffect(() => {
-    if (!showAbandonExamModal) return;
-    const unregister = backNavigation.registerSubModal('drive-abandon-modal', () => {
-      setShowAbandonExamModal(false);
-    });
-    return () => unregister();
-  }, [showAbandonExamModal]);
-
   useEffect(() => {
     if (!showOfflinePrompt) return;
     const unregister = backNavigation.registerSubModal('drive-offline-prompt', () => {
@@ -795,10 +783,9 @@ export const DriveModeScreen: React.FC<DriveModeScreenProps> = ({
     if (!isOpen || internalMode !== 'running') return;
 
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (showAbandonExamModal || isVoiceGuideOpen || showOfflinePrompt || isVoiceMenuOpen) {
+      if (isVoiceGuideOpen || showOfflinePrompt || isVoiceMenuOpen) {
         if (e.key === 'Escape') {
-          if (showAbandonExamModal) setShowAbandonExamModal(false);
-          else if (isVoiceGuideOpen) setIsVoiceGuideOpen(false);
+          if (isVoiceGuideOpen) setIsVoiceGuideOpen(false);
           else if (showOfflinePrompt) setShowOfflinePrompt(false);
         }
         return;
@@ -868,7 +855,7 @@ export const DriveModeScreen: React.FC<DriveModeScreenProps> = ({
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [isOpen, internalMode, currentQ, currentIndex, totalCount, isAutopilotEnabled, isPlaying, isPaused, showAbandonExamModal, isVoiceGuideOpen, showOfflinePrompt, isVoiceMenuOpen, handlePlayQuestion, handlePlayOption, restartCurrentOrSequence, togglePlayPause, pauseVoice, stopVoice, resumeVoice]);
+  }, [isOpen, internalMode, currentQ, currentIndex, totalCount, isAutopilotEnabled, isPlaying, isPaused, isVoiceGuideOpen, showOfflinePrompt, isVoiceMenuOpen, handlePlayQuestion, handlePlayOption, restartCurrentOrSequence, togglePlayPause, pauseVoice, stopVoice, resumeVoice]);
 
   // Gestione Swipe Touch a schermo intero
   const handleTouchStart = (e: React.TouchEvent) => {
@@ -970,13 +957,6 @@ export const DriveModeScreen: React.FC<DriveModeScreenProps> = ({
   };
 
   const handleClose = () => {
-    clearAllDriveTimers();
-    stopVoice();
-    stopDriveIntro();
-    if (internalMode === 'running' && (isExamSession || sessionContext?.isExam)) {
-      setShowAbandonExamModal(true);
-      return;
-    }
     executeClose();
   };
 
@@ -986,26 +966,6 @@ export const DriveModeScreen: React.FC<DriveModeScreenProps> = ({
     stopDriveIntro();
     setIsIntroActive(false);
     onClose();
-  };
-
-  const handleConfirmAbandonExam = () => {
-    setShowAbandonExamModal(false);
-    clearAllDriveTimers();
-    stopVoice();
-    stopDriveIntro();
-    setIsIntroActive(false);
-    dismissActiveSession();
-    setIsExamSession(false);
-    setAnswers({});
-    setFlags({});
-    if (sessionContext) {
-      if (sessionContext.onAbandonSession) {
-        sessionContext.onAbandonSession();
-      }
-      onClose();
-    } else {
-      setInternalMode('launcher');
-    }
   };
 
   const handleToggleAutopilot = () => {
@@ -1150,67 +1110,6 @@ export const DriveModeScreen: React.FC<DriveModeScreenProps> = ({
         isOpen={showOfflinePrompt}
         onClose={() => setShowOfflinePrompt(false)}
       />
-
-      {/* Modal di Conferma Interruzione Esame in Modalità Guida */}
-      {showAbandonExamModal && (
-        <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/85 backdrop-blur-md p-4 animate-in fade-in"
-          onClick={() => setShowAbandonExamModal(false)}
-        >
-          <div
-            className="bg-zinc-900 border border-zinc-800 light:bg-white light:border-slate-200 rounded-3xl p-6 sm:p-8 max-w-md w-full space-y-5 shadow-2xl text-center"
-            onClick={e => e.stopPropagation()}
-            role="dialog"
-            aria-modal="true"
-          >
-            <div className="w-14 h-14 mx-auto rounded-2xl bg-rose-500/20 text-rose-400 flex items-center justify-center border border-rose-500/30">
-              <XCircle className="w-8 h-8" />
-            </div>
-
-            <div className="space-y-2">
-              <h3 className="text-xl font-black text-white light:text-slate-900">
-                Interrompere la Simulazione?
-              </h3>
-              <p className="text-sm text-zinc-300 light:text-slate-600">
-                Stai svolgendo una sessione d'esame ufficiale. Vuoi davvero interromperla?
-              </p>
-              <p className="text-xs text-amber-400 light:text-amber-700 font-semibold">
-                Tutti i progressi della prova andranno persi e la scheda non verrà salvata.
-              </p>
-            </div>
-
-            <div className="flex flex-col sm:flex-row gap-3 pt-2">
-              <button
-                id="btn-drive-cancel-abandon"
-                onClick={() => setShowAbandonExamModal(false)}
-                className="flex-1 py-3.5 px-4 rounded-xl bg-amber-600 hover:bg-amber-500 text-white font-bold text-sm shadow-md transition-all active:scale-[0.98]"
-              >
-                Continua Esame
-              </button>
-              {sessionContext && (
-                <button
-                  id="btn-drive-return-to-screen"
-                  onClick={() => {
-                    setShowAbandonExamModal(false);
-                    executeClose();
-                  }}
-                  className="flex-1 py-3.5 px-4 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-zinc-200 font-semibold text-xs border border-zinc-700 light:bg-slate-100 light:hover:bg-slate-200 light:text-slate-700 light:border-slate-300 transition-all active:scale-[0.98]"
-                  title="Torna alla visualizzazione esame classica senza interrompere la prova"
-                >
-                  Torna alla Scheda
-                </button>
-              )}
-              <button
-                id="btn-drive-confirm-abandon"
-                onClick={handleConfirmAbandonExam}
-                className="flex-1 py-3.5 px-4 rounded-xl border border-rose-500/60 bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 light:bg-rose-50 light:border-rose-300 light:text-rose-700 font-bold text-xs transition-all active:scale-[0.98]"
-              >
-                Interrompi Esame
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 };
