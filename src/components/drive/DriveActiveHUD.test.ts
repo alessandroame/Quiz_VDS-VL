@@ -521,6 +521,67 @@ describe('DriveActiveHUD - Karaoke Accordion & Long Text Expansion', () => {
     expect(html).toContain('class="hidden sm:inline">Vista Normale</span>');
     expect(html).toContain('p-1.5 sm:px-3 sm:py-1.5');
   });
+
+  it('HUD-TOPBAR-SPATIAL-01: renders #btn-drive-exit in the right cluster alongside voice menu for spatial consistency with Navbar', () => {
+    const html = renderToString(
+      React.createElement(DriveActiveHUD, {
+        currentQ: sampleLongQuestion,
+        currentIndex: 0,
+        totalCount: 30,
+        isExamSession: false,
+        secondsRemaining: 0,
+        isIntroActive: false,
+        onDismissIntro: () => {},
+        onReplayIntro: () => {},
+        onOpenVoiceGuide: () => {},
+        setIsVoiceMenuOpen: () => {},
+        onClose: () => {},
+        onExecuteClose: () => {},
+        isAutopilotEnabled: false,
+        onToggleAutopilot: () => {},
+        isTutorEnabled: false,
+        onToggleTutor: () => {},
+        isVoiceSupported: true,
+        isVoiceCommandsEnabled: true,
+        voiceError: null,
+        isVoiceReceiving: false,
+        isVoiceListening: true,
+        onToggleVoiceCommands: () => {},
+        isPlaying: false,
+        isPaused: false,
+        isPartPlaying: () => false,
+        isExplanationPlaying: false,
+        onTogglePlayPause: () => {},
+        onRestartCurrentOrSequence: () => {},
+        onStopVoice: () => {},
+        onPlayExplanation: () => {},
+        waitingCountdown: null,
+        assimilationCountdown: null,
+        voiceInterimTranscript: '',
+        voiceLastTranscript: '',
+        lastRecognizedLabel: null,
+        unrecognizedSpeech: null,
+        voiceHint: '',
+        answers: {},
+        flags: {},
+        revealedQuestionId: null,
+        onSelectAnswer: () => {},
+        onPrevQuestion: () => {},
+        onNextQuestion: () => {},
+        onToggleFlag: () => {},
+        onSubmitExam: () => {}
+      })
+    );
+
+    // The question counter must appear before #btn-drive-exit in DOM order (left to right)
+    const counterIndex = html.indexOf('text-amber-400 light:text-amber-600');
+    const exitBtnIndex = html.indexOf('id="btn-drive-exit"');
+    const voiceMenuIndex = html.indexOf('data-testid="voice-quick-menu"');
+
+    expect(counterIndex).toBeGreaterThan(-1);
+    expect(exitBtnIndex).toBeGreaterThan(counterIndex);
+    expect(voiceMenuIndex).toBeGreaterThan(exitBtnIndex);
+  });
 });
 
 

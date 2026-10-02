@@ -14,6 +14,24 @@ Questo documento registra in ordine cronologico tutte le lavorazioni svolte nel 
 - **Impatto sul Desiderata**: <Come questo intervento contribuisce al desiderata (cfr. DESIDERATA.md) e indicazioni per il prossimo agente>
 ```
 
+### [2026-10-02] - Coerenza Spaziale Tasto Cuffia in Modalità Mani Libere / DriveActiveHUD (v1.7.10)
+
+- **Cosa abbiamo fatto**:
+  - **Risoluzione del Salto Spaziale del Tasto Cuffia ([src/components/drive/DriveActiveHUD.tsx](file:///c:/github/Quiz_VDS-VL/src/components/drive/DriveActiveHUD.tsx))**:
+    - Riposizionato il pulsante di ritorno a vista normale `#btn-drive-exit` all'interno del cluster controlli di destra, esattamente alla sinistra del menu voce (`VoiceQuickMenu`), specchiando la posizione del tasto `#btn-mini-audio` della Navbar normale.
+    - Spostato a sinistra il gruppo del contatore di progresso (`currentIndex + 1 / totalCount`) e del timer (`⏱ mm:ss`) per garantire un layout bilanciato, leggibile e privo di sovrapposizioni.
+    - Applicato lo stile attivo ad ambra coerente (`border-amber-500 bg-amber-500/20 text-amber-300 light:bg-amber-100 light:border-amber-400 light:text-amber-800`), garantendo che l'icona cuffia mantenga identica posizione fisica e relativa (`[🎧] [🔊]`) tra la vista standard del quiz e la schermata audio a schermo intero.
+  - **Suite di Test Unitari ([src/components/drive/DriveActiveHUD.test.ts](file:///c:/github/Quiz_VDS-VL/src/components/drive/DriveActiveHUD.test.ts))**:
+    - Aggiunto il test `HUD-TOPBAR-SPATIAL-01` che verifica l'ordine DOM degli elementi della top bar: il contatore precede `#btn-drive-exit` e `#btn-drive-exit` precede il menu voce rapido, blindando per il futuro la coerenza spaziale destra del toggle.
+  - **Collaudo Headless Multi-Viewport ([.agents/skills/headless-pwa-tester](file:///c:/github/Quiz_VDS-VL/.agents/skills/headless-pwa-tester/SKILL.md))**:
+    - Collaudato con CDP su `mobile-portrait` (390x844), `desktop` (1440x900) e `mobile-landscape` (844x390): verificato che il clic sul pulsante cuffia attiva la modalità audio lasciando l'icona esattamente sotto il pollice dell'utente, e un secondo tocco richiude la modalità tornando alla vista quiz senza alcuno spostamento a schermo.
+- **Scelte architetturali & Rationale**:
+  - *Principio di Località e Coerenza Spaziale (Spatial Memory in UI/UX)*: Quando un pulsante funge da toggle bifasico (apri/chiudi o attiva/disattiva), deve conservare la medesima collocazione fisica tra gli stati. Riconoscere che `#btn-drive-exit` è la controparte "chiudi" di `#btn-mini-audio` e posizionarlo nello stesso punto azzera il disorientamento cognitivo dell'allievo.
+- **Impatto sul Desiderata**:
+  - Risoluzione immediata della segnalazione utente e conformità piena al canone Minimal UI/UX e all'ergonomia mobile da cockpit.
+
+---
+
 ### [2026-10-02] - Avanzamento Intelligente su Domande Saltate (Smart Skip-Ahead) (v1.7.9)
 
 - **Cosa abbiamo fatto**:

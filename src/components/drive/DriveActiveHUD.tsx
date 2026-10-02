@@ -247,17 +247,7 @@ export const DriveActiveHUD: React.FC<DriveActiveHUDProps> = ({
 
       {/* Top Bar HUD */}
       <div className="flex items-center justify-between gap-1 sm:gap-2 pb-2 border-b border-zinc-800/90 light:border-slate-200 text-xs">
-        <button
-          id="btn-drive-exit"
-          onClick={onExecuteClose}
-          className="p-1.5 sm:px-3 sm:py-1.5 rounded-xl border border-zinc-700 bg-zinc-900 text-zinc-200 hover:text-white hover:border-zinc-500 light:bg-white light:border-slate-300 light:text-slate-800 font-bold flex items-center gap-1.5 transition-all flex-shrink-0 shadow-sm active:scale-95"
-          title="Torna alla vista normale del quiz"
-          aria-label="Torna alla vista normale"
-        >
-          <Headphones className="w-4 h-4 text-amber-400" />
-          <span className="hidden sm:inline">Vista Normale</span>
-        </button>
-
+        {/* Sinistra: Contatore Domanda & Timer */}
         <div className="flex items-center gap-2 font-mono flex-shrink-0">
           <span className="font-black text-sm text-amber-400 light:text-amber-600">
             {currentIndex + 1} / {totalCount}
@@ -277,7 +267,20 @@ export const DriveActiveHUD: React.FC<DriveActiveHUDProps> = ({
           <OfflineHUDTag />
         </div>
 
+        {/* Destra: Tasto Cuffia (stessa posizione della Navbar) + Controlli Audio */}
         <div className="flex items-center gap-1 sm:gap-1.5 flex-shrink-0">
+          {/* Tasto Ritorno a Vista Normale (posizionato a destra in corrispondenza del pulsante Mani Libere della Navbar) */}
+          <button
+            id="btn-drive-exit"
+            onClick={onExecuteClose}
+            className="p-1.5 sm:px-3 sm:py-1.5 rounded-xl border border-amber-500 bg-amber-500/20 text-amber-300 light:bg-amber-100 light:border-amber-400 light:text-amber-800 font-bold flex items-center gap-1.5 transition-all flex-shrink-0 shadow-sm active:scale-95"
+            title="Torna alla vista normale del quiz"
+            aria-label="Torna alla vista normale"
+          >
+            <Headphones className="w-4 h-4 text-amber-400 light:text-amber-700" />
+            <span className="hidden sm:inline">Vista Normale</span>
+          </button>
+
           {/* Menu Rapido Impostazioni Voce */}
           <VoiceQuickMenu
             id="btn-drive-voice-quick-menu"
