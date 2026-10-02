@@ -14,6 +14,57 @@ Questo documento registra in ordine cronologico tutte le lavorazioni svolte nel 
 - **Impatto sul Desiderata**: <Come questo intervento contribuisce al desiderata (cfr. DESIDERATA.md) e indicazioni per il prossimo agente>
 ```
 
+# 2026-10-02 - UI Audit Inspector: Unificazione Filtri Header & Fix Ingrandimento Lightbox
+
+## Cosa abbiamo fatto
+- **Risoluzione SyntaxError Ingrandimento Screenshot (Lightbox)**:
+  - Risolto l'errore `Uncaught SyntaxError: Invalid or unexpected token` che impediva l'apertura del Lightbox cliccando sugli screenshot o sul pulsante "Ingrandisci".
+  - **Causa radice**: I titoli dei rilievi contenenti virgolette doppie (es. `Contrasto insufficiente per "Consegna"`) e gli oggetti JSON dei rettangoli di evidenziazione venivano iniettati direttamente all'interno di attributi inline `onclick="..."`, spezzando la sintassi HTML/JS.
+  - **Soluzione applicata**: Sostituito l'inline handler con attributi `data-shot`, `data-id`, `data-title` e `data-rect` codificati in modo sicuro con `encodeURIComponent` e gestiti tramite event delegation su `document` con selettore `.image-overlay-wrapper`.
+- **Eliminazione Duplicazione Componenti nell'Header del Report**:
+  - Risolta la ridondanza segnalata dall'utente tra le card delle statistiche superiori e la barra dei pulsanti filtro sottostante (che duplicavano esattamente i medesimi numeri e categorie).
+  - Unificate le 5 card KPI superiori trasformandole direttamente nelle schede filtro interattive e cliccabili (`role="tablist"`):
+    * **Tutti i Rilievi** (vista completa, 22 difetti unici accorpati)
+    * **Contrasto WCAG AA** (12)
+    * **Microcopy & Vocabolario** (7)
+    * **Cluttering & Layout** (3)
+    * **Overflow / Fuori Schermo** (0)
+  - Eliminata al 100% la seconda fila di pulsanti-pillola sottostante, liberando spazio verticale e garantendo ergonomia e pulizia visiva del report.
+- **Rigenerazione Completa del Report**:
+  - Eseguita la nuova scansione automatica multi-viewport e verificata l'assenza totale di errori in console e il perfetto funzionamento interattivo di filtri e Lightbox: [audit_reports/audit_report_2026-10-02_10-16-14.html](file:///c:/github/Quiz_VDS-VL/audit_reports/audit_report_2026-10-02_10-16-14.html).
+
+## Scelte architetturali & Rationale
+- **Event Delegation con `encodeURIComponent`**: Rende il rendering del report immune a qualsiasi carattere speciale, virgoletta, apostrofo o markup HTML presente nei testi o nei JSON dei bounding box.
+- **Design a Tabbed Card**: Le metriche di sintesi diventano esse stesse i controlli di filtraggio, rispettando il principio cardine dell'anti-cluttering e massimizzando l'ergonomia per l'utente.
+
+## Impatto sul Desiderata
+- Piena aderenza ai principi di design minimale e zero distrazioni di [DESIDERATA.md](file:///c:/github/Quiz_VDS-VL/DESIDERATA.md) applicati anche agli strumenti interni di audit e diagnostica.
+
+---
+
+# 2026-10-02 - Formalizzazione Skill UI Audit Inspector & Report HTML Autosufficiente
+
+## Cosa abbiamo fatto
+- Progettato e formalizzato il protocollo di audit multi-viewport (Mobile Portrait `390x844`, Tablet Portrait `768x1024`, Tablet Landscape `1024x768`, Desktop `1440x900`).
+- Creata e registrata la nuova skill `.agents/skills/ui-audit-inspector/SKILL.md` con regole rigorose per:
+  - Assenza assoluta di overflow orizzontale e rispetto safe-area.
+  - Verifica matematica dei contrasti cromatici WCAG 2.1 AA su entrambi i temi (Dark Mode e Light Mode).
+  - Anti-cluttering (divieto moltiplicazione icone e righe filtri impilate).
+  - Microcopy essenziale e vocabolario canonico univoco (Inizia, Termina, Pausa, Elimina prova; eliminazione di gergo cosplay aeronautico come "cruscotto" e storytelling narrativo).
+- Implementato lo script di audit automatizzato `.agents/skills/ui-audit-inspector/scripts/run_audit.cjs` con comando rapido `npm run audit:ui` in `package.json`.
+- Eseguito il primo ciclo completo di audit su tutte le schermate, generando il report HTML autosufficiente con timestamp e screenshot integrati: `audit_reports/audit_report_2026-10-02_09-26-56.html`.
+- Assegnati ID univoci cliccabili/copiabili (`[CONTRAST-XX]`, `[CLUTTER-XX]`, `[COPY-XX]`, `[OVERFLOW-XX]`) per consentire all'utente commenti e riscontri mirati.
+
+## Scelte architetturali & Rationale
+- **Report HTML Standalone con Timestamp**: La denominazione `audit_report_YYYY-MM-DD_HH-mm-ss.html` garantisce la storicizzazione di ogni collaudo visivo prima e dopo i refactoring. La struttura HTML con CSS embedded e card interattive permette all'utente di ispezionare visivamente gli screenshot affiancati al rilievo.
+- **Identificativi Univoci Veloci**: Ogni problema dispone di un pulsante rapido che copia `[ID]` negli appunti con un clic, consentendo all'utente di scrivere ad esempio `per [CONTRAST-01] usa colore X` senza dover riscrivere descrizioni.
+- **Integrazione con AGENTS.md**: La nuova skill `ui-audit-inspector` è stata registrata nella mappa strutturale di [AGENTS.md](file:///c:/github/Quiz_VDS-VL/.agents/AGENTS.md).
+
+## Impatto sul Desiderata
+- Allineato con i requisiti di affidabilità visiva, contrasto per uso all'aperto e design minimale per lo studio di [DESIDERATA.md](file:///c:/github/Quiz_VDS-VL/DESIDERATA.md).
+
+---
+
 ### [2026-10-02] - Vincolo Bordi Schermo e Ridenominazione Pannello Impostazioni Voce (v1.6.8)
 - **Cosa abbiamo fatto**:
   - **Risoluzione Difetto Overflow Bordo Sinistro Schermo Mobile ([src/components/VoiceQuickMenu.tsx](file:///c:/github/Quiz_VDS-VL/src/components/VoiceQuickMenu.tsx))**:

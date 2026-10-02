@@ -25,6 +25,7 @@ L'alberatura delle configurazioni dell'agente è standardizzata, modulare e ordi
 │   ├── pwa-quiz-engine/        # Fair Coverage Randomizer, persistenza Dexie e gestione offline
 │   ├── vds-exam-examiner/      # Regolamento esame ufficiale AeCI (30 quiz, 45 min, max 3 errori)
 │   ├── vds-quiz-extractor/     # Pipeline estrazione e normalizzazione dei 504 quiz dal PDF ufficiale
+│   ├── ui-audit-inspector/     # Audit UI/UX, contrasti WCAG AA, anti-cluttering e report HTML con screenshot
 │   └── git-pro/                # Standard Conventional Commits e igiene del repository
 ├── worklog.d/                  # Frammenti di diario per sessioni parallele (anti-merge conflict)
 └── workflows/                  # Flussi procedurali standardizzati
