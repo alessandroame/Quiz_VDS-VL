@@ -99,7 +99,8 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectTab }) => {
   }, [onSelectTab, activeSession]);
 
   return (
-    <div className="max-w-4xl mx-auto px-3 sm:px-4 py-4 space-y-4 animate-in fade-in">
+    <>
+      <div className="max-w-4xl mx-auto px-3 sm:px-4 py-4 space-y-4 animate-in fade-in">
       {/* Status Strip: Prontezza & Telemetria Compatta */}
       <div className="p-3.5 sm:p-4 rounded-2xl bg-zinc-900 border border-zinc-700 shadow-sm dark:bg-zinc-900 dark:border-zinc-700 light:bg-white light:border-slate-300 light:shadow-sm space-y-2.5">
         <div className="flex items-center justify-between gap-2">
@@ -418,6 +419,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectTab }) => {
           </div>
         </button>
       </div>
+    </div>
 
       {/* Modal di Conferma Eliminazione Sessione dalla Home */}
       {showConfirmDiscard && (
@@ -500,6 +502,6 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectTab }) => {
           }
         />
       )}
-    </div>
+    </>
   );
 };

@@ -217,11 +217,15 @@ async function runAudit() {
           };
         }
 
+        // Active Dialog isolation: if a modal is open, only scan elements inside it
+        const activeDialog = document.querySelector('[role="dialog"], [aria-modal="true"], dialog[open]');
+
         // 1. Element Overflows
         const overflowElements = [];
         const allElements = document.querySelectorAll('*');
         for (const el of allElements) {
           if (['SCRIPT', 'STYLE', 'path', 'defs'].includes(el.tagName)) continue;
+          if (activeDialog && !activeDialog.contains(el)) continue;
           const rect = el.getBoundingClientRect();
           if (rect.width === 0 || rect.height === 0) continue;
           
@@ -253,6 +257,7 @@ async function runAudit() {
         const checkedTexts = new Set();
         for (const el of allElements) {
           if (['SCRIPT', 'STYLE', 'path', 'defs'].includes(el.tagName)) continue;
+          if (activeDialog && !activeDialog.contains(el)) continue;
           const style = window.getComputedStyle(el);
           if (style.display === 'none' || style.visibility === 'hidden' || style.opacity === '0') continue;
 
@@ -297,6 +302,7 @@ async function runAudit() {
 
         for (const el of allElements) {
           if (['SCRIPT', 'STYLE', 'path', 'defs'].includes(el.tagName)) continue;
+          if (activeDialog && !activeDialog.contains(el)) continue;
           const directText = (el.innerText || '').trim();
           if (!directText) continue;
           const lowerText = directText.toLowerCase();
@@ -446,13 +452,18 @@ async function runAudit() {
       return names.join(' • ');
     }
 
-    // 1. Group Contrast Issues by (normalized text + colorHex + bgHex + theme)
+    // 1. Group Contrast Issues by normalized text across themes and viewports
     const contrastGroups = new Map();
     for (const item of rawFindings) {
       for (const c of item.contrastIssues) {
-        // Normalize text by removing numbers in parens like "Tutte (40)" -> "Tutte (X)"
-        const normText = c.text.replace(/\(\d+\)/g, '(X)').replace(/#\d{4}/g, '#ID').trim();
-        const groupKey = `${normText}_${c.colorHex}_${c.bgHex}_${item.theme}`;
+        // Normalize text by removing numbers in parens or slash counters
+        const normText = c.text
+          .replace(/\(\d+\s*\/\s*\d+\)/g, '(X/X)')
+          .replace(/\d+\s*\/\s*\d+/g, 'X / Y')
+          .replace(/\(\d+\)/g, '(X)')
+          .replace(/#\d{4}/g, '#ID')
+          .trim();
+        const groupKey = normText;
 
         if (!contrastGroups.has(groupKey)) {
           contrastGroups.set(groupKey, {
@@ -460,9 +471,10 @@ async function runAudit() {
             normText,
             colorHex: c.colorHex,
             bgHex: c.bgHex,
-            ratio: c.ratio,
+            colorBgPairs: new Set([`${c.colorHex} su ${c.bgHex}`]),
+            ratios: [c.ratio],
             requiredRatio: c.requiredRatio,
-            theme: item.theme.toUpperCase(),
+            themes: new Set([item.theme.toUpperCase()]),
             screens: new Set([item.screenName]),
             viewports: new Set([item.viewportLabel]),
             bestShotRelPath: item.shotRelPath,
@@ -472,6 +484,9 @@ async function runAudit() {
           const g = contrastGroups.get(groupKey);
           g.screens.add(item.screenName);
           g.viewports.add(item.viewportLabel);
+          g.themes.add(item.theme.toUpperCase());
+          g.colorBgPairs.add(`${c.colorHex} su ${c.bgHex}`);
+          g.ratios.push(c.ratio);
           // Prefer mobile portrait shot for display if available
           if (item.viewport === 'mobile-portrait' && c.rect) {
             g.bestShotRelPath = item.shotRelPath;
@@ -482,36 +497,43 @@ async function runAudit() {
     }
 
     for (const [_, g] of contrastGroups) {
+      const minRatio = Math.min(...g.ratios);
       let sev = 'MEDIO';
-      if (g.ratio < 2.0) sev = 'CRITICO';
-      else if (g.ratio < 3.2) sev = 'ALTO';
+      if (minRatio < 2.0) sev = 'CRITICO';
+      else if (minRatio < 3.2) sev = 'ALTO';
+
+      const themeLabel = g.themes.size > 1 ? 'Dark & Light' : Array.from(g.themes)[0];
 
       cataloguedIssues.push({
         id: `CONTRAST-${String(contrastSeq++).padStart(2, '0')}`,
         category: 'Contrasto',
         severity: sev,
-        title: `Contrasto insufficiente per "${g.normText}" (${g.ratio}:1)`,
+        title: `Contrasto insufficiente per "${g.normText}" (${minRatio}:1)`,
         screens: Array.from(g.screens).join(', '),
         viewportsText: formatViewportsBadge(g.viewports),
-        theme: g.theme,
+        theme: themeLabel,
         shotRelPath: g.bestShotRelPath,
         rect: g.rect,
-        description: `Il testo "${g.normText}" ha colore ${g.colorHex} su sfondo ${g.bgHex}. Il rapporto di contrasto misurato è ${g.ratio}:1, inferiore alla soglia minima WCAG AA di ${g.requiredRatio}:1.`,
-        solution: g.theme === 'LIGHT'
+        description: `Il testo "${g.normText}" presenta un rapporto di contrasto minimo misurato di ${minRatio}:1 (${Array.from(g.colorBgPairs).join(', ')}), inferiore alla soglia minima WCAG AA di ${g.requiredRatio}:1.`,
+        solution: themeLabel.includes('LIGHT')
           ? `In Light Mode scurire il colore primario (es. usare text-amber-800 o text-slate-800 per superare 4.5:1 sotto luce solare).`
           : `In Dark Mode schiarire il testo o aumentare la luminosità del background.`
       });
     }
 
-    // 2. Group Banned Words / Microcopy Issues by (word + snippet)
+    // 2. Group Banned Words / Microcopy Issues by canonical term
     const copyGroups = new Map();
     for (const item of rawFindings) {
       for (const b of item.bannedFindings) {
-        const groupKey = `${b.word}_${b.snippet.slice(0, 25)}`;
+        let canonicalTerm = b.word;
+        if (canonicalTerm.includes('comincia')) canonicalTerm = 'comincia / cominciarne';
+        else if (canonicalTerm.includes('cruscotto')) canonicalTerm = 'cruscotto';
+        const groupKey = canonicalTerm;
+
         if (!copyGroups.has(groupKey)) {
           copyGroups.set(groupKey, {
-            word: b.word,
-            snippet: b.snippet,
+            word: canonicalTerm,
+            snippets: new Set([b.snippet]),
             reason: b.reason,
             screens: new Set([item.screenName]),
             viewports: new Set([item.viewportLabel]),
@@ -520,6 +542,7 @@ async function runAudit() {
           });
         } else {
           const g = copyGroups.get(groupKey);
+          g.snippets.add(b.snippet);
           g.screens.add(item.screenName);
           g.viewports.add(item.viewportLabel);
           if (item.viewport === 'mobile-portrait' && b.rect) {
@@ -530,20 +553,23 @@ async function runAudit() {
       }
     }
 
-    function getProposedCopyFix(word, snippet) {
+    function getProposedCopyFix(word) {
       if (word.includes('cruscotto')) return 'Sostituire "Torna al cruscotto Home" con la sola etichetta univoca "Home".';
       if (word === 'avvia') return 'Sostituire "Avvia" con il verbo canonico "Inizia" (es. "Inizia Esame", "Inizia Tutor").';
       if (word === 'ottimo lavoro') return 'Rimuovere l\'elogio paternalistico e riportare solo il dato oggettivo: "Nessun errore da ripassare."';
       if (word.includes('comincia')) return 'Sostituire con il verbo standard "Inizia" (es. "Iniziarne una nuova").';
       if (word.includes('decollo')) return 'Sostituire lo storytelling narrativo con il testo funzionale: "Scarica i file audio per l\'uso senza connessione internet."';
+      if (word.includes('rimani')) return 'Semplificare in "Continua" o "Rimani" per coerenza con il design minimale.';
       return 'Semplificare eliminando enfasi e applicando il vocabolario a una sola parola.';
     }
 
     for (const [_, g] of copyGroups) {
       let sev = 'MEDIO';
       if (g.word.includes('cruscotto') || g.word.includes('cockpit')) sev = 'ALTO';
-      if (g.word === 'avvia' || g.word === 'comincia' || g.word === 'cominciarne') sev = 'MEDIO';
+      if (g.word === 'avvia' || g.word.includes('comincia')) sev = 'MEDIO';
       if (g.word === 'ottimo lavoro' || g.word === 'fantastico') sev = 'BASSO';
+
+      const snippetsList = Array.from(g.snippets).map(s => `"...${s}..."`).join(', ');
 
       cataloguedIssues.push({
         id: `COPY-${String(copySeq++).padStart(2, '0')}`,
@@ -555,25 +581,12 @@ async function runAudit() {
         theme: 'Dark & Light',
         shotRelPath: g.bestShotRelPath,
         rect: g.rect,
-        description: `Trovato in: "...${g.snippet}...". ${g.reason}`,
-        solution: getProposedCopyFix(g.word, g.snippet)
+        description: `Trovato in: ${snippetsList}. ${g.reason}`,
+        solution: getProposedCopyFix(g.word)
       });
     }
 
     // 3. Cluttering Issues (Unique & Structured)
-    cataloguedIssues.push({
-      id: `CLUTTER-${String(clutterSeq++).padStart(2, '0')}`,
-      category: 'Cluttering',
-      severity: 'MEDIO',
-      title: 'Moltiplicazione icone audio (5 altoparlanti nella scheda quiz)',
-      screens: 'Esame, Tutor',
-      viewportsText: 'Comune a Tutti i Viewport',
-      theme: 'Dark & Light',
-      shotRelPath: capturedScreenshots['mobile-portrait_dark_exam_running'] || 'screenshots/mobile-portrait_dark_exam_running.png',
-      rect: { leftPct: 6, topPct: 25, widthPct: 88, heightPct: 40 },
-      description: 'La scheda quesito mostra un altoparlante nella testata ID, uno accanto alla domanda e uno per ciascuna delle tre opzioni di risposta, oltre alle 2 icone audio in Navbar. Questo genera disordine visivo e affaticamento cognitivo.',
-      solution: 'Mantenere un unico controllo audio contestuale chiaro ed ergonomico, eliminando gli altoparlanti ripetuti a fianco di ogni singola riga di risposta.'
-    });
 
     cataloguedIssues.push({
       id: `CLUTTER-${String(clutterSeq++).padStart(2, '0')}`,
