@@ -14,6 +14,32 @@ Questo documento registra in ordine cronologico tutte le lavorazioni svolte nel 
 - **Impatto sul Desiderata**: <Come questo intervento contribuisce al desiderata (cfr. DESIDERATA.md) e indicazioni per il prossimo agente>
 ```
 
+### [2026-10-02] - Riprogettazione Modalità Mani Libere come Vista Alternativa e Toggle Bidirezionale (v1.7.0)
+
+- **Cosa abbiamo fatto**:
+  - **Riconcettualizzazione Architetturale "Hands-Free as a View Mode"**:
+    * Trasformata la Modalità Mani Libere da "sessione parallela / silos applicativo" a **modalità di pura consultazione e vista alternativa** del quiz/schermo in corso.
+    * Eliminata qualsiasi frizione o equivoco legato all'abbandono dell'esame: passare a mani libere o tornare alla vista normale preserva esattamente la stessa domanda, lo stato delle risposte, le bandierine e il timer, senza finestre modali o conferme invadenti.
+  - **Interfaccia e Controlli (`Navbar.tsx` & `QuizContext.tsx`)**:
+    * Aggiunto `toggleDriveMode(context?)` in [QuizContext.tsx](file:///c:/github/Quiz_VDS-VL/src/context/QuizContext.tsx): se l'overlay mani libere è aperto lo chiude arrestando il sintetizzatore vocale; se è chiuso ne acquisisce il contesto attivo (esame, materia, quaderno errori) e lo apre a schermo intero.
+    * In [Navbar.tsx](file:///c:/github/Quiz_VDS-VL/src/components/Navbar.tsx): agganciati `#btn-mini-audio` (header compatto esame/studio) e `#btn-drive-mode` (header home) a `toggleDriveMode()`.
+    * Introdotto feedback visivo di stato attivo: quando `isDriveModeOpen === true`, l'icona e il pulsante assumono evidenziazione ambra (`border-amber-500 bg-amber-500/20 text-amber-300`), comunicando chiaramente che toccando il pulsante si ritorna alla vista normale.
+  - **Semplificazione HUD Cockpit (`DriveActiveHUD.tsx`)**:
+    * Sostituiti i pulsanti eterogenei ("Torna al Quiz", "Interrompi", "Esci") con un unico pulsante simmetrico `#btn-drive-exit` recante l'icona cuffie 🎧 `<Headphones />` e l'etichetta canonica **"Vista Normale"**, che invoca direttamente `onExecuteClose`.
+  - **Rimozione Modale Invasiva di Abbandono (`DriveModeScreen.tsx`)**:
+    * Rimosso lo stato `showAbandonExamModal`, la registrazione di submodale `drive-abandon-modal` e l'intero popup JSX con le opzioni "Torna alla Scheda" / "Interrompi Esame". L'eventuale abbandono dell'esame rimane di competenza naturale e coerente del pulsante "Esci / Abbandona" della schermata esame normale sottostante.
+  - **Test e Collaudo**:
+    * Aggiornato [DriveModeScreen.test.ts](file:///c:/github/Quiz_VDS-VL/src/components/DriveModeScreen.test.ts) (`DRIVE-VOICE-STOP-02`) per validare la chiusura immediata e l'arresto vocale senza prompt di abbandono.
+    * Esteso [Navbar.test.ts](file:///c:/github/Quiz_VDS-VL/src/components/Navbar.test.ts) con 4 nuovi test per lo styling attivo e l'invocazione di `toggleDriveMode`.
+    * Suite completa Vitest: 52/52 file passati, 393/393 test verdi.
+    * Verifica UI Audit: `npm run audit:ui` superato con 0 difetti residui su 4 risoluzioni.
+    * Build di produzione `tsc && vite build`: superata senza errori di compilazione né warning.
+- **Scelte architetturali & Rationale**:
+  - **Toggle vs Silos**: Trattare la fruizione vocale/hands-free come un modo di rendering/interazione trasparente e reversibile piuttosto che come un flusso separato riduce la complessità mentale per l'utente allievo pilota e azzera il rischio di perdere i dati della sessione.
+  - **Icona cuffie simmetrica bidirezionale**: Sia nella barra di navigazione che nel cockpit hands-free, l'icona cuffie funge da commutatore di stato coerente (Normale <-> Mani Libere).
+- **Impatto sul Desiderata**:
+  - Piena aderenza ai requisiti di usabilità e zero distrazioni per lo studio hands-free; versione avanzata a `1.7.0` sul branch dedicato `feat/ui-audit-remediation`.
+
 ### [2026-10-02] - Bonifica Completa UI Audit: 0 Difetti Residui su Contrasti WCAG AA, Microcopy e Cluttering Mobile (v1.6.9)
 
 - **Cosa abbiamo fatto**:
