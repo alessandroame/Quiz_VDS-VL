@@ -98,7 +98,7 @@ describe('DriveActiveHUD - Karaoke Accordion & Long Text Expansion', () => {
     expect(html).toContain('id="btn-drive-question-expand"');
   });
 
-  it('HUD-EXPAND-02: dynamically unclamps only the option currently spoken by the voice engine (karaoke accordion)', () => {
+  it('HUD-EXPAND-02: maintains stable line-clamp-2 during voice playback to prevent layout shifts while highlighting spoken option', () => {
     const html = renderToString(
       React.createElement(DriveActiveHUD, {
         currentQ: sampleLongQuestion,
@@ -149,12 +149,13 @@ describe('DriveActiveHUD - Karaoke Accordion & Long Text Expansion', () => {
       })
     );
 
-    // Option 2 is speaking -> expanded with line-clamp-none and Riduci button
-    expect(html).toContain('line-clamp-none');
-    expect(html).toContain('Riduci');
+    // Option 2 is speaking -> styled with amber active ring and pulse
+    expect(html).toContain('ring-amber-400');
+    expect(html).toContain('animate-pulse');
 
-    // Options 1 and 3 are still clamped
+    // All options remain clamped to line-clamp-2 so card heights do not jump
     expect(html).toContain('line-clamp-2');
+    expect(html).not.toContain('line-clamp-none');
   });
 
   it('HUD-EXPAND-03: dynamically unclamps question heading when isPartPlaying("question") is true', () => {
@@ -343,7 +344,7 @@ describe('DriveActiveHUD - Karaoke Accordion & Long Text Expansion', () => {
     expect(html).not.toContain('Tutor ON');
   });
 
-  it('HUD-EXPAND-05: gives flex-1 to the expanded option and flex-none to collapsed options so the expanded option occupies maximum available space', () => {
+  it('HUD-EXPAND-05: keeps equal flex-1 sizing across all options during voice playback to prevent target jumping under finger (zero layout shift)', () => {
     const html = renderToString(
       React.createElement(DriveActiveHUD, {
         currentQ: sampleLongQuestion,
@@ -394,16 +395,73 @@ describe('DriveActiveHUD - Karaoke Accordion & Long Text Expansion', () => {
       })
     );
 
-    // Option 2 is speaking -> expanded -> flex-1 to occupy maximum available space
-    // Options 1 and 3 are collapsed -> flex-none so they do not stretch with empty space
+    // Option 2 is speaking -> but all options remain flex-1 to prevent layout jumping under finger
     expect(html).toContain('id="btn-drive-opt-2"');
     const opt2Match = html.match(/id="btn-drive-opt-2"[^>]*class="([^"]*)"/);
     const opt1Match = html.match(/id="btn-drive-opt-1"[^>]*class="([^"]*)"/);
     const opt3Match = html.match(/id="btn-drive-opt-3"[^>]*class="([^"]*)"/);
 
     expect(opt2Match?.[1]).toContain('flex-1');
-    expect(opt1Match?.[1]).toContain('flex-none');
-    expect(opt3Match?.[1]).toContain('flex-none');
+    expect(opt1Match?.[1]).toContain('flex-1');
+    expect(opt3Match?.[1]).toContain('flex-1');
+    expect(opt1Match?.[1]).not.toContain('flex-none');
+    expect(opt3Match?.[1]).not.toContain('flex-none');
+  });
+
+  it('HUD-COOLDOWN-01: disables option buttons and sets pointer-events-none when isQuestionSwitching is true', () => {
+    const html = renderToString(
+      React.createElement(DriveActiveHUD, {
+        currentQ: sampleLongQuestion,
+        currentIndex: 7,
+        totalCount: 30,
+        isExamSession: true,
+        secondsRemaining: 200,
+        isIntroActive: false,
+        onDismissIntro: () => {},
+        onReplayIntro: () => {},
+        onOpenVoiceGuide: () => {},
+        setIsVoiceMenuOpen: () => {},
+        onClose: () => {},
+        onExecuteClose: () => {},
+        isAutopilotEnabled: true,
+        onToggleAutopilot: () => {},
+        isTutorEnabled: false,
+        onToggleTutor: () => {},
+        isVoiceSupported: true,
+        isVoiceCommandsEnabled: false,
+        voiceError: null,
+        isVoiceReceiving: false,
+        isVoiceListening: false,
+        onToggleVoiceCommands: () => {},
+        isPlaying: false,
+        isPaused: false,
+        isPartPlaying: () => false,
+        isExplanationPlaying: false,
+        onTogglePlayPause: () => {},
+        onRestartCurrentOrSequence: () => {},
+        onStopVoice: () => {},
+        onPlayExplanation: () => {},
+        waitingCountdown: null,
+        assimilationCountdown: null,
+        voiceInterimTranscript: '',
+        voiceLastTranscript: '',
+        lastRecognizedLabel: null,
+        unrecognizedSpeech: null,
+        voiceHint: '',
+        answers: {},
+        flags: {},
+        revealedQuestionId: null,
+        onSelectAnswer: () => {},
+        onPrevQuestion: () => {},
+        onNextQuestion: () => {},
+        onToggleFlag: () => {},
+        onSubmitExam: () => {},
+        isQuestionSwitching: true
+      })
+    );
+
+    expect(html).toContain('pointer-events-none');
+    expect(html).toContain('disabled=""');
   });
 
   it('HUD-RESPONSIVE-TOPBAR-01: renders #btn-drive-exit with responsive text (hidden sm:inline) to prevent top bar overflow on mobile', () => {

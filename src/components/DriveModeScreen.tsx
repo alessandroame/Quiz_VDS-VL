@@ -195,6 +195,11 @@ export const DriveModeScreen: React.FC<DriveModeScreenProps> = ({
   const touchStartXRef = useRef<number | null>(null);
   const touchStartYRef = useRef<number | null>(null);
 
+  // Micro-cooldown di sicurezza (250ms) al cambio domanda per prevenire click accidentali residui
+  const [isQuestionSwitching, setIsQuestionSwitching] = useState<boolean>(false);
+  const questionSwitchTimeoutRef = useRef<any>(null);
+  const prevQuestionIdRef = useRef<number | null>(null);
+
   const clearAllDriveTimers = useCallback(() => {
     if (countdownTimerRef.current) {
       clearInterval(countdownTimerRef.current);
@@ -216,6 +221,10 @@ export const DriveModeScreen: React.FC<DriveModeScreenProps> = ({
       clearTimeout(assimilationTimeoutRef.current);
       assimilationTimeoutRef.current = null;
     }
+    if (questionSwitchTimeoutRef.current) {
+      clearTimeout(questionSwitchTimeoutRef.current);
+      questionSwitchTimeoutRef.current = null;
+    }
     setWaitingCountdown(null);
     setAssimilationCountdown(null);
     setIsWaitingForExplanationEnd(false);
@@ -226,6 +235,8 @@ export const DriveModeScreen: React.FC<DriveModeScreenProps> = ({
   useEffect(() => {
     if (!isOpen) {
       setInternalMode('launcher');
+      prevQuestionIdRef.current = null;
+      setIsQuestionSwitching(false);
       return;
     }
     if (sessionContext) {
@@ -247,6 +258,29 @@ export const DriveModeScreen: React.FC<DriveModeScreenProps> = ({
   // Domanda attiva
   const currentQ = internalQuestions[currentIndex];
   const totalCount = internalQuestions.length;
+
+  // Grace period anti-misclick (250ms) al cambio domanda per prevenire risposte accidentali alla cieca
+  useEffect(() => {
+    if (!isOpen || internalMode !== 'running' || !currentQ?.id) return;
+
+    if (prevQuestionIdRef.current !== null && prevQuestionIdRef.current !== currentQ.id) {
+      setIsQuestionSwitching(true);
+      if (questionSwitchTimeoutRef.current) clearTimeout(questionSwitchTimeoutRef.current);
+      questionSwitchTimeoutRef.current = setTimeout(() => {
+        setIsQuestionSwitching(false);
+        questionSwitchTimeoutRef.current = null;
+      }, 250);
+    } else {
+      setIsQuestionSwitching(false);
+    }
+    prevQuestionIdRef.current = currentQ.id;
+
+    return () => {
+      if (questionSwitchTimeoutRef.current) {
+        clearTimeout(questionSwitchTimeoutRef.current);
+      }
+    };
+  }, [isOpen, internalMode, currentQ?.id]);
 
   const {
     isPlaying,
@@ -466,6 +500,9 @@ export const DriveModeScreen: React.FC<DriveModeScreenProps> = ({
   // Seleziona risposta
   const handleSelectAnswer = async (ans: 1 | 2 | 3) => {
     if (!currentQ || internalMode !== 'running') return;
+
+    // Ignora click durante il micro-cooldown (250ms) al cambio domanda
+    if (isQuestionSwitching) return;
 
     // Se l'esame è già terminato o la domanda è già rivelata
     if (answers[currentQ.id] !== undefined && (!isExamSession || isTutorEnabled)) return;
@@ -1082,6 +1119,7 @@ export const DriveModeScreen: React.FC<DriveModeScreenProps> = ({
           onNextQuestion={handleNextQuestion}
           onToggleFlag={handleToggleFlag}
           onSubmitExam={handleSubmitExam}
+          isQuestionSwitching={isQuestionSwitching}
         />
       )}
 

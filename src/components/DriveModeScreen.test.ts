@@ -395,5 +395,65 @@ describe('DriveModeScreen - Tutor Mode Explanation Playback Contract', () => {
     expect(handleAnswer).not.toHaveBeenCalled();
     expect(mockPlayExplanation).not.toHaveBeenCalled();
   });
+
+  it('DRIVE-COOLDOWN-01: prevents accidental answer clicks during the 250ms transition cooldown when switching to a new question', async () => {
+    const handleAnswer = vi.fn();
+    const question1: Question = { ...sampleQuestion, id: 1001 };
+    const question2: Question = { ...sampleQuestion, id: 1002, question: 'Seconda domanda di prova' };
+
+    const handleNavigate = vi.fn();
+
+    const renderWithIndex = (idx: number) => {
+      root.render(
+        React.createElement(DriveModeScreen, {
+          isOpen: true,
+          onClose: vi.fn(),
+          sessionContext: {
+            questions: [question1, question2],
+            currentIndex: idx,
+            answers: {},
+            flags: {},
+            onAnswer: handleAnswer,
+            onToggleFlag: vi.fn(),
+            onNavigateIndex: handleNavigate,
+            isTutor: true
+          }
+        })
+      );
+    };
+
+    await act(async () => {
+      renderWithIndex(0);
+    });
+
+    // Transition to question 2
+    await act(async () => {
+      renderWithIndex(1);
+    });
+
+    // Click immediately within the 250ms cooldown window on Question 2
+    const opt2Btn = container.querySelector('#btn-drive-opt-2') as HTMLButtonElement;
+    expect(opt2Btn).not.toBeNull();
+
+    await act(async () => {
+      opt2Btn.click();
+    });
+
+    // Click was ignored because cooldown is active
+    expect(handleAnswer).not.toHaveBeenCalled();
+
+    // Advance past the 250ms cooldown
+    await act(async () => {
+      vi.advanceTimersByTime(300);
+    });
+
+    // Click again after cooldown expired
+    await act(async () => {
+      opt2Btn.click();
+    });
+
+    // Answer is now successfully submitted
+    expect(handleAnswer).toHaveBeenCalledWith(1002, 2);
+  });
 });
 

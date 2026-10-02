@@ -78,6 +78,7 @@ export interface DriveActiveHUDProps {
   onNextQuestion: () => void;
   onToggleFlag: () => void;
   onSubmitExam: () => void;
+  isQuestionSwitching?: boolean;
 }
 
 export const DriveActiveHUD: React.FC<DriveActiveHUDProps> = ({
@@ -128,7 +129,8 @@ export const DriveActiveHUD: React.FC<DriveActiveHUDProps> = ({
   onPrevQuestion,
   onNextQuestion,
   onToggleFlag,
-  onSubmitExam
+  onSubmitExam,
+  isQuestionSwitching = false
 }) => {
   const isCurrentRevealed =
     revealedQuestionId === currentQ.id ||
@@ -198,7 +200,7 @@ export const DriveActiveHUD: React.FC<DriveActiveHUDProps> = ({
   const toggleOptionExpansion = (optNum: 1 | 2 | 3, e: React.MouseEvent | React.KeyboardEvent) => {
     e.stopPropagation();
     setManuallyExpandedOpts((prev) => {
-      const isCurrentlyExpanded = prev[optNum] !== undefined ? prev[optNum] : isPartPlaying(`opt${optNum}` as any);
+      const isCurrentlyExpanded = !!prev[optNum];
       if (isCurrentlyExpanded) {
         return { 1: false, 2: false, 3: false };
       } else {
@@ -213,12 +215,9 @@ export const DriveActiveHUD: React.FC<DriveActiveHUDProps> = ({
     ? isQuestionTruncated
     : currentQ.question.length > 105;
 
-  const isAnyOptionExpanded = currentQ.options.some((_, i) => {
+  const isAnyOptionManuallyExpanded = currentQ.options.some((_, i) => {
     const optNum = (i + 1) as 1 | 2 | 3;
-    const isCurrentOptPlaying = isPartPlaying(`opt${optNum}` as any);
-    return manuallyExpandedOpts[optNum] !== undefined
-      ? manuallyExpandedOpts[optNum]
-      : isCurrentOptPlaying;
+    return !!manuallyExpandedOpts[optNum];
   });
 
   return (
@@ -670,15 +669,13 @@ export const DriveActiveHUD: React.FC<DriveActiveHUDProps> = ({
 
       {/* 3 Macro-Fasce di Risposta & Card Didattica (Regola + Tranello) */}
       <div className="flex-1 flex flex-col gap-2.5 sm:gap-3.5 my-1 sm:my-2 min-h-0">
-        <div className={`flex flex-col gap-2.5 sm:gap-3.5 ${isCurrentRevealed ? 'flex-none' : 'flex-1'} min-h-0 overflow-y-auto custom-scrollbar`}>
+        <div className={`flex flex-col gap-2.5 sm:gap-3.5 ${isCurrentRevealed ? 'flex-none' : 'flex-1'} min-h-0 overflow-y-auto custom-scrollbar transition-opacity duration-200 ${isQuestionSwitching ? 'opacity-80' : 'opacity-100'}`}>
           {currentQ.options.map((opt, idx) => {
             const optNum = (idx + 1) as 1 | 2 | 3;
             const isSelected = answers[currentQ.id] === optNum;
             const isCorrectAnswer = currentQ.correctAnswer === optNum;
             const isCurrentOptPlaying = isPartPlaying(`opt${optNum}` as any);
-            const isExpanded = manuallyExpandedOpts[optNum] !== undefined
-              ? manuallyExpandedOpts[optNum]
-              : isCurrentOptPlaying;
+            const isExpanded = !!manuallyExpandedOpts[optNum];
             const isLongOption = truncatedOpts[optNum] !== undefined
               ? truncatedOpts[optNum]
               : opt.length > 95;
@@ -702,7 +699,7 @@ export const DriveActiveHUD: React.FC<DriveActiveHUDProps> = ({
                 'bg-amber-950 border-amber-500 text-amber-100 ring-2 ring-amber-500 font-bold light:bg-amber-50 light:border-amber-500 light:text-amber-950';
             } else if (isCurrentOptPlaying) {
               style =
-                'bg-amber-950/60 border-amber-400 text-amber-200 ring-1 ring-amber-400 light:bg-amber-50 light:border-amber-400 light:text-amber-950 light:ring-amber-400';
+                'bg-amber-950/60 border-amber-400 text-amber-200 ring-2 ring-amber-400 shadow-[0_0_15px_rgba(245,158,11,0.25)] light:bg-amber-50 light:border-amber-400 light:text-amber-950 light:ring-amber-400';
             }
 
             return (
@@ -711,25 +708,26 @@ export const DriveActiveHUD: React.FC<DriveActiveHUDProps> = ({
                 id={`btn-drive-opt-${optNum}`}
                 lang="it"
                 translate="no"
+                disabled={isQuestionSwitching}
                 onClick={() => onSelectAnswer(optNum)}
                 className={`overflow-hidden ${
                   isCurrentRevealed
                     ? 'w-full rounded-xl border p-2 sm:p-2.5 flex items-center gap-2.5 sm:gap-3 text-left transition-all'
-                    : `${isAnyOptionExpanded ? (isExpanded ? 'flex-1' : 'flex-none') : 'flex-1'} w-full min-h-[74px] sm:min-h-[85px] rounded-2xl border-2 p-3 sm:p-4 flex items-center gap-3.5 sm:gap-5 text-left transition-all shadow-md active:scale-[0.98]`
-                } ${style}`}
+                    : `${isAnyOptionManuallyExpanded ? (isExpanded ? 'flex-1' : 'flex-none') : 'flex-1'} w-full min-h-[74px] sm:min-h-[85px] rounded-2xl border-2 p-3 sm:p-4 flex items-center gap-3.5 sm:gap-5 text-left transition-all shadow-md active:scale-[0.98]`
+                } ${style} ${isQuestionSwitching ? 'pointer-events-none' : ''}`}
               >
                 <div
                   className={`${
                     isCurrentRevealed
                       ? 'w-7 h-7 sm:w-8 sm:h-8 rounded-lg font-black text-xs sm:text-sm'
                       : 'w-11 h-11 sm:w-14 sm:h-14 rounded-xl font-black text-xl sm:text-2xl ring-2 ring-black/20'
-                  } flex items-center justify-center flex-shrink-0 ${
+                  } flex items-center justify-center flex-shrink-0 transition-transform ${
                     isCurrentRevealed && isCorrectAnswer
                       ? 'bg-emerald-500 text-white'
                       : isSelected
                       ? 'bg-amber-500 text-zinc-950'
                       : isCurrentOptPlaying
-                      ? 'bg-amber-500 text-zinc-950 animate-pulse'
+                      ? 'bg-amber-500 text-zinc-950 animate-pulse shadow-[0_0_12px_rgba(245,158,11,0.6)] scale-105'
                       : 'bg-zinc-800 text-zinc-300 light:bg-slate-100 light:text-slate-700'
                   }`}
                 >

@@ -14,6 +14,33 @@ Questo documento registra in ordine cronologico tutte le lavorazioni svolte nel 
 - **Impatto sul Desiderata**: <Come questo intervento contribuisce al desiderata (cfr. DESIDERATA.md) e indicazioni per il prossimo agente>
 ```
 
+### [2026-10-02] - Stabilizzazione Geometria Fasce Risposta (Zero Layout Shift) e Grace Period 250ms al Cambio Domanda in Modalità Mani Libere
+
+- **Cosa abbiamo fatto**:
+  - **Risoluzione della Root Cause del "Target Saltante" (CLS) sotto il dito**:
+    * Identificato il problema in [src/components/drive/DriveActiveHUD.tsx](file:///c:/github/Quiz_VDS-VL/src/components/drive/DriveActiveHUD.tsx): durante la riproduzione vocale, l'opzione letta dalla voce neurale assumeva `flex-1` e `line-clamp-none`, mentre le altre collassavano a `flex-none` e `line-clamp-2`.
+    * Al passaggio vocale da un'opzione alla successiva (es. Opzione 1 -> Opzione 2), l'opzione 1 si rimpiccioliva istantaneamente di circa 60px e l'opzione 2 si espandeva, facendo saltare violentemente verso l'alto le coordinate verticali dei pulsanti e causando click involontari sulla risposta sbagliata.
+    * Disaccoppiata la riproduzione vocale (`isCurrentOptPlaying`) dal ridimensionamento e dallo sblocco del clamp: tutte le 3 macro-fasce mantengono una geometria stabile e permanente (`flex-1` equiripartito costante con `line-clamp-2`).
+    * L'evidenziazione dell'opzione in lettura vocale è ora puramente visiva: bordo dorato, anello ambra attivo (`ring-2 ring-amber-400 shadow-[0_0_15px_rgba(245,158,11,0.25)]`), badge numerico pulsante ad alta visibilità (`animate-pulse shadow-[0_0_12px_rgba(245,158,11,0.6)] scale-105`) e icona altoparlante `Volume2` pulsante. L'espansione testuale resta disponibile su richiesta manuale dell'allievo tramite tocco su `[Leggi tutto]`.
+  - **Implementazione Grace Period Protettivo (250ms) al Cambio Domanda**:
+    * In [src/components/DriveModeScreen.tsx](file:///c:/github/Quiz_VDS-VL/src/components/DriveModeScreen.tsx), introdotto un micro-cooldown di sicurezza di 250ms che si attiva unicamente al cambio effettivo di domanda (`prevQuestionIdRef.current !== currentQ.id`).
+    * Durante i 250ms della transizione, `handleSelectAnswer` scarta qualsiasi click e i pulsanti opzione in `DriveActiveHUD.tsx` vengono disabilitati con `disabled` e `pointer-events-none`, assorbendo tap tardivi o accidentali partiti a cavallo del passaggio tra domande.
+  - **Suite di Test Vitest & Contratti Ergonomici**:
+    * Aggiornato [src/components/drive/DriveActiveHUD.test.ts](file:///c:/github/Quiz_VDS-VL/src/components/drive/DriveActiveHUD.test.ts):
+      - `HUD-EXPAND-02`: asserisce che durante la voce le opzioni mantengano `line-clamp-2` stabile per azzerare il layout shift, verificando l'evidenziazione visiva attiva.
+      - `HUD-EXPAND-05`: asserisce che tutte le opzioni conservino `flex-1` equiripartito durante la voce senza mai comprimersi a `flex-none`.
+      - `HUD-COOLDOWN-01`: asserisce la disabilitazione e `pointer-events-none` dei pulsanti durante `isQuestionSwitching`.
+    * Aggiunto in [src/components/DriveModeScreen.test.ts](file:///c:/github/Quiz_VDS-VL/src/components/DriveModeScreen.test.ts):
+      - `DRIVE-COOLDOWN-01`: verifica che i tap immediatamente successivi al cambio domanda (<250ms) vengano ignorati e che il click sia regolarmente registrato una volta terminato il grace period.
+  - **Allineamento Documentale & SemVer**:
+    * Aggiornato [DESIDERATA.md](file:///c:/github/Quiz_VDS-VL/DESIDERATA.md) con la nuova specifica di geometria stabile Zero-CLS.
+    * Avanzamento di versione a `1.7.3` in [package.json](file:///c:/github/Quiz_VDS-VL/package.json).
+- **Scelte architetturali & Rationale**:
+  - Bloccare acriticamente i click per 500ms a ogni cambio di opzione vocale avrebbe introdotto una percezione di mancata risposta del touch ("dead clicks") per oltre 1.5s a quiz, senza curare la causa radice (lo spostamento fisico del pulsante).
+  - La stabilizzazione a geometria fissa (Zero CLS) garantisce che il bersaglio non si muova mai sotto il dito, mentre il micro-grace period di 250ms circoscritto al cambio di domanda intera assorbe i tocchi residui senza degradare la reattività percepita.
+- **Impatto sul Desiderata**:
+  - Ergonomia touch impeccabile in Modalità Mani Libere (Fitts's Law perfetta e zero click involontari).
+
 ### [2026-10-02] - Risoluzione Arresto Immediato Audio all'Accesso in Modalità Mani Libere (Bugfix Unmount Lifecycle in useAviationVoice e DriveModeScreen)
 
 - **Cosa abbiamo fatto**:
