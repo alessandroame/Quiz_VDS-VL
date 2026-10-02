@@ -14,6 +14,28 @@ Questo documento registra in ordine cronologico tutte le lavorazioni svolte nel 
 - **Impatto sul Desiderata**: <Come questo intervento contribuisce al desiderata (cfr. DESIDERATA.md) e indicazioni per il prossimo agente>
 ```
 
+### [2026-10-02] - Risoluzione Arresto Immediato Audio all'Accesso in Modalità Mani Libere (Bugfix Unmount Lifecycle in useAviationVoice e DriveModeScreen)
+
+- **Cosa abbiamo fatto**:
+  - **Identificazione della Root Cause via Tracciamento Diagnostico CDP**:
+    * Tramite intercettazione dinamica degli stack trace di `HTMLAudioElement.prototype.pause` e `voiceService.stop`, abbiamo accertato che all'apertura della Modalità Mani Libere (`openDriveMode` / `toggleDriveMode`) l'audio partiva correttamente al click dell'utente (`voiceService.playFullSequence`), ma veniva arrestato istantaneamente dopo una frazione di secondo.
+    * La causa risiedeva in due cleanup hook spuri eseguiti all'apertura del componente:
+      1. In [src/hooks/useAviationVoice.ts](file:///c:/github/Quiz_VDS-VL/src/hooks/useAviationVoice.ts): l'effetto di unmount controllava `voiceService.getState().currentQuestionId === questionId` e invocava incondizionatamente `voiceService.stop()`. Quando `DriveModeScreen` o altri componenti montavano (e nei cicli di mount/unmount di React 19 / StrictMode), questo cleanup arrestava il singleton audio appena avviato per quel quesito.
+      2. In [src/components/DriveModeScreen.tsx](file:///c:/github/Quiz_VDS-VL/src/components/DriveModeScreen.tsx): l'effetto unmount dei timer chiamava anch'esso `voiceService.stop()` e `voiceService.stopDriveIntro()`, duplicando lo stop distruttivo sul singleton condiviso.
+  - **Intervento Correttivo**:
+    * Rimosso l'arresto automatico distruttivo del singleton `voiceService` all'unmount da [src/hooks/useAviationVoice.ts](file:///c:/github/Quiz_VDS-VL/src/hooks/useAviationVoice.ts), demandando il controllo del ciclo di vita audio ai gestori espliciti di schermata e sessione (chiusura sessione, navigazione tab, back button, o cambio esplicito quesito).
+    * Rimosso `voiceService.stop()` dal cleanup unmount di [src/components/DriveModeScreen.tsx](file:///c:/github/Quiz_VDS-VL/src/components/DriveModeScreen.tsx), mantenendolo focalizzato sulla pulizia dei timer interni (`clearAllDriveTimers`, timer label/riconoscimento). L'uscita dalla schermata è già presidiata in modo affidabile da `btn-drive-exit`, `closeDriveMode`, `handlePopState` e `handleSelectTab`.
+    * Aggiornata la suite [src/hooks/useAviationVoice.test.ts](file:///c:/github/Quiz_VDS-VL/src/hooks/useAviationVoice.test.ts) per verificare che l'unmount dell'hook non interrompa la riproduzione in corso del singleton, garantendo transizioni fluide tra viste senza interruzioni audio.
+    * Aggiornato lo script di collaudo interattivo [scripts/test_drive_flow_interactive.cjs](file:///c:/github/Quiz_VDS-VL/scripts/test_drive_flow_interactive.cjs) per supportare sia la transizione fluida diretta a vista attiva che il launcher.
+  - **Verifiche & Validazione**:
+    * Test unitari Vitest: 52/52 file passati (394/394 test verdi).
+    * Collaudo visivo CDP interattivo (`npm run test:visual:drive:flow`): completato con 0 errori e 0 warning in console.
+    * Build di produzione (`npm run build`): compilata con successo (bundle Vite + TypeScript strict OK).
+- **Scelte architetturali & Rationale**:
+  - Il servizio vocale `voiceService` è un singleton dell'applicazione. Gli hook consumatori come `useAviationVoice` devono limitarsi a osservare e controllare la riproduzione, senza imporre chiusure globali al proprio ciclo di vita React locale, prevenendo race condition su mount concorrenti o remount di React 19.
+- **Impatto sul Desiderata**:
+  - Ripristino dell'ascolto hands-free immediato, continuo e senza intoppi dal primo tocco su smartphone e desktop.
+
 ### [2026-10-02] - Arricchimento Didattico Spiegazioni Aerodinamica: Cause Fisiche su Allungamento, Resistenza Quadratica, Depressione Estradosso ed Effetto Suolo (Quiz ID 2061, 2066, 2072, 2148)
 
 - **Cosa abbiamo fatto**:

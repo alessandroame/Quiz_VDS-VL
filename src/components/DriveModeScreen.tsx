@@ -726,14 +726,12 @@ export const DriveModeScreen: React.FC<DriveModeScreenProps> = ({
     }
   }, [voiceLastTranscript]);
 
-  // Clean up feedback timers and stop voice on unmount
+  // Clean up feedback timers on unmount
   useEffect(() => {
     return () => {
       clearAllDriveTimers();
       if (recognizedLabelTimerRef.current) clearTimeout(recognizedLabelTimerRef.current);
       if (unrecognizedTimerRef.current) clearTimeout(unrecognizedTimerRef.current);
-      voiceService.stop();
-      voiceService.stopDriveIntro();
     };
   }, [clearAllDriveTimers]);
 
