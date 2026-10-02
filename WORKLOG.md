@@ -14,6 +14,25 @@ Questo documento registra in ordine cronologico tutte le lavorazioni svolte nel 
 - **Impatto sul Desiderata**: <Come questo intervento contribuisce al desiderata (cfr. DESIDERATA.md) e indicazioni per il prossimo agente>
 ```
 
+### [2026-10-02] - Arricchimento Didattico Spiegazioni Aerodinamica: Cause Fisiche su Allungamento, Resistenza Quadratica, Depressione Estradosso ed Effetto Suolo (Quiz ID 2061, 2066, 2072, 2148)
+
+- **Cosa abbiamo fatto**:
+  - **Superamento della Didattica Descrittiva (4 Quesiti Cardine Aerodinamica)**:
+    * Aggiornate le spiegazioni didattiche (Regola e Tranello) in [src/data/questions.json](file:///c:/github/Quiz_VDS-VL/src/data/questions.json) per i quiz:
+      - **#2061 (Allungamento Alare & Resistenza Indotta)**: Spiegato il motivo per cui l'allungamento abbatte la resistenza indotta (ali lunghe e strette allontanano le estremità e riducono la corda, minimizzando la superficie alare investita dal travaso laterale e riducendo l'intensità dei vortici marginali, $C_{Di} \propto 1/AR$).
+      - **#2066 (Proporzionalità Quadratica della Resistenza)**: Spiegata l'origine fisica dell'esponente 2 ($R \propto V^2$): al raddoppiare della velocità ($2\times$), raddoppia sia la massa d'aria impattata al secondo ($2\times$), sia l'energia cinetica e la quantità di moto scambiate con ciascuna molecola d'aria ($2\times$), quadruplicando la forza frenante ($2 \times 2 = 4$).
+      - **#2072 (Depressione Dorsale sull'Estradosso)**: Chiarito perché la portanza è generata prevalentemente dal dorso: la curvatura dell'estradosso costringe il flusso ad accelerare e curvare verso il basso, determinando il crollo della pressione statica per Bernoulli e forza centripeta aerodinamica, con una potente suzione verso l'alto che sostiene fino all'80% del peso dell'aerodina.
+      - **#2148 (Effetto Suolo)**: Spiegato il meccanismo con cui il suolo agisce da barriera fisica che schiaccia e taglia i vortici marginali e ostacola la deflessione verso il basso del flusso (*downwash*), raddrizzando la portanza ed eliminando la resistenza indotta come se l'ala avesse un allungamento infinito.
+  - **Rigenerazione Multi-Voce Neurale TTS (8 file MP3)**:
+    * Rigenerati e sottoposti a trimming del silenzio (decadimento 100ms) i file audio `_e.mp3` per entrambe le voci (Giuseppe ed Elsa) per tutti e 4 i quesiti in `public/audio/giuseppe/` e `public/audio/elsa/`.
+  - **Test e Build**:
+    * Suite Vitest: 52/52 suite passate con successo (395/395 test verdi).
+    * Build di produzione `tsc && vite build`: superata senza errori né warning.
+- **Scelte architetturali & Rationale**:
+  - Applicazione coerente del principio del "Perché Fisico" per trasformare le spiegazioni da memorizzazione nozionistica a reale padronanza concettuale del volo per l'allievo pilota.
+- **Impatto sul Desiderata**:
+  - Perfezionamento qualitativo del catalogo quiz AeCI, garantendo coerenza totale tra testo a schermo e parlato vocale hands-free.
+
 # Worklog Entry: Instant Hands-Free Audio Speech on Toggle & UI Remediation
 
 - **Data**: 2026-10-02
