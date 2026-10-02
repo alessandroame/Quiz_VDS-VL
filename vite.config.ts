@@ -61,6 +61,21 @@ export default defineConfig({
         });
       }
     },
+    {
+      name: 'watch-git-commits',
+      configureServer(server) {
+        const gitDir = path.resolve(__dirname, '.git');
+        if (existsSync(gitDir)) {
+          server.watcher.add(path.join(gitDir, 'HEAD'));
+          server.watcher.add(path.join(gitDir, 'refs', 'heads'));
+          server.watcher.on('change', (filePath) => {
+            if (filePath.includes('.git')) {
+              server.restart();
+            }
+          });
+        }
+      }
+    },
     react(),
     VitePWA({
       registerType: 'autoUpdate',
