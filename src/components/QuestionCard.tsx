@@ -699,11 +699,11 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({
             className="space-y-1 text-xs text-zinc-200 light:text-slate-800 bg-zinc-950/80 light:bg-slate-50 p-2 sm:p-2.5 rounded-lg border border-zinc-700/70 light:border-slate-300 leading-snug"
           >
             <div>
-              <strong className="text-emerald-400 light:text-emerald-600">Regola: </strong>
+              <strong className="text-emerald-400 light:text-emerald-700">Regola: </strong>
               <span>{question.explanation.rule}</span>
             </div>
             <div>
-              <strong className="text-amber-400 light:text-amber-600">Tranello: </strong>
+              <strong className="text-amber-400 light:text-amber-800">Tranello: </strong>
               <span>{question.explanation.trap}</span>
             </div>
           </div>

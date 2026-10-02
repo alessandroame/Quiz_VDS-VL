@@ -206,7 +206,7 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab, openSet
               </div>
               {/* Secondary telemetry subtitle - hidden on mobile to avoid overlap */}
               <div className="text-[11px] text-zinc-400 light:text-slate-600 truncate hidden sm:block">
-                Preparazione: <strong className="text-amber-400 light:text-amber-600">{readinessScore}%</strong>
+                Preparazione: <strong className="text-amber-400 light:text-amber-800">{readinessScore}%</strong>
               </div>
             </div>
           </div>

@@ -288,11 +288,11 @@ const ArchiveItemExpandedContent: React.FC<ArchiveItemExpandedContentProps> = ({
               )}
             </div>
             <div>
-              <strong className="text-emerald-400 light:text-emerald-600">Regola: </strong>
+              <strong className="text-emerald-400 light:text-emerald-700">Regola: </strong>
               <span>{q.explanation.rule}</span>
             </div>
             <div>
-              <strong className="text-amber-400 light:text-amber-600">Tranello: </strong>
+              <strong className="text-amber-400 light:text-amber-800">Tranello: </strong>
               <span>{q.explanation.trap}</span>
             </div>
           </div>
