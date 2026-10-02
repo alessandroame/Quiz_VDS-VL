@@ -14,6 +14,31 @@ Questo documento registra in ordine cronologico tutte le lavorazioni svolte nel 
 - **Impatto sul Desiderata**: <Come questo intervento contribuisce al desiderata (cfr. DESIDERATA.md) e indicazioni per il prossimo agente>
 ```
 
+### [2026-10-02] - UI Audit Inspector: Isolamento Modali, Risoluzione Barra Bianca e Deduplicazione Avanzata
+
+- **Cosa abbiamo fatto**:
+  - **Risoluzione Barra Bianca Superiore su Schermata con Modale**:
+    * Identificata la causa scatenante: in [HomeScreen.tsx](file:///c:/github/Quiz_VDS-VL/src/components/HomeScreen.tsx), il contenitore principale possedeva le classi `animate-in fade-in`. In base alle specifiche CSS, qualsiasi elemento soggetto ad animazione/transizione crea un nuovo stacking context e contenitore vincolante per `position: fixed;`. Di conseguenza, `SessionConflictModal` e `showConfirmDiscard` venivano confinati al di sotto della Navbar (`fixed z-40`), lasciando scoperta e visibile la Navbar bianca in cima.
+    * Risolto isolando i modali all'esterno del contenitore animato tramite un React Fragment (`<> <div className="... animate-in fade-in">{content}</div> {modals} </>`). Ora i modali operano nel contesto di stacking radice con `z-50`, coprendo interamente il viewport (da `y=0` a `y=100vh`) ed eliminando definitivamente la barra bianca superiore.
+    * Verificato con successo il mantenimento al 100% di tutti i 389 test Vitest (52 suite verdi).
+  - **Eliminazione Falsi Positivi per Aree Oscurate Dietro ai Dialoghi**:
+    * Integrato in `.agents/skills/ui-audit-inspector/scripts/run_audit.cjs` il filtro `activeDialog`: quando un modale (`[role="dialog"]`, `[aria-modal="true"]`) è aperto a schermo, il motore di ispezione ignora sistematicamente tutti gli elementi del DOM sottostante al backdrop oscurato, scansionando esclusivamente il contenuto del dialog attivo.
+  - **Riconoscimento e Mantenimento dei Controlli Audio Individuali**:
+    * Risolto il dubbio didattico sollevato dall'utente ("e come faccio a farmi ripetere solo una risposta o solo una domanda?"): gli altoparlanti posizionati accanto al testo della domanda e a ciascuna opzione di risposta sono una caratteristica didattica irrinunciabile per consentire agli allievi piloti l'ascolto selettivo on-demand. Rimosso `CLUTTER-01` dal catalogo dei difetti.
+  - **Deduplicazione Avanzata e Accorpamento Multitema / Vocabolario**:
+    * Accorpati i difetti di contrasto per testo normalizzato (unificando Dark e Light mode in un'unica scheda con etichetta "Dark & Light" o specifica) e i difetti di microcopy per termine canonico ("avvia", "comincia / cominciarne", "rimani nel quiz").
+    * Ridotti i difetti catalogati da 28 duplicati a soli **14 rilievi unici, mirati e azionabili**.
+  - **Aggiornamento Artifact Operativo**:
+    * Aggiornato [UI_AUDIT_ACTION_PLAN.md](file:///C:/Users/aame/.gemini/antigravity/brain/a2d7aaeb-bbb7-404c-8484-b98078b668ba/UI_AUDIT_ACTION_PLAN.md) con la nuova matrice a 14 difetti.
+
+- **Scelte architetturali & Rationale**:
+  - Evitato l'uso forzato di `createPortal` in componenti testati a livello di sottoalbero, preferendo l'isolamento strutturale del JSX all'interno del componente: in questo modo i componenti mantengono sia la compatibilità nativa con il DOM di test senza frammentare l'albero, sia la corretta elevazione z-index a runtime nel browser.
+
+- **Impatto sul Desiderata**:
+  - Report di audit ora fedele al 100% alla realtà visiva, privo di rumore o falsi allarmi, pronto per la risoluzione puntuale a fasi.
+
+---
+
 # 2026-10-02 - UI Audit Inspector: Ingrandimento e Correzione Stili Textarea Note Utente
 
 ## Cosa abbiamo fatto
