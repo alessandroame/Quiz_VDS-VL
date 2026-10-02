@@ -1,5 +1,5 @@
 // scripts/generate_manual_screenshots.cjs
-// Automated screenshot generator for the VDS-VL Quiz Master User Manual
+// Automated screenshot generator for the Quiz VDS-VL User Manual
 // Uses native Chrome/Edge CDP with zero dependencies
 
 const { spawn } = require('child_process');
@@ -38,7 +38,7 @@ function sleep(ms) {
 
 async function run() {
   console.log('================================================================');
-  console.log('📸 GENERAZIONE SCREENSHOT PER MANUALE UTENTE VDS-VL QUIZ MASTER');
+  console.log('📸 GENERAZIONE SCREENSHOT PER MANUALE UTENTE QUIZ VDS-VL');
   console.log('================================================================\n');
 
   if (!BROWSER_BIN) {

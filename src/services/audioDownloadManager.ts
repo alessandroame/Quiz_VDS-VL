@@ -1,4 +1,4 @@
-// Audio Download Manager for VDS-VL Quiz Master
+// Audio Download Manager for Quiz VDS-VL
 // Manages non-blocking background downloads of neural TTS audio snippets into CacheStorage
 
 import questionsData from '../data/questions.json';

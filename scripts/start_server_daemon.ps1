@@ -1,4 +1,4 @@
-# Persistent background web server daemon for VDS-VL Quiz Master
+# Persistent background web server daemon for Quiz VDS-VL
 # Keeps Vite running continuously in the background until system reboot or explicit termination
 
 $ErrorActionPreference = 'SilentlyContinue'

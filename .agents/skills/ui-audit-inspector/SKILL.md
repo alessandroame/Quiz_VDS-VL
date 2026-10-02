@@ -57,6 +57,7 @@ Formula matematica basata sulla luminanza relativa $L = 0.2126 R + 0.7152 G + 0.
 
 ### D. Microcopy Essenziale & Vocabolario Univoco (`[COPY-XX]`)
 - **Regola Anti-Cosplay**: Bandito il gergo da finto pilota o "flavor text" gratuito (*"cruscotto"*, *"cockpit"*, *"plancia"*, *"in volo verso..."*, *"officina"*). Home è **Home**, statistiche sono **Statistiche**, esame è **Esame**.
+- **Regola Anti-Gamification & Brand Sobrio**: Banditi i cliché da quiz show televisivo o gaming arcade (*"quiz master"*, *"master"*, *"sfida"*, *"campione"*, *"scalata"*, *"punteggio record"*). L'attestato VDS-VL AeCI è una licenza ufficiale di volo: il tono deve rimanere sobrio, didattico, rigoroso e privo di retorica arcade. Il brand ufficiale approvato è **"Quiz VDS-VL"** (o **"VDS-VL Quiz"**).
 - **No Marketing / No Paternalismo**: Eliminare slogan autocelebrativi (*"fantastico"*, *"il miglior modo"*) o lodi superflue (*"Ottimo lavoro!"*, *"Mettiti alla prova"*).
 - **Vocabolario Univoco (1 Concetto = 1 Sola Parola)**:
   - Inizio azione: **`Inizia`** (banditi *"Avvia"*, *"Comincia"*, *"Parti"*).

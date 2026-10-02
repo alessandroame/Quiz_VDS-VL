@@ -5,6 +5,7 @@ describe('buildInfo utility', () => {
   it('returns valid default build info structure', () => {
     const info = getBuildInfo();
     expect(info).toBeDefined();
+    expect(info.appName).toBe('Quiz VDS-VL');
     expect(typeof info.version).toBe('string');
     expect(typeof info.buildNumber).toBe('string');
     expect(typeof info.commitHash).toBe('string');

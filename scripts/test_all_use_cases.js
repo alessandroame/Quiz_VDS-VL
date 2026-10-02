@@ -35,7 +35,7 @@ function sleep(ms) {
 
 async function run() {
   console.log('================================================================');
-  console.log('🏁 INIZIO COLLAUDO FUNZIONALE MULTI-CONTESTO VDS-VL QUIZ MASTER');
+  console.log('🏁 INIZIO COLLAUDO FUNZIONALE MULTI-CONTESTO QUIZ VDS-VL');
   console.log('================================================================\n');
 
   if (!BROWSER_BIN) {

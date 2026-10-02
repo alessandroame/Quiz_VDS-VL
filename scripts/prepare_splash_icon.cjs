@@ -164,8 +164,8 @@ async function main() {
     // 2. Update index.html with inline jpegData so it NEVER fails on cold start
     const indexHtml = fs.readFileSync(path.resolve('index.html'), 'utf8');
     const updatedIndexHtml = indexHtml.replace(
-      /<img\s+src="[^"]*"\s+alt="VDS-VL Quiz Master Icon"\s+class="splash-icon-img"\s*\/>/,
-      `<img src="${jpegData}" alt="VDS-VL Quiz Master Icon" class="splash-icon-img" />`
+      /<img\s+src="[^"]*"\s+alt="Quiz VDS-VL Icon"\s+class="splash-icon-img"\s*\/>/,
+      `<img src="${jpegData}" alt="Quiz VDS-VL Icon" class="splash-icon-img" />`
     );
     fs.writeFileSync(path.resolve('index.html'), updatedIndexHtml, 'utf8');
     console.log('✅ Updated index.html with self-contained splash icon');
@@ -257,9 +257,9 @@ async function main() {
 <body>
   <div id="splash-screen">
     <div class="splash-pulse" style="display:flex; flex-direction:column; align-items:center;">
-      <img src="${jpegData}" alt="VDS-VL Quiz Master Icon" class="splash-icon-img" />
+      <img src="${jpegData}" alt="Quiz VDS-VL Icon" class="splash-icon-img" />
       <div class="splash-title">
-        VDS-VL <span style="color: #f59e0b;">Quiz Master</span>
+        Quiz <span style="color: #f59e0b;">VDS-VL</span>
       </div>
       <div class="splash-sub">
         Volo Libero • AeCI

@@ -44,7 +44,7 @@ import type { ThemeMode } from '../types/database';
 import { FONT_SIZE_OPTIONS, getFontSizeLabel } from '../utils/fontSize';
 import { VoiceCommandsModal } from './VoiceCommandsModal';
 import { BuildInfoModal } from './BuildInfoModal';
-import { getBuildInfo, formatBuildDate, forceReloadPWA } from '../utils/buildInfo';
+import { getBuildInfo, formatBuildDate, forceReloadPWA, APP_NAME } from '../utils/buildInfo';
 import { getAppIconUrl, getAppFaviconUrl } from '../utils/assets';
 import {
   audioDownloadManager,
@@ -1717,7 +1717,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                   <div className="min-w-0 flex-1">
                     <div className="flex items-center gap-1.5 flex-wrap">
                       <span className="text-sm font-bold text-zinc-100 light:text-slate-900 tracking-tight">
-                        VDS-VL Quiz Master
+                        {APP_NAME}
                       </span>
                       <span className="px-1.5 py-0.5 rounded text-[10px] font-mono font-semibold bg-amber-500/20 text-amber-400 border border-amber-500/30 light:bg-amber-100 light:text-amber-800">
                         v{buildInfo.version}

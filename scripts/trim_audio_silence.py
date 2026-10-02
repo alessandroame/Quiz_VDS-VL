@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Pipeline for trimming trailing silence from neural TTS audio files in VDS-VL Quiz Master.
+Pipeline for trimming trailing silence from neural TTS audio files in Quiz VDS-VL.
 Removes artificial 900ms dead silence appended by Azure Edge-TTS (especially it-IT-DiegoNeural),
 preserving natural 100ms acoustic decay tail while retaining 100% of speech content.
 """

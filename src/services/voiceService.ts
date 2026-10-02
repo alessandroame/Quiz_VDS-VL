@@ -1,8 +1,9 @@
-// Singleton neural voice service for VDS-VL Quiz Master
+// Singleton neural voice service for Quiz VDS-VL
 // Manages atomic playback of audio snippets, full question-option sequences, play/pause and restarts
 
 import type { AudioPart, VoicePlaybackState } from '../types/audio';
 import { audioDownloadManager } from './audioDownloadManager';
+import { APP_NAME } from '../utils/buildInfo';
 
 type StateListener = (state: VoicePlaybackState) => void;
 export type VoiceFallbackListener = (info: { from: 'giuseppe' | 'elsa'; to: 'giuseppe' | 'elsa' }) => void;
@@ -202,7 +203,7 @@ export class VoiceService {
     if (typeof navigator !== 'undefined' && 'mediaSession' in navigator && typeof MediaMetadata !== 'undefined') {
       navigator.mediaSession.metadata = new MediaMetadata({
         title: `Quiz #${questionId} - ${titlePart}`,
-        artist: 'VDS-VL Quiz Master',
+        artist: APP_NAME,
         album: 'Preparazione Esame AeCI'
       });
       navigator.mediaSession.playbackState = 'playing';
@@ -497,7 +498,7 @@ export class VoiceService {
       if (typeof navigator !== 'undefined' && 'mediaSession' in navigator && typeof MediaMetadata !== 'undefined') {
         navigator.mediaSession.metadata = new MediaMetadata({
           title: 'Briefing Vocale - Modalità Mani Libere',
-          artist: 'VDS-VL Quiz Master',
+          artist: APP_NAME,
           album: 'Modalità Mani Libere'
         });
         navigator.mediaSession.playbackState = 'playing';

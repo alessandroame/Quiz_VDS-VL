@@ -210,7 +210,7 @@ async function main() {
         return {
           aboutExp: document.getElementById('tab-about')?.getAttribute('aria-expanded'),
           voiceExp: document.getElementById('tab-voice')?.getAttribute('aria-expanded'),
-          hasTitle: text.includes('VDS-VL Quiz Master'),
+          hasTitle: text.includes('Quiz VDS-VL'),
           hasVersion: text.includes('v1.0.0'),
           hasDpr: text.includes('D.P.R. 133/2010'),
           has504: text.includes('504 Quiz'),

@@ -3,7 +3,18 @@
  * Provides runtime access to build metadata injected by Vite at compile time.
  */
 
+/**
+ * Official application display and brand name.
+ */
+export const APP_NAME = 'Quiz VDS-VL' as const;
+
+/**
+ * Compact application name used for mobile home screens and narrow viewports.
+ */
+export const APP_SHORT_NAME = 'VDS Quiz' as const;
+
 export interface BuildInfo {
+  appName: string;
   version: string;
   buildNumber: string;
   commitHash: string;
@@ -16,6 +27,7 @@ export interface BuildInfo {
  */
 export function getBuildInfo(): BuildInfo {
   return {
+    appName: APP_NAME,
     version: typeof __APP_VERSION__ !== 'undefined' ? __APP_VERSION__ : '1.1.0',
     buildNumber: typeof __APP_BUILD_NUMBER__ !== 'undefined' ? __APP_BUILD_NUMBER__ : '0',
     commitHash: typeof __APP_COMMIT_HASH__ !== 'undefined' ? __APP_COMMIT_HASH__ : 'dev',

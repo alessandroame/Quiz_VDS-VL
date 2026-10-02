@@ -140,7 +140,7 @@ async function main() {
       expression: `(() => {
         const text = document.body.innerText;
         return {
-          hasTitle: text.includes('VDS-VL Quiz Master'),
+          hasTitle: text.includes('Quiz VDS-VL'),
           hasVersion: text.includes('v1.0.0'),
           hasDpr: text.includes('D.P.R. 133/2010'),
           has504: text.includes('504 Quiz'),

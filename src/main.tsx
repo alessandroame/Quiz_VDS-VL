@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom/client';
 import App from './App';
 import './index.css';
 import { audioDownloadManager } from './services/audioDownloadManager';
+import { APP_NAME } from './utils/buildInfo';
 
 // In development mode, unregister any stale service workers to prevent cache interception
 if (import.meta.env.DEV && typeof window !== 'undefined' && 'serviceWorker' in navigator) {
@@ -29,7 +30,7 @@ if (typeof window !== 'undefined') {
 }
 
 console.log(
-  `%c[VDS-VL Quiz Master]%c v${buildInfo.version} (Build #${buildInfo.buildNumber} • ${buildInfo.commitHash}) - Built: ${buildInfo.buildTime}`,
+  `%c[${APP_NAME}]%c v${buildInfo.version} (Build #${buildInfo.buildNumber} • ${buildInfo.commitHash}) - Built: ${buildInfo.buildTime}`,
   'background: #0284c7; color: #ffffff; font-weight: bold; padding: 2px 6px; border-radius: 4px;',
   'color: #38bdf8; font-weight: bold; margin-left: 4px;'
 );

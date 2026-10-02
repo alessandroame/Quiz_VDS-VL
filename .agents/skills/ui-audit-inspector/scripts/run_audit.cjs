@@ -59,19 +59,30 @@ function sleep(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-// Banned words & phrases for vocabulary unification and anti-cosplay
+// Banned words & phrases for vocabulary unification and anti-cosplay / anti-gamification
 const BANNED_PATTERNS = [
+  // Cosplay & Aviation jargon in UI
   { word: 'cruscotto aeronautico', reason: 'Cosplay e gergo superfluo. Home è la Home.' },
   { word: 'cruscotto', reason: 'Cosplay e gergo superfluo. Sostituire con Home o Panoramica.' },
   { word: 'cockpit', reason: 'Anglicismo cosplay superfluo in interfaccia italiana di studio.' },
   { word: 'plancia', reason: 'Metafora aeronautica superflua.' },
   { word: 'decolla', reason: 'Flavor text narrativo superfluo. Usare il verbo Inizia.' },
+  { word: 'in viaggio verso il decollo', reason: 'Storytelling narrativo superfluo nella schermata di download.' },
+
+  // Gamification & Commercial Arcade clichés
+  { word: 'quiz master', reason: 'Cliché da gamification e retaggio arcade superfluo. Sostituire con il brand sobrio ed essenziale "Quiz VDS-VL" o "VDS-VL Quiz".' },
+  { word: 'master', regex: '\\bmaster\\b', reason: 'Suffisso anglofono da quiz show o gaming arcade. Sostituire con "Quiz" o "Simulatore".' },
+  { word: 'sfida', regex: '\\bsfida\\b', reason: 'Terminologia da gaming/arcade non consona a uno studio di volo. Sostituire con "Esercitazione" o "Simulazione".' },
+  { word: 'campione', regex: '\\bcampione\\b', reason: 'Tono ludico e da gaming. Sostituire con "Idoneo" o "Completamento".' },
+  { word: 'scalata', regex: '\\bscalata\\b', reason: 'Metafora ludica di gaming. Sostituire con "Progresso" o "Avanzamento".' },
+  { word: 'punteggio record', reason: 'Terminologia da sala giochi. Usare "Miglior Risultato" o "Esito Ufficiale".' },
+
+  // Synonyms & Paternalism
   { word: 'avvia', reason: 'Sinonimo incoerente con lo standard univoco "Inizia".' },
   { word: 'comincia', reason: 'Sinonimo incoerente con lo standard univoco "Inizia".' },
   { word: 'cominciarne', reason: 'Sinonimo incoerente con lo standard univoco "Inizia".' },
   { word: 'ottimo lavoro', reason: 'Tono autocelebrativo/paternalistico non necessario.' },
   { word: 'fantastico', reason: 'Stile enfatico da televendita.' },
-  { word: 'in viaggio verso il decollo', reason: 'Storytelling narrativo superfluo nella schermata di download.' },
   { word: 'rimani nel quiz', reason: 'Frase prolissa per il semplice comando "Continua".' },
   { word: 'metti in pausa (riprendi più tardi)', reason: 'Parentesi esplicativa ovvia. Usare solo "Pausa".' }
 ];
@@ -296,10 +307,31 @@ async function runAudit() {
           }
         }
 
-        // 3. Scan Visible Text for Banned Words with Element Coordinates
+        // 3. Scan Visible Text and Document Title for Banned Words with Element Coordinates
         const bannedFindings = [];
         const bannedList = ${JSON.stringify(BANNED_PATTERNS)};
 
+        // 3a. Check Document Title (<title>)
+        if (document.title) {
+          const docTitle = document.title;
+          const lowerTitle = docTitle.toLowerCase();
+          for (const item of bannedList) {
+            if (item.word === 'master' && lowerTitle.includes('quiz master')) continue;
+            const matches = item.regex
+              ? new RegExp(item.regex, 'i').test(docTitle)
+              : lowerTitle.includes(item.word);
+            if (matches) {
+              bannedFindings.push({
+                word: item.word,
+                snippet: '<title>' + docTitle + '</title>',
+                reason: '[Titolo Scheda / Brand]: ' + item.reason,
+                rect: { leftPct: 0, topPct: 0, widthPct: 100, heightPct: 4 }
+              });
+            }
+          }
+        }
+
+        // 3b. Scan Visible Elements
         for (const el of allElements) {
           if (['SCRIPT', 'STYLE', 'path', 'defs'].includes(el.tagName)) continue;
           if (activeDialog && !activeDialog.contains(el)) continue;
@@ -308,11 +340,20 @@ async function runAudit() {
           const lowerText = directText.toLowerCase();
 
           for (const item of bannedList) {
-            if (lowerText.includes(item.word)) {
+            if (item.word === 'master' && lowerText.includes('quiz master')) continue;
+            const matches = item.regex
+              ? new RegExp(item.regex, 'i').test(directText)
+              : lowerText.includes(item.word);
+
+            if (matches) {
               // Avoid duplicate matches on parent containers
               let childMatched = false;
               for (const child of el.children) {
-                if ((child.innerText || '').toLowerCase().includes(item.word)) {
+                const childText = (child.innerText || '').trim();
+                const childMatches = item.regex
+                  ? new RegExp(item.regex, 'i').test(childText)
+                  : childText.toLowerCase().includes(item.word);
+                if (childMatches) {
                   childMatched = true;
                   break;
                 }
@@ -581,6 +622,11 @@ async function runAudit() {
     }
 
     function getProposedCopyFix(word) {
+      if (word.includes('quiz master') || word === 'master') return 'Sostituire con il brand sobrio ed essenziale "Quiz VDS-VL" o "VDS-VL Quiz".';
+      if (word.includes('sfida')) return 'Sostituire con "Esercitazione" o "Simulazione".';
+      if (word.includes('campione')) return 'Sostituire con "Idoneo" o "Completamento".';
+      if (word.includes('scalata')) return 'Sostituire con "Progresso" o "Avanzamento".';
+      if (word.includes('punteggio record')) return 'Sostituire con "Miglior Risultato" o "Esito Ufficiale".';
       if (word.includes('cruscotto')) return 'Sostituire "Torna al cruscotto Home" con la sola etichetta univoca "Home".';
       if (word === 'avvia') return 'Sostituire "Avvia" con il verbo canonico "Inizia" (es. "Inizia Esame", "Inizia Tutor").';
       if (word === 'ottimo lavoro') return 'Rimuovere l\'elogio paternalistico e riportare solo il dato oggettivo: "Nessun errore da ripassare."';
@@ -592,9 +638,9 @@ async function runAudit() {
 
     for (const [_, g] of copyGroups) {
       let sev = 'MEDIO';
-      if (g.word.includes('cruscotto') || g.word.includes('cockpit')) sev = 'ALTO';
-      if (g.word === 'avvia' || g.word.includes('comincia')) sev = 'MEDIO';
-      if (g.word === 'ottimo lavoro' || g.word === 'fantastico') sev = 'BASSO';
+      if (g.word.includes('cruscotto') || g.word.includes('cockpit') || g.word.includes('quiz master')) sev = 'ALTO';
+      if (g.word === 'master' || g.word === 'avvia' || g.word.includes('comincia')) sev = 'MEDIO';
+      if (g.word === 'ottimo lavoro' || g.word === 'fantastico' || g.word.includes('sfida')) sev = 'BASSO';
 
       const snippetsList = Array.from(g.snippets).map(s => `"...${s}..."`).join(', ');
 

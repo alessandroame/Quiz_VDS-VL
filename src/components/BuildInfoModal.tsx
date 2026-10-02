@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { X, RefreshCw, Copy, Check, GitCommit, Calendar, Tag, ShieldCheck } from 'lucide-react';
-import { getBuildInfo, formatBuildDate, forceReloadPWA } from '../utils/buildInfo';
+import { getBuildInfo, formatBuildDate, forceReloadPWA, APP_NAME } from '../utils/buildInfo';
 import { getAppIconUrl, getAppFaviconUrl } from '../utils/assets';
 import { useTheme } from '../context/ThemeContext';
 
@@ -20,7 +20,7 @@ export const BuildInfoModal: React.FC<BuildInfoModalProps> = ({ isOpen, onClose 
   const formattedDate = formatBuildDate(buildInfo.buildTime);
 
   const handleCopy = async () => {
-    const textToCopy = `VDS-VL Quiz Master v${buildInfo.version} (Build #${buildInfo.buildNumber} • ${buildInfo.commitHash}) - Data: ${formattedDate}`;
+    const textToCopy = `${APP_NAME} v${buildInfo.version} (Build #${buildInfo.buildNumber} • ${buildInfo.commitHash}) - Data: ${formattedDate}`;
     try {
       if (navigator?.clipboard?.writeText) {
         await navigator.clipboard.writeText(textToCopy);

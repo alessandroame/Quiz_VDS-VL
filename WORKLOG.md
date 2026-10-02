@@ -14,6 +14,41 @@ Questo documento registra in ordine cronologico tutte le lavorazioni svolte nel 
 - **Impatto sul Desiderata**: <Come questo intervento contribuisce al desiderata (cfr. DESIDERATA.md) e indicazioni per il prossimo agente>
 ```
 
+### [2026-10-02] - Estensione Audit UI con Anti-Gamification, Allineamento Brand Sobrio "Quiz VDS-VL" e Test di Microcopy (v1.7.6)
+
+- **Cosa abbiamo fatto**:
+  - **Potenziamento del Motore di Audit UI/UX ([.agents/skills/ui-audit-inspector/scripts/run_audit.cjs](file:///c:/github/Quiz_VDS-VL/.agents/skills/ui-audit-inspector/scripts/run_audit.cjs))**:
+    - Estesa la lista dei pattern vietati `BANNED_PATTERNS` introducendo la categoria *Anti-Gamification & Arcade Clichés* (`quiz master`, `\bmaster\b`, `\bsfida\b`, `\bcampione\b`, `\bscalata\b`, `\bpunteggio record\b`).
+    - Aggiunto il supporto al pattern matching tramite espressioni regolari per evitare falsi positivi su sottostringhe legittime e introdotto il controllo dedicato sul tag `<title>` della pagina.
+    - Introdotta la deduplicazione intelligente per evitare segnalazioni ridondanti (es. `master` quando è già presente `quiz master`).
+    - Aggiornate le mappature delle soluzioni proposte in `getProposedCopyFix` e assegnata la severità `ALTO` a termini di brand non conformi.
+    - Aggiornate le linee guida in [.agents/skills/ui-audit-inspector/SKILL.md](file:///c:/github/Quiz_VDS-VL/.agents/skills/ui-audit-inspector/SKILL.md) con la nuova regola *Anti-Gamification & Brand Sobrio*.
+  - **Centralizzazione e Bonifica Brand Name ([src/utils/buildInfo.ts](file:///c:/github/Quiz_VDS-VL/src/utils/buildInfo.ts))**:
+    - Definite ed esportate come costanti tipizzate immutabili (`as const`) `APP_NAME = 'Quiz VDS-VL'` e `APP_SHORT_NAME = 'VDS Quiz'`.
+    - Estesa l'interfaccia `BuildInfo` con la proprietà `appName: string`.
+    - Sostituite tutte le occorrenze hardcodate della vecchia dicitura `VDS-VL Quiz Master` con la costante tipizzata `APP_NAME` in:
+      * [src/components/SettingsModal.tsx](file:///c:/github/Quiz_VDS-VL/src/components/SettingsModal.tsx) (scheda Info / Versione)
+      * [src/components/BuildInfoModal.tsx](file:///c:/github/Quiz_VDS-VL/src/components/BuildInfoModal.tsx) (funzione di copia negli appunti)
+      * [src/main.tsx](file:///c:/github/Quiz_VDS-VL/src/main.tsx) (log di avvio in console)
+      * [src/services/voiceService.ts](file:///c:/github/Quiz_VDS-VL/src/services/voiceService.ts) (metadati MediaSession per audio quiz e briefing vocale)
+      * [index.html](file:///c:/github/Quiz_VDS-VL/index.html) (`<title>Quiz VDS-VL</title>`, splash screen markup e attributo `alt`)
+      * [vite.config.ts](file:///c:/github/Quiz_VDS-VL/vite.config.ts) (nome PWA nel manifest: `'Quiz VDS-VL'`)
+      * Script di collaudo e diagnostica ([scripts/prepare_splash_icon.cjs](file:///c:/github/Quiz_VDS-VL/scripts/prepare_splash_icon.cjs), [scripts/test_settings_about.js](file:///c:/github/Quiz_VDS-VL/scripts/test_settings_about.js), [scripts/test_settings_accordion.cjs](file:///c:/github/Quiz_VDS-VL/scripts/test_settings_accordion.cjs)).
+  - **Creazione Suite di Test Statica di Microcopy ([src/utils/microcopy.test.ts](file:///c:/github/Quiz_VDS-VL/src/utils/microcopy.test.ts))**:
+    - Creata una nuova suite Vitest con 3 asserzioni specialistiche (`BRAND-01`, `BRAND-02`, `BRAND-03`) che verificano staticamente, a zero latenza e senza richiedere browser headless, la conformità del nome dell'app, l'assenza di termini da gamification/arcade e l'integrità del tag `<title>`.
+  - **Ciclo Completo di Audit e Verifica (Zero Difetti)**:
+    - Eseguito audit pre-correzione: il motore ha correttamente intercettato e catalogato i 2 difetti unici `[COPY-01]` (`quiz master`) e `[COPY-02]` (`master`) accorpandoli su oltre 64 schermate.
+    - Eseguito audit post-correzione: 0 difetti unici rilevati su tutte le combinazioni di viewport (mobile portrait 390x844, tablet portrait 768x1024, tablet landscape 1024x768, desktop 1440x900) e temi cromatici (dark e light).
+    - Tutte le 54 suite di test Vitest (404 test) superate con successo; build di produzione e typecheck completati con 0 errori.
+- **Scelte architetturali & Rationale**:
+  - *Allineamento Semantico del Brand ("Quiz VDS-VL")*: L'attestato VDS/VL (Volo da Diporto o Sportivo) dell'Aero Club d'Italia è un titolo aeronautico ministeriale con valore legale. L'aggiunta di "Master" dava un'ingiustificata connotazione da quiz show televisivo o gaming arcade anni 2010, in aperto contrasto con l'anima tecnica, austera e concentrata dello studio ([minimal-ui-ux](file:///c:/github/Quiz_VDS-VL/.agents/skills/minimal-ui-ux/SKILL.md)). Il nome "Quiz VDS-VL" rispetta la massima essenzialità, riflette il nome del repository e conferisce immediata autorevolezza.
+  - *Single Source of Truth (`APP_NAME` in `buildInfo.ts`)*: Eliminata la duplicazione del nome dell'app in 6 file diversi, garantendo coerenza tipizzata tra shell PWA, MediaSession, diagnostica di build e interfaccia utente.
+  - *Doppio Livello di Verifica (Vitest Statico + CDP Headless)*: L'audit headless CDP ispeziona il rendering effettivo nel DOM reale; il test statico Vitest protegge la pipeline di build locale bloccando immediatamente eventuali regressioni prima ancora di avviare il browser.
+- **Impatto sul Desiderata**:
+  - Piena aderenza ai principi di *Zero Distrazioni & Ergonomia di Studio* e *Microcopy Essenziale (Anti-Cosplay & Anti-Gamification)* definiti in [DESIDERATA.md](file:///c:/github/Quiz_VDS-VL/DESIDERATA.md).
+
+---
+
 ### [2026-10-02] - Ancoraggio a Bordo Schermo Inferiore Banner di Scaricamento Voce (v1.7.5)
 - **Cosa abbiamo fatto**:
   - **Ancoraggio a Filo Bordo Inferiore Schermo ([src/components/AudioDownloadBanner.tsx](file:///c:/github/Quiz_VDS-VL/src/components/AudioDownloadBanner.tsx))**:

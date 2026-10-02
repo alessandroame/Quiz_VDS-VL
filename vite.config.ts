@@ -81,7 +81,7 @@ export default defineConfig({
       registerType: 'autoUpdate',
       includeAssets: ['favicon.svg', 'apple-touch-icon.png', 'robots.txt', 'icons/*.png'],
       manifest: {
-        name: 'VDS-VL Quiz Master',
+        name: 'Quiz VDS-VL',
         short_name: 'VDS Quiz',
         description: 'Simulatore e studio per esame attestato VDS-VL Volo Libero AeCI',
         theme_color: '#09090b',
