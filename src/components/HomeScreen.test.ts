@@ -57,7 +57,7 @@ describe('HomeScreen Component (Home Hub Contracts)', () => {
     );
 
     expect(html).toContain('id="btn-home-tutor"');
-    expect(html).toContain('Tutor Didattico');
+    expect(html).toContain('Tutor');
     expect(html).toContain('Senza Limiti');
 
     expect(html).toContain('id="btn-home-topics"');

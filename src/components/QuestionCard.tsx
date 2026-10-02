@@ -439,7 +439,7 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({
                 id="btn-tts-question-restart"
                 onClick={() => restartQuestion()}
                 className="p-1 rounded-md text-xs text-zinc-300 light:text-slate-700 hover:text-white light:hover:text-black hover:bg-zinc-700/60 light:hover:bg-slate-200 transition-colors"
-                title="Ricomincia domanda dall'inizio (Shift+Q)"
+                title="Ricomincia domanda (Shift+Q)"
               >
                 <RotateCcw className="w-3.5 h-3.5" />
               </button>
@@ -663,7 +663,7 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({
                     id="btn-tts-explanation-restart"
                     onClick={() => restartExplanation()}
                     className="px-1.5 py-0.5 rounded-md text-zinc-300 light:text-slate-700 hover:text-white light:hover:text-black hover:bg-zinc-700/60 light:hover:bg-slate-200 flex items-center gap-1 transition-colors"
-                    title="Ricomincia spiegazione dall'inizio (Shift+E)"
+                    title="Ricomincia spiegazione (Shift+E)"
                   >
                     <RotateCcw className="w-3 h-3" />
                     <span className="hidden sm:inline">Da capo</span>

@@ -12,8 +12,8 @@ export const SCENARIO_DEFINITIONS: ScenarioDefinition[] = [
   {
     id: 'tutor',
     shortcut: '1',
-    label: 'Tutor Didattico',
-    headerTitle: 'Tutor Didattico',
+    label: 'Tutor',
+    headerTitle: 'Tutor',
     description: '30 quiz AeCI senza limiti di tempo con feedback immediato e spiegazione Regola e Tranello.'
   },
   {

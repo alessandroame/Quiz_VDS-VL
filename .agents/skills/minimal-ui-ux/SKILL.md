@@ -17,6 +17,7 @@ L'utente è un allievo pilota che sta **studiando la teoria** per superare l'esa
 ## 1. Regole Ferree di Microcopy (Zero Parole Inutili)
 - Nessuna frase introduttiva prolissa, nessun preambolo decorativo.
 - Titoli e label di 1 o 2 parole:
+  - **Tutor** (anziché "Tutor Didattico" o "Simulazione Didattica" — divieto di pleonasmi)
   - **Esame** (anziché "Inizia una nuova simulazione d'esame")
   - **Materie** (anziché "Esercitati selezionando gli argomenti")
   - **Errori** (anziché "Quaderno degli errori e ripasso")
@@ -26,6 +27,7 @@ L'utente è un allievo pilota che sta **studiando la teoria** per superare l'esa
   - **Esatta** / **Errata**
   - **IDONEO** / **NON IDONEO**
   - **Prontezza: 85%**
+- **Divieto di Chimere Terminologiche**: Non accoppiare nomi di modalità differenti (*"a mani libere"*) a impostazioni o comandi situati in viste diverse.
 
 ## 2. Palette Tematica (High-Contrast Clean Theme)
 Tre stati: `dark` | `light` | `system`:

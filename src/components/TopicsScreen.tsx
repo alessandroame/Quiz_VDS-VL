@@ -456,7 +456,7 @@ export const TopicsScreen: React.FC<TopicsScreenProps> = ({
           activeSession?.subjectName ||
           (activeSession?.type === 'exam'
             ? activeSession.examMode === 'tutor'
-              ? 'Simulazione Didattica (Tutor)'
+              ? 'Tutor'
               : 'Esame Ufficiale'
             : 'Sessione di Studio')
         }

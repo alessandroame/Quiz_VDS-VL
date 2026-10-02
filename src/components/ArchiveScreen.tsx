@@ -138,7 +138,7 @@ const ArchiveItemExpandedContent: React.FC<ArchiveItemExpandedContentProps> = ({
                     <button
                       onClick={restartFullSequence}
                       className="px-1.5 py-0.5 rounded text-zinc-300 light:text-slate-700 hover:text-white light:hover:text-black flex items-center gap-1 transition-colors"
-                      title="Ricomincia da capo dall'inizio"
+                      title="Ricomincia dall'inizio"
                     >
                       <RotateCcw className="w-2.5 h-2.5" />
                       <span>Da capo</span>

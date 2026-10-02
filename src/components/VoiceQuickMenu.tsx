@@ -370,19 +370,6 @@ export const VoiceQuickMenu: React.FC<VoiceQuickMenuProps> = ({
                 className="w-4 h-4 accent-amber-500 rounded cursor-pointer"
               />
             </label>
-
-            <label className="flex items-center justify-between cursor-pointer py-0.5">
-              <span className={forceDark ? 'text-zinc-300' : 'text-zinc-300 light:text-slate-700'}>
-                Tutor didattico a mani libere
-              </span>
-              <input
-                id="quick-menu-toggle-tutor"
-                type="checkbox"
-                checked={settings.driveModeTutor ?? false}
-                onChange={e => updateSetting('driveModeTutor', e.target.checked)}
-                className="w-4 h-4 accent-amber-500 rounded cursor-pointer"
-              />
-            </label>
           </div>
 
           {/* Quick Voice Commands Link */}

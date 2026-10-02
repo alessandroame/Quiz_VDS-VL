@@ -59,14 +59,13 @@ Formula matematica basata sulla luminanza relativa $L = 0.2126 R + 0.7152 G + 0.
 - **Regola Anti-Cosplay**: Bandito il gergo da finto pilota o "flavor text" gratuito (*"cruscotto"*, *"cockpit"*, *"plancia"*, *"in volo verso..."*, *"officina"*). Home è **Home**, statistiche sono **Statistiche**, esame è **Esame**.
 - **Regola Anti-Gamification & Brand Sobrio**: Banditi i cliché da quiz show televisivo o gaming arcade (*"quiz master"*, *"master"*, *"sfida"*, *"campione"*, *"scalata"*, *"punteggio record"*). L'attestato VDS-VL AeCI è una licenza ufficiale di volo: il tono deve rimanere sobrio, didattico, rigoroso e privo di retorica arcade. Il brand ufficiale approvato è **"Quiz VDS-VL"** (o **"VDS-VL Quiz"**).
 - **No Marketing / No Paternalismo**: Eliminare slogan autocelebrativi (*"fantastico"*, *"il miglior modo"*) o lodi superflue (*"Ottimo lavoro!"*, *"Mettiti alla prova"*).
-- **Vocabolario Univoco (1 Concetto = 1 Sola Parola)**:
-  - Inizio azione: **`Inizia`** (banditi *"Avvia"*, *"Comincia"*, *"Parti"*).
-  - Fine/Abbandono: **`Termina`** o **`Elimina prova`** (se c'è perdita di dati).
-  - Sospensione: **`Pausa`** (non *"Metti in pausa (riprendi più tardi)"*).
-  - Conferma: **`Conferma`**.
-  - Rifiuto/Chiusura: **`Annulla`** o **`Chiudi`**.
-  - Non uscita: **`Continua`** (non *"Rimani nel quiz"*).
-  - Nuovo tentativo: **`Riprova`**.
+- **Regola Anti-Pleonasmo & No Chimere Fuori Contesto**:
+  - Banditi i pleonasmi accademici: **`Tutor`** (MAI *"Tutor Didattico"* o *"Simulazione Didattica"* — un tutor è didattico per definizione).
+  - Bandite le ripetizioni tautologiche (*"Ricomincia da capo dall'inizio"* -> **`Ricomincia`** o **`Da capo`**).
+  - Bandite le "chimere terminologiche": vietato appendere il nome di un'altra modalità (*"a mani libere"*) come etichetta generica all'interno di sottomenu non pertinenti o privi di contesto.
+- **Audit Semantico a Doppio Livello (CDP + AST/LLM)**:
+  - Oltre alla scansione biometrica via browser (CDP), eseguire l'estrazione statica al 100% di tutti i nodi di testo JSX e attributi UI con `npm run strings:extract` ([reports/ui_strings_catalog.json](file:///c:/github/Quiz_VDS-VL/reports/ui_strings_catalog.json)).
+  - Sottoporre il catalogo all'analisi semantica del modello AI (Gemini) per stanare sfumature, ambiguità contestuali e attriti cognitivi che sfuggono alle regex a parola singola.
 
 ---
 

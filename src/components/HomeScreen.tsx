@@ -234,7 +234,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectTab }) => {
                   <BookOpen className="w-3.5 h-3.5" />
                 </div>
                 <h2 className="text-sm font-bold text-zinc-100 light:text-slate-900 group-hover:text-emerald-400 light:group-hover:text-emerald-600 transition-colors">
-                  Tutor Didattico
+                  Tutor
                 </h2>
               </div>
               <div className="flex items-center gap-1.5">
@@ -483,7 +483,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectTab }) => {
           existingTitle={
             activeSession.subjectName ||
             (activeSession.type === 'exam'
-              ? (activeSession.examMode === 'tutor' ? 'Tutor Didattico' : 'Simulazione Esame')
+              ? (activeSession.examMode === 'tutor' ? 'Tutor' : 'Simulazione Esame')
               : 'Quaderno Errori')
           }
           existingProgress={`Domanda ${(activeSession.currentIndex || 0) + 1} di ${
@@ -491,7 +491,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectTab }) => {
           } • ${Object.keys(activeSession.answers || {}).length} risposte date`}
           newSessionTitle={
             conflictTargetTab === 'tutor'
-              ? 'Tutor Didattico'
+              ? 'Tutor'
               : conflictTargetTab === 'topics'
               ? 'Studio Materie'
               : conflictTargetTab === 'exam'

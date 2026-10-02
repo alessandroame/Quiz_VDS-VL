@@ -74,8 +74,8 @@ export const AudioOfflinePromptModal: React.FC<AudioOfflinePromptModalProps> = (
 
         {/* Content Body */}
         <p className="text-xs text-zinc-300 light:text-slate-700 leading-relaxed mb-5">
-          In viaggio verso il decollo o in zone montane il segnale internet potrebbe non essere disponibile.
-          Puoi salvare i file vocali nella memoria del browser per ascoltare tutti i 504 quiz senza consumare traffico.
+          In zone montane o senza copertura il segnale internet potrebbe non essere disponibile.
+          Puoi salvare i file vocali nella memoria del dispositivo per ascoltare tutti i 504 quiz senza consumare traffico.
         </p>
 
         {/* Options */}

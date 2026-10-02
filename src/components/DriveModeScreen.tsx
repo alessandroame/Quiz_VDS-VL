@@ -641,7 +641,7 @@ export const DriveModeScreen: React.FC<DriveModeScreenProps> = ({
       explain: 'Spiegazione ("Spiega")',
       tutor_on: 'Attiva Tutor',
       tutor_off: 'Disattiva Tutor',
-      toggle_tutor: 'Tutor Didattico',
+      toggle_tutor: 'Tutor',
       help: 'Guida Comandi'
     };
 

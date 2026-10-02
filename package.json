@@ -1,7 +1,7 @@
 {
   "name": "vds-vl-quiz-master",
   "private": true,
-  "version": "1.7.6",
+  "version": "1.7.7",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -28,7 +28,8 @@
     "build:audio:manifest": "python scripts/generate_audio_manifest.py",
     "audio:trim": "python scripts/trim_audio_silence.py",
     "worklog:consolidate": "node scripts/consolidate_worklog.cjs",
-    "worklog:consolidate:dry": "node scripts/consolidate_worklog.cjs --dry-run"
+    "worklog:consolidate:dry": "node scripts/consolidate_worklog.cjs --dry-run",
+    "strings:extract": "node scripts/extract_ui_strings.cjs"
   },
   "dependencies": {
     "canvas-confetti": "^1.9.4",

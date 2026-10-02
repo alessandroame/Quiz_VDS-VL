@@ -105,6 +105,9 @@ describe('VoiceQuickMenu Component (Neutral Disambiguation & Controls)', () => {
     const popover = container.querySelector('[data-testid="voice-quick-popover"]');
     expect(popover).not.toBeNull();
     expect(popover?.textContent).toContain('Impostazioni Voce');
+    expect(popover?.textContent).not.toContain('Tutor didattico');
+    expect(popover?.textContent).not.toContain('mani libere');
+    expect(container.querySelector('#quick-menu-toggle-tutor')).toBeNull();
 
     act(() => {
       root.unmount();

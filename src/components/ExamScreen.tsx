@@ -508,7 +508,7 @@ export const ExamScreen: React.FC<ExamScreenProps> = ({
         setFlags({});
         setCurrentIndex(0);
       },
-      title: examMode === 'tutor' ? 'Simulazione Didattica' : 'Esame Ufficiale'
+      title: examMode === 'tutor' ? 'Tutor' : 'Esame Ufficiale'
     });
 
     return () => {
@@ -552,10 +552,10 @@ export const ExamScreen: React.FC<ExamScreenProps> = ({
               </div>
               <h2 className="font-bold text-lg sm:text-xl text-zinc-100 light:text-slate-900 flex items-center gap-2.5">
                 <BookOpen className="w-6 h-6 text-emerald-400" />
-                <span>Simulazione Didattica (Tutor)</span>
+                <span>Tutor (Studio Guidato)</span>
               </h2>
               <p className="text-xs sm:text-sm text-zinc-400 light:text-slate-600 leading-relaxed">
-                Esercitazione guidata sui 30 quesiti ufficiali AeCI ripartiti per materia. Correzione cromatico-didattica istantanea ad ogni risposta con spiegazione dettagliata <strong>Regola</strong> e <strong>Tranello</strong>.
+                Esercitazione guidata sui 30 quesiti ufficiali AeCI ripartiti per materia. Correzione istantanea ad ogni risposta con spiegazione dettagliata <strong>Regola</strong> e <strong>Tranello</strong>.
               </p>
             </div>
 
@@ -577,7 +577,7 @@ export const ExamScreen: React.FC<ExamScreenProps> = ({
               onClick={() => handleRequestStartExam('tutor')}
               className="w-full py-3.5 rounded-xl bg-emerald-700 hover:bg-emerald-600 text-white font-bold text-sm shadow-lg shadow-emerald-950/40 flex items-center justify-center gap-2 transition-all active:scale-[0.99]"
             >
-              <span>Inizia Simulazione Didattica (30 Quiz)</span>
+              <span>Inizia Tutor (30 Quiz)</span>
               <ArrowRight className="w-4 h-4" />
             </button>
           </div>
@@ -677,7 +677,7 @@ export const ExamScreen: React.FC<ExamScreenProps> = ({
             className="text-xs text-zinc-400 hover:text-emerald-400 light:text-slate-500 light:hover:text-emerald-600 transition-colors inline-flex items-center gap-1.5"
           >
             <BookOpen className="w-3.5 h-3.5 text-emerald-400" />
-            <span>Vuoi prima esercitarti senza limiti di tempo? Passa a <strong>Tutor Didattico</strong></span>
+            <span>Vuoi prima esercitarti senza limiti di tempo? Passa a <strong>Tutor</strong></span>
           </button>
         </div>
       </div>
@@ -710,7 +710,7 @@ export const ExamScreen: React.FC<ExamScreenProps> = ({
             )}
           </div>
           <div className="text-[11px] font-bold uppercase tracking-wider text-zinc-400 light:text-slate-500">
-            {isTutor ? 'Simulazione Didattica' : completedSession.isMarathon ? 'Maratona Intensiva' : 'Esame Ufficiale'}
+            {isTutor ? 'Tutor' : completedSession.isMarathon ? 'Maratona Intensiva' : 'Esame Ufficiale'}
           </div>
           <h2
             className={`text-2xl font-black tracking-tight ${
@@ -774,7 +774,7 @@ export const ExamScreen: React.FC<ExamScreenProps> = ({
             className="flex-1 py-3 rounded-xl bg-amber-600 hover:bg-amber-500 text-white font-bold text-xs sm:text-sm flex items-center justify-center gap-2 shadow-md transition-colors"
           >
             <RotateCcw className="w-4 h-4" />
-            <span>Nuova Simulazione Didattica</span>
+            <span>Nuova Sessione Tutor</span>
           </button>
           <button
             id="btn-restart-official"
@@ -1096,7 +1096,7 @@ export const ExamScreen: React.FC<ExamScreenProps> = ({
             <div className="flex items-center gap-2 text-amber-400">
               <AlertCircle className="w-6 h-6" />
               <h3 className="font-bold text-base text-zinc-100 light:text-slate-900">
-                {examMode === 'tutor' ? 'Concludi Simulazione Didattica' : 'Consegna Esame'}
+                {examMode === 'tutor' ? 'Concludi Tutor' : 'Consegna Esame'}
               </h3>
             </div>
 
@@ -1176,7 +1176,7 @@ export const ExamScreen: React.FC<ExamScreenProps> = ({
         }}
         sessionTitle={
           examMode === 'tutor'
-            ? 'Simulazione Didattica (Tutor)'
+            ? 'Tutor'
             : isMarathon
             ? 'Maratona 60 Quiz'
             : 'Simulazione Esame Ufficiale'
@@ -1231,7 +1231,7 @@ export const ExamScreen: React.FC<ExamScreenProps> = ({
           activeSession?.subjectName ||
           (activeSession?.type === 'exam'
             ? activeSession.examMode === 'tutor'
-              ? 'Simulazione Didattica (Tutor)'
+              ? 'Tutor'
               : 'Esame Ufficiale'
             : 'Sessione di Studio')
         }
@@ -1240,7 +1240,7 @@ export const ExamScreen: React.FC<ExamScreenProps> = ({
         } • ${activeSession?.answers ? Object.keys(activeSession.answers).length : 0} risposte date`}
         newSessionTitle={
           conflictPendingMode === 'tutor'
-            ? 'Nuova Simulazione Didattica'
+            ? 'Nuova Sessione Tutor'
             : conflictPendingMode === 'marathon'
             ? 'Nuova Maratona 60 Quiz'
             : 'Nuova Simulazione Esame Ufficiale'

@@ -14,6 +14,38 @@ Questo documento registra in ordine cronologico tutte le lavorazioni svolte nel 
 - **Impatto sul Desiderata**: <Come questo intervento contribuisce al desiderata (cfr. DESIDERATA.md) e indicazioni per il prossimo agente>
 ```
 
+### [2026-10-02] - Analisi Semantica AI del Microcopy, Bonifica Pleonasmi e Script di Estrazione Stringhe AST (v1.7.7)
+
+- **Cosa abbiamo fatto**:
+  - **Rimozione Toggle Fuori Contesto nel Menu Rapido Voce ([src/components/VoiceQuickMenu.tsx](file:///c:/github/Quiz_VDS-VL/src/components/VoiceQuickMenu.tsx))**:
+    - Rimosso lo switch `driveModeTutor` ("Tutor didattico a mani libere"), incomprensibile e ridondante nel flyout della lettura audio generale.
+    - Aggiornato [src/components/VoiceQuickMenu.test.ts](file:///c:/github/Quiz_VDS-VL/src/components/VoiceQuickMenu.test.ts) asserendo che `quick-menu-toggle-tutor`, "Tutor didattico" e "mani libere" non compaiano nel flyout.
+  - **Semplificazione e Bonifica "Tutor Didattico" ➔ "Tutor"**:
+    - Allineato il nome della modalità da "Tutor Didattico" al canone essenziale a 1 parola **`Tutor`** in tutta l'applicazione:
+      * [src/components/HomeScreen.tsx](file:///c:/github/Quiz_VDS-VL/src/components/HomeScreen.tsx) e [src/components/HomeScreen.test.ts](file:///c:/github/Quiz_VDS-VL/src/components/HomeScreen.test.ts) (card Home e modali di conflitto sessione)
+      * [src/utils/navigation.ts](file:///c:/github/Quiz_VDS-VL/src/utils/navigation.ts) e [src/utils/navigation.test.ts](file:///c:/github/Quiz_VDS-VL/src/utils/navigation.test.ts) (`label: 'Tutor'`, `headerTitle: 'Tutor'`)
+      * [src/components/ExamScreen.tsx](file:///c:/github/Quiz_VDS-VL/src/components/ExamScreen.tsx) (card di avvio, riavvio, modali di conferma e consegna)
+      * [src/components/SettingsModal.tsx](file:///c:/github/Quiz_VDS-VL/src/components/SettingsModal.tsx) (`Modalità Tutor`)
+      * [src/components/drive/DriveLauncher.tsx](file:///c:/github/Quiz_VDS-VL/src/components/drive/DriveLauncher.tsx) e [src/components/drive/DriveTutorMode.test.ts](file:///c:/github/Quiz_VDS-VL/src/components/drive/DriveTutorMode.test.ts)
+      * [src/components/DriveModeScreen.tsx](file:///c:/github/Quiz_VDS-VL/src/components/DriveModeScreen.tsx), [src/components/MistakesScreen.tsx](file:///c:/github/Quiz_VDS-VL/src/components/MistakesScreen.tsx) e [src/components/TopicsScreen.tsx](file:///c:/github/Quiz_VDS-VL/src/components/TopicsScreen.tsx).
+  - **Bonifica Pleonasmi e Storytelling Emersi dall'Audit Semantico**:
+    - [src/components/ArchiveScreen.tsx](file:///c:/github/Quiz_VDS-VL/src/components/ArchiveScreen.tsx): corretto il triplo pleonasmo *"Ricomincia da capo dall'inizio"* in *"Ricomincia dall'inizio"*.
+    - [src/components/QuestionCard.tsx](file:///c:/github/Quiz_VDS-VL/src/components/QuestionCard.tsx): corretto *"Ricomincia domanda dall'inizio"* e *"Ricomincia spiegazione dall'inizio"* nei più sintetici *"Ricomincia domanda"* e *"Ricomincia spiegazione"*.
+    - [src/components/SettingsModal.tsx](file:///c:/github/Quiz_VDS-VL/src/components/SettingsModal.tsx): ripulita la label di reset dati in *"Azzera tutti i dati di studio"*.
+    - [src/components/AudioOfflinePromptModal.tsx](file:///c:/github/Quiz_VDS-VL/src/components/AudioOfflinePromptModal.tsx): rimosso lo storytelling da decollo (*"In viaggio verso il decollo..."*) sostituito con tono sobrio informativo (*"In zone montane o senza copertura..."*).
+  - **Tooling di Estrazione Stringhe AST ([scripts/extract_ui_strings.cjs](file:///c:/github/Quiz_VDS-VL/scripts/extract_ui_strings.cjs))**:
+    - Implementato uno script con il parser ufficiale TypeScript AST che analizza tutti i componenti `.tsx`/`.ts` ed estrae il 100% delle stringhe utente (nodi JSX, attributi `title`/`placeholder`/`aria-label`, toast) in [reports/ui_strings_catalog.json](file:///c:/github/Quiz_VDS-VL/reports/ui_strings_catalog.json) e `.md` (713 stringhe uniche).
+    - Aggiunto il comando `npm run strings:extract` a [package.json](file:///c:/github/Quiz_VDS-VL/package.json).
+  - **Aggiornamento Skill Direttive**:
+    - [.agents/skills/ui-audit-inspector/SKILL.md](file:///c:/github/Quiz_VDS-VL/.agents/skills/ui-audit-inspector/SKILL.md) e [.agents/skills/minimal-ui-ux/SKILL.md](file:///c:/github/Quiz_VDS-VL/.agents/skills/minimal-ui-ux/SKILL.md) aggiornate con la regola *Anti-Pleonasmo* e il protocollo di audit semantico combinato CDP + AST/LLM.
+- **Scelte architetturali & Rationale**:
+  - *AST Statico vs Scraping Dinamico CDP*: Lo scraping dinamico nel browser soffre del buco nero dei componenti non montati nel DOM (popover condizionali `{isOpen && ...}`, drawer chiusi). L'analisi AST di TypeScript garantisce una copertura al 100% dell'intero albero di componenti React indipendentemente dallo stato runtime.
+  - *Analisi Semantica con Modello AI vs Regex Rigide*: Le regex falliscono quando singole parole lecite vengono combinate in modo incoerente ("Tutor didattico a mani libere"). I modelli LLM con comprensione semantica rilevano immediatamente l'attrito cognitivo e i pleonasmi.
+- **Impatto sul Desiderata**:
+  - Eliminazione di attriti cognitivi nel microcopy e introduzione di uno strumento di estrazione stringhe permanente per garantire coerenza testuale e rigore nello studio d'esame.
+
+---
+
 ### [2026-10-02] - Politica di Riconnessione WebSocket HMR Meno Aggressiva con Exponential Backoff e Debounce Git Watcher
 
 - **Cosa abbiamo fatto**:

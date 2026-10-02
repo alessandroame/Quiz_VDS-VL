@@ -35,7 +35,7 @@ describe('Suite 17: Cockpit V2 Navigation & Home Hub Logic', () => {
 
   it('NAV-04: getHeaderTitle restituisce titoli essenziali per il mini-header e Home per la radice', () => {
     expect(getHeaderTitle('home')).toBe('Home');
-    expect(getHeaderTitle('tutor')).toBe('Tutor Didattico');
+    expect(getHeaderTitle('tutor')).toBe('Tutor');
     expect(getHeaderTitle('exam')).toBe('Simulazione Esame');
     expect(getHeaderTitle('topics')).toBe('Studio Materie');
     expect(getHeaderTitle('mistakes')).toBe('Quaderno Errori');
@@ -46,7 +46,7 @@ describe('Suite 17: Cockpit V2 Navigation & Home Hub Logic', () => {
   it('NAV-05: getTabLabel restituisce etichette leggibili per l\'abbandono e gestisce valori null o home', () => {
     expect(getTabLabel(null)).toBe('Home');
     expect(getTabLabel('home')).toBe('Home');
-    expect(getTabLabel('tutor')).toBe('Tutor Didattico');
+    expect(getTabLabel('tutor')).toBe('Tutor');
     expect(getTabLabel('exam')).toBe('Esame Ufficiale');
     expect(getTabLabel('topics')).toBe('Materie');
     expect(getTabLabel('mistakes')).toBe('Errori');

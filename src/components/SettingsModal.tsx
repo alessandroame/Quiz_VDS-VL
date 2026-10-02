@@ -1220,7 +1220,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                 <label className="flex items-center justify-between p-2.5 rounded-xl border border-zinc-700 bg-zinc-950/60 light:bg-slate-50 light:border-slate-300 cursor-pointer select-none active:scale-[0.99] touch-manipulation transition-all">
                   <div>
                     <span className="text-zinc-300 light:text-slate-700 font-medium block flex items-center gap-1.5">
-                      <span>Modalità Tutor Didattica</span>
+                      <span>Modalità Tutor</span>
                       <span className="text-[10px] font-mono px-1.5 py-0.2 rounded bg-amber-500/20 text-amber-300 font-bold">
                         REGOLA + TRANELLO
                       </span>
@@ -1676,7 +1676,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                   className="w-full py-2.5 rounded-xl border border-rose-500/20 bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 text-xs font-semibold flex items-center justify-center gap-1.5 transition-colors cursor-pointer active:scale-98 touch-manipulation"
                 >
                   <Trash2 className="w-3.5 h-3.5" />
-                  <span>Cancella tutti i dati e ricomincia da zero</span>
+                  <span>Azzera tutti i dati di studio</span>
                 </button>
               </div>
             </div>

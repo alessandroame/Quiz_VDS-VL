@@ -145,7 +145,7 @@ export const DriveLauncher: React.FC<DriveLauncherProps> = ({
               ? 'bg-amber-950/80 border-amber-500 text-amber-200 ring-1 ring-amber-500/50 light:bg-amber-100 light:border-amber-500 light:text-amber-900'
               : 'bg-zinc-900 border-zinc-800 text-zinc-400 hover:text-zinc-200 light:bg-white light:border-slate-200 light:text-slate-700 light:hover:text-slate-900 light:shadow-sm'
           }`}
-          title="Tocca per commutare la modalità Tutor con spiegazioni didattiche"
+          title="Tocca per attivare o disattivare il Tutor"
         >
           <div className="flex items-center gap-2 min-w-0">
             <GraduationCap
@@ -153,7 +153,7 @@ export const DriveLauncher: React.FC<DriveLauncherProps> = ({
             />
             <div className="text-left min-w-0">
               <div className="text-[10px] text-zinc-400 light:text-slate-500 uppercase font-semibold truncate">
-                Tutor Didattico
+                Tutor
               </div>
               <div
                 className="text-[11px] font-medium truncate"
@@ -383,7 +383,7 @@ export const DriveLauncher: React.FC<DriveLauncherProps> = ({
           <div className="flex items-center gap-3">
             <GraduationCap className="w-6 h-6 text-emerald-200" />
             <div className="text-left">
-              <div>Tutor Didattico (30 Quiz)</div>
+              <div>Tutor (30 Quiz)</div>
               <div className="text-xs text-emerald-200 font-medium">Spiegazioni vocali • Regola & Tranello • Senza fretta</div>
             </div>
           </div>

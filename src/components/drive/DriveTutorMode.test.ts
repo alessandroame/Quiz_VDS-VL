@@ -60,7 +60,7 @@ describe('Drive Mode Tutor Integration', () => {
     );
 
     expect(html).toContain('id="btn-drive-start-tutor"');
-    expect(html).toContain('Tutor Didattico (30 Quiz)');
+    expect(html).toContain('Tutor (30 Quiz)');
     expect(html).toContain('id="btn-drive-start-exam"');
     expect(html).toContain('Esame Ufficiale AeCI');
     expect(html).toContain('ATTIVA (Regola + Tranello su errore)');

@@ -531,7 +531,7 @@ export const MistakesScreen: React.FC<MistakesScreenProps> = ({ onNavigateHome }
           activeSession?.subjectName ||
           (activeSession?.type === 'exam'
             ? activeSession.examMode === 'tutor'
-              ? 'Simulazione Didattica (Tutor)'
+              ? 'Tutor'
               : 'Esame Ufficiale'
             : 'Sessione di Studio')
         }
