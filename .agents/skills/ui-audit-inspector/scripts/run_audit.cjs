@@ -995,7 +995,102 @@ async function runAudit() {
       font-size: 13px;
       box-shadow: 0 4px 14px rgba(0,0,0,0.5);
       display: none;
-      z-index: 1100;
+    /* User Notes & Action Bar */
+    .issue-notes-container {
+      margin-top: 14px;
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid #27272a;
+      border-radius: 8px;
+      padding: 10px 12px;
+    }
+    .notes-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 6px;
+    }
+    .notes-label {
+      font-weight: 700;
+      font-size: 11px;
+      color: var(--accent);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .notes-status {
+      font-size: 11px;
+      color: var(--success);
+      font-family: monospace;
+      opacity: 0;
+      transition: opacity 0.2s ease;
+    }
+    .issue-notes-textarea {
+      width: 100%;
+      background: #121214;
+      border: 1px solid #3f3f46;
+      border-radius: 6px;
+      color: #f4f4f5;
+      font-family: inherit;
+      font-size: 13px;
+      padding: 8px 10px;
+      resize: vertical;
+      min-height: 48px;
+      outline: none;
+      transition: border-color 0.15s;
+    }
+    .issue-notes-textarea:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 1px var(--accent);
+    }
+    .notes-floating-bar {
+      position: fixed;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(24, 24, 27, 0.95);
+      border: 1px solid var(--accent);
+      padding: 8px 16px;
+      border-radius: 30px;
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.8), 0 0 16px rgba(245, 158, 11, 0.2);
+      z-index: 1050;
+      backdrop-filter: blur(8px);
+    }
+    .action-btn {
+      background: var(--accent);
+      color: #000;
+      border: none;
+      padding: 8px 14px;
+      border-radius: 20px;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.15s;
+    }
+    .action-btn:hover {
+      background: #d97706;
+      transform: translateY(-1px);
+    }
+    .action-btn-secondary {
+      background: #27272a;
+      color: #a1a1aa;
+      border: 1px solid #3f3f46;
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-size: 12px;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .action-btn-secondary:hover {
+      color: #fff;
+      border-color: #52525b;
     }
   </style>
 </head>
@@ -1012,8 +1107,11 @@ async function runAudit() {
           Data generazione: <strong>${timestamp}</strong> • Rilievi unici accorpati tra tutti i viewport di test
         </p>
       </div>
-      <div>
+      <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
         <span class="badge badge-alto">Protocollo v1.0.0 (Deduplicato)</span>
+        <button class="action-btn" onclick="exportUserNotes()" title="Copia negli appunti tutte le note inserite">
+          📝 Note per Chat (<span id="notesCountHeader">0</span>)
+        </button>
       </div>
     </div>
 
@@ -1069,6 +1167,19 @@ async function runAudit() {
           <div class="issue-sol">
             <strong>Soluzione proposta:</strong> ${issue.solution}
           </div>
+          <div class="issue-notes-container">
+            <div class="notes-header">
+              <span class="notes-label">
+                <span>📝 Note & Direttive Utente</span>
+              </span>
+              <span id="save-status-${issue.id}" class="notes-status">✓ Salvato</span>
+            </div>
+            <textarea class="issue-notes-textarea"
+                      id="note-${issue.id}"
+                      data-issue-id="${issue.id}"
+                      placeholder="Scrivi qui la tua nota, domanda o istruzione personalizzata per [${issue.id}]..."
+                      rows="2"></textarea>
+          </div>
         </div>
         <div class="screenshot-box">
           <div class="image-overlay-wrapper"
@@ -1106,9 +1217,124 @@ async function runAudit() {
         </div>
       </div>
     </div>
+  <!-- Barra Flottante Note Utente -->
+  <div class="notes-floating-bar" id="notesFloatingBar">
+    <div style="font-size: 12px; font-weight: 700; color: #e4e4e7; display: flex; align-items: center; gap: 6px;">
+      <span>📝 Note Utente:</span>
+      <span id="notesCount" style="color: var(--accent); font-family: monospace; font-size: 14px;">0</span>
+    </div>
+    <button class="action-btn" onclick="exportUserNotes()" title="Copia negli appunti le tue note formattate per la chat">
+      📋 Copia per la Chat
+    </button>
+    <button class="action-btn-secondary" onclick="downloadNotesMarkdown()" title="Scarica le note come file Markdown">
+      💾 Scarica .md
+    </button>
+    <button class="action-btn-secondary" onclick="clearAllNotes()" title="Elimina tutte le note inserite">
+      🗑️ Azzera
+    </button>
   </div>
 
   <script>
+    const STORAGE_KEY = 'vds_audit_user_notes';
+
+    function getUserNotes() {
+      try {
+        return JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}');
+      } catch (e) {
+        return {};
+      }
+    }
+
+    function saveUserNote(issueId, text) {
+      const notes = getUserNotes();
+      if (text && text.trim()) {
+        notes[issueId] = text.trim();
+      } else {
+        delete notes[issueId];
+      }
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(notes));
+      } catch (e) {}
+      updateNotesCount();
+    }
+
+    function updateNotesCount() {
+      const notes = getUserNotes();
+      const count = Object.keys(notes).length;
+      document.querySelectorAll('#notesCount, #notesCountHeader').forEach(el => {
+        el.innerText = count;
+      });
+    }
+
+    function initUserNotes() {
+      const notes = getUserNotes();
+      document.querySelectorAll('.issue-notes-textarea').forEach(tx => {
+        const id = tx.getAttribute('data-issue-id');
+        if (notes[id]) {
+          tx.value = notes[id];
+        }
+        tx.addEventListener('input', () => {
+          saveUserNote(id, tx.value);
+          const st = document.getElementById('save-status-' + id);
+          if (st) {
+            st.style.opacity = '1';
+            setTimeout(() => { st.style.opacity = '0'; }, 1200);
+          }
+        });
+      });
+      updateNotesCount();
+    }
+
+    window.addEventListener('DOMContentLoaded', initUserNotes);
+    if (document.readyState !== 'loading') initUserNotes();
+
+    function exportUserNotes() {
+      const notes = getUserNotes();
+      const entries = Object.entries(notes);
+      if (entries.length === 0) {
+        alert('Nessuna nota inserita! Scrivi una nota o domanda in una delle schede prima di esportare.');
+        return;
+      }
+      let md = '### 📝 Note e Direttive Utente per la Risoluzione Audit:\\n\\n';
+      entries.forEach(([id, text]) => {
+        md += '- **[' + id + ']**: ' + text + '\\n';
+      });
+      navigator.clipboard.writeText(md).then(() => {
+        const toast = document.getElementById('copyToast');
+        toast.innerText = 'Copiata/e ' + entries.length + ' nota/e! Incollale in chat con l\\'agente.';
+        toast.style.display = 'block';
+        setTimeout(() => toast.style.display = 'none', 3000);
+      });
+    }
+
+    function downloadNotesMarkdown() {
+      const notes = getUserNotes();
+      const entries = Object.entries(notes);
+      if (entries.length === 0) {
+        alert('Nessuna nota inserita da scaricare.');
+        return;
+      }
+      let md = '# 📝 Note e Direttive Utente per la Risoluzione Audit\\n\\n';
+      entries.forEach(([id, text]) => {
+        md += '## [' + id + ']\\n' + text + '\\n\\n';
+      });
+      const blob = new Blob([md], { type: 'text/markdown' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'audit_user_notes.md';
+      a.click();
+      URL.revokeObjectURL(url);
+    }
+
+    function clearAllNotes() {
+      if (confirm('Vuoi davvero cancellare tutte le note inserite in questo report?')) {
+        localStorage.removeItem(STORAGE_KEY);
+        document.querySelectorAll('.issue-notes-textarea').forEach(tx => tx.value = '');
+        updateNotesCount();
+      }
+    }
+
     function copyId(id) {
       navigator.clipboard.writeText('[' + id + ']').then(() => {
         const toast = document.getElementById('copyToast');

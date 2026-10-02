@@ -14,6 +14,31 @@ Questo documento registra in ordine cronologico tutte le lavorazioni svolte nel 
 - **Impatto sul Desiderata**: <Come questo intervento contribuisce al desiderata (cfr. DESIDERATA.md) e indicazioni per il prossimo agente>
 ```
 
+# 2026-10-02 - UI Audit Inspector: Sistema Interattivo di Note e Direttive Utente nel Report
+
+## Cosa abbiamo fatto
+- **Implementazione Sistema di Note Interattive su Ciascuna Issue Card**:
+  - Aggiunto un campo `<textarea>` dedicato in ogni scheda difetto del report HTML per consentire all'utente di annotare commenti, preferenze cromatiche o domande specifiche (es. *"per questo badge usa il blu navy"* o *"su questa schermata lasciamo il pulsante verde?"*).
+  - Salvataggio automatico in tempo reale in `localStorage` (`vds_audit_user_notes`) ad ogni digitazione, con indicatore visivo `✓ Salvato` a dissolvenza.
+- **Barra Flottante & Toolbar di Esportazione per la Chat**:
+  - Aggiunta una toolbar flottante in basso (`.notes-floating-bar`) sempre accessibile durante lo scroll con:
+    * Contatore note attive in tempo reale.
+    * Tasto **"📋 Copia per la Chat"**: genera automaticamente un blocco Markdown ordinato con tutti i punti compilati (es. `- **[CONTRAST-04]**: ...`) e lo copia negli appunti con un clic.
+    * Tasto **"💾 Scarica .md"**: consente il download istantaneo del file `audit_user_notes.md`.
+    * Tasto **"🗑️ Azzera"**: pulizia rapida con prompt di conferma.
+  - Aggiunto pulsante di esportazione rapida anche nell'header della pagina (`📝 Note per Chat (N)`).
+- **Rigenerazione Report**:
+  - Eseguito il runner `npm run audit:ui` generando il report completo e verificato: [audit_reports/audit_report_2026-10-02_10-28-14.html](file:///c:/github/Quiz_VDS-VL/audit_reports/audit_report_2026-10-02_10-28-14.html).
+
+## Scelte architetturali & Rationale
+- **Zero Dipendenze & Salvataggio Locale (localStorage)**: Le note scritte dall'utente persistono anche ricaricando la pagina o riaprendo il file HTML successivamente.
+- **Esportazione Markdown a Un Clic**: Riduce a zero l'attrito comunicativo tra l'ispezione visiva del report e la conversazione con l'agente: l'utente scrive le proprie note nel report, clicca un pulsante e incolla il testo direttamente in chat. L'agente incorpora quindi queste direttive nel piano di remediation.
+
+## Impatto sul Desiderata
+- Incrementa la sinergia e la precisione nel ciclo di correzione UI/UX, garantendo che ogni feedback soggettivo o domanda dell'utente sia tracciata puntualmente prima di toccare il codice.
+
+---
+
 # 2026-10-02 - UI Audit Inspector: Unificazione Filtri Header & Fix Ingrandimento Lightbox
 
 ## Cosa abbiamo fatto
