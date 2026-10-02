@@ -90,3 +90,4 @@ Caratteristiche del report HTML:
 2. **Screenshot Contestuali**: Visualizzazione affiancata o integrata dello screenshot catturato a evidenza del problema.
 3. **Tabella Before ➔ After**: Proposta testuale precisa con calcolo della riduzione caratteri e motivazione tecnica.
 4. **Filtro Rapido**: Tasti in cima al report per visualizzare solo *Contrasti*, *Microcopy*, *Cluttering* o *Overflow*.
+5. **Apertura nel Browser da Antigravity**: Fornire sempre il link HTTP servito da Vite `http://localhost:5173/audit-reports/<report.html>` (in modo che l'IDE apra la pagina nel browser anziché mostrare il codice sorgente) e/o eseguire `Start-Process` per aprirlo all'istante sul sistema operativo dell'utente.

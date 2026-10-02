@@ -14,6 +14,25 @@ Questo documento registra in ordine cronologico tutte le lavorazioni svolte nel 
 - **Impatto sul Desiderata**: <Come questo intervento contribuisce al desiderata (cfr. DESIDERATA.md) e indicazioni per il prossimo agente>
 ```
 
+# 2026-10-02 - UI Audit Inspector: Servizio HTTP Statico dei Report per Apertura Browser da IDE
+
+## Cosa abbiamo fatto
+- **Risoluzione Problema Apertura Report da Antigravity**:
+  - Risolto il problema per cui i link `file:///...` cliccati nella chat di Antigravity venivano intercettati come file di codice sorgente aprendosi nell'editor di testo dell'IDE anziché nel browser web.
+  - **Middleware Statico in [vite.config.ts](file:///c:/github/Quiz_VDS-VL/vite.config.ts)**: Aggiunto il plugin `serve-audit-reports` che espone in streaming HTTP diretto la cartella `audit_reports/` su `http://localhost:5173/audit-reports/<file.html>`.
+  - **Comportamento IDE**: Cliccando su un link `http://...`, Antigravity delega immediatamente l'apertura al browser web di sistema o alla preview web.
+  - **Aggiornamento Script & SKILL**:
+    * Aggiornato [.agents/skills/ui-audit-inspector/scripts/run_audit.cjs](file:///c:/github/Quiz_VDS-VL/.agents/skills/ui-audit-inspector/scripts/run_audit.cjs) per stampare sia il link web `http://localhost:5173/audit-reports/...` che il path locale.
+    * Aggiornato [.agents/skills/ui-audit-inspector/SKILL.md](file:///c:/github/Quiz_VDS-VL/.agents/skills/ui-audit-inspector/SKILL.md) con la direttiva di fornire sempre l'URL HTTP nelle risposte utente.
+
+## Scelte architetturali & Rationale
+- Il dev server locale Vite è sempre attivo in fase di sviluppo: utilizzarlo per servire anche i report di audit permette di avere link web HTTP nativi che si aprono automaticamente nel browser predefinito dell'utente senza bisogno di server ausiliari.
+
+## Impatto sul Desiderata
+- Esperienza utente fluida, zero frizione nell'ispezione visiva dei report e verificabilità immediata dei collaudi.
+
+---
+
 # 2026-10-02 - UI Audit Inspector: Sistema Interattivo di Note e Direttive Utente nel Report
 
 ## Cosa abbiamo fatto

@@ -1414,8 +1414,10 @@ async function runAudit() {
 </html>`;
 
     fs.writeFileSync(reportHtmlPath, htmlContent, 'utf-8');
+    const httpUrl = `http://localhost:5173/audit-reports/${reportHtmlFilename}`;
     console.log(`\n🎉 Report HTML salvato con successo:`);
-    console.log(`👉 [${reportHtmlPath}](file:///${reportHtmlPath.replace(/\\/g, '/')})\n`);
+    console.log(`🌐 Nel Browser: ${httpUrl}`);
+    console.log(`📁 File Locale: [${reportHtmlPath}](file:///${reportHtmlPath.replace(/\\/g, '/')})\n`);
 
   } catch (err) {
     console.error('❌ Errore durante l\'esecuzione dell\'audit:', err);
