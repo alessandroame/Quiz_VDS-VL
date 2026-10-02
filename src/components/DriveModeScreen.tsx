@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import type { Question } from '../types/quiz';
 import type { ExamSession } from '../types/database';
+import type { AudioPart } from '../types/audio';
 import { useQuiz } from '../context/QuizContext';
 import { generateExamQuestions } from '../utils/fairRandomizer';
 import { evaluateExam } from '../services/examEvaluator';
@@ -200,6 +201,11 @@ export const DriveModeScreen: React.FC<DriveModeScreenProps> = ({
   const questionSwitchTimeoutRef = useRef<any>(null);
   const prevQuestionIdRef = useRef<number | null>(null);
 
+  // Safety micro-cooldown (500ms) when voice switches option to prevent accidental clicks during expansion
+  const [isOptionSwitchingCooldown, setIsOptionSwitchingCooldown] = useState<boolean>(false);
+  const optionSwitchTimeoutRef = useRef<any>(null);
+  const prevActivePartRef = useRef<AudioPart | null>(null);
+
   const clearAllDriveTimers = useCallback(() => {
     if (countdownTimerRef.current) {
       clearInterval(countdownTimerRef.current);
@@ -225,10 +231,15 @@ export const DriveModeScreen: React.FC<DriveModeScreenProps> = ({
       clearTimeout(questionSwitchTimeoutRef.current);
       questionSwitchTimeoutRef.current = null;
     }
+    if (optionSwitchTimeoutRef.current) {
+      clearTimeout(optionSwitchTimeoutRef.current);
+      optionSwitchTimeoutRef.current = null;
+    }
     setWaitingCountdown(null);
     setAssimilationCountdown(null);
     setIsWaitingForExplanationEnd(false);
     isWaitingForExplanationEndRef.current = false;
+    setIsOptionSwitchingCooldown(false);
   }, []);
 
   // Sincronizza stato iniziale all'apertura o cambio di context
@@ -236,7 +247,9 @@ export const DriveModeScreen: React.FC<DriveModeScreenProps> = ({
     if (!isOpen) {
       setInternalMode('launcher');
       prevQuestionIdRef.current = null;
+      prevActivePartRef.current = null;
       setIsQuestionSwitching(false);
+      setIsOptionSwitchingCooldown(false);
       return;
     }
     if (sessionContext) {
@@ -298,8 +311,37 @@ export const DriveModeScreen: React.FC<DriveModeScreenProps> = ({
     stopDriveIntro,
     stop: stopVoice,
     pause: pauseVoice,
-    resume: resumeVoice
+    resume: resumeVoice,
+    activePart
   } = useAviationVoice(currentQ?.id);
+
+  // Anti-misclick micro-cooldown (500ms) when voice switches spoken option
+  useEffect(() => {
+    if (!isOpen || internalMode !== 'running') return;
+
+    if (
+      isPlaying &&
+      prevActivePartRef.current &&
+      activePart &&
+      prevActivePartRef.current !== activePart &&
+      (activePart.startsWith('opt') || prevActivePartRef.current.startsWith('opt'))
+    ) {
+      setIsOptionSwitchingCooldown(true);
+      if (optionSwitchTimeoutRef.current) clearTimeout(optionSwitchTimeoutRef.current);
+      optionSwitchTimeoutRef.current = setTimeout(() => {
+        setIsOptionSwitchingCooldown(false);
+        optionSwitchTimeoutRef.current = null;
+      }, 500);
+    }
+
+    prevActivePartRef.current = activePart;
+
+    return () => {
+      if (optionSwitchTimeoutRef.current) {
+        clearTimeout(optionSwitchTimeoutRef.current);
+      }
+    };
+  }, [isOpen, internalMode, activePart, isPlaying]);
 
   const isExplanationPlaying = isPartPlaying('explanation');
 
@@ -501,8 +543,8 @@ export const DriveModeScreen: React.FC<DriveModeScreenProps> = ({
   const handleSelectAnswer = async (ans: 1 | 2 | 3) => {
     if (!currentQ || internalMode !== 'running') return;
 
-    // Ignora click durante il micro-cooldown (250ms) al cambio domanda
-    if (isQuestionSwitching) return;
+    // Ignore clicks during safety micro-cooldown (250ms on question switch or 500ms on spoken option switch with layout shift)
+    if (isQuestionSwitching || isOptionSwitchingCooldown) return;
 
     // Se l'esame è già terminato o la domanda è già rivelata
     if (answers[currentQ.id] !== undefined && (!isExamSession || isTutorEnabled)) return;
@@ -1120,6 +1162,7 @@ export const DriveModeScreen: React.FC<DriveModeScreenProps> = ({
           onToggleFlag={handleToggleFlag}
           onSubmitExam={handleSubmitExam}
           isQuestionSwitching={isQuestionSwitching}
+          isCooldownActive={isQuestionSwitching || isOptionSwitchingCooldown}
         />
       )}
 

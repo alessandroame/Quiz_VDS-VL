@@ -14,6 +14,31 @@ Questo documento registra in ordine cronologico tutte le lavorazioni svolte nel 
 - **Impatto sul Desiderata**: <Come questo intervento contribuisce al desiderata (cfr. DESIDERATA.md) e indicazioni per il prossimo agente>
 ```
 
+### [2026-10-02] - Ripristino Espansione Testuale Dinamica dell'Opzione Vocale e Cooldown di Sicurezza 500ms al Cambio Opzione in Modalità Mani Libere
+
+- **Cosa abbiamo fatto**:
+  - **Ripristino dell'Espansione Dinamica dell'Opzione Attiva (Karaoke Accordion)**:
+    * In [src/components/drive/DriveActiveHUD.tsx](file:///c:/github/Quiz_VDS-VL/src/components/drive/DriveActiveHUD.tsx), ripristinata l'espansione automatica `isExpanded = isCurrentOptPlaying || manualExpanded[idx]` e `line-clamp-none` con `flex-1` sull'opzione attualmente pronunciata dalla voce neurale (mentre le altre rimangono su `flex-none` e `line-clamp-2`), permettendo all'allievo di leggere interamente i testi lunghi mentre li ascolta.
+  - **Implementazione Cooldown di Sicurezza 500ms Anti-Misclick al Cambio Opzione Vocale**:
+    * In [src/components/DriveModeScreen.tsx](file:///c:/github/Quiz_VDS-VL/src/components/DriveModeScreen.tsx), intercettato `activePart` dall'hook `useAviationVoice(currentQ?.id)`.
+    * All'avanzamento della voce tra un'opzione e la successiva (`activePart.startsWith('opt')` con cambio di parte vocale), si attiva un blocco temporaneo di 500ms (`isOptionSwitchingCooldown`).
+    * Durante questi 500ms:
+      1. Il gestore di risposta `handleSelectAnswer` scarta qualsiasi tocco a livello logico (`if (isQuestionSwitching || isOptionSwitchingCooldown) return;`).
+      2. I pulsanti di risposta in `DriveActiveHUD.tsx` ricevono `isCooldownActive={isQuestionSwitching || isOptionSwitchingCooldown}`, attivando sia `disabled={isLocked}` che la classe Tailwind `pointer-events-none`.
+    * In questo modo, l'eventuale variazione di altezza e lo spostamento delle coordinate del pulsante sotto il dito non possono in alcun caso provocare una selezione accidentale errata.
+  - **Aggiornamento Contratti Ergonomici & Suite di Test**:
+    * In [src/components/drive/DriveActiveHUD.test.ts](file:///c:/github/Quiz_VDS-VL/src/components/drive/DriveActiveHUD.test.ts):
+      - `HUD-EXPAND-02`: asserisce che l'opzione in lettura vocale si espanda a `line-clamp-none`.
+      - `HUD-EXPAND-05`: asserisce `flex-1` per l'opzione parlata ed espansa, e `flex-none` per quelle inattive compresse.
+      - `HUD-COOLDOWN-01`: asserisce l'applicazione di `disabled` e `pointer-events-none` sia durante il cooldown cambio opzione che durante la transizione cambio domanda.
+    * In [src/components/DriveModeScreen.test.ts](file:///c:/github/Quiz_VDS-VL/src/components/DriveModeScreen.test.ts):
+      - Aggiunto `activePart: null` al mock di `useAviationVoice` per compatibilità completa con i test di cambio domanda (`DRIVE-COOLDOWN-01`).
+- **Scelte architetturali & Rationale**:
+  - L'allievo ha bisogno di leggere per intero le opzioni lunghe durante l'ascolto senza dover premere manualmente pulsanti aggiuntivi mentre è a mani libere.
+  - Combinando l'espansione visiva dinamica dell'opzione attiva con il lock di 500ms al momento esatto del cambio opzione (`pointer-events-none` + `disabled`), si ottiene il meglio dei due mondi: massima leggibilità dei testi lunghi e protezione totale da click accidentali dovuti al riposizionamento del pulsante sotto il dito.
+- **Impatto sul Desiderata**:
+  - Allineato al desiderata di Modalità Mani Libere (studio hands-free leggibile, sicuro e a prova di misclick).
+
 ### [2026-10-02] - Stabilizzazione Geometria Fasce Risposta (Zero Layout Shift) e Grace Period 250ms al Cambio Domanda in Modalità Mani Libere
 
 - **Cosa abbiamo fatto**:

@@ -39,6 +39,7 @@ vi.mock('../hooks/useAviationVoice', () => ({
     isSequencePlaying: false,
     isPartPlaying: () => false,
     isDriveIntroPlaying: false,
+    activePart: null,
     togglePlayPause: vi.fn(),
     restartCurrentOrSequence: vi.fn(),
     playFullSequence: vi.fn(),

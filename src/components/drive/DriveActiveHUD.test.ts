@@ -98,7 +98,7 @@ describe('DriveActiveHUD - Karaoke Accordion & Long Text Expansion', () => {
     expect(html).toContain('id="btn-drive-question-expand"');
   });
 
-  it('HUD-EXPAND-02: maintains stable line-clamp-2 during voice playback to prevent layout shifts while highlighting spoken option', () => {
+  it('HUD-EXPAND-02: dynamically unclamps the spoken option while speaking so long text is fully visible', () => {
     const html = renderToString(
       React.createElement(DriveActiveHUD, {
         currentQ: sampleLongQuestion,
@@ -153,9 +153,12 @@ describe('DriveActiveHUD - Karaoke Accordion & Long Text Expansion', () => {
     expect(html).toContain('ring-amber-400');
     expect(html).toContain('animate-pulse');
 
-    // All options remain clamped to line-clamp-2 so card heights do not jump
+    // Spoken option 2 is unclasped to line-clamp-none so text is fully expanded
+    expect(html).toContain('line-clamp-none');
+    expect(html).toContain('Riduci');
+
+    // Other options remain clamped to line-clamp-2
     expect(html).toContain('line-clamp-2');
-    expect(html).not.toContain('line-clamp-none');
   });
 
   it('HUD-EXPAND-03: dynamically unclamps question heading when isPartPlaying("question") is true', () => {
@@ -344,7 +347,7 @@ describe('DriveActiveHUD - Karaoke Accordion & Long Text Expansion', () => {
     expect(html).not.toContain('Tutor ON');
   });
 
-  it('HUD-EXPAND-05: keeps equal flex-1 sizing across all options during voice playback to prevent target jumping under finger (zero layout shift)', () => {
+  it('HUD-EXPAND-05: gives flex-1 to the expanded option and flex-none to collapsed options so the expanded option occupies maximum available space', () => {
     const html = renderToString(
       React.createElement(DriveActiveHUD, {
         currentQ: sampleLongQuestion,
@@ -395,20 +398,19 @@ describe('DriveActiveHUD - Karaoke Accordion & Long Text Expansion', () => {
       })
     );
 
-    // Option 2 is speaking -> but all options remain flex-1 to prevent layout jumping under finger
+    // Option 2 is speaking -> expanded -> flex-1
+    // Options 1 and 3 are collapsed -> flex-none
     expect(html).toContain('id="btn-drive-opt-2"');
     const opt2Match = html.match(/id="btn-drive-opt-2"[^>]*class="([^"]*)"/);
     const opt1Match = html.match(/id="btn-drive-opt-1"[^>]*class="([^"]*)"/);
     const opt3Match = html.match(/id="btn-drive-opt-3"[^>]*class="([^"]*)"/);
 
     expect(opt2Match?.[1]).toContain('flex-1');
-    expect(opt1Match?.[1]).toContain('flex-1');
-    expect(opt3Match?.[1]).toContain('flex-1');
-    expect(opt1Match?.[1]).not.toContain('flex-none');
-    expect(opt3Match?.[1]).not.toContain('flex-none');
+    expect(opt1Match?.[1]).toContain('flex-none');
+    expect(opt3Match?.[1]).toContain('flex-none');
   });
 
-  it('HUD-COOLDOWN-01: disables option buttons and sets pointer-events-none when isQuestionSwitching is true', () => {
+  it('HUD-COOLDOWN-01: disables option buttons and sets pointer-events-none when isCooldownActive is true', () => {
     const html = renderToString(
       React.createElement(DriveActiveHUD, {
         currentQ: sampleLongQuestion,
@@ -456,7 +458,7 @@ describe('DriveActiveHUD - Karaoke Accordion & Long Text Expansion', () => {
         onNextQuestion: () => {},
         onToggleFlag: () => {},
         onSubmitExam: () => {},
-        isQuestionSwitching: true
+        isCooldownActive: true
       })
     );
 
