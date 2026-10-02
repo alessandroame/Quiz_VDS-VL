@@ -472,6 +472,7 @@ export const ArchiveScreen: React.FC = () => {
   const [selectedSubject, setSelectedSubject] = useState<number | 'all'>('all');
   const [statusFilter, setStatusFilter] = useState<ArchiveStatusFilter>('all');
   const [activeConceptChipId, setActiveConceptChipId] = useState<string | null>(null);
+  const [activeFilterCategory, setActiveFilterCategory] = useState<'subject' | 'status' | 'theme'>('subject');
   const [isKeypadOpen, setIsKeypadOpen] = useState(false);
   const [numericBuffer, setNumericBuffer] = useState('');
   const [expandedId, setExpandedId] = useState<number | null>(null);
@@ -716,126 +717,174 @@ export const ArchiveScreen: React.FC = () => {
         </div>
       )}
 
-      {/* 1. Barra Rapida Materie (01..09 + TUTTE) */}
-      <div className="space-y-1">
-        <div className="flex items-center justify-between text-[11px] text-zinc-400 light:text-slate-600 font-medium px-0.5">
-          <span>Filtro Materia</span>
-          {selectedSubject !== 'all' && (
+      {/* Barra Compatta Categorie Filtro (Materie | Stato | Temi) */}
+      <div className="space-y-1.5 pt-1 border-t border-zinc-800/80 light:border-slate-200">
+        <div className="flex items-center justify-between gap-2">
+          <div className="inline-flex p-0.5 rounded-lg bg-zinc-900 border border-zinc-700/80 light:bg-slate-100 light:border-slate-200 text-xs">
+            <button
+              id="archive-tab-subjects"
+              onClick={() => {
+                setActiveFilterCategory('subject');
+                triggerHapticFeedback('tap');
+              }}
+              className={`px-2.5 py-1 rounded-md text-xs font-semibold transition-all ${
+                activeFilterCategory === 'subject'
+                  ? 'bg-zinc-800 text-amber-400 font-bold shadow-sm light:bg-white light:text-amber-800'
+                  : 'text-zinc-400 hover:text-zinc-200 light:text-slate-600'
+              }`}
+            >
+              Materie {selectedSubject !== 'all' && `(${formatSubjectCode(selectedSubject)})`}
+            </button>
+            <button
+              id="archive-tab-status"
+              onClick={() => {
+                setActiveFilterCategory('status');
+                triggerHapticFeedback('tap');
+              }}
+              className={`px-2.5 py-1 rounded-md text-xs font-semibold transition-all ${
+                activeFilterCategory === 'status'
+                  ? 'bg-zinc-800 text-amber-400 font-bold shadow-sm light:bg-white light:text-amber-800'
+                  : 'text-zinc-400 hover:text-zinc-200 light:text-slate-600'
+              }`}
+            >
+              Stato {statusFilter !== 'all' && `(1)`}
+            </button>
+            <button
+              id="archive-tab-theme"
+              onClick={() => {
+                setActiveFilterCategory('theme');
+                triggerHapticFeedback('tap');
+              }}
+              className={`px-2.5 py-1 rounded-md text-xs font-semibold transition-all ${
+                activeFilterCategory === 'theme'
+                  ? 'bg-zinc-800 text-amber-400 font-bold shadow-sm light:bg-white light:text-amber-800'
+                  : 'text-zinc-400 hover:text-zinc-200 light:text-slate-600'
+              }`}
+            >
+              Temi {activeConceptChipId && `(1)`}
+            </button>
+          </div>
+
+          {hasActiveFilters && (
+            <button
+              id="btn-archive-reset-filters"
+              onClick={handleResetAllFilters}
+              className="text-[11px] text-amber-400 hover:text-amber-300 light:text-amber-700 light:hover:text-amber-900 font-medium"
+            >
+              Azzera filtri
+            </button>
+          )}
+        </div>
+
+        {/* Riga Singola Filtro Attivo */}
+        {activeFilterCategory === 'subject' && (
+          <div id="archive-filter-row-subject" className="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-0.5">
             <button
               onClick={() => {
                 setSelectedSubject('all');
                 triggerHapticFeedback('tap');
               }}
-              className="text-amber-400 hover:underline"
-            >
-              Mostra tutte
-            </button>
-          )}
-        </div>
-        <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-0.5">
-          <button
-            onClick={() => {
-              setSelectedSubject('all');
-              triggerHapticFeedback('tap');
-            }}
-            className={`px-3 py-1.5 rounded-lg border text-xs font-bold transition-all shrink-0 ${
-              selectedSubject === 'all'
-                ? 'bg-amber-500 text-zinc-950 border-amber-500 shadow-sm'
-                : 'bg-zinc-900 border-zinc-700 text-zinc-300 hover:text-white hover:bg-zinc-800 light:bg-white light:border-slate-300 light:text-slate-700'
-            }`}
-          >
-            TUTTE
-          </button>
-          {[1, 2, 3, 4, 5, 6, 7, 8, 9].map(id => {
-            const subName = subjectsAnalytics.find(s => s.id === id)?.name || `Materia ${id}`;
-            const isSelected = selectedSubject === id;
-            return (
-              <button
-                key={id}
-                onClick={() => {
-                  setSelectedSubject(id);
-                  triggerHapticFeedback('tap');
-                }}
-                title={`${formatSubjectCode(id)} - ${subName}`}
-                className={`px-2.5 py-1.5 rounded-lg border font-mono text-xs font-bold transition-all shrink-0 ${
-                  isSelected
-                    ? 'bg-amber-500 text-zinc-950 border-amber-500 shadow-sm'
-                    : 'bg-zinc-900 border-zinc-700 text-zinc-300 hover:text-white hover:bg-zinc-800 light:bg-white light:border-slate-300 light:text-slate-700'
-                }`}
-              >
-                {formatSubjectCode(id)}
-              </button>
-            );
-          })}
-        </div>
-      </div>
-
-      {/* 2. Filtri di Stato a Tocco Singolo */}
-      <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-0.5">
-        {(
-          [
-            { id: 'all', label: 'Tutte', count: statusCounts.all },
-            { id: 'unseen', label: 'Non viste', count: statusCounts.unseen },
-            { id: 'incorrect', label: 'Errate', count: statusCounts.incorrect },
-            { id: 'bookmarked', label: 'Preferiti', count: statusCounts.bookmarked },
-            { id: 'with_notes', label: 'Note', count: statusCounts.with_notes }
-          ] as const
-        ).map(filter => {
-          const isActive = statusFilter === filter.id;
-          return (
-            <button
-              key={filter.id}
-              id={filter.id === 'with_notes' ? 'btn-filter-notes' : undefined}
-              onClick={() => {
-                setStatusFilter(filter.id);
-                triggerHapticFeedback('tap');
-              }}
-              className={`px-2.5 py-1.5 rounded-lg border text-xs font-semibold flex items-center gap-1.5 shrink-0 transition-all ${
-                isActive
-                  ? 'bg-zinc-200 text-zinc-950 border-zinc-200 font-bold light:bg-zinc-800 light:text-white'
-                  : 'bg-zinc-900 border-zinc-700 text-zinc-300 hover:text-white light:bg-white light:border-slate-300 light:text-slate-700'
+              className={`px-3 py-1.5 rounded-lg border text-xs font-bold transition-all shrink-0 ${
+                selectedSubject === 'all'
+                  ? 'bg-amber-500 text-zinc-950 border-amber-500 shadow-sm'
+                  : 'bg-zinc-900 border-zinc-700 text-zinc-300 hover:text-white hover:bg-zinc-800 light:bg-white light:border-slate-300 light:text-slate-700'
               }`}
             >
-              <span>{filter.label}</span>
-              <span
-                className={`text-[10px] px-1 py-0.2 rounded-full font-mono ${
-                  isActive
-                    ? 'bg-zinc-400/40 text-zinc-950 font-bold light:bg-zinc-700 light:text-white'
-                    : 'bg-zinc-800 text-zinc-300 light:bg-slate-200 light:text-slate-700'
-                }`}
-              >
-                {filter.count}
-              </span>
+              TUTTE
             </button>
-          );
-        })}
-      </div>
+            {[1, 2, 3, 4, 5, 6, 7, 8, 9].map(id => {
+              const subName = subjectsAnalytics.find(s => s.id === id)?.name || `Materia ${id}`;
+              const isSelected = selectedSubject === id;
+              return (
+                <button
+                  key={id}
+                  onClick={() => {
+                    setSelectedSubject(id);
+                    triggerHapticFeedback('tap');
+                  }}
+                  title={`${formatSubjectCode(id)} - ${subName}`}
+                  className={`px-2.5 py-1.5 rounded-lg border font-mono text-xs font-bold transition-all shrink-0 ${
+                    isSelected
+                      ? 'bg-amber-500 text-zinc-950 border-amber-500 shadow-sm'
+                      : 'bg-zinc-900 border-zinc-700 text-zinc-300 hover:text-white hover:bg-zinc-800 light:bg-white light:border-slate-300 light:text-slate-700'
+                  }`}
+                >
+                  {formatSubjectCode(id)}
+                </button>
+              );
+            })}
+          </div>
+        )}
 
-      {/* 3. Quick Chips Concetti Frequenti */}
-      <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-0.5">
-        <div className="flex items-center gap-1 text-[11px] text-zinc-400 light:text-slate-600 shrink-0 font-medium pl-0.5">
-          <Sparkles className="w-3 h-3 text-amber-400" />
-          <span>Temi:</span>
-        </div>
-        {ARCHIVE_CONCEPT_CHIPS.map(chip => {
-          const isActive = activeConceptChipId === chip.id;
-          return (
-            <button
-              key={chip.id}
-              onClick={() => {
-                setActiveConceptChipId(isActive ? null : chip.id);
-                triggerHapticFeedback('tap');
-              }}
-              className={`px-2.5 py-1 rounded-full border text-[11px] font-medium transition-all shrink-0 ${
-                isActive
-                  ? 'border-amber-500/80 bg-amber-500/20 text-amber-300 shadow-[0_0_8px_rgba(245,158,11,0.2)]'
-                  : 'border-zinc-700 bg-zinc-900/60 text-zinc-300 hover:text-white light:bg-white light:border-slate-300 light:text-slate-700'
-              }`}
-            >
-              {chip.label}
-            </button>
-          );
-        })}
+        {activeFilterCategory === 'status' && (
+          <div id="archive-filter-row-status" className="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-0.5">
+            {(
+              [
+                { id: 'all', label: 'Tutte', count: statusCounts.all },
+                { id: 'unseen', label: 'Non viste', count: statusCounts.unseen },
+                { id: 'incorrect', label: 'Errate', count: statusCounts.incorrect },
+                { id: 'bookmarked', label: 'Preferiti', count: statusCounts.bookmarked },
+                { id: 'with_notes', label: 'Note', count: statusCounts.with_notes }
+              ] as const
+            ).map(filter => {
+              const isActive = statusFilter === filter.id;
+              return (
+                <button
+                  key={filter.id}
+                  id={filter.id === 'with_notes' ? 'btn-filter-notes' : undefined}
+                  onClick={() => {
+                    setStatusFilter(filter.id);
+                    triggerHapticFeedback('tap');
+                  }}
+                  className={`px-2.5 py-1.5 rounded-lg border text-xs font-semibold flex items-center gap-1.5 shrink-0 transition-all ${
+                    isActive
+                      ? 'bg-zinc-200 text-zinc-950 border-zinc-200 font-bold light:bg-zinc-800 light:text-white'
+                      : 'bg-zinc-900 border-zinc-700 text-zinc-300 hover:text-white light:bg-white light:border-slate-300 light:text-slate-700'
+                  }`}
+                >
+                  <span>{filter.label}</span>
+                  <span
+                    className={`text-[10px] px-1 py-0.2 rounded-full font-mono ${
+                      isActive
+                        ? 'bg-zinc-400/40 text-zinc-950 font-bold light:bg-zinc-700 light:text-white'
+                        : 'bg-zinc-800 text-zinc-300 light:bg-slate-200 light:text-slate-700'
+                    }`}
+                  >
+                    {filter.count}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+        )}
+
+        {activeFilterCategory === 'theme' && (
+          <div id="archive-filter-row-theme" className="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-0.5">
+            <div className="flex items-center gap-1 text-[11px] text-zinc-400 light:text-slate-600 shrink-0 font-medium pl-0.5">
+              <Sparkles className="w-3 h-3 text-amber-400" />
+              <span>Temi:</span>
+            </div>
+            {ARCHIVE_CONCEPT_CHIPS.map(chip => {
+              const isActive = activeConceptChipId === chip.id;
+              return (
+                <button
+                  key={chip.id}
+                  onClick={() => {
+                    setActiveConceptChipId(isActive ? null : chip.id);
+                    triggerHapticFeedback('tap');
+                  }}
+                  className={`px-2.5 py-1 rounded-full border text-[11px] font-medium transition-all shrink-0 ${
+                    isActive
+                      ? 'border-amber-500/80 bg-amber-500/20 text-amber-300 shadow-[0_0_8px_rgba(245,158,11,0.2)]'
+                      : 'border-zinc-700 bg-zinc-900/60 text-zinc-300 hover:text-white light:bg-white light:border-slate-300 light:text-slate-700'
+                  }`}
+                >
+                  {chip.label}
+                </button>
+              );
+            })}
+          </div>
+        )}
       </div>
 
       {/* Reset filtri attivi */}

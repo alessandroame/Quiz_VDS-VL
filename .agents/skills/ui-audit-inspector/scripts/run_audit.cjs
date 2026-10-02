@@ -330,6 +330,30 @@ async function runAudit() {
           }
         }
 
+        // 4. Cluttering checks
+        let homeCardCutoff = false;
+        let archiveStackedFilters = false;
+        let clutterDetails = null;
+
+        const statsCard = document.querySelector('#btn-home-stats');
+        if (statsCard && winHeight <= 850 && winWidth < 500) {
+          const statsRect = statsCard.getBoundingClientRect();
+          if (statsRect.bottom > winHeight + 8) {
+            homeCardCutoff = true;
+            clutterDetails = {
+              type: 'HOME_CARD_CUTOFF',
+              rect: getRectPct(statsRect),
+              bottom: Math.round(statsRect.bottom),
+              winHeight
+            };
+          }
+        }
+
+        const stackedFilters = document.querySelectorAll('#archive-filter-row-subject, #archive-filter-row-status, #archive-filter-row-theme');
+        if (stackedFilters.length > 1) {
+          archiveStackedFilters = true;
+        }
+
         return {
           winWidth,
           winHeight,
@@ -337,7 +361,10 @@ async function runAudit() {
           rootOverflow,
           overflowElements: overflowElements.slice(0, 10),
           contrastIssues: contrastIssues.slice(0, 20),
-          bannedFindings
+          bannedFindings,
+          homeCardCutoff,
+          archiveStackedFilters,
+          clutterDetails
         };
       })()
     `;
@@ -587,34 +614,39 @@ async function runAudit() {
     }
 
     // 3. Cluttering Issues (Unique & Structured)
+    const archiveClutterFinding = rawFindings.find(f => f.screenId === 'archive' && f.archiveStackedFilters);
+    if (archiveClutterFinding) {
+      cataloguedIssues.push({
+        id: `CLUTTER-${String(clutterSeq++).padStart(2, '0')}`,
+        category: 'Cluttering',
+        severity: 'MEDIO',
+        title: '3 righe orizzontali di filtri sovrapposte sotto la barra di ricerca',
+        screens: 'Archivio Quiz',
+        viewportsText: 'Mobile Portrait (390x844)',
+        theme: 'Dark & Light',
+        shotRelPath: capturedScreenshots['mobile-portrait_dark_archive'] || 'screenshots/mobile-portrait_dark_archive.png',
+        rect: { leftPct: 4, topPct: 22, widthPct: 92, heightPct: 18 },
+        description: 'In mobile portrait sono impilate 3 righe di pill-filter distinte (Filtro Materie, Filtro Stato, Filtro Temi). Occupano circa 180px verticali spingendo i quiz in basso.',
+        solution: 'Accorpare i filtri tematici e di stato in un selettore a scomparsa (drawer compatto) o in un menu a scheda singola per recuperare 100px utili alla lettura.'
+      });
+    }
 
-    cataloguedIssues.push({
-      id: `CLUTTER-${String(clutterSeq++).padStart(2, '0')}`,
-      category: 'Cluttering',
-      severity: 'MEDIO',
-      title: '3 righe orizzontali di filtri sovrapposte sotto la barra di ricerca',
-      screens: 'Archivio Quiz',
-      viewportsText: 'Mobile Portrait (390x844)',
-      theme: 'Dark & Light',
-      shotRelPath: capturedScreenshots['mobile-portrait_dark_archive'] || 'screenshots/mobile-portrait_dark_archive.png',
-      rect: { leftPct: 4, topPct: 22, widthPct: 92, heightPct: 18 },
-      description: 'In mobile portrait sono impilate 3 righe di pill-filter distinte (Filtro Materie 01..09, Filtro Stato Tutte/Non viste/Errate/Preferiti, Filtro Temi). Occupano circa 180px verticali spingendo i quiz in basso.',
-      solution: 'Accorpare i filtri tematici e di stato in un selettore a scomparsa (drawer compatto) o in un menu a scheda singola per recuperare 100px utili alla lettura.'
-    });
-
-    cataloguedIssues.push({
-      id: `CLUTTER-${String(clutterSeq++).padStart(2, '0')}`,
-      category: 'Cluttering',
-      severity: 'BASSO',
-      title: 'Taglio della sesta card ("Statistiche") sotto la piega dello schermo',
-      screens: 'Home',
-      viewportsText: 'Mobile Portrait (390x844)',
-      theme: 'Dark & Light',
-      shotRelPath: capturedScreenshots['mobile-portrait_dark_home'] || 'screenshots/mobile-portrait_dark_home.png',
-      rect: { leftPct: 4, topPct: 88, widthPct: 92, heightPct: 11 },
-      description: 'A causa dell\'altezza delle card e dei preamboli descrittivi a 2 righe, sullo schermo 390x844 l\'ultima voce del menu principale viene troncata in basso.',
-      solution: 'Rendere le 6 card più compatte riducendo il padding verticale da p-4 a p-3 e accorciando le descrizioni a una sola riga essenziale.'
-    });
+    const homeClutterFinding = rawFindings.find(f => f.screenId === 'home' && f.homeCardCutoff);
+    if (homeClutterFinding) {
+      cataloguedIssues.push({
+        id: `CLUTTER-${String(clutterSeq++).padStart(2, '0')}`,
+        category: 'Cluttering',
+        severity: 'BASSO',
+        title: 'Taglio della sesta card ("Statistiche") sotto la piega dello schermo',
+        screens: 'Home',
+        viewportsText: 'Mobile Portrait (390x844)',
+        theme: 'Dark & Light',
+        shotRelPath: capturedScreenshots['mobile-portrait_dark_home'] || 'screenshots/mobile-portrait_dark_home.png',
+        rect: (homeClutterFinding.clutterDetails && homeClutterFinding.clutterDetails.rect) || { leftPct: 4, topPct: 88, widthPct: 92, heightPct: 11 },
+        description: 'A causa dell\'altezza delle card e dei preamboli descrittivi a 2 righe, sullo schermo 390x844 l\'ultima voce del menu principale viene troncata in basso.',
+        solution: 'Rendere le 6 card più compatte riducendo il padding verticale da p-4 a p-3 e accorciando le descrizioni a una sola riga essenziale.'
+      });
+    }
 
     // 4. Overflows (if any)
     const overflowGroups = new Map();
