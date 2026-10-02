@@ -199,10 +199,11 @@ export const DriveActiveHUD: React.FC<DriveActiveHUDProps> = ({
     e.stopPropagation();
     setManuallyExpandedOpts((prev) => {
       const isCurrentlyExpanded = prev[optNum] !== undefined ? prev[optNum] : isPartPlaying(`opt${optNum}` as any);
-      return {
-        ...prev,
-        [optNum]: !isCurrentlyExpanded
-      };
+      if (isCurrentlyExpanded) {
+        return { 1: false, 2: false, 3: false };
+      } else {
+        return { 1: false, 2: false, 3: false, [optNum]: true };
+      }
     });
   };
 
@@ -211,6 +212,14 @@ export const DriveActiveHUD: React.FC<DriveActiveHUDProps> = ({
   const isLongQuestion = isQuestionTruncated !== null
     ? isQuestionTruncated
     : currentQ.question.length > 105;
+
+  const isAnyOptionExpanded = currentQ.options.some((_, i) => {
+    const optNum = (i + 1) as 1 | 2 | 3;
+    const isCurrentOptPlaying = isPartPlaying(`opt${optNum}` as any);
+    return manuallyExpandedOpts[optNum] !== undefined
+      ? manuallyExpandedOpts[optNum]
+      : isCurrentOptPlaying;
+  });
 
   return (
     <div className="flex-1 flex flex-col justify-between p-3 sm:p-5 max-w-2xl mx-auto w-full h-full overflow-hidden">
@@ -232,15 +241,16 @@ export const DriveActiveHUD: React.FC<DriveActiveHUDProps> = ({
       )}
 
       {/* Top Bar HUD */}
-      <div className="flex items-center justify-between gap-2 pb-2 border-b border-zinc-800/90 light:border-slate-200 text-xs">
+      <div className="flex items-center justify-between gap-1 sm:gap-2 pb-2 border-b border-zinc-800/90 light:border-slate-200 text-xs">
         <button
           id="btn-drive-exit"
           onClick={onExecuteClose}
-          className="px-3 py-1.5 rounded-xl border border-zinc-700 bg-zinc-900 text-zinc-200 hover:text-white hover:border-zinc-500 light:bg-white light:border-slate-300 light:text-slate-800 font-bold flex items-center gap-1.5 transition-all flex-shrink-0 shadow-sm active:scale-95"
+          className="p-1.5 sm:px-3 sm:py-1.5 rounded-xl border border-zinc-700 bg-zinc-900 text-zinc-200 hover:text-white hover:border-zinc-500 light:bg-white light:border-slate-300 light:text-slate-800 font-bold flex items-center gap-1.5 transition-all flex-shrink-0 shadow-sm active:scale-95"
           title="Torna alla vista normale del quiz"
+          aria-label="Torna alla vista normale"
         >
           <Headphones className="w-4 h-4 text-amber-400" />
-          <span>Vista Normale</span>
+          <span className="hidden sm:inline">Vista Normale</span>
         </button>
 
         <div className="flex items-center gap-2 font-mono flex-shrink-0">
@@ -705,7 +715,7 @@ export const DriveActiveHUD: React.FC<DriveActiveHUDProps> = ({
                 className={`overflow-hidden ${
                   isCurrentRevealed
                     ? 'w-full rounded-xl border p-2 sm:p-2.5 flex items-center gap-2.5 sm:gap-3 text-left transition-all'
-                    : `${isExpanded ? 'flex-none' : 'flex-1'} w-full min-h-[74px] sm:min-h-[85px] rounded-2xl border-2 p-3 sm:p-4 flex items-center gap-3.5 sm:gap-5 text-left transition-all shadow-md active:scale-[0.98]`
+                    : `${isAnyOptionExpanded ? (isExpanded ? 'flex-1' : 'flex-none') : 'flex-1'} w-full min-h-[74px] sm:min-h-[85px] rounded-2xl border-2 p-3 sm:p-4 flex items-center gap-3.5 sm:gap-5 text-left transition-all shadow-md active:scale-[0.98]`
                 } ${style}`}
               >
                 <div
