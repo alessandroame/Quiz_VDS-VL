@@ -94,7 +94,7 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab, openSet
                 {(activeTab === 'exam' || activeTab === 'tutor') && isExamRunning && (
                   <span
                     title="Sessione in corso"
-                    className="text-[9px] sm:text-[10px] px-1.5 py-0.2 rounded-full bg-rose-500/20 text-rose-400 border border-rose-500/40 font-bold flex items-center gap-1 animate-pulse flex-shrink-0"
+                    className="text-[9px] sm:text-[10px] px-1.5 py-0.2 rounded-full bg-rose-500/20 text-rose-400 border border-rose-500/40 light:bg-rose-100 light:text-rose-700 light:border-rose-300 font-bold flex items-center gap-1 animate-pulse flex-shrink-0"
                   >
                     <span className="w-1.5 h-1.5 rounded-full bg-rose-500" />
                     <span className="hidden sm:inline">ATTIVO</span>
@@ -196,7 +196,7 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab, openSet
                 >
                   v{buildInfo.version}
                   {buildInfo.buildNumber && buildInfo.buildNumber !== '0' && (
-                    <span className="hidden sm:inline text-zinc-400 light:text-slate-500 font-normal">
+                    <span className="hidden sm:inline text-zinc-400 light:text-slate-700 font-normal">
                       {' '}#{buildInfo.buildNumber}
                     </span>
                   )}

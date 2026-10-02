@@ -575,7 +575,7 @@ export const ExamScreen: React.FC<ExamScreenProps> = ({
             <button
               id="btn-start-tutor-exam"
               onClick={() => handleRequestStartExam('tutor')}
-              className="w-full py-3.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-sm shadow-lg shadow-emerald-950/40 flex items-center justify-center gap-2 transition-all active:scale-[0.99]"
+              className="w-full py-3.5 rounded-xl bg-emerald-700 hover:bg-emerald-600 text-white font-bold text-sm shadow-lg shadow-emerald-950/40 flex items-center justify-center gap-2 transition-all active:scale-[0.99]"
             >
               <span>Avvia Simulazione Didattica (30 Quiz)</span>
               <ArrowRight className="w-4 h-4" />
@@ -1002,7 +1002,7 @@ export const ExamScreen: React.FC<ExamScreenProps> = ({
               voiceService.stop();
               setShowSubmitModal(true);
             }}
-            className="px-2.5 py-1.5 sm:px-3.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs shadow-sm transition-all"
+            className="px-2.5 py-1.5 sm:px-3.5 rounded-lg bg-emerald-700 hover:bg-emerald-600 text-white font-bold text-xs shadow-sm transition-all"
           >
             {examMode === 'tutor' ? 'Concludi' : 'Consegna'}
             <span className="hidden sm:inline"> ({answeredCount}/{totalCount})</span>
@@ -1127,7 +1127,7 @@ export const ExamScreen: React.FC<ExamScreenProps> = ({
                 <button
                   id="btn-confirm-submit-exam"
                   onClick={handleSubmitExam}
-                  className="flex-1 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold shadow-md"
+                  className="flex-1 py-2.5 rounded-xl bg-emerald-700 hover:bg-emerald-600 text-white text-xs font-bold shadow-md"
                 >
                   {examMode === 'tutor' ? 'Mostra Debriefing' : 'Conferma'}
                 </button>

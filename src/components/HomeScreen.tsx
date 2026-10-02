@@ -118,7 +118,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectTab }) => {
               Prontezza
             </span>
             <div className="flex items-center gap-1.5">
-              <span className="font-mono font-bold text-base sm:text-lg text-amber-400 light:text-amber-600">
+              <span className="font-mono font-bold text-base sm:text-lg text-amber-400 light:text-amber-800">
                 {readinessScore}%
               </span>
             </div>
@@ -198,7 +198,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectTab }) => {
             <button
               id="btn-home-resume-session"
               onClick={handleResumeSession}
-              className="px-3 py-1.5 rounded-lg bg-amber-600 hover:bg-amber-500 text-white font-bold text-xs flex items-center gap-1 shadow-sm transition-colors"
+              className="px-3 py-1.5 rounded-lg bg-amber-700 hover:bg-amber-600 text-white font-bold text-xs flex items-center gap-1 shadow-sm transition-colors"
             >
               <span>Riprendi</span>
               <ArrowRight className="w-3.5 h-3.5" />

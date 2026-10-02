@@ -417,7 +417,7 @@ const ArchiveItem: React.FC<ArchiveItemProps> = ({ question: q, isExpanded, onTo
       >
         <div className="space-y-1 flex-1">
           <div className="flex items-center gap-2">
-            <span className="font-mono font-bold text-amber-400 text-xs">
+            <span className="font-mono font-bold text-amber-400 light:text-amber-800 text-xs">
               #{q.id}
             </span>
             <span className="text-[11px] text-zinc-400 light:text-slate-600 font-medium">

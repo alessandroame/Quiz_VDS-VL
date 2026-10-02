@@ -104,7 +104,7 @@ export const QuestionNavigator: React.FC<QuestionNavigatorProps> = ({
           <span className="text-xs font-bold text-zinc-300 light:text-slate-700 tracking-wide">
             Quesiti
           </span>
-          <span className="font-mono text-[11px] font-semibold text-amber-400 light:text-amber-600 bg-amber-500/10 light:bg-amber-100 px-1.5 py-0.5 rounded">
+          <span className="font-mono text-[11px] font-semibold text-amber-400 light:text-amber-900 bg-amber-500/10 light:bg-amber-100 px-1.5 py-0.5 rounded">
             {`${currentIndex + 1} / ${questions.length}`}
           </span>
           {flaggedCount > 0 && (
