@@ -64,7 +64,7 @@ export const StatsScreen: React.FC<StatsScreenProps> = ({ onTrainSubject }) => {
             <span className="text-xs font-bold text-zinc-400 light:text-slate-600 uppercase tracking-wider">
               Preparazione Esame
             </span>
-            <div className="text-3xl sm:text-4xl font-black text-amber-400 light:text-amber-600">
+            <div className="text-3xl sm:text-4xl font-black text-amber-400 light:text-amber-800">
               {readinessScore}%
             </div>
           </div>

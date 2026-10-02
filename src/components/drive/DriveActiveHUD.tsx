@@ -1,6 +1,5 @@
 import React from 'react';
 import {
-  X,
   Volume2,
   Flag,
   ArrowRight,
@@ -79,6 +78,8 @@ export interface DriveActiveHUDProps {
   onNextQuestion: () => void;
   onToggleFlag: () => void;
   onSubmitExam: () => void;
+  isQuestionSwitching?: boolean;
+  isCooldownActive?: boolean;
 }
 
 export const DriveActiveHUD: React.FC<DriveActiveHUDProps> = ({
@@ -87,13 +88,11 @@ export const DriveActiveHUD: React.FC<DriveActiveHUDProps> = ({
   totalCount,
   isExamSession,
   secondsRemaining,
-  sessionContext,
   isIntroActive,
   onDismissIntro,
   onReplayIntro,
   onOpenVoiceGuide,
   setIsVoiceMenuOpen,
-  onClose,
   onExecuteClose,
   isAutopilotEnabled,
   onToggleAutopilot,
@@ -131,8 +130,11 @@ export const DriveActiveHUD: React.FC<DriveActiveHUDProps> = ({
   onPrevQuestion,
   onNextQuestion,
   onToggleFlag,
-  onSubmitExam
+  onSubmitExam,
+  isQuestionSwitching = false,
+  isCooldownActive = false
 }) => {
+  const isLocked = isCooldownActive || isQuestionSwitching;
   const isCurrentRevealed =
     revealedQuestionId === currentQ.id ||
     ((!isExamSession || isTutorEnabled) && answers[currentQ.id] !== undefined);
@@ -202,10 +204,11 @@ export const DriveActiveHUD: React.FC<DriveActiveHUDProps> = ({
     e.stopPropagation();
     setManuallyExpandedOpts((prev) => {
       const isCurrentlyExpanded = prev[optNum] !== undefined ? prev[optNum] : isPartPlaying(`opt${optNum}` as any);
-      return {
-        ...prev,
-        [optNum]: !isCurrentlyExpanded
-      };
+      if (isCurrentlyExpanded) {
+        return { 1: false, 2: false, 3: false };
+      } else {
+        return { 1: false, 2: false, 3: false, [optNum]: true };
+      }
     });
   };
 
@@ -214,6 +217,14 @@ export const DriveActiveHUD: React.FC<DriveActiveHUDProps> = ({
   const isLongQuestion = isQuestionTruncated !== null
     ? isQuestionTruncated
     : currentQ.question.length > 105;
+
+  const isAnyOptionExpanded = currentQ.options.some((_, i) => {
+    const optNum = (i + 1) as 1 | 2 | 3;
+    const isCurrentOptPlaying = isPartPlaying(`opt${optNum}` as any);
+    return manuallyExpandedOpts[optNum] !== undefined
+      ? manuallyExpandedOpts[optNum]
+      : isCurrentOptPlaying;
+  });
 
   return (
     <div className="flex-1 flex flex-col justify-between p-3 sm:p-5 max-w-2xl mx-auto w-full h-full overflow-hidden">
@@ -235,32 +246,17 @@ export const DriveActiveHUD: React.FC<DriveActiveHUDProps> = ({
       )}
 
       {/* Top Bar HUD */}
-      <div className="flex items-center justify-between gap-2 pb-2 border-b border-zinc-800/90 light:border-slate-200 text-xs">
-        {sessionContext ? (
-          <button
-            id="btn-drive-exit"
-            onClick={sessionContext.isExam ? onClose : onExecuteClose}
-            className="px-3 py-1.5 rounded-xl border border-zinc-700 bg-zinc-900 text-zinc-200 hover:text-white hover:border-zinc-500 light:bg-white light:border-slate-300 light:text-slate-800 font-bold flex items-center gap-1.5 transition-all flex-shrink-0 shadow-sm active:scale-95"
-            title={sessionContext.isExam ? "Opzioni di uscita o interruzione esame" : "Torna alla visualizzazione normale del quiz sullo schermo"}
-          >
-            <ArrowLeft className="w-4 h-4" />
-            <span>{sessionContext.isExam ? "Esci" : "Torna al Quiz"}</span>
-          </button>
-        ) : (
-          <button
-            id="btn-drive-exit"
-            onClick={onClose}
-            className={`px-3 py-1.5 rounded-xl border font-bold flex items-center gap-1 transition-colors flex-shrink-0 ${
-              isExamSession
-                ? 'bg-rose-500/10 border-rose-500/40 text-rose-400 hover:bg-rose-500/20 light:bg-rose-50 light:border-rose-300 light:text-rose-700'
-                : 'bg-zinc-900 border-zinc-800 text-zinc-300 hover:text-white light:bg-white light:border-slate-200 light:text-slate-700 light:hover:text-slate-900 light:shadow-sm'
-            }`}
-            title={isExamSession ? "Interrompi la simulazione d'esame" : 'Esci dalla Modalità Mani Libere'}
-          >
-            <X className="w-4 h-4" />
-            <span>{isExamSession ? 'Interrompi' : 'Esci'}</span>
-          </button>
-        )}
+      <div className="flex items-center justify-between gap-1 sm:gap-2 pb-2 border-b border-zinc-800/90 light:border-slate-200 text-xs">
+        <button
+          id="btn-drive-exit"
+          onClick={onExecuteClose}
+          className="p-1.5 sm:px-3 sm:py-1.5 rounded-xl border border-zinc-700 bg-zinc-900 text-zinc-200 hover:text-white hover:border-zinc-500 light:bg-white light:border-slate-300 light:text-slate-800 font-bold flex items-center gap-1.5 transition-all flex-shrink-0 shadow-sm active:scale-95"
+          title="Torna alla vista normale del quiz"
+          aria-label="Torna alla vista normale"
+        >
+          <Headphones className="w-4 h-4 text-amber-400" />
+          <span className="hidden sm:inline">Vista Normale</span>
+        </button>
 
         <div className="flex items-center gap-2 font-mono flex-shrink-0">
           <span className="font-black text-sm text-amber-400 light:text-amber-600">
@@ -679,7 +675,7 @@ export const DriveActiveHUD: React.FC<DriveActiveHUDProps> = ({
 
       {/* 3 Macro-Fasce di Risposta & Card Didattica (Regola + Tranello) */}
       <div className="flex-1 flex flex-col gap-2.5 sm:gap-3.5 my-1 sm:my-2 min-h-0">
-        <div className={`flex flex-col gap-2.5 sm:gap-3.5 ${isCurrentRevealed ? 'flex-none' : 'flex-1'} min-h-0 overflow-y-auto custom-scrollbar`}>
+        <div className={`flex flex-col gap-2.5 sm:gap-3.5 ${isCurrentRevealed ? 'flex-none' : 'flex-1'} min-h-0 overflow-y-auto custom-scrollbar transition-opacity duration-200 ${isLocked ? 'opacity-80' : 'opacity-100'}`}>
           {currentQ.options.map((opt, idx) => {
             const optNum = (idx + 1) as 1 | 2 | 3;
             const isSelected = answers[currentQ.id] === optNum;
@@ -711,7 +707,7 @@ export const DriveActiveHUD: React.FC<DriveActiveHUDProps> = ({
                 'bg-amber-950 border-amber-500 text-amber-100 ring-2 ring-amber-500 font-bold light:bg-amber-50 light:border-amber-500 light:text-amber-950';
             } else if (isCurrentOptPlaying) {
               style =
-                'bg-amber-950/60 border-amber-400 text-amber-200 ring-1 ring-amber-400 light:bg-amber-50 light:border-amber-400 light:text-amber-950 light:ring-amber-400';
+                'bg-amber-950/60 border-amber-400 text-amber-200 ring-2 ring-amber-400 shadow-[0_0_15px_rgba(245,158,11,0.25)] light:bg-amber-50 light:border-amber-400 light:text-amber-950 light:ring-amber-400';
             }
 
             return (
@@ -720,25 +716,26 @@ export const DriveActiveHUD: React.FC<DriveActiveHUDProps> = ({
                 id={`btn-drive-opt-${optNum}`}
                 lang="it"
                 translate="no"
+                disabled={isLocked}
                 onClick={() => onSelectAnswer(optNum)}
                 className={`overflow-hidden ${
                   isCurrentRevealed
-                    ? 'w-full rounded-xl border p-2 sm:p-2.5 flex items-center gap-2.5 sm:gap-3 text-left transition-all'
-                    : `${isExpanded ? 'flex-none' : 'flex-1'} w-full min-h-[74px] sm:min-h-[85px] rounded-2xl border-2 p-3 sm:p-4 flex items-center gap-3.5 sm:gap-5 text-left transition-all shadow-md active:scale-[0.98]`
-                } ${style}`}
+                    ? 'w-full rounded-xl border p-2 sm:p-2.5 flex items-center gap-2.5 sm:gap-3 text-left transition-all duration-300'
+                    : `${isAnyOptionExpanded ? (isExpanded ? 'flex-1' : 'flex-none') : 'flex-1'} w-full min-h-[74px] sm:min-h-[85px] rounded-2xl border-2 p-3 sm:p-4 flex items-center gap-3.5 sm:gap-5 text-left transition-all duration-300 shadow-md active:scale-[0.98]`
+                } ${style} ${isLocked ? 'pointer-events-none' : ''}`}
               >
                 <div
                   className={`${
                     isCurrentRevealed
                       ? 'w-7 h-7 sm:w-8 sm:h-8 rounded-lg font-black text-xs sm:text-sm'
                       : 'w-11 h-11 sm:w-14 sm:h-14 rounded-xl font-black text-xl sm:text-2xl ring-2 ring-black/20'
-                  } flex items-center justify-center flex-shrink-0 ${
+                  } flex items-center justify-center flex-shrink-0 transition-transform ${
                     isCurrentRevealed && isCorrectAnswer
                       ? 'bg-emerald-500 text-white'
                       : isSelected
                       ? 'bg-amber-500 text-zinc-950'
                       : isCurrentOptPlaying
-                      ? 'bg-amber-500 text-zinc-950 animate-pulse'
+                      ? 'bg-amber-500 text-zinc-950 animate-pulse shadow-[0_0_12px_rgba(245,158,11,0.6)] scale-105'
                       : 'bg-zinc-800 text-zinc-300 light:bg-slate-100 light:text-slate-700'
                   }`}
                 >

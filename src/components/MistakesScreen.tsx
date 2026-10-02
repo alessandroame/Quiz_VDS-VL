@@ -386,7 +386,7 @@ export const MistakesScreen: React.FC<MistakesScreenProps> = ({ onNavigateHome }
             Nessun errore da ripassare
           </h3>
           <p className="text-xs text-zinc-400 light:text-slate-600 max-w-sm mx-auto">
-            Hai risposto correttamente a tutte le domande affrontate per almeno 2 volte consecutive. Ottimo lavoro! Avvia una simulazione d'esame per metterti alla prova.
+            Hai risposto correttamente a tutte le domande affrontate per almeno 2 volte consecutive. Inizia una simulazione d'esame per verificare la preparazione.
           </p>
         </div>
       ) : (

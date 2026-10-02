@@ -45,6 +45,8 @@ describe('Navbar Component (Top Bar & Mini-Header Disambiguation)', () => {
       isExamRunning: false,
       activeSession: null,
       openDriveMode: vi.fn(),
+      toggleDriveMode: vi.fn(),
+      isDriveModeOpen: false,
       settings: {
         autoSyncDrive: false
       },
@@ -69,6 +71,71 @@ describe('Navbar Component (Top Bar & Mini-Header Disambiguation)', () => {
       expect(html).toContain('bg-zinc-900/60');
       expect(html).not.toContain('bg-amber-500/10');
       expect(html).not.toContain('border-amber-500/30');
+    });
+
+    it('renders btn-mini-audio with active amber styling when isDriveModeOpen is true', () => {
+      mockUseQuiz.mockReturnValueOnce({
+        readinessScore: 85,
+        isExamRunning: false,
+        activeSession: null,
+        openDriveMode: vi.fn(),
+        toggleDriveMode: vi.fn(),
+        isDriveModeOpen: true,
+        settings: { autoSyncDrive: false },
+        syncState: { status: 'synced' }
+      });
+
+      const html = renderToString(
+        React.createElement(Navbar, {
+          activeTab: 'exam',
+          setActiveTab: () => {},
+          openSettings: () => {}
+        })
+      );
+
+      expect(html).toContain('id="btn-mini-audio"');
+      expect(html).toContain('border-amber-500 bg-amber-500/20 text-amber-300');
+      expect(html).toContain('Torna alla vista normale');
+    });
+
+    it('calls toggleDriveMode when clicking btn-mini-audio', () => {
+      const toggleDriveMode = vi.fn();
+      mockUseQuiz.mockReturnValueOnce({
+        readinessScore: 85,
+        isExamRunning: false,
+        activeSession: null,
+        openDriveMode: vi.fn(),
+        toggleDriveMode,
+        isDriveModeOpen: false,
+        settings: { autoSyncDrive: false },
+        syncState: { status: 'synced' }
+      });
+
+      const container = document.createElement('div');
+      document.body.appendChild(container);
+      const root = createRoot(container);
+
+      act(() => {
+        root.render(
+          React.createElement(Navbar, {
+            activeTab: 'exam',
+            setActiveTab: () => {},
+            openSettings: () => {}
+          })
+        );
+      });
+
+      const btn = container.querySelector('#btn-mini-audio') as HTMLButtonElement;
+      expect(btn).not.toBeNull();
+      act(() => {
+        btn.click();
+      });
+
+      expect(toggleDriveMode).toHaveBeenCalled();
+      act(() => {
+        root.unmount();
+      });
+      container.remove();
     });
 
     it('renders btn-nav-back-home with neutral chevron icon', () => {
@@ -103,6 +170,71 @@ describe('Navbar Component (Top Bar & Mini-Header Disambiguation)', () => {
       expect(html).not.toContain('border-amber-500/40');
     });
 
+    it('renders btn-drive-mode with active amber styling when isDriveModeOpen is true', () => {
+      mockUseQuiz.mockReturnValueOnce({
+        readinessScore: 85,
+        isExamRunning: false,
+        activeSession: null,
+        openDriveMode: vi.fn(),
+        toggleDriveMode: vi.fn(),
+        isDriveModeOpen: true,
+        settings: { autoSyncDrive: false },
+        syncState: { status: 'synced' }
+      });
+
+      const html = renderToString(
+        React.createElement(Navbar, {
+          activeTab: 'home',
+          setActiveTab: () => {},
+          openSettings: () => {}
+        })
+      );
+
+      expect(html).toContain('id="btn-drive-mode"');
+      expect(html).toContain('border-amber-500 bg-amber-500/20 text-amber-300');
+      expect(html).toContain('Torna alla vista normale');
+    });
+
+    it('calls toggleDriveMode when clicking btn-drive-mode', () => {
+      const toggleDriveMode = vi.fn();
+      mockUseQuiz.mockReturnValueOnce({
+        readinessScore: 85,
+        isExamRunning: false,
+        activeSession: null,
+        openDriveMode: vi.fn(),
+        toggleDriveMode,
+        isDriveModeOpen: false,
+        settings: { autoSyncDrive: false },
+        syncState: { status: 'synced' }
+      });
+
+      const container = document.createElement('div');
+      document.body.appendChild(container);
+      const root = createRoot(container);
+
+      act(() => {
+        root.render(
+          React.createElement(Navbar, {
+            activeTab: 'home',
+            setActiveTab: () => {},
+            openSettings: () => {}
+          })
+        );
+      });
+
+      const btn = container.querySelector('#btn-drive-mode') as HTMLButtonElement;
+      expect(btn).not.toBeNull();
+      act(() => {
+        btn.click();
+      });
+
+      expect(toggleDriveMode).toHaveBeenCalled();
+      act(() => {
+        root.unmount();
+      });
+      container.remove();
+    });
+
     it('renders 2017 edition badge with neutral styling', () => {
       const html = renderToString(
         React.createElement(Navbar, {
@@ -125,6 +257,8 @@ describe('Navbar Component (Top Bar & Mini-Header Disambiguation)', () => {
         isExamRunning: false,
         activeSession: null,
         openDriveMode: vi.fn(),
+        toggleDriveMode: vi.fn(),
+        isDriveModeOpen: false,
         settings: {
           autoSyncDrive: true
         },
@@ -170,6 +304,8 @@ describe('Navbar Component (Top Bar & Mini-Header Disambiguation)', () => {
         isExamRunning: false,
         activeSession: null,
         openDriveMode: vi.fn(),
+        toggleDriveMode: vi.fn(),
+        isDriveModeOpen: false,
         settings: {
           autoSyncDrive: true
         },

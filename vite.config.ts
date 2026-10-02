@@ -1,7 +1,8 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import { VitePWA } from 'vite-plugin-pwa';
-import { readFileSync } from 'fs';
+import { readFileSync, existsSync, statSync } from 'fs';
+import path from 'path';
 import { execSync } from 'child_process';
 
 const pkg = JSON.parse(readFileSync(new URL('./package.json', import.meta.url), 'utf-8'));
@@ -42,6 +43,39 @@ export default defineConfig({
     strictPort: true
   },
   plugins: [
+    {
+      name: 'serve-audit-reports',
+      configureServer(server) {
+        server.middlewares.use((req, res, next) => {
+          if (req.url && req.url.startsWith('/audit-reports/')) {
+            const relPath = decodeURIComponent(req.url.replace(/^\/audit-reports\//, '').split('?')[0]);
+            const filePath = path.join(__dirname, 'audit_reports', relPath);
+            if (existsSync(filePath) && statSync(filePath).isFile()) {
+              if (filePath.endsWith('.html')) res.setHeader('Content-Type', 'text/html; charset=utf-8');
+              else if (filePath.endsWith('.png')) res.setHeader('Content-Type', 'image/png');
+              else if (filePath.endsWith('.json')) res.setHeader('Content-Type', 'application/json');
+              return res.end(readFileSync(filePath));
+            }
+          }
+          next();
+        });
+      }
+    },
+    {
+      name: 'watch-git-commits',
+      configureServer(server) {
+        const gitDir = path.resolve(__dirname, '.git');
+        if (existsSync(gitDir)) {
+          server.watcher.add(path.join(gitDir, 'HEAD'));
+          server.watcher.add(path.join(gitDir, 'refs', 'heads'));
+          server.watcher.on('change', (filePath) => {
+            if (filePath.includes('.git')) {
+              server.restart();
+            }
+          });
+        }
+      }
+    },
     react(),
     VitePWA({
       registerType: 'autoUpdate',

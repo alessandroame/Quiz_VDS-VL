@@ -39,6 +39,7 @@ vi.mock('../hooks/useAviationVoice', () => ({
     isSequencePlaying: false,
     isPartPlaying: () => false,
     isDriveIntroPlaying: false,
+    activePart: null,
     togglePlayPause: vi.fn(),
     restartCurrentOrSequence: vi.fn(),
     playFullSequence: vi.fn(),
@@ -327,7 +328,7 @@ describe('DriveModeScreen - Tutor Mode Explanation Playback Contract', () => {
     expect(handleSubmit).toHaveBeenCalled();
   });
 
-  it('DRIVE-VOICE-STOP-02: abandoning an exam calls sessionContext.onAbandonSession and stops voice', async () => {
+  it('DRIVE-VOICE-STOP-02: exiting hands-free view immediately returns to normal quiz, stops voice, and does not abandon exam session', async () => {
     const handleAbandon = vi.fn();
     const handleClose = vi.fn();
     await act(async () => {
@@ -350,27 +351,20 @@ describe('DriveModeScreen - Tutor Mode Explanation Playback Contract', () => {
       );
     });
 
-    // Click exit button to show abandon modal
+    // Find and click exit button ("Vista Normale")
     const exitBtn = container.querySelector('#btn-drive-exit') as HTMLButtonElement;
     expect(exitBtn).not.toBeNull();
 
+    mockStopVoice.mockClear();
     await act(async () => {
       exitBtn.click();
     });
 
-
-    // Click confirm abandon button
-    const confirmAbandonBtn = container.querySelector('#btn-drive-confirm-abandon') as HTMLButtonElement;
-    expect(confirmAbandonBtn).not.toBeNull();
-
-    mockStopVoice.mockClear();
-    await act(async () => {
-      confirmAbandonBtn.click();
-    });
-
+    // Exiting hands-free mode stops voice and triggers close without opening any abandon modal
     expect(mockStopVoice).toHaveBeenCalled();
-    expect(handleAbandon).toHaveBeenCalled();
     expect(handleClose).toHaveBeenCalled();
+    expect(handleAbandon).not.toHaveBeenCalled();
+    expect(container.querySelector('#btn-drive-confirm-abandon')).toBeNull();
   });
 
   it('DRIVE-UNHURRIED-01: does NOT start a countdown or auto-advance when thinking (unhurried study)', async () => {
@@ -401,6 +395,66 @@ describe('DriveModeScreen - Tutor Mode Explanation Playback Contract', () => {
     // Must NOT have answered or auto-advanced
     expect(handleAnswer).not.toHaveBeenCalled();
     expect(mockPlayExplanation).not.toHaveBeenCalled();
+  });
+
+  it('DRIVE-COOLDOWN-01: prevents accidental answer clicks during the 250ms transition cooldown when switching to a new question', async () => {
+    const handleAnswer = vi.fn();
+    const question1: Question = { ...sampleQuestion, id: 1001 };
+    const question2: Question = { ...sampleQuestion, id: 1002, question: 'Seconda domanda di prova' };
+
+    const handleNavigate = vi.fn();
+
+    const renderWithIndex = (idx: number) => {
+      root.render(
+        React.createElement(DriveModeScreen, {
+          isOpen: true,
+          onClose: vi.fn(),
+          sessionContext: {
+            questions: [question1, question2],
+            currentIndex: idx,
+            answers: {},
+            flags: {},
+            onAnswer: handleAnswer,
+            onToggleFlag: vi.fn(),
+            onNavigateIndex: handleNavigate,
+            isTutor: true
+          }
+        })
+      );
+    };
+
+    await act(async () => {
+      renderWithIndex(0);
+    });
+
+    // Transition to question 2
+    await act(async () => {
+      renderWithIndex(1);
+    });
+
+    // Click immediately within the 250ms cooldown window on Question 2
+    const opt2Btn = container.querySelector('#btn-drive-opt-2') as HTMLButtonElement;
+    expect(opt2Btn).not.toBeNull();
+
+    await act(async () => {
+      opt2Btn.click();
+    });
+
+    // Click was ignored because cooldown is active
+    expect(handleAnswer).not.toHaveBeenCalled();
+
+    // Advance past the 250ms cooldown
+    await act(async () => {
+      vi.advanceTimersByTime(300);
+    });
+
+    // Click again after cooldown expired
+    await act(async () => {
+      opt2Btn.click();
+    });
+
+    // Answer is now successfully submitted
+    expect(handleAnswer).toHaveBeenCalledWith(1002, 2);
   });
 });
 

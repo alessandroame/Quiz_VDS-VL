@@ -254,7 +254,7 @@ export const TopicsScreen: React.FC<TopicsScreenProps> = ({
             {currentSubjectMeta?.name}
           </div>
 
-          <div className="text-xs font-mono text-amber-400 light:text-amber-600 font-semibold">
+          <div className="text-xs font-mono text-amber-400 light:text-amber-800 font-semibold">
             {currentIndex + 1}/{sessionQuestions.length}
           </div>
         </div>
@@ -371,7 +371,7 @@ export const TopicsScreen: React.FC<TopicsScreenProps> = ({
             >
               <div className="flex items-start justify-between gap-2">
                 <div>
-                  <div className="text-[11px] font-mono text-amber-400 light:text-amber-600 font-bold">
+                  <div className="text-[11px] font-mono text-amber-400 light:text-amber-800 font-bold">
                     0{sub.id}
                   </div>
                   <h3 className="font-bold text-sm text-zinc-100 light:text-slate-900">
@@ -386,9 +386,9 @@ export const TopicsScreen: React.FC<TopicsScreenProps> = ({
                   <div
                     className={`text-sm font-bold ${
                       sub.accuracy >= 90
-                        ? 'text-emerald-400 light:text-emerald-600'
+                        ? 'text-emerald-400 light:text-emerald-700'
                         : sub.accuracy >= 70
-                        ? 'text-amber-400 light:text-amber-600'
+                        ? 'text-amber-400 light:text-amber-800'
                         : 'text-zinc-400'
                     }`}
                   >

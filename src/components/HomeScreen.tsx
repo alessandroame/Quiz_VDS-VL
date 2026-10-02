@@ -99,9 +99,10 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectTab }) => {
   }, [onSelectTab, activeSession]);
 
   return (
-    <div className="max-w-4xl mx-auto px-3 sm:px-4 py-4 space-y-4 animate-in fade-in">
+    <>
+      <div className="max-w-4xl mx-auto px-3 sm:px-4 py-2.5 sm:py-3.5 space-y-2.5 sm:space-y-3.5 animate-in fade-in">
       {/* Status Strip: Prontezza & Telemetria Compatta */}
-      <div className="p-3.5 sm:p-4 rounded-2xl bg-zinc-900 border border-zinc-700 shadow-sm dark:bg-zinc-900 dark:border-zinc-700 light:bg-white light:border-slate-300 light:shadow-sm space-y-2.5">
+      <div className="p-3 sm:p-3.5 rounded-2xl bg-zinc-900 border border-zinc-700 shadow-sm dark:bg-zinc-900 dark:border-zinc-700 light:bg-white light:border-slate-300 light:shadow-sm space-y-2">
         <div className="flex items-center justify-between gap-2">
           <div className="flex items-center gap-2 min-w-0">
             <span className="text-xs font-bold uppercase tracking-wider text-zinc-300 light:text-slate-700">
@@ -117,7 +118,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectTab }) => {
               Prontezza
             </span>
             <div className="flex items-center gap-1.5">
-              <span className="font-mono font-bold text-base sm:text-lg text-amber-400 light:text-amber-600">
+              <span className="font-mono font-bold text-base sm:text-lg text-amber-400 light:text-amber-800">
                 {readinessScore}%
               </span>
             </div>
@@ -197,7 +198,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectTab }) => {
             <button
               id="btn-home-resume-session"
               onClick={handleResumeSession}
-              className="px-3 py-1.5 rounded-lg bg-amber-600 hover:bg-amber-500 text-white font-bold text-xs flex items-center gap-1 shadow-sm transition-colors"
+              className="px-3 py-1.5 rounded-lg bg-amber-700 hover:bg-amber-600 text-white font-bold text-xs flex items-center gap-1 shadow-sm transition-colors"
             >
               <span>Riprendi</span>
               <ArrowRight className="w-3.5 h-3.5" />
@@ -219,20 +220,20 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectTab }) => {
       )}
 
       {/* Grid 6 Macro-Pulsanti (I 6 Scenari Puri) */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 sm:gap-2.5">
         {/* 1. TUTOR DIDATTICO */}
         <button
           id="btn-home-tutor"
           onClick={() => handleSelectScenario('tutor')}
-          className="group relative p-3.5 sm:p-4 rounded-xl bg-zinc-900 border border-zinc-700 hover:border-emerald-500/80 text-left transition-all shadow-sm hover:shadow-emerald-950/20 light:bg-white light:border-slate-300 light:shadow-sm light:hover:border-emerald-500 flex flex-col justify-between min-h-[105px] active:scale-[0.99]"
+          className="group relative p-2.5 sm:p-3 rounded-xl bg-zinc-900 border border-zinc-700 hover:border-emerald-500/80 text-left transition-all shadow-sm hover:shadow-emerald-950/20 light:bg-white light:border-slate-300 light:shadow-sm light:hover:border-emerald-500 flex flex-col justify-between min-h-[76px] active:scale-[0.99]"
         >
-          <div className="space-y-1.5">
+          <div className="space-y-1">
             <div className="flex items-center justify-between gap-2">
               <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-lg bg-emerald-500/20 text-emerald-400 light:bg-emerald-100 light:text-emerald-700 flex items-center justify-center">
-                  <BookOpen className="w-4 h-4" />
+                <div className="w-7 h-7 rounded-lg bg-emerald-500/20 text-emerald-400 light:bg-emerald-100 light:text-emerald-700 flex items-center justify-center">
+                  <BookOpen className="w-3.5 h-3.5" />
                 </div>
-                <h2 className="text-sm sm:text-base font-bold text-zinc-100 light:text-slate-900 group-hover:text-emerald-400 light:group-hover:text-emerald-600 transition-colors">
+                <h2 className="text-sm font-bold text-zinc-100 light:text-slate-900 group-hover:text-emerald-400 light:group-hover:text-emerald-600 transition-colors">
                   Tutor Didattico
                 </h2>
               </div>
@@ -246,8 +247,8 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectTab }) => {
               </div>
             </div>
 
-            <p className="text-xs text-zinc-400 light:text-slate-600">
-              30 quiz senza limiti di tempo con feedback didattico immediato (Regola e Tranello).
+            <p className="text-xs text-zinc-400 light:text-slate-600 truncate">
+              30 quiz con feedback didattico immediato (Regola e Tranello).
             </p>
           </div>
         </button>
@@ -256,15 +257,15 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectTab }) => {
         <button
           id="btn-home-topics"
           onClick={() => handleSelectScenario('topics')}
-          className="group relative p-3.5 sm:p-4 rounded-xl bg-zinc-900 border border-zinc-700 hover:border-amber-500/80 text-left transition-all shadow-sm light:bg-white light:border-slate-300 light:shadow-sm light:hover:border-amber-500 flex flex-col justify-between min-h-[105px] active:scale-[0.99]"
+          className="group relative p-2.5 sm:p-3 rounded-xl bg-zinc-900 border border-zinc-700 hover:border-amber-500/80 text-left transition-all shadow-sm light:bg-white light:border-slate-300 light:shadow-sm light:hover:border-amber-500 flex flex-col justify-between min-h-[76px] active:scale-[0.99]"
         >
-          <div className="space-y-1.5">
+          <div className="space-y-1">
             <div className="flex items-center justify-between gap-2">
               <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-lg bg-amber-500/20 text-amber-400 light:bg-amber-100 light:text-amber-700 flex items-center justify-center">
-                  <Compass className="w-4 h-4" />
+                <div className="w-7 h-7 rounded-lg bg-amber-500/20 text-amber-400 light:bg-amber-100 light:text-amber-700 flex items-center justify-center">
+                  <Compass className="w-3.5 h-3.5" />
                 </div>
-                <h2 className="text-sm sm:text-base font-bold text-zinc-100 light:text-slate-900 group-hover:text-amber-400 light:group-hover:text-amber-600 transition-colors">
+                <h2 className="text-sm font-bold text-zinc-100 light:text-slate-900 group-hover:text-amber-400 light:group-hover:text-amber-600 transition-colors">
                   Studio Materie
                 </h2>
               </div>
@@ -278,8 +279,8 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectTab }) => {
               </div>
             </div>
 
-            <p className="text-xs text-zinc-400 light:text-slate-600">
-              Esercitazione tematica mirata sulle 9 materie ufficiali del programma AeCI.
+            <p className="text-xs text-zinc-400 light:text-slate-600 truncate">
+              Esercitazione mirata sulle 9 materie del programma AeCI.
             </p>
           </div>
         </button>
@@ -288,15 +289,15 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectTab }) => {
         <button
           id="btn-home-exam"
           onClick={() => handleSelectScenario('exam')}
-          className="group relative p-3.5 sm:p-4 rounded-xl bg-zinc-900 border border-zinc-700 hover:border-sky-500/80 text-left transition-all shadow-sm light:bg-white light:border-slate-300 light:shadow-sm light:hover:border-sky-500 flex flex-col justify-between min-h-[105px] active:scale-[0.99]"
+          className="group relative p-2.5 sm:p-3 rounded-xl bg-zinc-900 border border-zinc-700 hover:border-sky-500/80 text-left transition-all shadow-sm light:bg-white light:border-slate-300 light:shadow-sm light:hover:border-sky-500 flex flex-col justify-between min-h-[76px] active:scale-[0.99]"
         >
-          <div className="space-y-1.5">
+          <div className="space-y-1">
             <div className="flex items-center justify-between gap-2">
               <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-lg bg-sky-500/20 text-sky-400 light:bg-sky-100 light:text-sky-700 flex items-center justify-center">
-                  <Timer className="w-4 h-4" />
+                <div className="w-7 h-7 rounded-lg bg-sky-500/20 text-sky-400 light:bg-sky-100 light:text-sky-700 flex items-center justify-center">
+                  <Timer className="w-3.5 h-3.5" />
                 </div>
-                <h2 className="text-sm sm:text-base font-bold text-zinc-100 light:text-slate-900 group-hover:text-sky-400 light:group-hover:text-sky-600 transition-colors">
+                <h2 className="text-sm font-bold text-zinc-100 light:text-slate-900 group-hover:text-sky-400 light:group-hover:text-sky-600 transition-colors">
                   Esame Ufficiale
                 </h2>
               </div>
@@ -310,8 +311,8 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectTab }) => {
               </div>
             </div>
 
-            <p className="text-xs text-zinc-400 light:text-slate-600">
-              Simulazione prova d'esame AeCI: 30 quiz, countdown 45 min, max 3 errori.
+            <p className="text-xs text-zinc-400 light:text-slate-600 truncate">
+              Simulazione AeCI: 30 quiz, 45 minuti, max 3 errori.
             </p>
           </div>
         </button>
@@ -320,15 +321,15 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectTab }) => {
         <button
           id="btn-home-mistakes"
           onClick={() => handleSelectScenario('mistakes')}
-          className="group relative p-3.5 sm:p-4 rounded-xl bg-zinc-900 border border-zinc-700 hover:border-rose-500/80 text-left transition-all shadow-sm light:bg-white light:border-slate-300 light:shadow-sm light:hover:border-rose-500 flex flex-col justify-between min-h-[105px] active:scale-[0.99]"
+          className="group relative p-2.5 sm:p-3 rounded-xl bg-zinc-900 border border-zinc-700 hover:border-rose-500/80 text-left transition-all shadow-sm light:bg-white light:border-slate-300 light:shadow-sm light:hover:border-rose-500 flex flex-col justify-between min-h-[76px] active:scale-[0.99]"
         >
-          <div className="space-y-1.5">
+          <div className="space-y-1">
             <div className="flex items-center justify-between gap-2">
               <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-lg bg-rose-500/20 text-rose-400 light:bg-rose-100 light:text-rose-700 flex items-center justify-center">
-                  <AlertTriangle className="w-4 h-4" />
+                <div className="w-7 h-7 rounded-lg bg-rose-500/20 text-rose-400 light:bg-rose-100 light:text-rose-700 flex items-center justify-center">
+                  <AlertTriangle className="w-3.5 h-3.5" />
                 </div>
-                <h2 className="text-sm sm:text-base font-bold text-zinc-100 light:text-slate-900 group-hover:text-rose-400 light:group-hover:text-rose-600 transition-colors">
+                <h2 className="text-sm font-bold text-zinc-100 light:text-slate-900 group-hover:text-rose-400 light:group-hover:text-rose-600 transition-colors">
                   Quaderno Errori
                 </h2>
               </div>
@@ -348,8 +349,8 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectTab }) => {
               </div>
             </div>
 
-            <p className="text-xs text-zinc-400 light:text-slate-600">
-              Ripasso Leitner: rimozione vincolata a 2 risposte esatte consecutive.
+            <p className="text-xs text-zinc-400 light:text-slate-600 truncate">
+              Ripasso Leitner: uscita a 2 risposte esatte consecutive.
             </p>
           </div>
         </button>
@@ -358,15 +359,15 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectTab }) => {
         <button
           id="btn-home-archive"
           onClick={() => onSelectTab('archive')}
-          className="group relative p-3.5 sm:p-4 rounded-xl bg-zinc-900 border border-zinc-700 hover:border-purple-500/80 text-left transition-all shadow-sm light:bg-white light:border-slate-300 light:shadow-sm light:hover:border-purple-500 flex flex-col justify-between min-h-[105px] active:scale-[0.99]"
+          className="group relative p-2.5 sm:p-3 rounded-xl bg-zinc-900 border border-zinc-700 hover:border-purple-500/80 text-left transition-all shadow-sm light:bg-white light:border-slate-300 light:shadow-sm light:hover:border-purple-500 flex flex-col justify-between min-h-[76px] active:scale-[0.99]"
         >
-          <div className="space-y-1.5">
+          <div className="space-y-1">
             <div className="flex items-center justify-between gap-2">
               <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-lg bg-purple-500/20 text-purple-400 light:bg-purple-100 light:text-purple-700 flex items-center justify-center">
-                  <Search className="w-4 h-4" />
+                <div className="w-7 h-7 rounded-lg bg-purple-500/20 text-purple-400 light:bg-purple-100 light:text-purple-700 flex items-center justify-center">
+                  <Search className="w-3.5 h-3.5" />
                 </div>
-                <h2 className="text-sm sm:text-base font-bold text-zinc-100 light:text-slate-900 group-hover:text-purple-400 light:group-hover:text-purple-600 transition-colors">
+                <h2 className="text-sm font-bold text-zinc-100 light:text-slate-900 group-hover:text-purple-400 light:group-hover:text-purple-600 transition-colors">
                   Archivio & Cerca
                 </h2>
               </div>
@@ -380,8 +381,8 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectTab }) => {
               </div>
             </div>
 
-            <p className="text-xs text-zinc-400 light:text-slate-600">
-              Catalogo completo dei 474 quiz con ricerca full-text, note e preferiti.
+            <p className="text-xs text-zinc-400 light:text-slate-600 truncate">
+              Catalogo completo con ricerca full-text, note e preferiti.
             </p>
           </div>
         </button>
@@ -390,15 +391,15 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectTab }) => {
         <button
           id="btn-home-stats"
           onClick={() => onSelectTab('stats')}
-          className="group relative p-3.5 sm:p-4 rounded-xl bg-zinc-900 border border-zinc-700 hover:border-amber-500/80 text-left transition-all shadow-sm light:bg-white light:border-slate-300 light:shadow-sm light:hover:border-amber-500 flex flex-col justify-between min-h-[105px] active:scale-[0.99]"
+          className="group relative p-2.5 sm:p-3 rounded-xl bg-zinc-900 border border-zinc-700 hover:border-amber-500/80 text-left transition-all shadow-sm light:bg-white light:border-slate-300 light:shadow-sm light:hover:border-amber-500 flex flex-col justify-between min-h-[76px] active:scale-[0.99]"
         >
-          <div className="space-y-1.5">
+          <div className="space-y-1">
             <div className="flex items-center justify-between gap-2">
               <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-lg bg-amber-500/20 text-amber-400 light:bg-amber-100 light:text-amber-700 flex items-center justify-center">
-                  <BarChart3 className="w-4 h-4" />
+                <div className="w-7 h-7 rounded-lg bg-amber-500/20 text-amber-400 light:bg-amber-100 light:text-amber-700 flex items-center justify-center">
+                  <BarChart3 className="w-3.5 h-3.5" />
                 </div>
-                <h2 className="text-sm sm:text-base font-bold text-zinc-100 light:text-slate-900 group-hover:text-amber-400 light:group-hover:text-amber-600 transition-colors">
+                <h2 className="text-sm font-bold text-zinc-100 light:text-slate-900 group-hover:text-amber-400 light:group-hover:text-amber-600 transition-colors">
                   Statistiche
                 </h2>
               </div>
@@ -412,12 +413,13 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectTab }) => {
               </div>
             </div>
 
-            <p className="text-xs text-zinc-400 light:text-slate-600">
-              Radar di rendimento sulle 9 materie e storico delle sessioni svolte.
+            <p className="text-xs text-zinc-400 light:text-slate-600 truncate">
+              Radar di rendimento per materia e storico delle sessioni.
             </p>
           </div>
         </button>
       </div>
+    </div>
 
       {/* Modal di Conferma Eliminazione Sessione dalla Home */}
       {showConfirmDiscard && (
@@ -500,6 +502,6 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectTab }) => {
           }
         />
       )}
-    </div>
+    </>
   );
 };

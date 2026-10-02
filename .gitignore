@@ -25,6 +25,7 @@ Thumbs.db
 !public/**/*.png
 !docs/screenshots/**/*.png
 public/audit_*.png
+audit_reports/
 
 # Logs and PIDs
 *.log

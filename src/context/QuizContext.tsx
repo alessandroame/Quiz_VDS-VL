@@ -40,6 +40,7 @@ interface QuizContextType {
   registerAudioSessionContext: (context: DriveModeSessionContext | null) => void;
   openDriveMode: (context?: DriveModeSessionContext) => void;
   closeDriveMode: () => void;
+  toggleDriveMode: (context?: DriveModeSessionContext) => void;
   updateSetting: <K extends keyof AppSettings>(key: K, value: AppSettings[K]) => Promise<void>;
   recordAnswer: (
     questionId: number,
@@ -82,18 +83,7 @@ export const QuizProvider: React.FC<{ children: React.ReactNode }> = ({ children
     activeAudioSessionContextRef.current = context;
   }, []);
 
-  const openDriveMode = useCallback((context?: DriveModeSessionContext) => {
-    const targetContext = context ?? activeAudioSessionContextRef.current;
-    setDriveSessionContext(targetContext || null);
-    setIsDriveModeOpen(true);
-    telemetry.trackStudyModeEntered({ mode: 'audio_mode' });
-  }, []);
 
-  const closeDriveMode = useCallback(() => {
-    voiceService.stop();
-    setIsDriveModeOpen(false);
-    setDriveSessionContext(null);
-  }, []);
 
   // Reattività istantanea con Dexie live queries
   const statsList = useLiveQuery(() => db.stats.toArray(), []) || [];
@@ -249,6 +239,78 @@ export const QuizProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
+  const openDriveMode = useCallback((context?: DriveModeSessionContext) => {
+    let targetContext = context ?? activeAudioSessionContextRef.current;
+    if (!targetContext && filteredQuestions.length > 0) {
+      targetContext = {
+        questions: filteredQuestions,
+        currentIndex: 0,
+        answers: {},
+        flags: {},
+        onAnswer: (qid, ans) => {
+          const q = filteredQuestions.find(item => item.id === qid);
+          if (q) recordAnswer(qid, q.correctAnswer === ans, ans, 'topics');
+        },
+        onToggleFlag: () => {},
+        onNavigateIndex: () => {},
+        title: 'Radio Quiz'
+      };
+    }
+    setDriveSessionContext(targetContext || null);
+    setIsDriveModeOpen(true);
+    telemetry.trackStudyModeEntered({ mode: 'audio_mode' });
+
+    // Directly start speech within the user click gesture to satisfy browser autoplay policies
+    if (targetContext && targetContext.questions && targetContext.questions.length > 0) {
+      const q = targetContext.questions[targetContext.currentIndex || 0];
+      if (q) {
+        voiceService.playFullSequence(q.id);
+      }
+    }
+  }, [filteredQuestions, recordAnswer]);
+
+  const closeDriveMode = useCallback(() => {
+    voiceService.stop();
+    setIsDriveModeOpen(false);
+    setDriveSessionContext(null);
+  }, []);
+
+  const toggleDriveMode = useCallback((context?: DriveModeSessionContext) => {
+    if (isDriveModeOpen) {
+      voiceService.stop();
+      setIsDriveModeOpen(false);
+      setDriveSessionContext(null);
+    } else {
+      let targetContext = context ?? activeAudioSessionContextRef.current;
+      if (!targetContext && filteredQuestions.length > 0) {
+        targetContext = {
+          questions: filteredQuestions,
+          currentIndex: 0,
+          answers: {},
+          flags: {},
+          onAnswer: (qid, ans) => {
+            const q = filteredQuestions.find(item => item.id === qid);
+            if (q) recordAnswer(qid, q.correctAnswer === ans, ans, 'topics');
+          },
+          onToggleFlag: () => {},
+          onNavigateIndex: () => {},
+          title: 'Radio Quiz'
+        };
+      }
+      setDriveSessionContext(targetContext || null);
+      setIsDriveModeOpen(true);
+      telemetry.trackStudyModeEntered({ mode: 'audio_mode' });
+
+      // Directly start speech within the user click gesture to satisfy browser autoplay policies
+      if (targetContext && targetContext.questions && targetContext.questions.length > 0) {
+        const q = targetContext.questions[targetContext.currentIndex || 0];
+        if (q) {
+          voiceService.playFullSequence(q.id);
+        }
+      }
+    }
+  }, [isDriveModeOpen, filteredQuestions, recordAnswer]);
+
   const toggleBookmark = async (questionId: number) => {
     const res = await toggleQuestionBookmark(questionId);
     syncEngine.schedulePush();
@@ -352,6 +414,7 @@ export const QuizProvider: React.FC<{ children: React.ReactNode }> = ({ children
         registerAudioSessionContext,
         openDriveMode,
         closeDriveMode,
+        toggleDriveMode,
         updateSetting,
         recordAnswer,
         toggleBookmark,

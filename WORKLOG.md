@@ -14,6 +14,396 @@ Questo documento registra in ordine cronologico tutte le lavorazioni svolte nel 
 - **Impatto sul Desiderata**: <Come questo intervento contribuisce al desiderata (cfr. DESIDERATA.md) e indicazioni per il prossimo agente>
 ```
 
+### [2026-10-02] - Ripristino Espansione Testuale Dinamica dell'Opzione Vocale e Cooldown di Sicurezza 500ms al Cambio Opzione in Modalità Mani Libere
+
+- **Cosa abbiamo fatto**:
+  - **Ripristino dell'Espansione Dinamica dell'Opzione Attiva (Karaoke Accordion)**:
+    * In [src/components/drive/DriveActiveHUD.tsx](file:///c:/github/Quiz_VDS-VL/src/components/drive/DriveActiveHUD.tsx), ripristinata l'espansione automatica `isExpanded = isCurrentOptPlaying || manualExpanded[idx]` e `line-clamp-none` con `flex-1` sull'opzione attualmente pronunciata dalla voce neurale (mentre le altre rimangono su `flex-none` e `line-clamp-2`), permettendo all'allievo di leggere interamente i testi lunghi mentre li ascolta.
+  - **Implementazione Cooldown di Sicurezza 500ms Anti-Misclick al Cambio Opzione Vocale**:
+    * In [src/components/DriveModeScreen.tsx](file:///c:/github/Quiz_VDS-VL/src/components/DriveModeScreen.tsx), intercettato `activePart` dall'hook `useAviationVoice(currentQ?.id)`.
+    * All'avanzamento della voce tra un'opzione e la successiva (`activePart.startsWith('opt')` con cambio di parte vocale), si attiva un blocco temporaneo di 500ms (`isOptionSwitchingCooldown`).
+    * Durante questi 500ms:
+      1. Il gestore di risposta `handleSelectAnswer` scarta qualsiasi tocco a livello logico (`if (isQuestionSwitching || isOptionSwitchingCooldown) return;`).
+      2. I pulsanti di risposta in `DriveActiveHUD.tsx` ricevono `isCooldownActive={isQuestionSwitching || isOptionSwitchingCooldown}`, attivando sia `disabled={isLocked}` che la classe Tailwind `pointer-events-none`.
+    * In questo modo, l'eventuale variazione di altezza e lo spostamento delle coordinate del pulsante sotto il dito non possono in alcun caso provocare una selezione accidentale errata.
+  - **Aggiornamento Contratti Ergonomici & Suite di Test**:
+    * In [src/components/drive/DriveActiveHUD.test.ts](file:///c:/github/Quiz_VDS-VL/src/components/drive/DriveActiveHUD.test.ts):
+      - `HUD-EXPAND-02`: asserisce che l'opzione in lettura vocale si espanda a `line-clamp-none`.
+      - `HUD-EXPAND-05`: asserisce `flex-1` per l'opzione parlata ed espansa, e `flex-none` per quelle inattive compresse.
+      - `HUD-COOLDOWN-01`: asserisce l'applicazione di `disabled` e `pointer-events-none` sia durante il cooldown cambio opzione che durante la transizione cambio domanda.
+    * In [src/components/DriveModeScreen.test.ts](file:///c:/github/Quiz_VDS-VL/src/components/DriveModeScreen.test.ts):
+      - Aggiunto `activePart: null` al mock di `useAviationVoice` per compatibilità completa con i test di cambio domanda (`DRIVE-COOLDOWN-01`).
+- **Scelte architetturali & Rationale**:
+  - L'allievo ha bisogno di leggere per intero le opzioni lunghe durante l'ascolto senza dover premere manualmente pulsanti aggiuntivi mentre è a mani libere.
+  - Combinando l'espansione visiva dinamica dell'opzione attiva con il lock di 500ms al momento esatto del cambio opzione (`pointer-events-none` + `disabled`), si ottiene il meglio dei due mondi: massima leggibilità dei testi lunghi e protezione totale da click accidentali dovuti al riposizionamento del pulsante sotto il dito.
+- **Impatto sul Desiderata**:
+  - Allineato al desiderata di Modalità Mani Libere (studio hands-free leggibile, sicuro e a prova di misclick).
+
+### [2026-10-02] - Stabilizzazione Geometria Fasce Risposta (Zero Layout Shift) e Grace Period 250ms al Cambio Domanda in Modalità Mani Libere
+
+- **Cosa abbiamo fatto**:
+  - **Risoluzione della Root Cause del "Target Saltante" (CLS) sotto il dito**:
+    * Identificato il problema in [src/components/drive/DriveActiveHUD.tsx](file:///c:/github/Quiz_VDS-VL/src/components/drive/DriveActiveHUD.tsx): durante la riproduzione vocale, l'opzione letta dalla voce neurale assumeva `flex-1` e `line-clamp-none`, mentre le altre collassavano a `flex-none` e `line-clamp-2`.
+    * Al passaggio vocale da un'opzione alla successiva (es. Opzione 1 -> Opzione 2), l'opzione 1 si rimpiccioliva istantaneamente di circa 60px e l'opzione 2 si espandeva, facendo saltare violentemente verso l'alto le coordinate verticali dei pulsanti e causando click involontari sulla risposta sbagliata.
+    * Disaccoppiata la riproduzione vocale (`isCurrentOptPlaying`) dal ridimensionamento e dallo sblocco del clamp: tutte le 3 macro-fasce mantengono una geometria stabile e permanente (`flex-1` equiripartito costante con `line-clamp-2`).
+    * L'evidenziazione dell'opzione in lettura vocale è ora puramente visiva: bordo dorato, anello ambra attivo (`ring-2 ring-amber-400 shadow-[0_0_15px_rgba(245,158,11,0.25)]`), badge numerico pulsante ad alta visibilità (`animate-pulse shadow-[0_0_12px_rgba(245,158,11,0.6)] scale-105`) e icona altoparlante `Volume2` pulsante. L'espansione testuale resta disponibile su richiesta manuale dell'allievo tramite tocco su `[Leggi tutto]`.
+  - **Implementazione Grace Period Protettivo (250ms) al Cambio Domanda**:
+    * In [src/components/DriveModeScreen.tsx](file:///c:/github/Quiz_VDS-VL/src/components/DriveModeScreen.tsx), introdotto un micro-cooldown di sicurezza di 250ms che si attiva unicamente al cambio effettivo di domanda (`prevQuestionIdRef.current !== currentQ.id`).
+    * Durante i 250ms della transizione, `handleSelectAnswer` scarta qualsiasi click e i pulsanti opzione in `DriveActiveHUD.tsx` vengono disabilitati con `disabled` e `pointer-events-none`, assorbendo tap tardivi o accidentali partiti a cavallo del passaggio tra domande.
+  - **Suite di Test Vitest & Contratti Ergonomici**:
+    * Aggiornato [src/components/drive/DriveActiveHUD.test.ts](file:///c:/github/Quiz_VDS-VL/src/components/drive/DriveActiveHUD.test.ts):
+      - `HUD-EXPAND-02`: asserisce che durante la voce le opzioni mantengano `line-clamp-2` stabile per azzerare il layout shift, verificando l'evidenziazione visiva attiva.
+      - `HUD-EXPAND-05`: asserisce che tutte le opzioni conservino `flex-1` equiripartito durante la voce senza mai comprimersi a `flex-none`.
+      - `HUD-COOLDOWN-01`: asserisce la disabilitazione e `pointer-events-none` dei pulsanti durante `isQuestionSwitching`.
+    * Aggiunto in [src/components/DriveModeScreen.test.ts](file:///c:/github/Quiz_VDS-VL/src/components/DriveModeScreen.test.ts):
+      - `DRIVE-COOLDOWN-01`: verifica che i tap immediatamente successivi al cambio domanda (<250ms) vengano ignorati e che il click sia regolarmente registrato una volta terminato il grace period.
+  - **Allineamento Documentale & SemVer**:
+    * Aggiornato [DESIDERATA.md](file:///c:/github/Quiz_VDS-VL/DESIDERATA.md) con la nuova specifica di geometria stabile Zero-CLS.
+    * Avanzamento di versione a `1.7.3` in [package.json](file:///c:/github/Quiz_VDS-VL/package.json).
+- **Scelte architetturali & Rationale**:
+  - Bloccare acriticamente i click per 500ms a ogni cambio di opzione vocale avrebbe introdotto una percezione di mancata risposta del touch ("dead clicks") per oltre 1.5s a quiz, senza curare la causa radice (lo spostamento fisico del pulsante).
+  - La stabilizzazione a geometria fissa (Zero CLS) garantisce che il bersaglio non si muova mai sotto il dito, mentre il micro-grace period di 250ms circoscritto al cambio di domanda intera assorbe i tocchi residui senza degradare la reattività percepita.
+- **Impatto sul Desiderata**:
+  - Ergonomia touch impeccabile in Modalità Mani Libere (Fitts's Law perfetta e zero click involontari).
+
+### [2026-10-02] - Risoluzione Arresto Immediato Audio all'Accesso in Modalità Mani Libere (Bugfix Unmount Lifecycle in useAviationVoice e DriveModeScreen)
+
+- **Cosa abbiamo fatto**:
+  - **Identificazione della Root Cause via Tracciamento Diagnostico CDP**:
+    * Tramite intercettazione dinamica degli stack trace di `HTMLAudioElement.prototype.pause` e `voiceService.stop`, abbiamo accertato che all'apertura della Modalità Mani Libere (`openDriveMode` / `toggleDriveMode`) l'audio partiva correttamente al click dell'utente (`voiceService.playFullSequence`), ma veniva arrestato istantaneamente dopo una frazione di secondo.
+    * La causa risiedeva in due cleanup hook spuri eseguiti all'apertura del componente:
+      1. In [src/hooks/useAviationVoice.ts](file:///c:/github/Quiz_VDS-VL/src/hooks/useAviationVoice.ts): l'effetto di unmount controllava `voiceService.getState().currentQuestionId === questionId` e invocava incondizionatamente `voiceService.stop()`. Quando `DriveModeScreen` o altri componenti montavano (e nei cicli di mount/unmount di React 19 / StrictMode), questo cleanup arrestava il singleton audio appena avviato per quel quesito.
+      2. In [src/components/DriveModeScreen.tsx](file:///c:/github/Quiz_VDS-VL/src/components/DriveModeScreen.tsx): l'effetto unmount dei timer chiamava anch'esso `voiceService.stop()` e `voiceService.stopDriveIntro()`, duplicando lo stop distruttivo sul singleton condiviso.
+  - **Intervento Correttivo**:
+    * Rimosso l'arresto automatico distruttivo del singleton `voiceService` all'unmount da [src/hooks/useAviationVoice.ts](file:///c:/github/Quiz_VDS-VL/src/hooks/useAviationVoice.ts), demandando il controllo del ciclo di vita audio ai gestori espliciti di schermata e sessione (chiusura sessione, navigazione tab, back button, o cambio esplicito quesito).
+    * Rimosso `voiceService.stop()` dal cleanup unmount di [src/components/DriveModeScreen.tsx](file:///c:/github/Quiz_VDS-VL/src/components/DriveModeScreen.tsx), mantenendolo focalizzato sulla pulizia dei timer interni (`clearAllDriveTimers`, timer label/riconoscimento). L'uscita dalla schermata è già presidiata in modo affidabile da `btn-drive-exit`, `closeDriveMode`, `handlePopState` e `handleSelectTab`.
+    * Aggiornata la suite [src/hooks/useAviationVoice.test.ts](file:///c:/github/Quiz_VDS-VL/src/hooks/useAviationVoice.test.ts) per verificare che l'unmount dell'hook non interrompa la riproduzione in corso del singleton, garantendo transizioni fluide tra viste senza interruzioni audio.
+    * Aggiornato lo script di collaudo interattivo [scripts/test_drive_flow_interactive.cjs](file:///c:/github/Quiz_VDS-VL/scripts/test_drive_flow_interactive.cjs) per supportare sia la transizione fluida diretta a vista attiva che il launcher.
+  - **Verifiche & Validazione**:
+    * Test unitari Vitest: 52/52 file passati (394/394 test verdi).
+    * Collaudo visivo CDP interattivo (`npm run test:visual:drive:flow`): completato con 0 errori e 0 warning in console.
+    * Build di produzione (`npm run build`): compilata con successo (bundle Vite + TypeScript strict OK).
+- **Scelte architetturali & Rationale**:
+  - Il servizio vocale `voiceService` è un singleton dell'applicazione. Gli hook consumatori come `useAviationVoice` devono limitarsi a osservare e controllare la riproduzione, senza imporre chiusure globali al proprio ciclo di vita React locale, prevenendo race condition su mount concorrenti o remount di React 19.
+- **Impatto sul Desiderata**:
+  - Ripristino dell'ascolto hands-free immediato, continuo e senza intoppi dal primo tocco su smartphone e desktop.
+
+### [2026-10-02] - Arricchimento Didattico Spiegazioni Aerodinamica: Cause Fisiche su Allungamento, Resistenza Quadratica, Depressione Estradosso ed Effetto Suolo (Quiz ID 2061, 2066, 2072, 2148)
+
+- **Cosa abbiamo fatto**:
+  - **Superamento della Didattica Descrittiva (4 Quesiti Cardine Aerodinamica)**:
+    * Aggiornate le spiegazioni didattiche (Regola e Tranello) in [src/data/questions.json](file:///c:/github/Quiz_VDS-VL/src/data/questions.json) per i quiz:
+      - **#2061 (Allungamento Alare & Resistenza Indotta)**: Spiegato il motivo per cui l'allungamento abbatte la resistenza indotta (ali lunghe e strette allontanano le estremità e riducono la corda, minimizzando la superficie alare investita dal travaso laterale e riducendo l'intensità dei vortici marginali, $C_{Di} \propto 1/AR$).
+      - **#2066 (Proporzionalità Quadratica della Resistenza)**: Spiegata l'origine fisica dell'esponente 2 ($R \propto V^2$): al raddoppiare della velocità ($2\times$), raddoppia sia la massa d'aria impattata al secondo ($2\times$), sia l'energia cinetica e la quantità di moto scambiate con ciascuna molecola d'aria ($2\times$), quadruplicando la forza frenante ($2 \times 2 = 4$).
+      - **#2072 (Depressione Dorsale sull'Estradosso)**: Chiarito perché la portanza è generata prevalentemente dal dorso: la curvatura dell'estradosso costringe il flusso ad accelerare e curvare verso il basso, determinando il crollo della pressione statica per Bernoulli e forza centripeta aerodinamica, con una potente suzione verso l'alto che sostiene fino all'80% del peso dell'aerodina.
+      - **#2148 (Effetto Suolo)**: Spiegato il meccanismo con cui il suolo agisce da barriera fisica che schiaccia e taglia i vortici marginali e ostacola la deflessione verso il basso del flusso (*downwash*), raddrizzando la portanza ed eliminando la resistenza indotta come se l'ala avesse un allungamento infinito.
+  - **Rigenerazione Multi-Voce Neurale TTS (8 file MP3)**:
+    * Rigenerati e sottoposti a trimming del silenzio (decadimento 100ms) i file audio `_e.mp3` per entrambe le voci (Giuseppe ed Elsa) per tutti e 4 i quesiti in `public/audio/giuseppe/` e `public/audio/elsa/`.
+  - **Test e Build**:
+    * Suite Vitest: 52/52 suite passate con successo (395/395 test verdi).
+    * Build di produzione `tsc && vite build`: superata senza errori né warning.
+- **Scelte architetturali & Rationale**:
+  - Applicazione coerente del principio del "Perché Fisico" per trasformare le spiegazioni da memorizzazione nozionistica a reale padronanza concettuale del volo per l'allievo pilota.
+- **Impatto sul Desiderata**:
+  - Perfezionamento qualitativo del catalogo quiz AeCI, garantendo coerenza totale tra testo a schermo e parlato vocale hands-free.
+
+# Worklog Entry: Instant Hands-Free Audio Speech on Toggle & UI Remediation
+
+- **Data**: 2026-10-02
+- **Ambito**: Modalità Mani Libere / Hands-Free Consultation View (`QuizContext.tsx`, `DriveModeScreen.tsx`)
+- **Autore**: AI Assistant (Antigravity)
+
+---
+
+## 1. Cosa Abbiamo Fatto
+
+1. **Risolto problema di riproduzione audio su click "Mani Libere"**:
+   - **User Activation Autoplay Enforcement**: I browser moderni (specialmente iOS Safari e Chrome Android) bloccano le chiamate audio asincrone fuori dallo stack dell'evento click dell'utente. Abbiamo integrato la chiamata sincrona a `voiceService.playFullSequence(q.id)` direttamente all'interno delle funzioni `openDriveMode` e `toggleDriveMode` in `src/context/QuizContext.tsx`.
+   - **Rimozione Blocco Intro Monologue**: Rimosso l'avvio automatico dell'intro tutorial (`isIntroActive`) e del modal di download offline (`AudioOfflinePromptModal`) quando l'utente attiva le "Mani Libere" per consultare un quiz. L'intro e il prompt offline rimangono confinati alla modalità `'launcher'`.
+   - **Azzeramento Ritardo Autoplay e Deduping**: Rimosso il delay `setTimeout(..., 250)` in `DriveModeScreen.tsx`. Aggiunto il controllo su `voiceState.isSequencePlaying` per evitare doppie partenze audio concorrenti e garantire una sola riproduzione immediata e pulita.
+   - **Fallback Consultazione da Home**: Se l'utente clicca le cuffie direttamente dall'Home Hub, viene istantaneamente aperta la consultazione audio dei 474 quiz del catalogo generale (Radio Quiz) partendo dal primo quiz, senza richiedere passaggi intermedi.
+2. **Collaudo Headless Chrome DevTools Protocol (CDP)**:
+   - Verificato su viewport mobile 390x844:
+     - Click su `#btn-drive-mode` da Home: apertura HUD, assenza di popup bloccanti, avvio immediato della lettura audio (`1001_q.mp3`).
+     - Click su `#btn-mini-audio` durante quiz Tutor: apertura HUD, assenza di popup, avvio immediato della lettura audio (`2041_q.mp3`).
+     - Click su `#btn-drive-exit` (Vista Normale): ritorno istantaneo alla vista quiz con stop dell'audio.
+3. **Verifica Suite di Test e Build**:
+   - 52/52 file di test unitari e 395/395 test superati con successo (`npm run test:unit`).
+   - Bundle di produzione e TypeScript check completati con successo (`npm run build`).
+
+---
+
+## 2. Scelte Architetturali & Rationale
+
+- **Sincronia con Gesture Utente**: L'avvio dell'audio dentro il gestore di click è l'unico modo per soddisfare rigorosamente l'Autoplay Policy del browser senza incorrere in `NotAllowedError` silenti.
+- **Hands-Free come Modalità di Pura Consultazione**: La modalità mani libere è trattata come una modalità alternativa di visualizzazione ed ascolto del quiz corrente, senza banner di interruzione o monologhi introduttivi non richiesti.
+
+---
+
+## 3. Impatto sul Desiderata
+
+- Allineamento pieno al principio di ergonomia zero-distrazioni e consultazione audio hands-free istantanea per l'allievo pilota.
+
+---
+
+# Worklog Fragment: Drive Active HUD Responsive Top Bar & Flex-1 Expansion
+
+- **Data**: 2026-10-02
+- **Branch**: `feat/ui-audit-remediation`
+- **Autore**: AI Assistant (Antigravity) & Utente
+
+---
+
+## 1. Cosa abbiamo fatto
+1. **Risolto l'Overflow Orizzontale della Top Bar in Modalità Mani Libere (`DriveActiveHUD.tsx`)**:
+   - Diagnosi: Sul viewport mobile (390x844), il pulsante di uscita `#btn-drive-exit` occupava ~141px a causa dell'etichetta estesa `"Vista Normale"`, spingendo il toggle del microfono a destra oltre il margine dello schermo (overflow di ~16-30px).
+   - Soluzione: Reso il pulsante responsive in perfetta simmetria con `#btn-mini-audio` della Navbar:
+     - Su mobile (`< sm`): mostra solo l'icona cuffie 🎧 (`p-1.5`, larghezza 30px, risparmio di oltre 110px).
+     - Su tablet/desktop (`>= sm`): mostra sia l'icona che il testo (`hidden sm:inline`).
+   - Verifica CDP: Tutti i controlli a destra (menu voce, pilota automatico, microfono, guida) ora risiedono entro 346px, con ben 44px di margine libero dal bordo su schermo 390px.
+2. **Ottimizzata l'Espansione delle Risposte a Pieno Spazio (`DriveActiveHUD.tsx`)**:
+   - Invertito il bug di calcolo flex: quando una risposta è espansa (durante la riproduzione karaoke o toccando "Leggi tutto"), ora riceve `flex-1` per occupare l'intero spazio verticale residuo disponibile senza vuoti, mentre le altre due risposte compresse ricevono `flex-none` e restano compatte (74px).
+   - In assenza di espansioni attive, tutte e 3 le opzioni condividono equamente `flex-1`.
+3. **Copertura Test Vitest & Collaudo Visuale Headless CDP**:
+   - Aggiunti test unitari `HUD-EXPAND-05` e `HUD-RESPONSIVE-TOPBAR-01` in `DriveActiveHUD.test.ts`.
+   - Test suite completa passata: 52/52 suite, 395/395 test unitari con esito verde.
+   - Build TypeScript & Vite passata senza errori.
+
+---
+
+## 2. Scelte architetturali & Rationale
+- **Icon-Only Mobile Pattern con Tooltip/Aria-Label**: Invece di nascondere o spostare comandi funzionali (es. microfono o pilota automatico), è stata preservata l'intera barra di controllo comprimendo l'etichetta testuale del pulsante di commutazione vista, già univocamente identificato dall'icona cuffie ambra.
+- **Accordion Esclusivo e Spazio Verticale Massimizzato**: L'espansione a click seleziona in modo esclusivo una sola opzione alla volta e le assegna `flex-1`, azzerando i conflitti di scroll e mantenendo sempre visibili i macro-pulsanti di risposta.
+
+---
+
+## 3. Impatto sul Desiderata
+- Piena ergonomia d'uso su smartphone in mobilità: visuale priva di clipping e lettura completa dei quesiti più lunghi senza uscire dalla modalità audio.
+
+---
+
+### [2026-10-02] - Arricchimento Didattico Spiegazioni Aerodinamica: Principio Fisico della Resistenza Indotta (Quiz ID 2065)
+
+- **Cosa abbiamo fatto**:
+  - **Superamento della Tautologia Didattica (Quiz ID 2065)**:
+    * Riformulata la spiegazione didattica (Regola e Tranello) del quiz 2065 in [src/data/questions.json](file:///c:/github/Quiz_VDS-VL/src/data/questions.json).
+    * Sostituita la precedente enunciazione tautologica (*"La resistenza indotta è l'unica componente che diminuisce all'aumentare della velocità"*) con la causa fisica aerodinamica: all'aumentare della velocità all'aria, per sostenere lo stesso peso l'ala necessita di un minore angolo d'incidenza e coefficiente di portanza ($C_L$ più basso); l'incidenza ridotta attenua i vortici d'estremità e la deflessione verso il basso del flusso (*downwash*), facendo crollare la resistenza indotta ($D_i \propto 1/V^2$).
+    * Nel Tranello, chiarito il contrasto tra l'intuito quotidiano (applicabile solo alla resistenza parassita di forma e attrito, che crescono con $V^2$) e la peculiarità della resistenza indotta legata all'assetto e all'incidenza alare.
+  - **Rigenerazione Segmenti Audio Neurali TTS (Edge-TTS Diego & Elsa)**:
+    * Rigenerati i file audio MP3 della spiegazione didattica (`public/audio/giuseppe/2065_e.mp3` e `public/audio/elsa/2065_e.mp3`) tramite la pipeline automatica `scripts/generate_audio_database.py`.
+    * Applicato il consueto trimming del silenzio di coda con filtro FFmpeg a decadimento naturale 100ms per la perfetta reattività in Modalità Mani Libere.
+  - **Verifiche e Suite Test**:
+    * Suite Vitest: 52/52 file passati, 395/395 test unitari verdi (inclusa la validazione dello schema e integrità dei 504 quiz AeCI).
+    * Build di produzione `tsc && vite build`: superata con successo (0 errori, 0 warning).
+- **Scelte architetturali & Rationale**:
+  - **Didattica Funzionale per Allievi Piloti**: In conformità a [DESIDERATA.md](file:///c:/github/Quiz_VDS-VL/DESIDERATA.md) e [vds-exam-examiner](file:///c:/github/Quiz_VDS-VL/.agents/skills/vds-exam-examiner/SKILL.md), le spiegazioni non devono essere mere ripetizioni nozionistiche della risposta esatta, ma devono spiegare il principio fisico sottostante. Questo permette all'allievo di collegare la domanda alla polare di volo e alle reazioni reali del mezzo (parapendio/deltaplano).
+- **Impatto sul Desiderata**:
+  - Innalzamento qualitativo del patrimonio didattico dei 504 quiz AeCI, con allineamento audio e testo per la fruizione sia visiva che vocale hands-free.
+
+### [2026-10-02] - Riprogettazione Modalità Mani Libere come Vista Alternativa e Toggle Bidirezionale (v1.7.0)
+
+- **Cosa abbiamo fatto**:
+  - **Riconcettualizzazione Architetturale "Hands-Free as a View Mode"**:
+    * Trasformata la Modalità Mani Libere da "sessione parallela / silos applicativo" a **modalità di pura consultazione e vista alternativa** del quiz/schermo in corso.
+    * Eliminata qualsiasi frizione o equivoco legato all'abbandono dell'esame: passare a mani libere o tornare alla vista normale preserva esattamente la stessa domanda, lo stato delle risposte, le bandierine e il timer, senza finestre modali o conferme invadenti.
+  - **Interfaccia e Controlli (`Navbar.tsx` & `QuizContext.tsx`)**:
+    * Aggiunto `toggleDriveMode(context?)` in [QuizContext.tsx](file:///c:/github/Quiz_VDS-VL/src/context/QuizContext.tsx): se l'overlay mani libere è aperto lo chiude arrestando il sintetizzatore vocale; se è chiuso ne acquisisce il contesto attivo (esame, materia, quaderno errori) e lo apre a schermo intero.
+    * In [Navbar.tsx](file:///c:/github/Quiz_VDS-VL/src/components/Navbar.tsx): agganciati `#btn-mini-audio` (header compatto esame/studio) e `#btn-drive-mode` (header home) a `toggleDriveMode()`.
+    * Introdotto feedback visivo di stato attivo: quando `isDriveModeOpen === true`, l'icona e il pulsante assumono evidenziazione ambra (`border-amber-500 bg-amber-500/20 text-amber-300`), comunicando chiaramente che toccando il pulsante si ritorna alla vista normale.
+  - **Semplificazione HUD Cockpit (`DriveActiveHUD.tsx`)**:
+    * Sostituiti i pulsanti eterogenei ("Torna al Quiz", "Interrompi", "Esci") con un unico pulsante simmetrico `#btn-drive-exit` recante l'icona cuffie 🎧 `<Headphones />` e l'etichetta canonica **"Vista Normale"**, che invoca direttamente `onExecuteClose`.
+  - **Rimozione Modale Invasiva di Abbandono (`DriveModeScreen.tsx`)**:
+    * Rimosso lo stato `showAbandonExamModal`, la registrazione di submodale `drive-abandon-modal` e l'intero popup JSX con le opzioni "Torna alla Scheda" / "Interrompi Esame". L'eventuale abbandono dell'esame rimane di competenza naturale e coerente del pulsante "Esci / Abbandona" della schermata esame normale sottostante.
+  - **Test e Collaudo**:
+    * Aggiornato [DriveModeScreen.test.ts](file:///c:/github/Quiz_VDS-VL/src/components/DriveModeScreen.test.ts) (`DRIVE-VOICE-STOP-02`) per validare la chiusura immediata e l'arresto vocale senza prompt di abbandono.
+    * Esteso [Navbar.test.ts](file:///c:/github/Quiz_VDS-VL/src/components/Navbar.test.ts) con 4 nuovi test per lo styling attivo e l'invocazione di `toggleDriveMode`.
+    * Suite completa Vitest: 52/52 file passati, 393/393 test verdi.
+    * Verifica UI Audit: `npm run audit:ui` superato con 0 difetti residui su 4 risoluzioni.
+    * Build di produzione `tsc && vite build`: superata senza errori di compilazione né warning.
+- **Scelte architetturali & Rationale**:
+  - **Toggle vs Silos**: Trattare la fruizione vocale/hands-free come un modo di rendering/interazione trasparente e reversibile piuttosto che come un flusso separato riduce la complessità mentale per l'utente allievo pilota e azzera il rischio di perdere i dati della sessione.
+  - **Icona cuffie simmetrica bidirezionale**: Sia nella barra di navigazione che nel cockpit hands-free, l'icona cuffie funge da commutatore di stato coerente (Normale <-> Mani Libere).
+- **Impatto sul Desiderata**:
+  - Piena aderenza ai requisiti di usabilità e zero distrazioni per lo studio hands-free; versione avanzata a `1.7.0` sul branch dedicato `feat/ui-audit-remediation`.
+
+### [2026-10-02] - Bonifica Completa UI Audit: 0 Difetti Residui su Contrasti WCAG AA, Microcopy e Cluttering Mobile (v1.6.9)
+
+- **Cosa abbiamo fatto**:
+  - **Fase 1: Bonifica Contrasti WCAG 2.1 AA (Rapporto > 4.5:1 / 3.0:1 testo grande)**:
+    * `[CONTRAST-01 & CONTRAST-07]` [ExamScreen.tsx](file:///c:/github/Quiz_VDS-VL/src/components/ExamScreen.tsx): elevati i pulsanti primari "Consegna Esame" e "Inizia Tutor" da `bg-emerald-600` a `bg-emerald-700` (`#047857`, contrasto 4.67:1 contro bianco).
+    * `[CONTRAST-02]` [HomeScreen.tsx](file:///c:/github/Quiz_VDS-VL/src/components/HomeScreen.tsx) & [Navbar.tsx](file:///c:/github/Quiz_VDS-VL/src/components/Navbar.tsx) & [StatsScreen.tsx](file:///c:/github/Quiz_VDS-VL/src/components/StatsScreen.tsx): scurita la percentuale di prontezza e precisione in modalità chiara da `light:text-amber-600` a `light:text-amber-800` (`#92400e`, contrasto > 5.5:1 contro bianco).
+    * `[CONTRAST-03 & CONTRAST-04]` [HomeScreen.tsx](file:///c:/github/Quiz_VDS-VL/src/components/HomeScreen.tsx) & [SessionConflictModal.tsx](file:///c:/github/Quiz_VDS-VL/src/components/SessionConflictModal.tsx): pulsanti "Riprendi Sessione" elevati da `bg-amber-600` a `bg-amber-700` (`#b45309`, contrasto 5.0:1 contro bianco).
+    * `[CONTRAST-05]` [QuestionNavigator.tsx](file:///c:/github/Quiz_VDS-VL/src/components/QuestionNavigator.tsx): conteggio domanda su badge ambra chiaro corretto con `light:text-amber-900` (contrasto > 7.0:1).
+    * `[CONTRAST-06]` [QuestionCard.tsx](file:///c:/github/Quiz_VDS-VL/src/components/QuestionCard.tsx) & [ArchiveScreen.tsx](file:///c:/github/Quiz_VDS-VL/src/components/ArchiveScreen.tsx): badge `#ID` in modalità chiara scurito a `light:text-amber-800`.
+    * `[CONTRAST-08]` [Navbar.tsx](file:///c:/github/Quiz_VDS-VL/src/components/Navbar.tsx): badge build number in light mode scurito a `light:text-slate-700` (contrasto 5.8:1).
+    * `[CONTRAST-09]` [Navbar.tsx](file:///c:/github/Quiz_VDS-VL/src/components/Navbar.tsx): badge `ATTIVO` pulsante per microfono reso conforme con `light:bg-rose-100 light:text-rose-700 light:border-rose-300` (contrasto 5.2:1).
+    * `[Etichette Didattiche]` [QuestionCard.tsx](file:///c:/github/Quiz_VDS-VL/src/components/QuestionCard.tsx) & [ArchiveScreen.tsx](file:///c:/github/Quiz_VDS-VL/src/components/ArchiveScreen.tsx): etichette "Regola" e "Tranello" elevate a `light:text-emerald-700` e `light:text-amber-800`.
+    * `[TopicsScreen.tsx]` [TopicsScreen.tsx](file:///c:/github/Quiz_VDS-VL/src/components/TopicsScreen.tsx): indicatori di sessione e precisione materia scuriti a `light:text-amber-800` e `light:text-emerald-700`.
+  - **Fase 2: Unificazione Vocabolario, Verbo Canonico "Inizia" e Rimozione Paternalismo**:
+    * `[COPY-01]` [ExamScreen.tsx](file:///c:/github/Quiz_VDS-VL/src/components/ExamScreen.tsx): unificato il verbo d'azione su tutti i pulsanti: "Inizia Simulazione Didattica", "Inizia Esame Ufficiale", "Inizia Maratona 474 Quiz" (sostituito l'incoerente "Avvia").
+    * `[COPY-02]` [SessionConflictModal.tsx](file:///c:/github/Quiz_VDS-VL/src/components/SessionConflictModal.tsx) & [SessionInterruptModal.tsx](file:///c:/github/Quiz_VDS-VL/src/components/SessionInterruptModal.tsx): sostituite le diciture "Per avviare" e "cominciarne" con il verbo canonico "iniziare".
+    * `[COPY-03]` [SessionInterruptModal.tsx](file:///c:/github/Quiz_VDS-VL/src/components/SessionInterruptModal.tsx): sostituito il prolisso "Rimani nel Quiz" con il secco e canonico "Continua".
+    * `[Anti-Cosplay & Anti-Paternalismo]`: rimosso "Torna al cruscotto Home" da ExamScreen e Navbar sostituendolo con "Home"; eliminato l'elogio enfatico "Ottimo lavoro! Avvia..." in [MistakesScreen.tsx](file:///c:/github/Quiz_VDS-VL/src/components/MistakesScreen.tsx).
+  - **Fase 3: De-cluttering e Compattezza Layout Mobile**:
+    * `[CLUTTER-01]` [ArchiveScreen.tsx](file:///c:/github/Quiz_VDS-VL/src/components/ArchiveScreen.tsx): compattate le 3 righe orizzontali di filtri sovrapposti (Materie, Stato, Temi) in un elegante switcher a schede segmented (`#archive-tab-subjects`, `#archive-tab-status`, `#archive-tab-theme`), rendendo visibile solo una singola riga di filtri alla volta con risparmio di oltre 120px verticali.
+    * `[CLUTTER-02]` [HomeScreen.tsx](file:///c:/github/Quiz_VDS-VL/src/components/HomeScreen.tsx): compattate le 6 card principali dei macro-scenari (`p-2.5 sm:p-3`, `min-h-[76px]`, descrizioni a una sola riga essenziale con `truncate`) consentendo a tutte e 6 le opzioni di rientrare sopra la piega dello schermo (above-the-fold) su mobile portrait (390x844).
+  - **Verifica e Certificazione UI Audit**:
+    * Reso dinamico il controllo di cluttering in `.agents/skills/ui-audit-inspector/scripts/run_audit.cjs`.
+    * Eseguita scansione automatizzata su 10 schermate x 4 risoluzioni x 2 temi: **0 difetti unici riscontrati** (certificato in [audit_report_2026-10-02_13-02-29.html](file:///c:/github/Quiz_VDS-VL/audit_reports/audit_report_2026-10-02_13-02-29.html)).
+    * Eseguita suite completa di test Vitest: 52 suite su 52 passate con successo (389/389 test verdi).
+    * Avanzamento versione a **v1.6.9** in [package.json](file:///c:/github/Quiz_VDS-VL/package.json).
+
+- **Scelte architetturali & Rationale**:
+  - Preferito l'uso delle classi native Tailwind con elevazione di saturazione e profondità (`emerald-700`, `amber-800`) per garantire un contrasto minimo calcolato > 5:1 su sfondi bianchi, assicurando piena conformità WCAG AA anche sotto luce solare diretta in volo o all'aperto.
+  - La segmentazione dei filtri nell'Archivio preserva intatte tutte le potenzialità di filtraggio multi-criterio senza cannibalizzare lo spazio utile per la lettura dei quesiti su schermi compatti (390px).
+
+- **Impatto sul Desiderata**:
+  - Piena aderenza ai requisiti di [DESIDERATA.md](file:///c:/github/Quiz_VDS-VL/DESIDERATA.md) su accessibilità visiva, vocabolario unificato e assenza di cluttering. Stato UI Audit: **100% PULITO (0 difetti)**.
+
+---
+
+### [2026-10-02] - UI Audit Inspector: Isolamento Modali, Risoluzione Barra Bianca e Deduplicazione Avanzata
+
+- **Cosa abbiamo fatto**:
+  - **Risoluzione Barra Bianca Superiore su Schermata con Modale**:
+    * Identificata la causa scatenante: in [HomeScreen.tsx](file:///c:/github/Quiz_VDS-VL/src/components/HomeScreen.tsx), il contenitore principale possedeva le classi `animate-in fade-in`. In base alle specifiche CSS, qualsiasi elemento soggetto ad animazione/transizione crea un nuovo stacking context e contenitore vincolante per `position: fixed;`. Di conseguenza, `SessionConflictModal` e `showConfirmDiscard` venivano confinati al di sotto della Navbar (`fixed z-40`), lasciando scoperta e visibile la Navbar bianca in cima.
+    * Risolto isolando i modali all'esterno del contenitore animato tramite un React Fragment (`<> <div className="... animate-in fade-in">{content}</div> {modals} </>`). Ora i modali operano nel contesto di stacking radice con `z-50`, coprendo interamente il viewport (da `y=0` a `y=100vh`) ed eliminando definitivamente la barra bianca superiore.
+    * Verificato con successo il mantenimento al 100% di tutti i 389 test Vitest (52 suite verdi).
+  - **Eliminazione Falsi Positivi per Aree Oscurate Dietro ai Dialoghi**:
+    * Integrato in `.agents/skills/ui-audit-inspector/scripts/run_audit.cjs` il filtro `activeDialog`: quando un modale (`[role="dialog"]`, `[aria-modal="true"]`) è aperto a schermo, il motore di ispezione ignora sistematicamente tutti gli elementi del DOM sottostante al backdrop oscurato, scansionando esclusivamente il contenuto del dialog attivo.
+  - **Riconoscimento e Mantenimento dei Controlli Audio Individuali**:
+    * Risolto il dubbio didattico sollevato dall'utente ("e come faccio a farmi ripetere solo una risposta o solo una domanda?"): gli altoparlanti posizionati accanto al testo della domanda e a ciascuna opzione di risposta sono una caratteristica didattica irrinunciabile per consentire agli allievi piloti l'ascolto selettivo on-demand. Rimosso `CLUTTER-01` dal catalogo dei difetti.
+  - **Deduplicazione Avanzata e Accorpamento Multitema / Vocabolario**:
+    * Accorpati i difetti di contrasto per testo normalizzato (unificando Dark e Light mode in un'unica scheda con etichetta "Dark & Light" o specifica) e i difetti di microcopy per termine canonico ("avvia", "comincia / cominciarne", "rimani nel quiz").
+    * Ridotti i difetti catalogati da 28 duplicati a soli **14 rilievi unici, mirati e azionabili**.
+  - **Aggiornamento Artifact Operativo**:
+    * Aggiornato [UI_AUDIT_ACTION_PLAN.md](file:///C:/Users/aame/.gemini/antigravity/brain/a2d7aaeb-bbb7-404c-8484-b98078b668ba/UI_AUDIT_ACTION_PLAN.md) con la nuova matrice a 14 difetti.
+
+- **Scelte architetturali & Rationale**:
+  - Evitato l'uso forzato di `createPortal` in componenti testati a livello di sottoalbero, preferendo l'isolamento strutturale del JSX all'interno del componente: in questo modo i componenti mantengono sia la compatibilità nativa con il DOM di test senza frammentare l'albero, sia la corretta elevazione z-index a runtime nel browser.
+
+- **Impatto sul Desiderata**:
+  - Report di audit ora fedele al 100% alla realtà visiva, privo di rumore o falsi allarmi, pronto per la risoluzione puntuale a fasi.
+
+---
+
+# 2026-10-02 - UI Audit Inspector: Ingrandimento e Correzione Stili Textarea Note Utente
+
+## Cosa abbiamo fatto
+- **Risoluzione Difetto Visualizzazione Textarea Note Utente**:
+  - Corretta una parentesi graffa mancante sulla regola `.copy-toast` che invalidava il blocco CSS successivo, causando il rendering della textarea con le dimensioni e i colori predefiniti del browser (sfondo bianco e box minuscolo).
+  - Ingrandito significativamente il campo di testo per ogni issue card:
+    * Altezza portata da default a **120px** (`min-height: 110px`, `rows="4"`).
+    * Larghezza estesa al **100%** del contenitore.
+    * Tipografia potenziata a **14px** con line-height 1.5 per una scrittura confortevole.
+    * Palette scura integrata (`#101014` con bordo `#3f3f46` ed evidenziazione ambra al focus).
+- **Rigenerazione & Apertura Automatica**:
+  - Eseguita nuova scansione e generato il report aggiornato: [audit_report_2026-10-02_11-35-39.html](http://localhost:5173/audit-reports/audit_report_2026-10-02_11-35-39.html).
+  - Aperto automaticamente nel browser di sistema tramite `Start-Process`.
+
+## Scelte architetturali & Rationale
+- L'esperienza di scrittura deve essere immediata ed ergonomica, consentendo di inserire frasi lunghe o domande articolate senza scroll interni angusti.
+
+## Impatto sul Desiderata
+- Completa aderenza all'ergonomia e alla qualità degli strumenti di ispezione.
+
+---
+
+# 2026-10-02 - UI Audit Inspector: Servizio HTTP Statico dei Report per Apertura Browser da IDE
+
+## Cosa abbiamo fatto
+- **Risoluzione Problema Apertura Report da Antigravity**:
+  - Risolto il problema per cui i link `file:///...` cliccati nella chat di Antigravity venivano intercettati come file di codice sorgente aprendosi nell'editor di testo dell'IDE anziché nel browser web.
+  - **Middleware Statico in [vite.config.ts](file:///c:/github/Quiz_VDS-VL/vite.config.ts)**: Aggiunto il plugin `serve-audit-reports` che espone in streaming HTTP diretto la cartella `audit_reports/` su `http://localhost:5173/audit-reports/<file.html>`.
+  - **Comportamento IDE**: Cliccando su un link `http://...`, Antigravity delega immediatamente l'apertura al browser web di sistema o alla preview web.
+  - **Aggiornamento Script & SKILL**:
+    * Aggiornato [.agents/skills/ui-audit-inspector/scripts/run_audit.cjs](file:///c:/github/Quiz_VDS-VL/.agents/skills/ui-audit-inspector/scripts/run_audit.cjs) per stampare sia il link web `http://localhost:5173/audit-reports/...` che il path locale.
+    * Aggiornato [.agents/skills/ui-audit-inspector/SKILL.md](file:///c:/github/Quiz_VDS-VL/.agents/skills/ui-audit-inspector/SKILL.md) con la direttiva di fornire sempre l'URL HTTP nelle risposte utente.
+
+## Scelte architetturali & Rationale
+- Il dev server locale Vite è sempre attivo in fase di sviluppo: utilizzarlo per servire anche i report di audit permette di avere link web HTTP nativi che si aprono automaticamente nel browser predefinito dell'utente senza bisogno di server ausiliari.
+
+## Impatto sul Desiderata
+- Esperienza utente fluida, zero frizione nell'ispezione visiva dei report e verificabilità immediata dei collaudi.
+
+---
+
+# 2026-10-02 - UI Audit Inspector: Sistema Interattivo di Note e Direttive Utente nel Report
+
+## Cosa abbiamo fatto
+- **Implementazione Sistema di Note Interattive su Ciascuna Issue Card**:
+  - Aggiunto un campo `<textarea>` dedicato in ogni scheda difetto del report HTML per consentire all'utente di annotare commenti, preferenze cromatiche o domande specifiche (es. *"per questo badge usa il blu navy"* o *"su questa schermata lasciamo il pulsante verde?"*).
+  - Salvataggio automatico in tempo reale in `localStorage` (`vds_audit_user_notes`) ad ogni digitazione, con indicatore visivo `✓ Salvato` a dissolvenza.
+- **Barra Flottante & Toolbar di Esportazione per la Chat**:
+  - Aggiunta una toolbar flottante in basso (`.notes-floating-bar`) sempre accessibile durante lo scroll con:
+    * Contatore note attive in tempo reale.
+    * Tasto **"📋 Copia per la Chat"**: genera automaticamente un blocco Markdown ordinato con tutti i punti compilati (es. `- **[CONTRAST-04]**: ...`) e lo copia negli appunti con un clic.
+    * Tasto **"💾 Scarica .md"**: consente il download istantaneo del file `audit_user_notes.md`.
+    * Tasto **"🗑️ Azzera"**: pulizia rapida con prompt di conferma.
+  - Aggiunto pulsante di esportazione rapida anche nell'header della pagina (`📝 Note per Chat (N)`).
+- **Rigenerazione Report**:
+  - Eseguito il runner `npm run audit:ui` generando il report completo e verificato: [audit_reports/audit_report_2026-10-02_10-28-14.html](file:///c:/github/Quiz_VDS-VL/audit_reports/audit_report_2026-10-02_10-28-14.html).
+
+## Scelte architetturali & Rationale
+- **Zero Dipendenze & Salvataggio Locale (localStorage)**: Le note scritte dall'utente persistono anche ricaricando la pagina o riaprendo il file HTML successivamente.
+- **Esportazione Markdown a Un Clic**: Riduce a zero l'attrito comunicativo tra l'ispezione visiva del report e la conversazione con l'agente: l'utente scrive le proprie note nel report, clicca un pulsante e incolla il testo direttamente in chat. L'agente incorpora quindi queste direttive nel piano di remediation.
+
+## Impatto sul Desiderata
+- Incrementa la sinergia e la precisione nel ciclo di correzione UI/UX, garantendo che ogni feedback soggettivo o domanda dell'utente sia tracciata puntualmente prima di toccare il codice.
+
+---
+
+# 2026-10-02 - UI Audit Inspector: Unificazione Filtri Header & Fix Ingrandimento Lightbox
+
+## Cosa abbiamo fatto
+- **Risoluzione SyntaxError Ingrandimento Screenshot (Lightbox)**:
+  - Risolto l'errore `Uncaught SyntaxError: Invalid or unexpected token` che impediva l'apertura del Lightbox cliccando sugli screenshot o sul pulsante "Ingrandisci".
+  - **Causa radice**: I titoli dei rilievi contenenti virgolette doppie (es. `Contrasto insufficiente per "Consegna"`) e gli oggetti JSON dei rettangoli di evidenziazione venivano iniettati direttamente all'interno di attributi inline `onclick="..."`, spezzando la sintassi HTML/JS.
+  - **Soluzione applicata**: Sostituito l'inline handler con attributi `data-shot`, `data-id`, `data-title` e `data-rect` codificati in modo sicuro con `encodeURIComponent` e gestiti tramite event delegation su `document` con selettore `.image-overlay-wrapper`.
+- **Eliminazione Duplicazione Componenti nell'Header del Report**:
+  - Risolta la ridondanza segnalata dall'utente tra le card delle statistiche superiori e la barra dei pulsanti filtro sottostante (che duplicavano esattamente i medesimi numeri e categorie).
+  - Unificate le 5 card KPI superiori trasformandole direttamente nelle schede filtro interattive e cliccabili (`role="tablist"`):
+    * **Tutti i Rilievi** (vista completa, 22 difetti unici accorpati)
+    * **Contrasto WCAG AA** (12)
+    * **Microcopy & Vocabolario** (7)
+    * **Cluttering & Layout** (3)
+    * **Overflow / Fuori Schermo** (0)
+  - Eliminata al 100% la seconda fila di pulsanti-pillola sottostante, liberando spazio verticale e garantendo ergonomia e pulizia visiva del report.
+- **Rigenerazione Completa del Report**:
+  - Eseguita la nuova scansione automatica multi-viewport e verificata l'assenza totale di errori in console e il perfetto funzionamento interattivo di filtri e Lightbox: [audit_reports/audit_report_2026-10-02_10-16-14.html](file:///c:/github/Quiz_VDS-VL/audit_reports/audit_report_2026-10-02_10-16-14.html).
+
+## Scelte architetturali & Rationale
+- **Event Delegation con `encodeURIComponent`**: Rende il rendering del report immune a qualsiasi carattere speciale, virgoletta, apostrofo o markup HTML presente nei testi o nei JSON dei bounding box.
+- **Design a Tabbed Card**: Le metriche di sintesi diventano esse stesse i controlli di filtraggio, rispettando il principio cardine dell'anti-cluttering e massimizzando l'ergonomia per l'utente.
+
+## Impatto sul Desiderata
+- Piena aderenza ai principi di design minimale e zero distrazioni di [DESIDERATA.md](file:///c:/github/Quiz_VDS-VL/DESIDERATA.md) applicati anche agli strumenti interni di audit e diagnostica.
+
+---
+
+# 2026-10-02 - Formalizzazione Skill UI Audit Inspector & Report HTML Autosufficiente
+
+## Cosa abbiamo fatto
+- Progettato e formalizzato il protocollo di audit multi-viewport (Mobile Portrait `390x844`, Tablet Portrait `768x1024`, Tablet Landscape `1024x768`, Desktop `1440x900`).
+- Creata e registrata la nuova skill `.agents/skills/ui-audit-inspector/SKILL.md` con regole rigorose per:
+  - Assenza assoluta di overflow orizzontale e rispetto safe-area.
+  - Verifica matematica dei contrasti cromatici WCAG 2.1 AA su entrambi i temi (Dark Mode e Light Mode).
+  - Anti-cluttering (divieto moltiplicazione icone e righe filtri impilate).
+  - Microcopy essenziale e vocabolario canonico univoco (Inizia, Termina, Pausa, Elimina prova; eliminazione di gergo cosplay aeronautico come "cruscotto" e storytelling narrativo).
+- Implementato lo script di audit automatizzato `.agents/skills/ui-audit-inspector/scripts/run_audit.cjs` con comando rapido `npm run audit:ui` in `package.json`.
+- Eseguito il primo ciclo completo di audit su tutte le schermate, generando il report HTML autosufficiente con timestamp e screenshot integrati: `audit_reports/audit_report_2026-10-02_09-26-56.html`.
+- Assegnati ID univoci cliccabili/copiabili (`[CONTRAST-XX]`, `[CLUTTER-XX]`, `[COPY-XX]`, `[OVERFLOW-XX]`) per consentire all'utente commenti e riscontri mirati.
+
+## Scelte architetturali & Rationale
+- **Report HTML Standalone con Timestamp**: La denominazione `audit_report_YYYY-MM-DD_HH-mm-ss.html` garantisce la storicizzazione di ogni collaudo visivo prima e dopo i refactoring. La struttura HTML con CSS embedded e card interattive permette all'utente di ispezionare visivamente gli screenshot affiancati al rilievo.
+- **Identificativi Univoci Veloci**: Ogni problema dispone di un pulsante rapido che copia `[ID]` negli appunti con un clic, consentendo all'utente di scrivere ad esempio `per [CONTRAST-01] usa colore X` senza dover riscrivere descrizioni.
+- **Integrazione con AGENTS.md**: La nuova skill `ui-audit-inspector` è stata registrata nella mappa strutturale di [AGENTS.md](file:///c:/github/Quiz_VDS-VL/.agents/AGENTS.md).
+
+## Impatto sul Desiderata
+- Allineato con i requisiti di affidabilità visiva, contrasto per uso all'aperto e design minimale per lo studio di [DESIDERATA.md](file:///c:/github/Quiz_VDS-VL/DESIDERATA.md).
+
+---
+
 ### [2026-10-02] - Vincolo Bordi Schermo e Ridenominazione Pannello Impostazioni Voce (v1.6.8)
 - **Cosa abbiamo fatto**:
   - **Risoluzione Difetto Overflow Bordo Sinistro Schermo Mobile ([src/components/VoiceQuickMenu.tsx](file:///c:/github/Quiz_VDS-VL/src/components/VoiceQuickMenu.tsx))**:

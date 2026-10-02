@@ -1,7 +1,7 @@
 {
   "name": "vds-vl-quiz-master",
   "private": true,
-  "version": "1.6.8",
+  "version": "1.7.4",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -11,6 +11,7 @@
     "test:unit": "vitest run",
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage",
+    "audit:ui": "node .agents/skills/ui-audit-inspector/scripts/run_audit.cjs",
     "screenshots:manual": "node scripts/generate_manual_screenshots.cjs",
     "test:visual": "node .agents/skills/headless-pwa-tester/scripts/visual_check.js desktop",
     "test:visual:portrait": "node .agents/skills/headless-pwa-tester/scripts/visual_check.js mobile-portrait",

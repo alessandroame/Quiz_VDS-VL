@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { XCircle } from 'lucide-react';
 import type { Question } from '../types/quiz';
 import type { ExamSession } from '../types/database';
+import type { AudioPart } from '../types/audio';
 import { useQuiz } from '../context/QuizContext';
 import { generateExamQuestions } from '../utils/fairRandomizer';
 import { evaluateExam } from '../services/examEvaluator';
@@ -60,13 +60,10 @@ export const DriveModeScreen: React.FC<DriveModeScreenProps> = ({
   onClose,
   sessionContext
 }) => {
-  const { questions, statsMap, saveExam, recordAnswer, settings, updateSetting, dismissActiveSession } = useQuiz();
+  const { questions, statsMap, saveExam, recordAnswer, settings, updateSetting } = useQuiz();
 
   // Screen Wake Lock API sempre attivo in Modalità Guida
   const { isActive: isWakeLockActive } = useWakeLock(isOpen);
-
-  // Modale di conferma interruzione esame
-  const [showAbandonExamModal, setShowAbandonExamModal] = useState<boolean>(false);
 
   // Modalità sessione interna (se non viene fornito sessionContext da un esame esistente)
   const [internalMode, setInternalMode] = useState<'launcher' | 'running' | 'debriefing'>(
@@ -133,14 +130,6 @@ export const DriveModeScreen: React.FC<DriveModeScreenProps> = ({
 
   // Registra sub-modali interne con il coordinatore back navigation
   useEffect(() => {
-    if (!showAbandonExamModal) return;
-    const unregister = backNavigation.registerSubModal('drive-abandon-modal', () => {
-      setShowAbandonExamModal(false);
-    });
-    return () => unregister();
-  }, [showAbandonExamModal]);
-
-  useEffect(() => {
     if (!showOfflinePrompt) return;
     const unregister = backNavigation.registerSubModal('drive-offline-prompt', () => {
       setShowOfflinePrompt(false);
@@ -148,10 +137,10 @@ export const DriveModeScreen: React.FC<DriveModeScreenProps> = ({
     return () => unregister();
   }, [showOfflinePrompt]);
 
-  // Trigger prompt audio offline al primo avvio della Guida solo se NESSUNA voce è già scaricata offline
+  // Trigger prompt audio offline solo se nel Launcher e nessuna voce è già scaricata offline
   useEffect(() => {
     let isCancelled = false;
-    if (isOpen && !settings.audioOfflinePromptDismissed) {
+    if (isOpen && internalMode === 'launcher' && !settings.audioOfflinePromptDismissed) {
       const activeVoice = settings.ttsVoice || 'giuseppe';
 
       // Verifica accurata asincrona dello stato effettivo in CacheStorage
@@ -207,6 +196,16 @@ export const DriveModeScreen: React.FC<DriveModeScreenProps> = ({
   const touchStartXRef = useRef<number | null>(null);
   const touchStartYRef = useRef<number | null>(null);
 
+  // Micro-cooldown di sicurezza (250ms) al cambio domanda per prevenire click accidentali residui
+  const [isQuestionSwitching, setIsQuestionSwitching] = useState<boolean>(false);
+  const questionSwitchTimeoutRef = useRef<any>(null);
+  const prevQuestionIdRef = useRef<number | null>(null);
+
+  // Safety micro-cooldown (500ms) when voice switches option to prevent accidental clicks during expansion
+  const [isOptionSwitchingCooldown, setIsOptionSwitchingCooldown] = useState<boolean>(false);
+  const optionSwitchTimeoutRef = useRef<any>(null);
+  const prevActivePartRef = useRef<AudioPart | null>(null);
+
   const clearAllDriveTimers = useCallback(() => {
     if (countdownTimerRef.current) {
       clearInterval(countdownTimerRef.current);
@@ -228,16 +227,29 @@ export const DriveModeScreen: React.FC<DriveModeScreenProps> = ({
       clearTimeout(assimilationTimeoutRef.current);
       assimilationTimeoutRef.current = null;
     }
+    if (questionSwitchTimeoutRef.current) {
+      clearTimeout(questionSwitchTimeoutRef.current);
+      questionSwitchTimeoutRef.current = null;
+    }
+    if (optionSwitchTimeoutRef.current) {
+      clearTimeout(optionSwitchTimeoutRef.current);
+      optionSwitchTimeoutRef.current = null;
+    }
     setWaitingCountdown(null);
     setAssimilationCountdown(null);
     setIsWaitingForExplanationEnd(false);
     isWaitingForExplanationEndRef.current = false;
+    setIsOptionSwitchingCooldown(false);
   }, []);
 
   // Sincronizza stato iniziale all'apertura o cambio di context
   useEffect(() => {
     if (!isOpen) {
       setInternalMode('launcher');
+      prevQuestionIdRef.current = null;
+      prevActivePartRef.current = null;
+      setIsQuestionSwitching(false);
+      setIsOptionSwitchingCooldown(false);
       return;
     }
     if (sessionContext) {
@@ -260,6 +272,29 @@ export const DriveModeScreen: React.FC<DriveModeScreenProps> = ({
   const currentQ = internalQuestions[currentIndex];
   const totalCount = internalQuestions.length;
 
+  // Grace period anti-misclick (250ms) al cambio domanda per prevenire risposte accidentali alla cieca
+  useEffect(() => {
+    if (!isOpen || internalMode !== 'running' || !currentQ?.id) return;
+
+    if (prevQuestionIdRef.current !== null && prevQuestionIdRef.current !== currentQ.id) {
+      setIsQuestionSwitching(true);
+      if (questionSwitchTimeoutRef.current) clearTimeout(questionSwitchTimeoutRef.current);
+      questionSwitchTimeoutRef.current = setTimeout(() => {
+        setIsQuestionSwitching(false);
+        questionSwitchTimeoutRef.current = null;
+      }, 250);
+    } else {
+      setIsQuestionSwitching(false);
+    }
+    prevQuestionIdRef.current = currentQ.id;
+
+    return () => {
+      if (questionSwitchTimeoutRef.current) {
+        clearTimeout(questionSwitchTimeoutRef.current);
+      }
+    };
+  }, [isOpen, internalMode, currentQ?.id]);
+
   const {
     isPlaying,
     isPaused,
@@ -276,8 +311,37 @@ export const DriveModeScreen: React.FC<DriveModeScreenProps> = ({
     stopDriveIntro,
     stop: stopVoice,
     pause: pauseVoice,
-    resume: resumeVoice
+    resume: resumeVoice,
+    activePart
   } = useAviationVoice(currentQ?.id);
+
+  // Anti-misclick micro-cooldown (500ms) when voice switches spoken option
+  useEffect(() => {
+    if (!isOpen || internalMode !== 'running') return;
+
+    if (
+      isPlaying &&
+      prevActivePartRef.current &&
+      activePart &&
+      prevActivePartRef.current !== activePart &&
+      (activePart.startsWith('opt') || prevActivePartRef.current.startsWith('opt'))
+    ) {
+      setIsOptionSwitchingCooldown(true);
+      if (optionSwitchTimeoutRef.current) clearTimeout(optionSwitchTimeoutRef.current);
+      optionSwitchTimeoutRef.current = setTimeout(() => {
+        setIsOptionSwitchingCooldown(false);
+        optionSwitchTimeoutRef.current = null;
+      }, 500);
+    }
+
+    prevActivePartRef.current = activePart;
+
+    return () => {
+      if (optionSwitchTimeoutRef.current) {
+        clearTimeout(optionSwitchTimeoutRef.current);
+      }
+    };
+  }, [isOpen, internalMode, activePart, isPlaying]);
 
   const isExplanationPlaying = isPartPlaying('explanation');
 
@@ -291,7 +355,7 @@ export const DriveModeScreen: React.FC<DriveModeScreenProps> = ({
       return;
     }
 
-    if (!settings.driveModeIntroPlayed && !hasTriggeredInitialIntroRef.current) {
+    if (internalMode === 'launcher' && !settings.driveModeIntroPlayed && !hasTriggeredInitialIntroRef.current) {
       hasTriggeredInitialIntroRef.current = true;
       setIsIntroActive(true);
       const t = setTimeout(() => {
@@ -299,7 +363,7 @@ export const DriveModeScreen: React.FC<DriveModeScreenProps> = ({
       }, 350);
       return () => clearTimeout(t);
     }
-  }, [isOpen, settings.driveModeIntroPlayed, playDriveIntro]);
+  }, [isOpen, internalMode, settings.driveModeIntroPlayed, playDriveIntro]);
 
   // Rileva quando la guida vocale finisce di parlare
   const prevIntroPlayingRef = useRef<boolean>(false);
@@ -346,7 +410,11 @@ export const DriveModeScreen: React.FC<DriveModeScreenProps> = ({
   const autoPlayTriggeredForRef = useRef<number | null>(null);
 
   useEffect(() => {
-    if (!isOpen || internalMode !== 'running' || !currentQ || isIntroActive) return;
+    if (!isOpen) {
+      autoPlayTriggeredForRef.current = null;
+      return;
+    }
+    if (internalMode !== 'running' || !currentQ || isIntroActive) return;
 
     // Reset stati di attesa per la nuova domanda
     setWaitingCountdown(null);
@@ -356,24 +424,22 @@ export const DriveModeScreen: React.FC<DriveModeScreenProps> = ({
       countdownTimerRef.current = null;
     }
 
-    if (isAutopilotEnabled && autoPlayTriggeredForRef.current !== currentQ.id) {
+    const voiceState = voiceService.getState();
+    const isAlreadyPlayingThisQ =
+      voiceState.currentQuestionId === currentQ.id &&
+      (voiceState.isPlaying || voiceState.isPaused || voiceState.isSequencePlaying);
+
+    if (isAlreadyPlayingThisQ) {
       autoPlayTriggeredForRef.current = currentQ.id;
-      if (autoPlayTimerRef.current) clearTimeout(autoPlayTimerRef.current);
-      // Breve delay di 250ms per transizione fluida
-      autoPlayTimerRef.current = setTimeout(() => {
+    } else if (isAutopilotEnabled && autoPlayTriggeredForRef.current !== currentQ.id) {
+      autoPlayTriggeredForRef.current = currentQ.id;
+      if (autoPlayTimerRef.current) {
+        clearTimeout(autoPlayTimerRef.current);
         autoPlayTimerRef.current = null;
-        if (internalMode === 'running') {
-          playFullSequence();
-        }
-      }, 250);
-      return () => {
-        if (autoPlayTimerRef.current) {
-          clearTimeout(autoPlayTimerRef.current);
-          autoPlayTimerRef.current = null;
-        }
-      };
+      }
+      playFullSequence();
     }
-  }, [isOpen, internalMode, currentQ?.id, isAutopilotEnabled, isIntroActive]);
+  }, [isOpen, internalMode, currentQ?.id, isAutopilotEnabled, isIntroActive, playFullSequence]);
   // Studio sereno a ritmo dell'allievo: al termine della lettura audio, la domanda
   // attende la risposta (touch, vocale o tastiera) senza countdown o avanzamenti forzati.
 
@@ -476,6 +542,9 @@ export const DriveModeScreen: React.FC<DriveModeScreenProps> = ({
   // Seleziona risposta
   const handleSelectAnswer = async (ans: 1 | 2 | 3) => {
     if (!currentQ || internalMode !== 'running') return;
+
+    // Ignore clicks during safety micro-cooldown (250ms on question switch or 500ms on spoken option switch with layout shift)
+    if (isQuestionSwitching || isOptionSwitchingCooldown) return;
 
     // Se l'esame è già terminato o la domanda è già rivelata
     if (answers[currentQ.id] !== undefined && (!isExamSession || isTutorEnabled)) return;
@@ -736,14 +805,12 @@ export const DriveModeScreen: React.FC<DriveModeScreenProps> = ({
     }
   }, [voiceLastTranscript]);
 
-  // Clean up feedback timers and stop voice on unmount
+  // Clean up feedback timers on unmount
   useEffect(() => {
     return () => {
       clearAllDriveTimers();
       if (recognizedLabelTimerRef.current) clearTimeout(recognizedLabelTimerRef.current);
       if (unrecognizedTimerRef.current) clearTimeout(unrecognizedTimerRef.current);
-      voiceService.stop();
-      voiceService.stopDriveIntro();
     };
   }, [clearAllDriveTimers]);
 
@@ -795,10 +862,9 @@ export const DriveModeScreen: React.FC<DriveModeScreenProps> = ({
     if (!isOpen || internalMode !== 'running') return;
 
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (showAbandonExamModal || isVoiceGuideOpen || showOfflinePrompt || isVoiceMenuOpen) {
+      if (isVoiceGuideOpen || showOfflinePrompt || isVoiceMenuOpen) {
         if (e.key === 'Escape') {
-          if (showAbandonExamModal) setShowAbandonExamModal(false);
-          else if (isVoiceGuideOpen) setIsVoiceGuideOpen(false);
+          if (isVoiceGuideOpen) setIsVoiceGuideOpen(false);
           else if (showOfflinePrompt) setShowOfflinePrompt(false);
         }
         return;
@@ -868,7 +934,7 @@ export const DriveModeScreen: React.FC<DriveModeScreenProps> = ({
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [isOpen, internalMode, currentQ, currentIndex, totalCount, isAutopilotEnabled, isPlaying, isPaused, showAbandonExamModal, isVoiceGuideOpen, showOfflinePrompt, isVoiceMenuOpen, handlePlayQuestion, handlePlayOption, restartCurrentOrSequence, togglePlayPause, pauseVoice, stopVoice, resumeVoice]);
+  }, [isOpen, internalMode, currentQ, currentIndex, totalCount, isAutopilotEnabled, isPlaying, isPaused, isVoiceGuideOpen, showOfflinePrompt, isVoiceMenuOpen, handlePlayQuestion, handlePlayOption, restartCurrentOrSequence, togglePlayPause, pauseVoice, stopVoice, resumeVoice]);
 
   // Gestione Swipe Touch a schermo intero
   const handleTouchStart = (e: React.TouchEvent) => {
@@ -970,13 +1036,6 @@ export const DriveModeScreen: React.FC<DriveModeScreenProps> = ({
   };
 
   const handleClose = () => {
-    clearAllDriveTimers();
-    stopVoice();
-    stopDriveIntro();
-    if (internalMode === 'running' && (isExamSession || sessionContext?.isExam)) {
-      setShowAbandonExamModal(true);
-      return;
-    }
     executeClose();
   };
 
@@ -986,26 +1045,6 @@ export const DriveModeScreen: React.FC<DriveModeScreenProps> = ({
     stopDriveIntro();
     setIsIntroActive(false);
     onClose();
-  };
-
-  const handleConfirmAbandonExam = () => {
-    setShowAbandonExamModal(false);
-    clearAllDriveTimers();
-    stopVoice();
-    stopDriveIntro();
-    setIsIntroActive(false);
-    dismissActiveSession();
-    setIsExamSession(false);
-    setAnswers({});
-    setFlags({});
-    if (sessionContext) {
-      if (sessionContext.onAbandonSession) {
-        sessionContext.onAbandonSession();
-      }
-      onClose();
-    } else {
-      setInternalMode('launcher');
-    }
   };
 
   const handleToggleAutopilot = () => {
@@ -1122,6 +1161,8 @@ export const DriveModeScreen: React.FC<DriveModeScreenProps> = ({
           onNextQuestion={handleNextQuestion}
           onToggleFlag={handleToggleFlag}
           onSubmitExam={handleSubmitExam}
+          isQuestionSwitching={isQuestionSwitching}
+          isCooldownActive={isQuestionSwitching || isOptionSwitchingCooldown}
         />
       )}
 
@@ -1150,67 +1191,6 @@ export const DriveModeScreen: React.FC<DriveModeScreenProps> = ({
         isOpen={showOfflinePrompt}
         onClose={() => setShowOfflinePrompt(false)}
       />
-
-      {/* Modal di Conferma Interruzione Esame in Modalità Guida */}
-      {showAbandonExamModal && (
-        <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/85 backdrop-blur-md p-4 animate-in fade-in"
-          onClick={() => setShowAbandonExamModal(false)}
-        >
-          <div
-            className="bg-zinc-900 border border-zinc-800 light:bg-white light:border-slate-200 rounded-3xl p-6 sm:p-8 max-w-md w-full space-y-5 shadow-2xl text-center"
-            onClick={e => e.stopPropagation()}
-            role="dialog"
-            aria-modal="true"
-          >
-            <div className="w-14 h-14 mx-auto rounded-2xl bg-rose-500/20 text-rose-400 flex items-center justify-center border border-rose-500/30">
-              <XCircle className="w-8 h-8" />
-            </div>
-
-            <div className="space-y-2">
-              <h3 className="text-xl font-black text-white light:text-slate-900">
-                Interrompere la Simulazione?
-              </h3>
-              <p className="text-sm text-zinc-300 light:text-slate-600">
-                Stai svolgendo una sessione d'esame ufficiale. Vuoi davvero interromperla?
-              </p>
-              <p className="text-xs text-amber-400 light:text-amber-700 font-semibold">
-                Tutti i progressi della prova andranno persi e la scheda non verrà salvata.
-              </p>
-            </div>
-
-            <div className="flex flex-col sm:flex-row gap-3 pt-2">
-              <button
-                id="btn-drive-cancel-abandon"
-                onClick={() => setShowAbandonExamModal(false)}
-                className="flex-1 py-3.5 px-4 rounded-xl bg-amber-600 hover:bg-amber-500 text-white font-bold text-sm shadow-md transition-all active:scale-[0.98]"
-              >
-                Continua Esame
-              </button>
-              {sessionContext && (
-                <button
-                  id="btn-drive-return-to-screen"
-                  onClick={() => {
-                    setShowAbandonExamModal(false);
-                    executeClose();
-                  }}
-                  className="flex-1 py-3.5 px-4 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-zinc-200 font-semibold text-xs border border-zinc-700 light:bg-slate-100 light:hover:bg-slate-200 light:text-slate-700 light:border-slate-300 transition-all active:scale-[0.98]"
-                  title="Torna alla visualizzazione esame classica senza interrompere la prova"
-                >
-                  Torna alla Scheda
-                </button>
-              )}
-              <button
-                id="btn-drive-confirm-abandon"
-                onClick={handleConfirmAbandonExam}
-                className="flex-1 py-3.5 px-4 rounded-xl border border-rose-500/60 bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 light:bg-rose-50 light:border-rose-300 light:text-rose-700 font-bold text-xs transition-all active:scale-[0.98]"
-              >
-                Interrompi Esame
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 };

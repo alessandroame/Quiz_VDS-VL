@@ -123,7 +123,7 @@ export const SessionInterruptModal: React.FC<SessionInterruptModalProps> = ({
               <div className="min-w-0">
                 <div className="text-xs font-bold">Termina ed Elimina</div>
                 <div className="text-[10px] text-zinc-400 light:text-slate-600 truncate">
-                  Cancella la sessione per cominciarne una nuova
+                  Abbandona la sessione per iniziarne una nuova
                 </div>
               </div>
             </div>
@@ -136,7 +136,7 @@ export const SessionInterruptModal: React.FC<SessionInterruptModalProps> = ({
             onClick={onClose}
             className="w-full py-2.5 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-zinc-200 hover:text-white light:bg-slate-100 light:hover:bg-slate-200 light:text-slate-800 text-xs font-semibold text-center transition-colors active:scale-[0.99]"
           >
-            Rimani nel Quiz
+            Continua
           </button>
         </div>
       </div>

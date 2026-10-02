@@ -1712,8 +1712,8 @@
     ],
     "correctAnswer": 2,
     "explanation": {
-      "rule": "La resistenza indotta è inversamente proporzionale all'allungamento alare: ali a grande allungamento riducono la proporzione dei vortici marginali.",
-      "trap": "Non dipende solo dall'allungamento (dipende anche dal coefficiente di portanza), ma un allungamento maggiore abbatte nettamente la resistenza indotta."
+      "rule": "La resistenza indotta è inversamente proporzionale all'allungamento alare. Un'ala lunga e stretta allontana le estremità e ha una corda ridotta: la percentuale di superficie disturbata dal travaso d'aria laterale è minima, smorzando i vortici marginali.",
+      "trap": "Non dipende solo dall'allungamento (dipende anzitutto dal coefficiente di portanza e dall'incidenza), ma a parità di peso e velocità un allungamento maggiore abbatte nettamente la resistenza indotta."
     }
   },
   {
@@ -1780,8 +1780,8 @@
     ],
     "correctAnswer": 2,
     "explanation": {
-      "rule": "La resistenza indotta è l'unica componente della resistenza totale che diminuisce all'aumentare della velocità all'aria.",
-      "trap": "Sia l'attrito che la forma crescono rapidamente con la velocità; solo la componente indotta gode di questo andamento decrescente."
+      "rule": "La resistenza indotta nasce dai vortici d'estremità generati dalla portanza. All'aumentare della velocità serve meno angolo d'incidenza per sostenere il peso: l'ala è meno inclinata, i vortici marginali si riducono e la resistenza indotta crolla.",
+      "trap": "L'intuito fa credere che ogni resistenza aumenti con la velocità (come per attrito e forma). Si dimentica che l'indotta dipende dall'incidenza: più l'ala vola veloce, minore è l'incidenza necessaria a sostenerla."
     }
   },
   {
@@ -1797,8 +1797,8 @@
     ],
     "correctAnswer": 3,
     "explanation": {
-      "rule": "La resistenza aerodinamica è direttamente proporzionale al quadrato della velocità dell'aria (R ∝ V²).",
-      "trap": "La proporzionalità non è lineare di primo grado: il legame è quadratico (velocità al quadrato)."
+      "rule": "La resistenza aerodinamica cresce con il quadrato della velocità (R ∝ V²). Se raddoppi la velocità, raddoppia sia la massa d'aria impattata al secondo, sia l'energia cinetica scambiata con ciascuna molecola d'aria (2 × 2 = 4).",
+      "trap": "L'intuito porta a immaginare una proporzionalità lineare (doppia velocità = doppia resistenza). In realtà la forza resistente quadruplica a ogni raddoppio di velocità perché il legame è quadratico."
     }
   },
   {
@@ -1899,8 +1899,8 @@
     ],
     "correctAnswer": 1,
     "explanation": {
-      "rule": "In un profilo convenzionale la portanza è generata per oltre i due terzi dalla forte depressione (diminuzione di pressione statica) presente sull'estradosso.",
-      "trap": "Non è la spinta da sotto sull'intradosso a fare la parte principale: è la suzione generata dalla depressione statica dorsale sull'estradosso."
+      "rule": "La portanza è generata per oltre i due terzi dalla depressione sull'estradosso. La curvatura del dorso costringe l'aria ad accelerare e curvare: la pressione statica locale crolla rispetto all'aria indisturbata, creando una potente suzione verso l'alto.",
+      "trap": "Si tende a pensare ingenuamente che l'ala voli perché 'galleggia' o viene 'spinta da sotto' dall'aria sull'intradosso. In realtà è la suzione generata dalla depressione dorsale a sostenere quasi l'intero peso dell'aerodina."
     }
   },
   {
@@ -3191,8 +3191,8 @@
     ],
     "correctAnswer": 2,
     "explanation": {
-      "rule": "L'effetto suolo è causato primariamente dalla riduzione della resistenza indotta, poiché la presenza del terreno deforma e smorza i vortici di estremità alare.",
-      "trap": "Non è dovuto solo a un 'cuscino' di compressione d'aria né a una sensazione soggettiva: la vicinanza del suolo abbatte fisicamente la resistenza indotta."
+      "rule": "L'effetto suolo riduce drasticamente la resistenza indotta. Il terreno agisce come barriera solida che schiaccia e blocca i vortici d'estremità e ostacola la deflessione verso il basso del flusso (downwash), raddrizzando la portanza e aumentando l'efficienza.",
+      "trap": "L'effetto suolo non è una semplice compressione statica dell'aria a 'cuscino' né un'illusione del pilota: è un fenomeno aerodinamico reale causato dal confinamento geometrico che disinnesca i vortici marginali."
     }
   },
   {

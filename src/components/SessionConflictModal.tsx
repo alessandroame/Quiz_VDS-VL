@@ -78,7 +78,7 @@ export const SessionConflictModal: React.FC<SessionConflictModalProps> = ({
             </div>
           </div>
           <p>
-            Per avviare <strong className="text-zinc-100 dark:text-zinc-100 light:text-slate-900 font-semibold">{newSessionTitle}</strong>, cosa desideri fare?
+            Per iniziare <strong className="text-zinc-100 dark:text-zinc-100 light:text-slate-900 font-semibold">{newSessionTitle}</strong>, cosa desideri fare?
           </p>
         </div>
 
@@ -88,7 +88,7 @@ export const SessionConflictModal: React.FC<SessionConflictModalProps> = ({
           <button
             id="btn-conflict-resume"
             onClick={onResumeExisting}
-            className="w-full py-3 px-4 rounded-xl bg-amber-600 hover:bg-amber-500 text-white font-bold text-xs sm:text-sm shadow-md transition-all active:scale-[0.99] flex items-center justify-center gap-2"
+            className="w-full py-3 px-4 rounded-xl bg-amber-700 hover:bg-amber-600 text-white font-bold text-xs sm:text-sm shadow-md transition-all active:scale-[0.99] flex items-center justify-center gap-2"
           >
             <Play className="w-4 h-4 fill-current" />
             <span>Riprendi la Sessione in Sospeso</span>

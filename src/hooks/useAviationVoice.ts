@@ -9,13 +9,7 @@ export function useAviationVoice(questionId?: number) {
     return voiceService.subscribe(setState);
   }, []);
 
-  useEffect(() => {
-    return () => {
-      if (questionId !== undefined && voiceService.getState().currentQuestionId === questionId) {
-        voiceService.stop();
-      }
-    };
-  }, [questionId]);
+
 
   const isThisQuestionActive = questionId !== undefined && state.currentQuestionId === questionId;
   const isPartPlaying = useCallback(

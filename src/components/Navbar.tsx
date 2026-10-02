@@ -32,7 +32,7 @@ interface NavbarProps {
 
 export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab, openSettings }) => {
   const { theme, cycleTheme, resolvedTheme } = useTheme();
-  const { readinessScore, isExamRunning, activeSession, openDriveMode, settings, syncState } = useQuiz();
+  const { readinessScore, isExamRunning, activeSession, toggleDriveMode, isDriveModeOpen, settings, syncState } = useQuiz();
   const [isBuildInfoOpen, setIsBuildInfoOpen] = useState(false);
   const buildInfo = getBuildInfo();
 
@@ -76,7 +76,7 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab, openSet
                 id="btn-nav-back-home"
                 onClick={() => setActiveTab('home')}
                 className="group flex items-center gap-1 sm:gap-1.5 px-2.5 py-1.5 rounded-xl bg-zinc-900 border border-zinc-700 hover:border-zinc-500 hover:bg-zinc-800 text-zinc-200 hover:text-white light:bg-slate-100 light:border-slate-300 light:text-slate-800 text-xs font-bold transition-all active:scale-95 shadow-sm flex-shrink-0"
-                title="Torna al cruscotto Home"
+                title="Torna alla Home"
               >
                 <ChevronLeft className="w-4 h-4 text-zinc-400 group-hover:text-white light:text-slate-500 light:group-hover:text-slate-900 transition-colors" />
                 <span className="font-mono">Home</span>
@@ -94,7 +94,7 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab, openSet
                 {(activeTab === 'exam' || activeTab === 'tutor') && isExamRunning && (
                   <span
                     title="Sessione in corso"
-                    className="text-[9px] sm:text-[10px] px-1.5 py-0.2 rounded-full bg-rose-500/20 text-rose-400 border border-rose-500/40 font-bold flex items-center gap-1 animate-pulse flex-shrink-0"
+                    className="text-[9px] sm:text-[10px] px-1.5 py-0.2 rounded-full bg-rose-500/20 text-rose-400 border border-rose-500/40 light:bg-rose-100 light:text-rose-700 light:border-rose-300 font-bold flex items-center gap-1 animate-pulse flex-shrink-0"
                   >
                     <span className="w-1.5 h-1.5 rounded-full bg-rose-500" />
                     <span className="hidden sm:inline">ATTIVO</span>
@@ -108,11 +108,19 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab, openSet
               {/* Tasto Switch Rapido Modalità Mani Libere */}
               <button
                 id="btn-mini-audio"
-                onClick={() => openDriveMode()}
-                title="Passa all'ascolto hands-free (Modalità Mani Libere)"
-                className="group p-1.5 sm:px-2.5 sm:py-1.5 rounded-lg border border-zinc-800 bg-zinc-900/60 hover:bg-zinc-800 hover:border-zinc-700 text-zinc-300 hover:text-white light:bg-slate-100 light:border-slate-200 light:text-slate-700 light:hover:text-slate-900 flex items-center gap-1 text-xs font-semibold transition-all active:scale-95 shadow-sm"
+                onClick={() => toggleDriveMode()}
+                title={isDriveModeOpen ? 'Torna alla vista normale' : "Passa all'ascolto hands-free (Modalità Mani Libere)"}
+                className={`group p-1.5 sm:px-2.5 sm:py-1.5 rounded-lg border flex items-center gap-1 text-xs font-semibold transition-all active:scale-95 shadow-sm ${
+                  isDriveModeOpen
+                    ? 'border-amber-500 bg-amber-500/20 text-amber-300 light:bg-amber-100 light:border-amber-400 light:text-amber-800'
+                    : 'border-zinc-800 bg-zinc-900/60 hover:bg-zinc-800 hover:border-zinc-700 text-zinc-300 hover:text-white light:bg-slate-100 light:border-slate-200 light:text-slate-700 light:hover:text-slate-900'
+                }`}
               >
-                <Headphones className="w-3.5 h-3.5 text-zinc-400 group-hover:text-zinc-200 light:text-slate-500 light:group-hover:text-slate-800 transition-colors" />
+                <Headphones className={`w-3.5 h-3.5 transition-colors ${
+                  isDriveModeOpen
+                    ? 'text-amber-400 light:text-amber-700'
+                    : 'text-zinc-400 group-hover:text-zinc-200 light:text-slate-500 light:group-hover:text-slate-800'
+                }`} />
                 <span className="hidden sm:inline">Mani Libere</span>
               </button>
 
@@ -196,7 +204,7 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab, openSet
                 >
                   v{buildInfo.version}
                   {buildInfo.buildNumber && buildInfo.buildNumber !== '0' && (
-                    <span className="hidden sm:inline text-zinc-400 light:text-slate-500 font-normal">
+                    <span className="hidden sm:inline text-zinc-400 light:text-slate-700 font-normal">
                       {' '}#{buildInfo.buildNumber}
                     </span>
                   )}
@@ -206,7 +214,7 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab, openSet
               </div>
               {/* Secondary telemetry subtitle - hidden on mobile to avoid overlap */}
               <div className="text-[11px] text-zinc-400 light:text-slate-600 truncate hidden sm:block">
-                Preparazione: <strong className="text-amber-400 light:text-amber-600">{readinessScore}%</strong>
+                Preparazione: <strong className="text-amber-400 light:text-amber-800">{readinessScore}%</strong>
               </div>
             </div>
           </div>
@@ -216,11 +224,19 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab, openSet
             {/* Modalità Mani Libere */}
             <button
               id="btn-drive-mode"
-              onClick={() => openDriveMode()}
-              title="Modalità Mani Libere (Macro-target & Hands-free)"
-              className="group p-1.5 sm:px-2.5 sm:py-1.5 rounded-lg border border-zinc-800 bg-zinc-900/60 hover:bg-zinc-800 hover:border-zinc-700 text-zinc-300 hover:text-white light:bg-slate-100 light:border-slate-200 light:text-slate-700 light:hover:text-slate-900 flex items-center gap-1.5 text-xs font-semibold transition-all active:scale-95 shadow-sm"
+              onClick={() => toggleDriveMode()}
+              title={isDriveModeOpen ? 'Torna alla vista normale' : 'Modalità Mani Libere (Macro-target & Hands-free)'}
+              className={`group p-1.5 sm:px-2.5 sm:py-1.5 rounded-lg border flex items-center gap-1.5 text-xs font-semibold transition-all active:scale-95 shadow-sm ${
+                isDriveModeOpen
+                  ? 'border-amber-500 bg-amber-500/20 text-amber-300 light:bg-amber-100 light:border-amber-400 light:text-amber-800'
+                  : 'border-zinc-800 bg-zinc-900/60 hover:bg-zinc-800 hover:border-zinc-700 text-zinc-300 hover:text-white light:bg-slate-100 light:border-slate-200 light:text-slate-700 light:hover:text-slate-900'
+              }`}
             >
-              <Headphones className="w-4 h-4 text-zinc-400 group-hover:text-zinc-200 light:text-slate-500 light:group-hover:text-slate-800 transition-colors" />
+              <Headphones className={`w-4 h-4 transition-colors ${
+                isDriveModeOpen
+                  ? 'text-amber-400 light:text-amber-700'
+                  : 'text-zinc-400 group-hover:text-zinc-200 light:text-slate-500 light:group-hover:text-slate-800'
+              }`} />
               <span className="hidden sm:inline">Mani Libere</span>
             </button>
 

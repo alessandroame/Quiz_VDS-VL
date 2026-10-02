@@ -157,21 +157,28 @@ async function run() {
     `);
     await sleep(1500);
 
-    console.log('2. Verifying Audio Launcher rendered...');
+    console.log('2. Verifying Audio HUD or Launcher rendered...');
+    const runningDirectly = await evaluate(`
+      Boolean(document.getElementById('btn-drive-opt-1') && document.getElementById('btn-drive-opt-2'))
+    `);
     const launcherFound = await evaluate(`
       Boolean(document.getElementById('btn-drive-start-radio') || document.getElementById('btn-drive-start-exam'))
     `);
-    console.log('Audio Launcher visible:', launcherFound);
-    if (!launcherFound) {
-      throw new Error('Audio launcher was not found after clicking quick audio button');
+    console.log('Audio HUD Running:', runningDirectly, 'Launcher visible:', launcherFound);
+    if (!runningDirectly && !launcherFound) {
+      throw new Error('Neither running Audio HUD nor launcher was found after clicking quick audio button');
     }
 
-    console.log('3. Starting Radio Quiz in Audio Mode...');
-    await evaluate(`
-      const btnRadio = document.getElementById('btn-drive-start-radio');
-      if (btnRadio) btnRadio.click();
-    `);
-    await sleep(1500);
+    if (launcherFound && !runningDirectly) {
+      console.log('3. Starting Radio Quiz from Launcher in Audio Mode...');
+      await evaluate(`
+        const btnRadio = document.getElementById('btn-drive-start-radio');
+        if (btnRadio) btnRadio.click();
+      `);
+      await sleep(1500);
+    } else {
+      console.log('3. Already directly running in Audio Mode (seamless toggle view)...');
+    }
 
     console.log('4. Verifying quiz HUD & macro-options in running mode...');
     const optionsFound = await evaluate(`
