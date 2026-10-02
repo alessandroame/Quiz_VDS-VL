@@ -36,13 +36,74 @@ export default defineConfig({
   base: process.env.BASE_PATH || (process.env.GITHUB_ACTIONS ? '/Quiz_VDS-VL/' : '/'),
   server: {
     port: 5173,
-    strictPort: true
+    strictPort: true,
+    hmr: {
+      timeout: 60000
+    }
   },
   preview: {
     port: 5173,
     strictPort: true
   },
   plugins: [
+    {
+      name: 'relaxed-hmr-reconnect',
+      transform(code, id) {
+        if (id.includes('vite/dist/client/client.mjs') || id.includes('@vite/client')) {
+          const targetStart = 'async function waitForSuccessfulPing(socketUrl, ms = 1e3) {';
+          const targetEnd = 'function wait(ms) {';
+          const startIndex = code.indexOf(targetStart);
+          const endIndex = code.indexOf(targetEnd, startIndex);
+          if (startIndex !== -1 && endIndex !== -1) {
+            const replacement = `async function waitForSuccessfulPing(socketUrl, initialMs = 3000) {
+  async function ping() {
+    const socket = new WebSocket(socketUrl, "vite-ping");
+    return new Promise((resolve) => {
+      function onOpen() {
+        resolve(true);
+        close();
+      }
+      function onError() {
+        resolve(false);
+        close();
+      }
+      function close() {
+        socket.removeEventListener("open", onOpen);
+        socket.removeEventListener("error", onError);
+        socket.close();
+      }
+      socket.addEventListener("open", onOpen);
+      socket.addEventListener("error", onError);
+    });
+  }
+  if (await ping()) {
+    return;
+  }
+  let currentDelay = initialMs;
+  const maxDelay = 15000;
+  await wait(currentDelay);
+  while (true) {
+    if (document.visibilityState === "visible") {
+      if (await ping()) {
+        break;
+      }
+      currentDelay = Math.min(Math.round(currentDelay * 1.5), maxDelay);
+      await wait(currentDelay);
+    } else {
+      await waitForWindowShow();
+    }
+  }
+}\n\n`;
+            let res = code.slice(0, startIndex) + replacement + code.slice(endIndex);
+            res = res.replace(
+              'Polling for restart...',
+              'Polling for restart (relaxed exponential backoff: 3s -> 15s)...'
+            );
+            return res;
+          }
+        }
+      }
+    },
     {
       name: 'serve-audit-reports',
       configureServer(server) {
@@ -68,9 +129,13 @@ export default defineConfig({
         if (existsSync(gitDir)) {
           server.watcher.add(path.join(gitDir, 'HEAD'));
           server.watcher.add(path.join(gitDir, 'refs', 'heads'));
+          let debounceTimer: NodeJS.Timeout | null = null;
           server.watcher.on('change', (filePath) => {
             if (filePath.includes('.git')) {
-              server.restart();
+              if (debounceTimer) clearTimeout(debounceTimer);
+              debounceTimer = setTimeout(() => {
+                server.restart();
+              }, 1000);
             }
           });
         }

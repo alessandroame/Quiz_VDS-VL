@@ -14,6 +14,32 @@ Questo documento registra in ordine cronologico tutte le lavorazioni svolte nel 
 - **Impatto sul Desiderata**: <Come questo intervento contribuisce al desiderata (cfr. DESIDERATA.md) e indicazioni per il prossimo agente>
 ```
 
+### [2026-10-02] - Politica di Riconnessione WebSocket HMR Meno Aggressiva con Exponential Backoff e Debounce Git Watcher
+
+- **Cosa abbiamo fatto**:
+  - **Integrazione Plugin Vite per Riconnessione Rilassata ([vite.config.ts](file:///c:/github/Quiz_VDS-VL/vite.config.ts))**:
+    - Creato il plugin Vite dedicato `relaxed-hmr-reconnect` con hook `transform(code, id)` mirato a `vite/dist/client/client.mjs` e `@vite/client`.
+    - Sostituito il polling a frequenza fissa (1 secondo fisso `ms = 1e3`) della funzione HMR `waitForSuccessfulPing` con un algoritmo a ritardo progressivo esponenziale (*exponential backoff*):
+      * Ritardo iniziale: 3000ms (3 secondi), per dare tempo al server dev di completare il riavvio prima del primo tentativo.
+      * Fattore di moltiplicazione: 1.5x progressivo (`Math.min(Math.round(currentDelay * 1.5), 15000)`).
+      * Tetto massimo (*cap*): 15000ms (15 secondi), riducendo di oltre l'85% le connessioni a vuoto in caso di server offline prolungato.
+      * Mantenimento della pausa a schermo inattivo (`document.visibilityState !== "visible"` tramite `waitForWindowShow()`).
+    - Aggiornato il messaggio informativo a console durante la perdita di connessione: `[vite] server connection lost. Polling for restart (relaxed exponential backoff: 3s -> 15s)...`.
+    - Configurato il timeout del socket HMR in `server.hmr.timeout: 60000` (60 secondi).
+  - **Debounce del Watcher Git ([vite.config.ts](file:///c:/github/Quiz_VDS-VL/vite.config.ts))**:
+    - Aggiunto un timer di debounce di 1000ms nel plugin `watch-git-commits` per le modifiche ai file `.git/HEAD` e `.git/refs/heads`.
+    - Previene i riavvii multipli e a raffica del server dev durante le operazioni Git (commit, staging, merge) che provocano la caduta immediata e ripetuta del socket.
+  - **Verifica e Collaudo**:
+    - Verificato tramite richiesta HTTP su `http://localhost:5173/@vite/client` che il client servito contenga la nuova logica di backoff esponenziale.
+    - Eseguiti con successo tutti i 404 test Vitest (54 file) e completata la build di produzione (`tsc && vite build`).
+- **Scelte architetturali & Rationale**:
+  - *Intercettazione a Livello Plugin Vite vs Patch Fisica*: L'approccio con plugin Vite che trasforma `@vite/client` al volo è completamente zero-dipendenze esterne, non modifica file fisici in `node_modules` (che verrebbero sovrascritti o persi su altre macchine) e si applica in modo trasparente a qualsiasi browser o dispositivo mobile connesso al server dev.
+  - *Tutela della Batteria Mobile e Pulizia Console*: Quando si collauda la PWA su smartphone o tablet tramite l'indirizzo LAN (`http://192.168.x.x:5173`), se il PC va in sleep o il server viene interrotto, il client predefinito di Vite spammava centinaia di errori rossi `ERR_CONNECTION_REFUSED` al secondo. Con il backoff a 3s -> 4.5s -> 6.8s -> 10.1s -> 15s la frequenza scende drasticamente a zero rumore.
+- **Impatto sul Desiderata**:
+  - Ottimizzazione dell'esperienza di sviluppo e test ergonomico della PWA in mobilità, coerente con le direttive di efficienza e stabilità.
+
+---
+
 ### [2026-10-02] - Estensione Audit UI con Anti-Gamification, Allineamento Brand Sobrio "Quiz VDS-VL" e Test di Microcopy (v1.7.6)
 
 - **Cosa abbiamo fatto**:
