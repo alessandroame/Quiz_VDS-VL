@@ -14,6 +14,24 @@ Questo documento registra in ordine cronologico tutte le lavorazioni svolte nel 
 - **Impatto sul Desiderata**: <Come questo intervento contribuisce al desiderata (cfr. DESIDERATA.md) e indicazioni per il prossimo agente>
 ```
 
+### [2026-10-02] - Arricchimento Didattico Spiegazioni Aerodinamica: Principio Fisico della Resistenza Indotta (Quiz ID 2065)
+
+- **Cosa abbiamo fatto**:
+  - **Superamento della Tautologia Didattica (Quiz ID 2065)**:
+    * Riformulata la spiegazione didattica (Regola e Tranello) del quiz 2065 in [src/data/questions.json](file:///c:/github/Quiz_VDS-VL/src/data/questions.json).
+    * Sostituita la precedente enunciazione tautologica (*"La resistenza indotta è l'unica componente che diminuisce all'aumentare della velocità"*) con la causa fisica aerodinamica: all'aumentare della velocità all'aria, per sostenere lo stesso peso l'ala necessita di un minore angolo d'incidenza e coefficiente di portanza ($C_L$ più basso); l'incidenza ridotta attenua i vortici d'estremità e la deflessione verso il basso del flusso (*downwash*), facendo crollare la resistenza indotta ($D_i \propto 1/V^2$).
+    * Nel Tranello, chiarito il contrasto tra l'intuito quotidiano (applicabile solo alla resistenza parassita di forma e attrito, che crescono con $V^2$) e la peculiarità della resistenza indotta legata all'assetto e all'incidenza alare.
+  - **Rigenerazione Segmenti Audio Neurali TTS (Edge-TTS Diego & Elsa)**:
+    * Rigenerati i file audio MP3 della spiegazione didattica (`public/audio/giuseppe/2065_e.mp3` e `public/audio/elsa/2065_e.mp3`) tramite la pipeline automatica `scripts/generate_audio_database.py`.
+    * Applicato il consueto trimming del silenzio di coda con filtro FFmpeg a decadimento naturale 100ms per la perfetta reattività in Modalità Mani Libere.
+  - **Verifiche e Suite Test**:
+    * Suite Vitest: 52/52 file passati, 395/395 test unitari verdi (inclusa la validazione dello schema e integrità dei 504 quiz AeCI).
+    * Build di produzione `tsc && vite build`: superata con successo (0 errori, 0 warning).
+- **Scelte architetturali & Rationale**:
+  - **Didattica Funzionale per Allievi Piloti**: In conformità a [DESIDERATA.md](file:///c:/github/Quiz_VDS-VL/DESIDERATA.md) e [vds-exam-examiner](file:///c:/github/Quiz_VDS-VL/.agents/skills/vds-exam-examiner/SKILL.md), le spiegazioni non devono essere mere ripetizioni nozionistiche della risposta esatta, ma devono spiegare il principio fisico sottostante. Questo permette all'allievo di collegare la domanda alla polare di volo e alle reazioni reali del mezzo (parapendio/deltaplano).
+- **Impatto sul Desiderata**:
+  - Innalzamento qualitativo del patrimonio didattico dei 504 quiz AeCI, con allineamento audio e testo per la fruizione sia visiva che vocale hands-free.
+
 ### [2026-10-02] - Riprogettazione Modalità Mani Libere come Vista Alternativa e Toggle Bidirezionale (v1.7.0)
 
 - **Cosa abbiamo fatto**:
