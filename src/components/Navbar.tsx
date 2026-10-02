@@ -76,7 +76,7 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab, openSet
                 id="btn-nav-back-home"
                 onClick={() => setActiveTab('home')}
                 className="group flex items-center gap-1 sm:gap-1.5 px-2.5 py-1.5 rounded-xl bg-zinc-900 border border-zinc-700 hover:border-zinc-500 hover:bg-zinc-800 text-zinc-200 hover:text-white light:bg-slate-100 light:border-slate-300 light:text-slate-800 text-xs font-bold transition-all active:scale-95 shadow-sm flex-shrink-0"
-                title="Torna al cruscotto Home"
+                title="Torna alla Home"
               >
                 <ChevronLeft className="w-4 h-4 text-zinc-400 group-hover:text-white light:text-slate-500 light:group-hover:text-slate-900 transition-colors" />
                 <span className="font-mono">Home</span>

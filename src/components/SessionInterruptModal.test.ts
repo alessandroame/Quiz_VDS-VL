@@ -119,7 +119,7 @@ describe('SessionInterruptModal Component', () => {
     expect(mockTerminate).toHaveBeenCalledTimes(1);
   });
 
-  it('triggers onClose when clicking Rimani nel Quiz button or pressing Escape', async () => {
+  it('triggers onClose when clicking Continua button or pressing Escape', async () => {
     const mockClose = vi.fn();
     act(() => {
       root.render(

@@ -577,7 +577,7 @@ export const ExamScreen: React.FC<ExamScreenProps> = ({
               onClick={() => handleRequestStartExam('tutor')}
               className="w-full py-3.5 rounded-xl bg-emerald-700 hover:bg-emerald-600 text-white font-bold text-sm shadow-lg shadow-emerald-950/40 flex items-center justify-center gap-2 transition-all active:scale-[0.99]"
             >
-              <span>Avvia Simulazione Didattica (30 Quiz)</span>
+              <span>Inizia Simulazione Didattica (30 Quiz)</span>
               <ArrowRight className="w-4 h-4" />
             </button>
           </div>
@@ -642,7 +642,7 @@ export const ExamScreen: React.FC<ExamScreenProps> = ({
             className="w-full py-3.5 rounded-xl bg-sky-600 hover:bg-sky-500 text-white font-bold text-sm shadow-lg shadow-sky-950/40 flex items-center justify-center gap-2 transition-all active:scale-[0.99] light:bg-sky-600 light:hover:bg-sky-700"
           >
             <Timer className="w-4 h-4" />
-            <span>Avvia Esame Ufficiale (45 min)</span>
+            <span>Inizia Esame Ufficiale (45 min)</span>
           </button>
         </div>
 
@@ -662,7 +662,7 @@ export const ExamScreen: React.FC<ExamScreenProps> = ({
             onClick={() => handleRequestStartExam('marathon')}
             className="px-3.5 py-2 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-zinc-200 light:bg-slate-200 light:text-slate-800 light:hover:bg-slate-300 font-semibold text-xs whitespace-nowrap transition-colors flex-shrink-0"
           >
-            Avvia Maratona
+            Inizia Maratona
           </button>
         </div>
 
@@ -802,7 +802,7 @@ export const ExamScreen: React.FC<ExamScreenProps> = ({
             }}
             className="text-xs font-semibold text-zinc-400 hover:text-zinc-200 light:text-slate-500 light:hover:text-slate-800 flex items-center gap-1.5 py-1 px-3 rounded-lg hover:bg-zinc-800/40 light:hover:bg-slate-200/60 transition-colors"
           >
-            <span>← Torna al Cruscotto Home</span>
+            <span>← Torna alla Home</span>
           </button>
         </div>
 

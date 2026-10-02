@@ -78,7 +78,7 @@ export const SessionConflictModal: React.FC<SessionConflictModalProps> = ({
             </div>
           </div>
           <p>
-            Per avviare <strong className="text-zinc-100 dark:text-zinc-100 light:text-slate-900 font-semibold">{newSessionTitle}</strong>, cosa desideri fare?
+            Per iniziare <strong className="text-zinc-100 dark:text-zinc-100 light:text-slate-900 font-semibold">{newSessionTitle}</strong>, cosa desideri fare?
           </p>
         </div>
 
