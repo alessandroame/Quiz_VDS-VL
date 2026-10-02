@@ -22,6 +22,8 @@ export interface VoiceQuickMenuProps {
   onOpenChange?: (isOpen: boolean) => void;
 }
 
+const useIsomorphicLayoutEffect = typeof window !== 'undefined' ? React.useLayoutEffect : React.useEffect;
+
 export const VoiceQuickMenu: React.FC<VoiceQuickMenuProps> = ({
   id = 'btn-voice-quick-menu',
   popoverId,
@@ -36,12 +38,58 @@ export const VoiceQuickMenu: React.FC<VoiceQuickMenuProps> = ({
   const { settings, updateSetting } = useQuiz();
   const [isOpen, setIsOpen] = useState(false);
   const [isVoiceGuideOpen, setIsVoiceGuideOpen] = useState(false);
+  const [shiftX, setShiftX] = useState<number>(0);
   const containerRef = useRef<HTMLDivElement>(null);
+  const popoverRef = useRef<HTMLDivElement>(null);
 
   const handleSetOpen = (open: boolean) => {
     setIsOpen(open);
     onOpenChange?.(open);
   };
+
+  // Adjust popover offset to guarantee it stays strictly within the screen bounds
+  useIsomorphicLayoutEffect(() => {
+    if (!isOpen) {
+      setShiftX(0);
+      return;
+    }
+
+    const computeOffset = () => {
+      if (!containerRef.current) return;
+      const buttonRect = containerRef.current.getBoundingClientRect();
+      const viewportWidth = window.innerWidth;
+      const padding = 12; // 12px safe distance from screen boundaries
+      const popoverWidth = popoverRef.current?.offsetWidth || 288;
+
+      if (align === 'right') {
+        const popoverLeft = buttonRect.right - popoverWidth;
+        if (popoverLeft < padding) {
+          const neededShiftRight = padding - popoverLeft;
+          const maxShiftRight = Math.max(0, viewportWidth - padding - buttonRect.right);
+          setShiftX(Math.min(neededShiftRight, maxShiftRight));
+        } else {
+          setShiftX(0);
+        }
+      } else {
+        const popoverRight = buttonRect.left + popoverWidth;
+        if (popoverRight > viewportWidth - padding) {
+          const neededShiftLeft = popoverRight - (viewportWidth - padding);
+          const maxShiftLeft = Math.max(0, buttonRect.left - padding);
+          setShiftX(Math.min(neededShiftLeft, maxShiftLeft));
+        } else {
+          setShiftX(0);
+        }
+      }
+    };
+
+    computeOffset();
+    const rafId = requestAnimationFrame(computeOffset);
+    window.addEventListener('resize', computeOffset);
+    return () => {
+      cancelAnimationFrame(rafId);
+      window.removeEventListener('resize', computeOffset);
+    };
+  }, [isOpen, align]);
 
   // Close when clicking outside
   useEffect(() => {
@@ -124,8 +172,14 @@ export const VoiceQuickMenu: React.FC<VoiceQuickMenuProps> = ({
       {/* Flyout / Popover Menu */}
       {isOpen && (
         <div
+          ref={popoverRef}
           id={resolvedPopoverId}
           data-testid="voice-quick-popover"
+          style={
+            align === 'right'
+              ? (shiftX > 0 ? { right: `-${shiftX}px` } : undefined)
+              : (shiftX > 0 ? { left: `-${shiftX}px` } : undefined)
+          }
           onTouchStart={e => e.stopPropagation()}
           onTouchEnd={e => e.stopPropagation()}
           onMouseDown={e => e.stopPropagation()}
@@ -146,7 +200,7 @@ export const VoiceQuickMenu: React.FC<VoiceQuickMenuProps> = ({
               <span className={`text-xs font-bold tracking-wide uppercase ${
                 forceDark ? 'text-zinc-200' : 'text-zinc-200 light:text-slate-800'
               }`}>
-                Controllo Voce Rapido
+                Impostazioni Voce
               </span>
             </div>
             <button

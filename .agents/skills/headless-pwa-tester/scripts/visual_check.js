@@ -22,6 +22,7 @@ const VIEWPORTS = {
   desktop: { width: 1440, height: 900, deviceScaleFactor: 1, isMobile: false },
   mobile: { width: 390, height: 844, deviceScaleFactor: 2, isMobile: true, orientation: { type: 'portraitPrimary', angle: 0 } },
   'mobile-portrait': { width: 390, height: 844, deviceScaleFactor: 2, isMobile: true, orientation: { type: 'portraitPrimary', angle: 0 } },
+  'mobile-small': { width: 360, height: 800, deviceScaleFactor: 2, isMobile: true, orientation: { type: 'portraitPrimary', angle: 0 } },
   'pixel-7': { width: 412, height: 915, deviceScaleFactor: 2.625, isMobile: true, orientation: { type: 'portraitPrimary', angle: 0 } },
   'mobile-landscape': { width: 844, height: 390, deviceScaleFactor: 2, isMobile: true, orientation: { type: 'landscapePrimary', angle: 90 } },
   tablet: { width: 820, height: 1180, deviceScaleFactor: 2, isMobile: false }

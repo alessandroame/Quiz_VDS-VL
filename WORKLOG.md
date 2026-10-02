@@ -14,6 +14,31 @@ Questo documento registra in ordine cronologico tutte le lavorazioni svolte nel 
 - **Impatto sul Desiderata**: <Come questo intervento contribuisce al desiderata (cfr. DESIDERATA.md) e indicazioni per il prossimo agente>
 ```
 
+### [2026-10-02] - Vincolo Bordi Schermo e Ridenominazione Pannello Impostazioni Voce (v1.6.8)
+- **Cosa abbiamo fatto**:
+  - **Risoluzione Difetto Overflow Bordo Sinistro Schermo Mobile ([src/components/VoiceQuickMenu.tsx](file:///c:/github/Quiz_VDS-VL/src/components/VoiceQuickMenu.tsx))**:
+    - Risolto il difetto visivo ed ergonomico su smartphone per cui il menu a tendina aperto dal pulsante rapido voce nella barra superiore (top bar) finiva fuori dal display a sinistra.
+    - Causa radice: la classe `right-0` agganciava il popover (largo 288px) all'angolo destro del trigger button (`VoiceQuickMenu`). Poiché il pulsante nella navbar si trova a ~80-120px dal margine destro dello schermo (a causa dei tasti tema, sync e impostazioni), il popover sporgeva di 20-50px oltre il margine sinistro su schermi stretti (es. 360px o 375px).
+    - Implementato algoritmo di posizionamento dinamico con `useIsomorphicLayoutEffect` e margine di sicurezza (`padding: 12px`):
+      * Misura deterministica di `containerRect` e `popoverWidth` (fallback 288px).
+      * Calcolo dello scostamento `shiftX` per garantire che il bordo sinistro non scenda mai al di sotto di 12px dal margine del viewport (`popoverLeft >= 12px`), senza oltrepassare il margine destro.
+      * Applicazione dello shift tramite `style={{ right: -shiftX }}` (o `left` in caso di `align='left'`), garantendo che il menu rimanga perfettamente e stabilmente all'interno dello schermo senza causare salti visivi.
+      * Ascolto continuo su eventi di `resize` e microtask `requestAnimationFrame`.
+  - **Ridenominazione Titolo del Pannello**:
+    - Aggiornato il titolo nell'header del popover da `"Controllo Voce Rapido"` a `"Impostazioni Voce"` (renderizzato in maiuscolo `"IMPOSTAZIONI VOCE"` secondo il design system).
+  - **Estensione Suite di Test Unitari ([src/components/VoiceQuickMenu.test.ts](file:///c:/github/Quiz_VDS-VL/src/components/VoiceQuickMenu.test.ts))**:
+    - Aggiunto test per la verifica del nuovo titolo `"Impostazioni Voce"`.
+    - Aggiunto test di simulazione viewport per l'algoritmo di boundary clamping con `shiftX` negativo su `style.right`.
+  - **Estensione Tooling Collaudo Headless ([.agents/skills/headless-pwa-tester/scripts/visual_check.js](file:///c:/github/Quiz_VDS-VL/.agents/skills/headless-pwa-tester/scripts/visual_check.js))**:
+    - Aggiunto il profilo viewport standard Android `mobile-small` (360x800) a `VIEWPORTS` per consentire collaudi visivi automatici ad alta fedeltà su smartphone compatti.
+  - **Collaudo Visivo Headless CDP**:
+    - Eseguita verifica visiva con Chrome headless su `mobile-small` (360x800), `mobile-portrait` (390x844) e `desktop` (1440x900) sia in Dark Mode che in Light Mode.
+    - Accertata la perfetta leggibilità, bordatura intatta con padding 12px e zero errori in console.
+- **Scelte architetturali & Rationale**:
+  - *Calcolo Dinamico Bounded vs Portal/Fixed*: All'interno della Navbar è presente `backdrop-blur` (`backdrop-filter`), che nelle specifiche CSS crea un nuovo containing block per gli elementi `position: fixed`. Utilizzare il calcolo reattivo dell'offset relativo (`right: -shiftX`) incapsulato nel componente garantisce robustezza universale ovunque `VoiceQuickMenu` sia montato (Home navbar, mini-header o DriveMode HUD), senza rompere l'animazione Tailwind né richiedere portali DOM complessi.
+- **Impatto sul Desiderata**:
+  - Risoluzione immediata di un problema di usabilità reale su dispositivi mobili allievi piloti, garantendo concentrazione e chiarezza nello studio teorico (cfr. [DESIDERATA.md](file:///c:/github/Quiz_VDS-VL/DESIDERATA.md)).
+
 ### [2026-10-02] - Rimozione Icona e Toggle Tutor dalla Top Bar HUD (v1.6.7)
 - **Cosa abbiamo fatto**:
   - **Rimozione Toggle Tutor dalla Top Bar HUD ([src/components/drive/DriveActiveHUD.tsx](file:///c:/github/Quiz_VDS-VL/src/components/drive/DriveActiveHUD.tsx))**:
