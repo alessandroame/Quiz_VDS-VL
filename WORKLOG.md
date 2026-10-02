@@ -14,6 +14,81 @@ Questo documento registra in ordine cronologico tutte le lavorazioni svolte nel 
 - **Impatto sul Desiderata**: <Come questo intervento contribuisce al desiderata (cfr. DESIDERATA.md) e indicazioni per il prossimo agente>
 ```
 
+# Worklog Entry: Instant Hands-Free Audio Speech on Toggle & UI Remediation
+
+- **Data**: 2026-10-02
+- **Ambito**: Modalità Mani Libere / Hands-Free Consultation View (`QuizContext.tsx`, `DriveModeScreen.tsx`)
+- **Autore**: AI Assistant (Antigravity)
+
+---
+
+## 1. Cosa Abbiamo Fatto
+
+1. **Risolto problema di riproduzione audio su click "Mani Libere"**:
+   - **User Activation Autoplay Enforcement**: I browser moderni (specialmente iOS Safari e Chrome Android) bloccano le chiamate audio asincrone fuori dallo stack dell'evento click dell'utente. Abbiamo integrato la chiamata sincrona a `voiceService.playFullSequence(q.id)` direttamente all'interno delle funzioni `openDriveMode` e `toggleDriveMode` in `src/context/QuizContext.tsx`.
+   - **Rimozione Blocco Intro Monologue**: Rimosso l'avvio automatico dell'intro tutorial (`isIntroActive`) e del modal di download offline (`AudioOfflinePromptModal`) quando l'utente attiva le "Mani Libere" per consultare un quiz. L'intro e il prompt offline rimangono confinati alla modalità `'launcher'`.
+   - **Azzeramento Ritardo Autoplay e Deduping**: Rimosso il delay `setTimeout(..., 250)` in `DriveModeScreen.tsx`. Aggiunto il controllo su `voiceState.isSequencePlaying` per evitare doppie partenze audio concorrenti e garantire una sola riproduzione immediata e pulita.
+   - **Fallback Consultazione da Home**: Se l'utente clicca le cuffie direttamente dall'Home Hub, viene istantaneamente aperta la consultazione audio dei 474 quiz del catalogo generale (Radio Quiz) partendo dal primo quiz, senza richiedere passaggi intermedi.
+2. **Collaudo Headless Chrome DevTools Protocol (CDP)**:
+   - Verificato su viewport mobile 390x844:
+     - Click su `#btn-drive-mode` da Home: apertura HUD, assenza di popup bloccanti, avvio immediato della lettura audio (`1001_q.mp3`).
+     - Click su `#btn-mini-audio` durante quiz Tutor: apertura HUD, assenza di popup, avvio immediato della lettura audio (`2041_q.mp3`).
+     - Click su `#btn-drive-exit` (Vista Normale): ritorno istantaneo alla vista quiz con stop dell'audio.
+3. **Verifica Suite di Test e Build**:
+   - 52/52 file di test unitari e 395/395 test superati con successo (`npm run test:unit`).
+   - Bundle di produzione e TypeScript check completati con successo (`npm run build`).
+
+---
+
+## 2. Scelte Architetturali & Rationale
+
+- **Sincronia con Gesture Utente**: L'avvio dell'audio dentro il gestore di click è l'unico modo per soddisfare rigorosamente l'Autoplay Policy del browser senza incorrere in `NotAllowedError` silenti.
+- **Hands-Free come Modalità di Pura Consultazione**: La modalità mani libere è trattata come una modalità alternativa di visualizzazione ed ascolto del quiz corrente, senza banner di interruzione o monologhi introduttivi non richiesti.
+
+---
+
+## 3. Impatto sul Desiderata
+
+- Allineamento pieno al principio di ergonomia zero-distrazioni e consultazione audio hands-free istantanea per l'allievo pilota.
+
+---
+
+# Worklog Fragment: Drive Active HUD Responsive Top Bar & Flex-1 Expansion
+
+- **Data**: 2026-10-02
+- **Branch**: `feat/ui-audit-remediation`
+- **Autore**: AI Assistant (Antigravity) & Utente
+
+---
+
+## 1. Cosa abbiamo fatto
+1. **Risolto l'Overflow Orizzontale della Top Bar in Modalità Mani Libere (`DriveActiveHUD.tsx`)**:
+   - Diagnosi: Sul viewport mobile (390x844), il pulsante di uscita `#btn-drive-exit` occupava ~141px a causa dell'etichetta estesa `"Vista Normale"`, spingendo il toggle del microfono a destra oltre il margine dello schermo (overflow di ~16-30px).
+   - Soluzione: Reso il pulsante responsive in perfetta simmetria con `#btn-mini-audio` della Navbar:
+     - Su mobile (`< sm`): mostra solo l'icona cuffie 🎧 (`p-1.5`, larghezza 30px, risparmio di oltre 110px).
+     - Su tablet/desktop (`>= sm`): mostra sia l'icona che il testo (`hidden sm:inline`).
+   - Verifica CDP: Tutti i controlli a destra (menu voce, pilota automatico, microfono, guida) ora risiedono entro 346px, con ben 44px di margine libero dal bordo su schermo 390px.
+2. **Ottimizzata l'Espansione delle Risposte a Pieno Spazio (`DriveActiveHUD.tsx`)**:
+   - Invertito il bug di calcolo flex: quando una risposta è espansa (durante la riproduzione karaoke o toccando "Leggi tutto"), ora riceve `flex-1` per occupare l'intero spazio verticale residuo disponibile senza vuoti, mentre le altre due risposte compresse ricevono `flex-none` e restano compatte (74px).
+   - In assenza di espansioni attive, tutte e 3 le opzioni condividono equamente `flex-1`.
+3. **Copertura Test Vitest & Collaudo Visuale Headless CDP**:
+   - Aggiunti test unitari `HUD-EXPAND-05` e `HUD-RESPONSIVE-TOPBAR-01` in `DriveActiveHUD.test.ts`.
+   - Test suite completa passata: 52/52 suite, 395/395 test unitari con esito verde.
+   - Build TypeScript & Vite passata senza errori.
+
+---
+
+## 2. Scelte architetturali & Rationale
+- **Icon-Only Mobile Pattern con Tooltip/Aria-Label**: Invece di nascondere o spostare comandi funzionali (es. microfono o pilota automatico), è stata preservata l'intera barra di controllo comprimendo l'etichetta testuale del pulsante di commutazione vista, già univocamente identificato dall'icona cuffie ambra.
+- **Accordion Esclusivo e Spazio Verticale Massimizzato**: L'espansione a click seleziona in modo esclusivo una sola opzione alla volta e le assegna `flex-1`, azzerando i conflitti di scroll e mantenendo sempre visibili i macro-pulsanti di risposta.
+
+---
+
+## 3. Impatto sul Desiderata
+- Piena ergonomia d'uso su smartphone in mobilità: visuale priva di clipping e lettura completa dei quesiti più lunghi senza uscire dalla modalità audio.
+
+---
+
 ### [2026-10-02] - Arricchimento Didattico Spiegazioni Aerodinamica: Principio Fisico della Resistenza Indotta (Quiz ID 2065)
 
 - **Cosa abbiamo fatto**:

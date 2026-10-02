@@ -136,10 +136,10 @@ export const DriveModeScreen: React.FC<DriveModeScreenProps> = ({
     return () => unregister();
   }, [showOfflinePrompt]);
 
-  // Trigger prompt audio offline al primo avvio della Guida solo se NESSUNA voce è già scaricata offline
+  // Trigger prompt audio offline solo se nel Launcher e nessuna voce è già scaricata offline
   useEffect(() => {
     let isCancelled = false;
-    if (isOpen && !settings.audioOfflinePromptDismissed) {
+    if (isOpen && internalMode === 'launcher' && !settings.audioOfflinePromptDismissed) {
       const activeVoice = settings.ttsVoice || 'giuseppe';
 
       // Verifica accurata asincrona dello stato effettivo in CacheStorage
@@ -279,7 +279,7 @@ export const DriveModeScreen: React.FC<DriveModeScreenProps> = ({
       return;
     }
 
-    if (!settings.driveModeIntroPlayed && !hasTriggeredInitialIntroRef.current) {
+    if (internalMode === 'launcher' && !settings.driveModeIntroPlayed && !hasTriggeredInitialIntroRef.current) {
       hasTriggeredInitialIntroRef.current = true;
       setIsIntroActive(true);
       const t = setTimeout(() => {
@@ -287,7 +287,7 @@ export const DriveModeScreen: React.FC<DriveModeScreenProps> = ({
       }, 350);
       return () => clearTimeout(t);
     }
-  }, [isOpen, settings.driveModeIntroPlayed, playDriveIntro]);
+  }, [isOpen, internalMode, settings.driveModeIntroPlayed, playDriveIntro]);
 
   // Rileva quando la guida vocale finisce di parlare
   const prevIntroPlayingRef = useRef<boolean>(false);
@@ -334,7 +334,11 @@ export const DriveModeScreen: React.FC<DriveModeScreenProps> = ({
   const autoPlayTriggeredForRef = useRef<number | null>(null);
 
   useEffect(() => {
-    if (!isOpen || internalMode !== 'running' || !currentQ || isIntroActive) return;
+    if (!isOpen) {
+      autoPlayTriggeredForRef.current = null;
+      return;
+    }
+    if (internalMode !== 'running' || !currentQ || isIntroActive) return;
 
     // Reset stati di attesa per la nuova domanda
     setWaitingCountdown(null);
@@ -344,24 +348,22 @@ export const DriveModeScreen: React.FC<DriveModeScreenProps> = ({
       countdownTimerRef.current = null;
     }
 
-    if (isAutopilotEnabled && autoPlayTriggeredForRef.current !== currentQ.id) {
+    const voiceState = voiceService.getState();
+    const isAlreadyPlayingThisQ =
+      voiceState.currentQuestionId === currentQ.id &&
+      (voiceState.isPlaying || voiceState.isPaused || voiceState.isSequencePlaying);
+
+    if (isAlreadyPlayingThisQ) {
       autoPlayTriggeredForRef.current = currentQ.id;
-      if (autoPlayTimerRef.current) clearTimeout(autoPlayTimerRef.current);
-      // Breve delay di 250ms per transizione fluida
-      autoPlayTimerRef.current = setTimeout(() => {
+    } else if (isAutopilotEnabled && autoPlayTriggeredForRef.current !== currentQ.id) {
+      autoPlayTriggeredForRef.current = currentQ.id;
+      if (autoPlayTimerRef.current) {
+        clearTimeout(autoPlayTimerRef.current);
         autoPlayTimerRef.current = null;
-        if (internalMode === 'running') {
-          playFullSequence();
-        }
-      }, 250);
-      return () => {
-        if (autoPlayTimerRef.current) {
-          clearTimeout(autoPlayTimerRef.current);
-          autoPlayTimerRef.current = null;
-        }
-      };
+      }
+      playFullSequence();
     }
-  }, [isOpen, internalMode, currentQ?.id, isAutopilotEnabled, isIntroActive]);
+  }, [isOpen, internalMode, currentQ?.id, isAutopilotEnabled, isIntroActive, playFullSequence]);
   // Studio sereno a ritmo dell'allievo: al termine della lettura audio, la domanda
   // attende la risposta (touch, vocale o tastiera) senza countdown o avanzamenti forzati.
 
