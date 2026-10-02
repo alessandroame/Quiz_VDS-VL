@@ -131,5 +131,8 @@ Questo file costituisce la **memoria tecnica permanente** del progetto. Raccogli
   * Il tocco apre `BuildInfoModal` con dettagli completi (Versione, Build #, Commit, Data compilazione) e pulsante "Forza Aggiornamento PWA" che ripulisce le cache dell'app shell (preservando i file audio pesanti `vds-audio-*`) e ricarica istantaneamente l'app.
 - **GitHub Actions Full History**:
   * In `.github/workflows/deploy.yml`, il checkout usa `fetch-depth: 0` affinché `git rev-list --count HEAD` corrisponda esattamente alla cronologia reale locale anche in produzione su GitHub Pages.
+- **Comunicazione Sistematica Numero di Build (Direttiva Utente)**:
+  * Indicare SEMPRE all'utente in ogni risposta di avanzamento o completamento il numero di build corrente (`#<build_number>`), la versione (`v<version>`) e l'hash di commit (`<commit_hash>`), così che l'allievo/sviluppatore possa verificare immediatamente sul badge `#app-version-badge` della Navbar che il dispositivo (mobile o desktop) stia eseguendo esattamente la build desiderata.
+
 
 
