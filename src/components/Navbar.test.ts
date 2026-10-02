@@ -151,6 +151,31 @@ describe('Navbar Component (Top Bar & Mini-Header Disambiguation)', () => {
       expect(html).toContain('text-zinc-400 group-hover:text-white');
       expect(html).not.toContain('text-amber-400 light:text-amber-600');
     });
+
+    it('does not render redundant "ATTIVO" or "Sessione in corso" badge during quiz sessions', () => {
+      mockUseQuiz.mockReturnValueOnce({
+        readinessScore: 85,
+        isExamRunning: true,
+        activeSession: { type: 'exam', questionIds: [1, 2, 3] },
+        openDriveMode: vi.fn(),
+        toggleDriveMode: vi.fn(),
+        isDriveModeOpen: false,
+        settings: { autoSyncDrive: false },
+        syncState: { status: 'synced' }
+      });
+
+      const html = renderToString(
+        React.createElement(Navbar, {
+          activeTab: 'exam',
+          setActiveTab: () => {},
+          openSettings: () => {}
+        })
+      );
+
+      expect(html).not.toContain('Sessione in corso');
+      expect(html).not.toContain('ATTIVO');
+      expect(html).not.toContain('bg-rose-500');
+    });
   });
 
   describe('Home Header (activeTab === "home")', () => {

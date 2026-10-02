@@ -31,7 +31,7 @@ interface NavbarProps {
 
 export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab, openSettings }) => {
   const { theme, cycleTheme, resolvedTheme } = useTheme();
-  const { readinessScore, isExamRunning, toggleDriveMode, isDriveModeOpen, settings, syncState } = useQuiz();
+  const { readinessScore, toggleDriveMode, isDriveModeOpen, settings, syncState } = useQuiz();
   const [isBuildInfoOpen, setIsBuildInfoOpen] = useState(false);
   const buildInfo = getBuildInfo();
 
@@ -88,15 +88,6 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab, openSet
                 {activeTab === 'tutor' && (
                   <span className="text-[10px] px-1.5 py-0.2 rounded bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 font-mono font-bold hidden sm:inline flex-shrink-0">
                     Senza Limiti
-                  </span>
-                )}
-                {(activeTab === 'exam' || activeTab === 'tutor') && isExamRunning && (
-                  <span
-                    title="Sessione in corso"
-                    className="text-[9px] sm:text-[10px] px-1.5 py-0.2 rounded-full bg-rose-500/20 text-rose-400 border border-rose-500/40 light:bg-rose-100 light:text-rose-700 light:border-rose-300 font-bold flex items-center gap-1 animate-pulse flex-shrink-0"
-                  >
-                    <span className="w-1.5 h-1.5 rounded-full bg-rose-500" />
-                    <span className="hidden sm:inline">ATTIVO</span>
                   </span>
                 )}
               </div>

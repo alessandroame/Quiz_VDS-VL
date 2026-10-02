@@ -14,6 +14,22 @@ Questo documento registra in ordine cronologico tutte le lavorazioni svolte nel 
 - **Impatto sul Desiderata**: <Come questo intervento contribuisce al desiderata (cfr. DESIDERATA.md) e indicazioni per il prossimo agente>
 ```
 
+### [2026-10-02] - Rimozione Badge Ridondante di "Sessione in Corso" / "ATTIVO" nella Navbar (v1.7.8)
+
+- **Cosa abbiamo fatto**:
+  - **Eliminazione Badge di Stato Sessione Ridondante ([src/components/Navbar.tsx](file:///c:/github/Quiz_VDS-VL/src/components/Navbar.tsx))**:
+    - Rimosso il pill badge pulsante rosso (`bg-rose-500/20 text-rose-400 border-rose-500/40 animate-pulse` con punto centrale `bg-rose-500` e testo `ATTIVO` / tooltip `"Sessione in corso"`) dal mini-header delle sessioni di quiz (`exam` e `tutor`).
+    - Su viewport mobile, a causa della classe `hidden sm:inline` sul testo `ATTIVO`, il componente collassava in un'icona vuota a capsula rosa con pallino rosso centrale non cliccabile, percepita comprensibilmente come un indicatore di registrazione o un elemento ambiguo privo di senso per l'allievo già impegnato nella risoluzione dei quiz.
+    - Rimosso `isExamRunning` dal destructuring di `useQuiz()` in `Navbar.tsx`, mantenendo la barra pulita e focalizzata unicamente sul titolo della sezione corrente e sui controlli essenziali.
+  - **Suite di Test Unitari ([src/components/Navbar.test.ts](file:///c:/github/Quiz_VDS-VL/src/components/Navbar.test.ts))**:
+    - Aggiunto test specifico che asserisce l'assenza categorica di badge `bg-rose-500`, diciture `ATTIVO` o tooltip `Sessione in corso` durante lo svolgimento dell'esame o del tutor.
+- **Scelte architetturali & Rationale**:
+  - *Principio di Zero-Clutter e Pertinenza Informativa*: In aderenza alle direttive [minimal-ui-ux](file:///c:/github/Quiz_VDS-VL/.agents/skills/minimal-ui-ux/SKILL.md), l'interfaccia deve azzerare qualsiasi distrazione o ridondanza informativa. L'allievo ha già selezionato attivamente la modalità e ha a schermo i quesiti numerati con timer e contatori: segnalare con un indicatore rosso pulsante che la sessione è "in corso" appesantisce la UI senza fornire alcun valore pratico.
+- **Impatto sul Desiderata**:
+  - Piena rispondenza alla segnalazione utente, pulizia visiva del mini-header mobile e desktop e allineamento al canone Minimal UI/UX.
+
+---
+
 ### [2026-10-02] - Analisi Semantica AI del Microcopy, Bonifica Pleonasmi e Script di Estrazione Stringhe AST (v1.7.7)
 
 - **Cosa abbiamo fatto**:
