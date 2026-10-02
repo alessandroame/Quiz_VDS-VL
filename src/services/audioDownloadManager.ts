@@ -637,3 +637,7 @@ export class AudioDownloadManager {
 }
 
 export const audioDownloadManager = new AudioDownloadManager();
+
+if (typeof window !== 'undefined') {
+  (window as any).__audioDownloadManager = audioDownloadManager;
+}

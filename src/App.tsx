@@ -5,6 +5,7 @@ import { Navbar, type NavTab } from './components/Navbar';
 import { HomeScreen } from './components/HomeScreen';
 import { ExamScreen } from './components/ExamScreen';
 import { OfflineBanner } from './components/OfflineIndicator';
+import { AudioDownloadBanner } from './components/AudioDownloadBanner';
 import { Download, Play, ArrowRight, X } from 'lucide-react';
 import { voiceService } from './services/voiceService';
 import { audioDownloadManager } from './services/audioDownloadManager';
@@ -521,6 +522,8 @@ function AppContent() {
           answeredCount={activeSession?.answers ? Object.keys(activeSession.answers).length : 0}
         />
       )}
+      {/* Audio Download Bottom Banner */}
+      <AudioDownloadBanner elevated={isExamRunning} />
     </div>
   );
 }

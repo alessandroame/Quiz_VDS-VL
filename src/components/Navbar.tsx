@@ -14,7 +14,6 @@ import { useTheme } from '../context/ThemeContext';
 import { useQuiz } from '../context/QuizContext';
 import { VoiceQuickMenu } from './VoiceQuickMenu';
 import { OfflineIndicator } from './OfflineIndicator';
-import { AudioDownloadBanner } from './AudioDownloadBanner';
 import { BuildInfoModal } from './BuildInfoModal';
 import { getBuildInfo } from '../utils/buildInfo';
 import { getAppIconUrl, getAppFaviconUrl } from '../utils/assets';
@@ -32,7 +31,7 @@ interface NavbarProps {
 
 export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab, openSettings }) => {
   const { theme, cycleTheme, resolvedTheme } = useTheme();
-  const { readinessScore, isExamRunning, activeSession, toggleDriveMode, isDriveModeOpen, settings, syncState } = useQuiz();
+  const { readinessScore, isExamRunning, toggleDriveMode, isDriveModeOpen, settings, syncState } = useQuiz();
   const [isBuildInfoOpen, setIsBuildInfoOpen] = useState(false);
   const buildInfo = getBuildInfo();
 
@@ -152,9 +151,6 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab, openSet
             </div>
           </div>
         </header>
-
-        {/* Audio Download Bottom Banner */}
-        <AudioDownloadBanner elevated={isExamRunning || Boolean(activeSession)} />
 
         {/* Modal Dettagli Versione e Build */}
         <BuildInfoModal isOpen={isBuildInfoOpen} onClose={() => setIsBuildInfoOpen(false)} />
@@ -292,9 +288,6 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab, openSet
           </div>
         </div>
       </header>
-
-      {/* Audio Download Bottom Banner */}
-      <AudioDownloadBanner elevated={isExamRunning || Boolean(activeSession)} />
 
       {/* Modal Dettagli Versione e Build */}
       <BuildInfoModal isOpen={isBuildInfoOpen} onClose={() => setIsBuildInfoOpen(false)} />

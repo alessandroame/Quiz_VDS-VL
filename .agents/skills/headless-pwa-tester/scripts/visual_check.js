@@ -159,6 +159,16 @@ async function runSingleViewportCheck(viewportName, options = {}) {
           (async () => {
             const selectors = ${JSON.stringify(options.clickSelector)}.split(',').map(s => s.trim()).filter(Boolean);
             for (const sel of selectors) {
+              if (sel.startsWith('eval:')) {
+                try {
+                  const evalFn = new Function(sel.slice(5));
+                  await evalFn();
+                  await new Promise(r => setTimeout(r, 400));
+                } catch (e) {
+                  return { success: false, reason: 'Errore eval: ' + e.message };
+                }
+                continue;
+              }
               if (sel.startsWith('scroll:')) {
                 const target = document.querySelector(sel.slice(7));
                 if (target) {

@@ -14,6 +14,28 @@ Questo documento registra in ordine cronologico tutte le lavorazioni svolte nel 
 - **Impatto sul Desiderata**: <Come questo intervento contribuisce al desiderata (cfr. DESIDERATA.md) e indicazioni per il prossimo agente>
 ```
 
+### [2026-10-02] - Ancoraggio a Bordo Schermo Inferiore Banner di Scaricamento Voce (v1.7.5)
+- **Cosa abbiamo fatto**:
+  - **Ancoraggio a Filo Bordo Inferiore Schermo ([src/components/AudioDownloadBanner.tsx](file:///c:/github/Quiz_VDS-VL/src/components/AudioDownloadBanner.tsx))**:
+    - Riprogettato il layout del banner di avanzamento download voce (`AudioDownloadBanner`) per aderire perfettamente al margine inferiore dello schermo (`fixed bottom-0 left-0 right-0 z-[60] border-t pb-[max(0.6rem,env(safe-area-inset-bottom))] pt-2.5 sm:pt-3 px-3 sm:px-4`).
+    - Eliminato l'effetto fluttuante/staccato dal fondo (`bottom-3 sm:bottom-4` e `rounded-xl`).
+    - La modalità elevata (`elevated=true`) è ora attiva esclusivamente durante l'esame attivo (`isExamRunning`), posizionando il banner subito sopra la barra dei quiz (`bottom-[60px] sm:bottom-[68px]`).
+    - Convertita l'interpolazione del testo in template string (`Scaricamento ${voiceLabel}`) per evitare frammentazione dei nodi di testo nel DOM.
+  - **Spostamento del Montaggio a Livello Radice ([src/App.tsx](file:///c:/github/Quiz_VDS-VL/src/App.tsx) & [src/components/Navbar.tsx](file:///c:/github/Quiz_VDS-VL/src/components/Navbar.tsx))**:
+    - Spostato il componente `AudioDownloadBanner` da `Navbar.tsx` alla radice di `AppContent()` in `App.tsx`, con layering prioritario `z-[60]`.
+    - Risolto il problema del context stacking: poiché `Navbar` ha `z-40` e il modale Impostazioni ha `z-50`, quando l'utente avviava il download di una voce dentro Impostazioni il banner rimaneva nascosto sotto il modale.
+    - Risolto il difetto di elevazione errata: in `Navbar` era presente `elevated={isExamRunning || Boolean(activeSession)}`. Poiché `activeSession` viene ripristinata all'avvio dell'app da Dexie se esiste una sessione non terminata, il banner fluttuava ingiustificatamente a 80px di altezza (`bottom-16 sm:bottom-20`) persino nella Home.
+    - Rimossa la destrutturazione inutilizzata di `activeSession` da `Navbar.tsx`.
+  - **Debugging Runtime & Testing Specialistico ([src/services/audioDownloadManager.ts](file:///c:/github/Quiz_VDS-VL/src/services/audioDownloadManager.ts) & [src/components/AudioDownloadBanner.test.ts](file:///c:/github/Quiz_VDS-VL/src/components/AudioDownloadBanner.test.ts))**:
+    - Esposta l'istanza `window.__audioDownloadManager` per ispezione runtime e scripting headless.
+    - Creata una suite completa di test unitari con 5 test per `AudioDownloadBanner`: resa nulla a riposo, stato download singola voce con progress bar, download aggregato di tutte le voci, invocazione dell'azione di annullamento (`cancelDownload`) e verifica delle classi Tailwind di ancoraggio inferiore (`bottom-0` vs `bottom-[60px]`).
+    - Esteso lo script di verifica visiva headless CDP ([.agents/skills/headless-pwa-tester/scripts/visual_check.js](file:///c:/github/Quiz_VDS-VL/.agents/skills/headless-pwa-tester/scripts/visual_check.js)) con supporto a comandi `eval:` e profilo `mobile-small` (360x800).
+    - Tutte le suite di test Vitest superate con successo al 100%. Build di produzione e typecheck completati con 0 errori.
+- **Scelte architetturali & Rationale**:
+  - *Layering Radice vs Annidamento in Navbar*: Un componente di feedback persistente trasversale a tutta l'applicazione (come il download delle voci in background) non deve appartenere gerarchicamente alla barra di navigazione né dipendere dallo z-index di quest'ultima. Posizionandolo alla radice di `App.tsx` con `z-[60]` garantisce che il banner rimanga sempre visibile e saldamente ancorato in basso, indipendentemente dal fatto che l'utente stia navigando la Home, sia dentro il modale Impostazioni o in qualsiasi altra schermata.
+- **Impatto sul Desiderata**:
+  - Massima chiarezza di stato durante le operazioni di download dei pacchetti audio vocali offline, con UI ordinata, aderente ai bordi e compatibile con le safe area dei moderni smartphone (cfr. [DESIDERATA.md](file:///c:/github/Quiz_VDS-VL/DESIDERATA.md)).
+
 ### [2026-10-02] - Ripristino Espansione Testuale Dinamica dell'Opzione Vocale e Cooldown di Sicurezza 500ms al Cambio Opzione in Modalità Mani Libere
 
 - **Cosa abbiamo fatto**:
