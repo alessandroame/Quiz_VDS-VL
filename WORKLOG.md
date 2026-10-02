@@ -14,6 +14,28 @@ Questo documento registra in ordine cronologico tutte le lavorazioni svolte nel 
 - **Impatto sul Desiderata**: <Come questo intervento contribuisce al desiderata (cfr. DESIDERATA.md) e indicazioni per il prossimo agente>
 ```
 
+# 2026-10-02 - UI Audit Inspector: Ingrandimento e Correzione Stili Textarea Note Utente
+
+## Cosa abbiamo fatto
+- **Risoluzione Difetto Visualizzazione Textarea Note Utente**:
+  - Corretta una parentesi graffa mancante sulla regola `.copy-toast` che invalidava il blocco CSS successivo, causando il rendering della textarea con le dimensioni e i colori predefiniti del browser (sfondo bianco e box minuscolo).
+  - Ingrandito significativamente il campo di testo per ogni issue card:
+    * Altezza portata da default a **120px** (`min-height: 110px`, `rows="4"`).
+    * Larghezza estesa al **100%** del contenitore.
+    * Tipografia potenziata a **14px** con line-height 1.5 per una scrittura confortevole.
+    * Palette scura integrata (`#101014` con bordo `#3f3f46` ed evidenziazione ambra al focus).
+- **Rigenerazione & Apertura Automatica**:
+  - Eseguita nuova scansione e generato il report aggiornato: [audit_report_2026-10-02_11-35-39.html](http://localhost:5173/audit-reports/audit_report_2026-10-02_11-35-39.html).
+  - Aperto automaticamente nel browser di sistema tramite `Start-Process`.
+
+## Scelte architetturali & Rationale
+- L'esperienza di scrittura deve essere immediata ed ergonomica, consentendo di inserire frasi lunghe o domande articolate senza scroll interni angusti.
+
+## Impatto sul Desiderata
+- Completa aderenza all'ergonomia e alla qualità degli strumenti di ispezione.
+
+---
+
 # 2026-10-02 - UI Audit Inspector: Servizio HTTP Statico dei Report per Apertura Browser da IDE
 
 ## Cosa abbiamo fatto

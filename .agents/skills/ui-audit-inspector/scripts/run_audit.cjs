@@ -995,23 +995,26 @@ async function runAudit() {
       font-size: 13px;
       box-shadow: 0 4px 14px rgba(0,0,0,0.5);
       display: none;
+      z-index: 1100;
+    }
+
     /* User Notes & Action Bar */
     .issue-notes-container {
-      margin-top: 14px;
-      background: rgba(255, 255, 255, 0.02);
-      border: 1px solid #27272a;
-      border-radius: 8px;
-      padding: 10px 12px;
+      margin-top: 16px;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid #3f3f46;
+      border-radius: 10px;
+      padding: 12px 14px;
     }
     .notes-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 6px;
+      margin-bottom: 8px;
     }
     .notes-label {
       font-weight: 700;
-      font-size: 11px;
+      font-size: 12px;
       color: var(--accent);
       text-transform: uppercase;
       letter-spacing: 0.5px;
@@ -1020,29 +1023,35 @@ async function runAudit() {
       gap: 6px;
     }
     .notes-status {
-      font-size: 11px;
+      font-size: 12px;
       color: var(--success);
       font-family: monospace;
+      font-weight: 600;
       opacity: 0;
       transition: opacity 0.2s ease;
     }
     .issue-notes-textarea {
       width: 100%;
-      background: #121214;
-      border: 1px solid #3f3f46;
-      border-radius: 6px;
+      background: #101014;
+      border: 1.5px solid #3f3f46;
+      border-radius: 8px;
       color: #f4f4f5;
-      font-family: inherit;
-      font-size: 13px;
-      padding: 8px 10px;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      font-size: 14px;
+      line-height: 1.5;
+      padding: 12px 14px;
       resize: vertical;
-      min-height: 48px;
+      min-height: 110px;
+      height: 120px;
       outline: none;
-      transition: border-color 0.15s;
+      transition: all 0.15s ease;
+      display: block;
+      box-sizing: border-box;
     }
     .issue-notes-textarea:focus {
       border-color: var(--accent);
-      box-shadow: 0 0 0 1px var(--accent);
+      background: #141418;
+      box-shadow: 0 0 0 2px rgba(245, 158, 11, 0.25);
     }
     .notes-floating-bar {
       position: fixed;
@@ -1178,7 +1187,7 @@ async function runAudit() {
                       id="note-${issue.id}"
                       data-issue-id="${issue.id}"
                       placeholder="Scrivi qui la tua nota, domanda o istruzione personalizzata per [${issue.id}]..."
-                      rows="2"></textarea>
+                      rows="4"></textarea>
           </div>
         </div>
         <div class="screenshot-box">
