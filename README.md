@@ -72,6 +72,7 @@
     - **Avanzamento Fluido a 1 Tocco & Auto-Advance su Risposta Esatta**:
       * In caso di risposta corretta, l'applicazione attende un intervallo percettivo di 900ms con conferma visiva verde smeraldo e avanza automaticamente alla domanda successiva, velocizzando le sessioni di studio sia in **Tutor**, sia in **Studio per Materie**, sia nel **Quaderno Errori**.
       * In caso di risposta errata, l'avanzamento automatico si arresta tassativamente per permettere all'allievo di consultare con calma la scheda didattica (**Regola** e **Tranello**).
+      * **Salto Intelligente alle Domande Non Risposte (Smart Skip-Ahead)**: se l'allievo è tornato indietro per rispondere a un quesito precedentemente saltato, l'avanzamento (sia con auto-advance che con il tasto *"Successiva"* o freccia destra) salta a piè pari le domande già compilate e conduce direttamente al primo quesito ancora privo di risposta, eliminando clic a vuoto e ripetizioni inutili.
       * Disattivabile in qualsiasi momento nelle Impostazioni (*Feedback di Studio* ➔ *Avanzamento automatico su risposta esatta*).
       * Pulsante dedicato *"Prossima Domanda"* sempre disponibile per avanzamento manuale.
     - **Registrazione Istantanea**: statistiche e telemetria salvate in tempo reale in IndexedDB, alimentando subito il Quaderno Errori senza attendere la fine della scheda.

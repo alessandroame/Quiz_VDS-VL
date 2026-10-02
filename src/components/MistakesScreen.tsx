@@ -15,6 +15,7 @@ import { voiceService } from '../services/voiceService';
 import { QuestionDetailModal } from './QuestionDetailModal';
 import { SessionInterruptModal } from './SessionInterruptModal';
 import { SessionConflictModal } from './SessionConflictModal';
+import { getNextQuestionIndex } from '../utils/quizNavigation';
 
 export interface MistakesScreenProps {
   onNavigateHome?: () => void;
@@ -189,13 +190,15 @@ export const MistakesScreen: React.FC<MistakesScreenProps> = ({ onNavigateHome }
     if (
       isCorrect &&
       settings.autoAdvanceOnCorrect !== false &&
-      currentIndex < reviewQuestions.length - 1 &&
       targetQid === currentQ?.id
     ) {
-      if (autoAdvanceTimerRef.current) clearTimeout(autoAdvanceTimerRef.current);
-      autoAdvanceTimerRef.current = setTimeout(() => {
-        changeIndex(currentIndex + 1);
-      }, 900);
+      const nextIdx = getNextQuestionIndex(currentIndex, reviewQuestions, updatedAnswers, { fallbackToEndIfComplete: true });
+      if (nextIdx !== currentIndex) {
+        if (autoAdvanceTimerRef.current) clearTimeout(autoAdvanceTimerRef.current);
+        autoAdvanceTimerRef.current = setTimeout(() => {
+          changeIndex(nextIdx);
+        }, 900);
+      }
     }
   };
 
@@ -289,7 +292,7 @@ export const MistakesScreen: React.FC<MistakesScreenProps> = ({ onNavigateHome }
           currentIndex={currentIndex}
           totalCount={reviewQuestions.length}
           onPrevious={() => changeIndex(Math.max(0, currentIndex - 1))}
-          onNext={() => changeIndex(currentIndex + 1)}
+          onNext={() => changeIndex(getNextQuestionIndex(currentIndex, reviewQuestions, reviewAnswers))}
           isPreviousDisabled={currentIndex === 0}
           previousId="btn-mistakes-prev-question"
           nextId="btn-mistakes-next-question"

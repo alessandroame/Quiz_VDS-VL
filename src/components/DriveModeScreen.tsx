@@ -19,6 +19,7 @@ import { backNavigation } from '../utils/backNavigation';
 import { DriveLauncher } from './drive/DriveLauncher';
 import { DriveActiveHUD } from './drive/DriveActiveHUD';
 import { DriveDebriefing } from './drive/DriveDebriefing';
+import { getNextQuestionIndex } from '../utils/quizNavigation';
 
 
 export interface DriveModeSessionContext {
@@ -470,15 +471,15 @@ export const DriveModeScreen: React.FC<DriveModeScreenProps> = ({
     clearAllDriveTimers();
     stopVoice();
 
-    if (currentIndex < totalCount - 1) {
+    const nextIdx = getNextQuestionIndex(currentIndex, internalQuestions, answers);
+    if (nextIdx !== currentIndex) {
       triggerHapticFeedback('tap');
-      const nextIdx = currentIndex + 1;
       setCurrentIndex(nextIdx);
       if (sessionContext) sessionContext.onNavigateIndex(nextIdx);
     } else if (isExamSession) {
       handleSubmitExamRef.current();
     }
-  }, [internalMode, clearAllDriveTimers, stopVoice, currentIndex, totalCount, sessionContext, isExamSession]);
+  }, [internalMode, clearAllDriveTimers, stopVoice, currentIndex, internalQuestions, answers, sessionContext, isExamSession]);
 
   handleNextQuestionRef.current = handleNextQuestion;
 

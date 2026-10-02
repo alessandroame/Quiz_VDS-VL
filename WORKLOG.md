@@ -14,6 +14,34 @@ Questo documento registra in ordine cronologico tutte le lavorazioni svolte nel 
 - **Impatto sul Desiderata**: <Come questo intervento contribuisce al desiderata (cfr. DESIDERATA.md) e indicazioni per il prossimo agente>
 ```
 
+### [2026-10-02] - Avanzamento Intelligente su Domande Saltate (Smart Skip-Ahead) (v1.7.9)
+
+- **Cosa abbiamo fatto**:
+  - **Modulo Deterministico di Navigazione ([src/utils/quizNavigation.ts](file:///c:/github/Quiz_VDS-VL/src/utils/quizNavigation.ts))**:
+    - Implementata la funzione pura `getNextQuestionIndex(currentIndex, questions, answers, options)` che calcola l'indice di avanzamento prioritario.
+    - Se l'allievo è tornato indietro per rispondere o rivedere un quesito precedentemente saltato, l'avanzamento cerca in avanti (`currentIndex + 1` fino a `totalCount - 1`) il primo quesito non ancora risposto (`answers[q.id] === undefined`), saltando le domande già compilate.
+    - Se non vi sono quesiti non risposti in avanti, esegue una ricerca a ciclo continuo (wrap-around da `0` a `currentIndex - 1`) per non lasciare indietro eventuali quesiti saltati ancora prima.
+    - Se tutti i quesiti dell'esame o del quiz risultano risposti:
+      * Con `fallbackToEndIfComplete: true` (auto-advance su risposta esatta e conclusione tutor): atterra direttamente all'ultimo quesito (`totalCount - 1`) per consentire la consegna immediata senza scorrimenti intermedi.
+      * Con `fallbackToEndIfComplete: false` (tasto manuale "Successiva"): avanza sequenzialmente di 1 passo (`currentIndex + 1`) per permettere la revisione ordinata delle risposte date.
+  - **Integrazione in Tutte le Sessioni di Quiz**:
+    - [src/components/ExamScreen.tsx](file:///c:/github/Quiz_VDS-VL/src/components/ExamScreen.tsx): integrato in auto-advance su risposta esatta (tutor), nel pulsante primario *"Successiva"* (`#btn-tutor-next-question`), nella barra ancorata `QuizBottomBar` (`onNext`) e nella navigazione da tastiera con freccia destra (`ArrowRight`).
+    - [src/components/TopicsScreen.tsx](file:///c:/github/Quiz_VDS-VL/src/components/TopicsScreen.tsx): integrato in auto-advance su risposta esatta e nel tasto *"Successiva"* di `QuizBottomBar`.
+    - [src/components/MistakesScreen.tsx](file:///c:/github/Quiz_VDS-VL/src/components/MistakesScreen.tsx): integrato in auto-advance nel quaderno errori e nel tasto *"Successiva"* di `QuizBottomBar`.
+    - [src/components/DriveModeScreen.tsx](file:///c:/github/Quiz_VDS-VL/src/components/DriveModeScreen.tsx): integrato nel gestore unificato `handleNextQuestion` (tocco su *"Successiva"*, comando vocale *"Avanti"*, timer del pilota automatico e fine spiegazione didattica).
+  - **Suite di Test Unitari e di Integrazione**:
+    - [src/utils/quizNavigation.test.ts](file:///c:/github/Quiz_VDS-VL/src/utils/quizNavigation.test.ts): 8 test specialistici BVA (progressione sequenziale, salto multiplo, salto su riesame senza risposta, wrap-around, fallback revisione vs completamento).
+    - [src/components/SmartAdvanceOnSkippedQuestion.test.ts](file:///c:/github/Quiz_VDS-VL/src/components/SmartAdvanceOnSkippedQuestion.test.ts): 3 test d'integrazione end-to-end con DOM mock su `ExamScreen` (auto-advance con salto domande intermedie, tasto Successiva in QuizBottomBar e shortcut da tastiera ArrowRight).
+  - **Aggiornamento Documentazione ([README.md](file:///c:/github/Quiz_VDS-VL/README.md), [DESIDERATA.md](file:///c:/github/Quiz_VDS-VL/DESIDERATA.md))**:
+    - Documentata la logica di Smart Skip-Ahead e aggiornata la matrice di stato del desiderata.
+- **Scelte architetturali & Rationale**:
+  - *Funzione Pura Isolata vs Logica Inline Frammentata*: Centralizzare l'algoritmo di calcolo in `src/utils/quizNavigation.ts` garantisce che Tutor, Esame Ufficiale, Materie, Quaderno Errori e Modalità Audio adottino esattamente lo stesso comportamento deterministico senza duplicazione di codice e con testabilità al 100%.
+  - *Distinzione Automazione vs Revisione*: Quando l'allievo ha completato l'intero test al 100%, l'auto-advance conduce all'ultimo quesito dove risiede il pulsante di consegna, mentre il clic manuale su "Successiva" mantiene il passo singolo (`+1`) consentendo all'allievo di rileggere in rassegna le proprie risposte prima di consegnare.
+- **Impatto sul Desiderata**:
+  - Eliminazione di una delle principali fonti di frustrazione ergonomica durante lo studio dei quiz, con navigazione fluida e zero clic a vuoto.
+
+---
+
 ### [2026-10-02] - Rimozione Badge Ridondante di "Sessione in Corso" / "ATTIVO" nella Navbar (v1.7.8)
 
 - **Cosa abbiamo fatto**:

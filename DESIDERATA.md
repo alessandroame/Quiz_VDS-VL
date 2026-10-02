@@ -170,6 +170,7 @@ Questo documento rappresenta la **bussola strategica e funzionale** del progetto
 | Manuale Utente Illustrato & Pipeline Screenshot CDP | 🟢 Completato | Completato con TODO-10. Manuale completo in `docs/MANUALE_UTENTE.md`, 13 screenshot reali pixel-perfect in `docs/screenshots/`, script automatico `scripts/generate_manual_screenshots.cjs`, link hero in `README.md` e card integrata in `SettingsModal.tsx` (About). |
 | Telemetria di Prodotto PostHog (Opt-Out Trasparente) | 🟢 Completato | Modulo telemetria anonima in `src/services/telemetry.ts` con lazy load chunk `telemetry`, request batching per singola domanda (più viste, corrette, errate), tracciamento esami e download audio, toggle privacy opt-out in Impostazioni e fallback dummy no-op. |
 | Pulsante Unificato Interruzione & Pausa/Ripresa Sessione | 🟢 Completato | Pulsante unificato `[Interrompi]` in tutti i quiz con dialog `SessionInterruptModal` (Metti in Pausa, Termina ed Elimina, Rimani nel Quiz), persistenza `isPaused` e freeze timer in Dexie, banner Home con tag visibile `In Pausa` e cestino eliminazione, e risoluzione automatica conflitti (`SessionConflictModal`). |
+| Avanzamento Intelligente su Domande Saltate (Smart Skip-Ahead) | 🟢 Completato | Algoritmo deterministico `getNextQuestionIndex` in `src/utils/quizNavigation.ts`: quando l'allievo torna indietro per rispondere a un quesito saltato, l'avanzamento (auto-advance, tasto "Successiva", freccia destra tastiera e voce) salta le domande già risposte e atterra direttamente sul primo quesito ancora non risposto. |
 
 ---
 

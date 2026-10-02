@@ -11,6 +11,7 @@ import { QuizBottomBar } from './QuizBottomBar';
 import { voiceService } from '../services/voiceService';
 import { SessionInterruptModal } from './SessionInterruptModal';
 import { SessionConflictModal } from './SessionConflictModal';
+import { getNextQuestionIndex } from '../utils/quizNavigation';
 
 export interface TopicsScreenProps {
   initialSubjectId?: number | null;
@@ -182,13 +183,15 @@ export const TopicsScreen: React.FC<TopicsScreenProps> = ({
     if (
       isCorrect &&
       settings.autoAdvanceOnCorrect !== false &&
-      currentIndex < sessionQuestions.length - 1 &&
       targetQid === currentQ?.id
     ) {
-      if (autoAdvanceTimerRef.current) clearTimeout(autoAdvanceTimerRef.current);
-      autoAdvanceTimerRef.current = setTimeout(() => {
-        changeIndex(currentIndex + 1);
-      }, 900);
+      const nextIdx = getNextQuestionIndex(currentIndex, sessionQuestions, updatedAnswers, { fallbackToEndIfComplete: true });
+      if (nextIdx !== currentIndex) {
+        if (autoAdvanceTimerRef.current) clearTimeout(autoAdvanceTimerRef.current);
+        autoAdvanceTimerRef.current = setTimeout(() => {
+          changeIndex(nextIdx);
+        }, 900);
+      }
     }
   };
 
@@ -274,7 +277,7 @@ export const TopicsScreen: React.FC<TopicsScreenProps> = ({
           currentIndex={currentIndex}
           totalCount={sessionQuestions.length}
           onPrevious={() => changeIndex(Math.max(0, currentIndex - 1))}
-          onNext={() => changeIndex(currentIndex + 1)}
+          onNext={() => changeIndex(getNextQuestionIndex(currentIndex, sessionQuestions, sessionAnswers))}
           isPreviousDisabled={currentIndex === 0}
           previousId="btn-topics-prev-question"
           nextId="btn-topics-next-question"

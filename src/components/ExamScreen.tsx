@@ -26,6 +26,7 @@ import { backNavigation } from '../utils/backNavigation';
 import { SessionInterruptModal } from './SessionInterruptModal';
 import { SessionConflictModal } from './SessionConflictModal';
 import { telemetry } from '../services/telemetry';
+import { getNextQuestionIndex } from '../utils/quizNavigation';
 
 interface ExamScreenProps {
   initialMode?: ExamModeType;
@@ -329,13 +330,15 @@ export const ExamScreen: React.FC<ExamScreenProps> = ({
         if (
           isCorrect &&
           settings.autoAdvanceOnCorrect !== false &&
-          currentIndex < totalCount - 1 &&
           targetId === currentQuestion?.id
         ) {
-          if (autoAdvanceTimerRef.current) clearTimeout(autoAdvanceTimerRef.current);
-          autoAdvanceTimerRef.current = setTimeout(() => {
-            changeIndex(currentIndex + 1);
-          }, 900);
+          const nextIdx = getNextQuestionIndex(currentIndex, examQuestions, updatedAnswers, { fallbackToEndIfComplete: true });
+          if (nextIdx !== currentIndex) {
+            if (autoAdvanceTimerRef.current) clearTimeout(autoAdvanceTimerRef.current);
+            autoAdvanceTimerRef.current = setTimeout(() => {
+              changeIndex(nextIdx);
+            }, 900);
+          }
         }
       }
     }
@@ -386,7 +389,10 @@ export const ExamScreen: React.FC<ExamScreenProps> = ({
       else if (e.key === '3') handleSelectAnswer(3);
       else if (e.key.toLowerCase() === 'f') handleToggleFlag();
       else if (e.key === 'ArrowLeft' && currentIndex > 0) changeIndex(currentIndex - 1);
-      else if (e.key === 'ArrowRight' && currentIndex < totalCount - 1) changeIndex(currentIndex + 1);
+      else if (e.key === 'ArrowRight' && currentIndex < totalCount - 1) {
+        const nextIdx = getNextQuestionIndex(currentIndex, examQuestions, answers);
+        changeIndex(nextIdx);
+      }
     };
 
     window.addEventListener('keydown', handleKeyDown);
@@ -1039,7 +1045,7 @@ export const ExamScreen: React.FC<ExamScreenProps> = ({
         currentIndex={currentIndex}
         totalCount={totalCount}
         onPrevious={() => changeIndex(Math.max(0, currentIndex - 1))}
-        onNext={() => changeIndex(Math.min(totalCount - 1, currentIndex + 1))}
+        onNext={() => changeIndex(getNextQuestionIndex(currentIndex, examQuestions, answers))}
         isPreviousDisabled={currentIndex === 0}
         isNextDisabled={currentIndex === totalCount - 1}
         previousId="btn-prev-question"
@@ -1062,7 +1068,7 @@ export const ExamScreen: React.FC<ExamScreenProps> = ({
                     label: 'Successiva',
                     variant: 'amber',
                     icon: <ArrowRight className="w-4 h-4" />,
-                    onClick: () => changeIndex(currentIndex + 1)
+                    onClick: () => changeIndex(getNextQuestionIndex(currentIndex, examQuestions, answers, { fallbackToEndIfComplete: true }))
                   }
                 : {
                     id: 'btn-tutor-complete-exam',
