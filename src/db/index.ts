@@ -24,7 +24,6 @@ export const DEFAULT_SETTINGS: AppSettings = {
   ttsAutoPlayQuestion: false,
   ttsPlaybackRate: 1.0,
   driveModeAutopilot: true,
-  driveModeAutoAdvanceSeconds: 5,
   driveModeVoiceCommands: false,
   driveModeAudioOutput: 'speaker',
   driveModeIntroPlayed: false,

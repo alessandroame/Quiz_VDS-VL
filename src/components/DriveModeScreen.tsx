@@ -200,7 +200,6 @@ export const DriveModeScreen: React.FC<DriveModeScreenProps> = ({
 
   const countdownTimerRef = useRef<any>(null);
   const autopilotAdvanceTimerRef = useRef<any>(null);
-  const autoRevealTimerRef = useRef<any>(null);
   const autoExplainTimerRef = useRef<any>(null);
   const autoPlayTimerRef = useRef<any>(null);
   const handleNextQuestionRef = useRef<() => void>(() => {});
@@ -216,10 +215,6 @@ export const DriveModeScreen: React.FC<DriveModeScreenProps> = ({
     if (autopilotAdvanceTimerRef.current) {
       clearTimeout(autopilotAdvanceTimerRef.current);
       autopilotAdvanceTimerRef.current = null;
-    }
-    if (autoRevealTimerRef.current) {
-      clearTimeout(autoRevealTimerRef.current);
-      autoRevealTimerRef.current = null;
     }
     if (autoExplainTimerRef.current) {
       clearTimeout(autoExplainTimerRef.current);
@@ -266,7 +261,6 @@ export const DriveModeScreen: React.FC<DriveModeScreenProps> = ({
   const totalCount = internalQuestions.length;
 
   const {
-    isThisQuestionActive,
     isPlaying,
     isPaused,
     isSequencePlaying,
@@ -380,66 +374,8 @@ export const DriveModeScreen: React.FC<DriveModeScreenProps> = ({
       };
     }
   }, [isOpen, internalMode, currentQ?.id, isAutopilotEnabled, isIntroActive]);
-
-  // Avvia il countdown di attesa risposta (default 5s)
-  const startWaitingCountdown = useCallback(() => {
-    if (!currentQ || internalMode !== 'running') return;
-    const waitSeconds = settings.driveModeAutoAdvanceSeconds || 5;
-    setWaitingCountdown(waitSeconds);
-
-    if (countdownTimerRef.current) clearInterval(countdownTimerRef.current);
-
-    countdownTimerRef.current = setInterval(() => {
-      setWaitingCountdown(prev => {
-        if (prev === null || prev <= 1) {
-          clearInterval(countdownTimerRef.current);
-          countdownTimerRef.current = null;
-          if (internalMode === 'running') {
-            handleAutoRevealAndAdvance();
-          }
-          return null;
-        }
-        return prev - 1;
-      });
-    }, 1000);
-  }, [currentQ, internalMode, settings.driveModeAutoAdvanceSeconds]);
-
-  // Gestione termine sequenza audio vocale o singolo frammento -> avvio countdown attesa risposta
-  const prevSequencePlayingRef = useRef<boolean>(false);
-  const prevPlayingRef = useRef<boolean>(false);
-
-  useEffect(() => {
-    if (!isOpen || internalMode !== 'running' || !isAutopilotEnabled || !currentQ) return;
-
-    const wasPlayingSnippet = prevPlayingRef.current && !isPlaying;
-    const wasSequenceSnippet = prevSequencePlayingRef.current && !isSequencePlaying;
-
-    // Rileva quando la sequenza o il singolo frammento vocale finisce di suonare
-    if (
-      (wasSequenceSnippet || wasPlayingSnippet) &&
-      isThisQuestionActive &&
-      !isDriveIntroPlaying &&
-      !isExplanationPlaying
-    ) {
-      // Se l'utente non ha ancora risposto a questa domanda
-      if (!answers[currentQ.id] && revealedQuestionId !== currentQ.id) {
-        startWaitingCountdown();
-      }
-    }
-    prevSequencePlayingRef.current = isSequencePlaying;
-    prevPlayingRef.current = isPlaying;
-  }, [
-    isSequencePlaying,
-    isPlaying,
-    isThisQuestionActive,
-    isAutopilotEnabled,
-    isDriveIntroPlaying,
-    isExplanationPlaying,
-    currentQ?.id,
-    answers,
-    revealedQuestionId,
-    startWaitingCountdown
-  ]);
+  // Studio sereno a ritmo dell'allievo: al termine della lettura audio, la domanda
+  // attende la risposta (touch, vocale o tastiera) senza countdown o avanzamenti forzati.
 
   // Riascolto selettivo di sola domanda o singola opzione
   const handlePlayQuestion = useCallback(() => {
@@ -536,41 +472,6 @@ export const DriveModeScreen: React.FC<DriveModeScreenProps> = ({
       return () => clearTimeout(guardTimer);
     }
   }, [isWaitingForExplanationEnd, isExplanationPlaying, isAutopilotEnabled, internalMode]);
-
-  // Auto-rivelazione in modalità Pilota Automatico passivo (se l'utente non tocca nulla)
-  const handleAutoRevealAndAdvance = useCallback(async () => {
-    if (!currentQ || internalMode !== 'running') return;
-    setRevealedQuestionId(currentQ.id);
-
-    // Feedback sonoro didattico
-    if (settings.soundEnabled) {
-      soundFX.playClick();
-    }
-
-    // Registra come vista/non risposta (solo se fuori esame e senza context padre)
-    if (!isExamSession && !sessionContext) {
-      await recordAnswer(currentQ.id, false);
-    }
-
-    if (internalMode !== 'running') return;
-
-    if (isTutorEnabled || settings.ttsAutoExplainOnMistake) {
-      // MODALITÀ TUTOR o spiegazione automatica su errore (timeout mancata risposta):
-      // avvia lettura integrale e attende il completamento naturale
-      isWaitingForExplanationEndRef.current = true;
-      setIsWaitingForExplanationEnd(true);
-      playExplanation();
-    } else {
-      // MODALITÀ STANDARD: avanza dopo 3.5 secondi
-      if (autoRevealTimerRef.current) clearTimeout(autoRevealTimerRef.current);
-      autoRevealTimerRef.current = setTimeout(() => {
-        autoRevealTimerRef.current = null;
-        if (internalMode === 'running') {
-          handleNextQuestionRef.current();
-        }
-      }, 3500);
-    }
-  }, [currentQ, internalMode, settings.soundEnabled, isTutorEnabled, settings.ttsAutoExplainOnMistake, playExplanation, recordAnswer, isExamSession, sessionContext]);
 
   // Seleziona risposta
   const handleSelectAnswer = async (ans: 1 | 2 | 3) => {

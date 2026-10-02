@@ -259,6 +259,28 @@ describe('SettingsModal Component (Accordion & Mobile Ergonomics)', () => {
     container.remove();
   });
 
+  it('should NOT render "Tempo per Pensare alla Risposta" in Mani Libere section (unhurried learning)', () => {
+    const container = document.createElement('div');
+    document.body.appendChild(container);
+    const root = createRoot(container);
+
+    act(() => {
+      root.render(React.createElement(SettingsModal, { isOpen: true, onClose: () => {}, defaultTab: 'drive' }));
+    });
+
+    const driveCardTab = container.querySelector('#tab-drive') as HTMLButtonElement;
+    expect(driveCardTab).not.toBeNull();
+    expect(driveCardTab.getAttribute('aria-expanded')).toBe('true');
+
+    // Verify that "Tempo per Pensare alla Risposta" is completely removed
+    expect(container.textContent).not.toContain('Tempo per Pensare alla Risposta');
+
+    act(() => {
+      root.unmount();
+    });
+    container.remove();
+  });
+
   it('should display light theme app logo in About section when resolvedTheme is light', () => {
     mockUseTheme.mockReturnValue({
       theme: 'light',

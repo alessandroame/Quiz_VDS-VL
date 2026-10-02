@@ -468,7 +468,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
       : settings.driveModeAutopilot ?? true
       ? 'Radio ON'
       : 'Manuale'
-  } • ${settings.driveModeAutoAdvanceSeconds || 5}s${settings.driveModeTutor ? ' • Tutor ON' : ''}`;
+  }${settings.driveModeTutor ? ' • Tutor ON' : ''}`;
 
   const cloudSummary = `${
     settings.autoSyncDrive ? 'Auto-Sync ON' : syncState?.lastSyncedAt ? 'Drive Sincronizzato' : 'Manuale'
@@ -1335,33 +1335,6 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                         Microfono sempre attivo. Permette di interrompere il parlato in qualsiasi momento.
                       </p>
                     </button>
-                  </div>
-                </div>
-
-                <div className="p-2.5 rounded-xl border border-zinc-700 bg-zinc-950/60 light:bg-slate-50 light:border-slate-300 space-y-1.5">
-                  <div className="flex justify-between items-center">
-                    <span className="text-zinc-300 light:text-slate-700 font-medium">
-                      Tempo per Pensare alla Risposta
-                    </span>
-                    <span className="font-mono font-bold text-amber-400">
-                      {settings.driveModeAutoAdvanceSeconds || 5} secondi
-                    </span>
-                  </div>
-                  <div className="grid grid-cols-3 gap-1.5 pt-1">
-                    {[3, 5, 8].map(sec => (
-                      <button
-                        key={sec}
-                        type="button"
-                        onClick={() => updateSetting('driveModeAutoAdvanceSeconds', sec)}
-                        className={`py-2 rounded-lg text-xs font-semibold transition-all cursor-pointer active:scale-95 touch-manipulation ${
-                          (settings.driveModeAutoAdvanceSeconds || 5) === sec
-                            ? 'bg-amber-600 text-white shadow-sm'
-                            : 'bg-zinc-800 hover:bg-zinc-700 text-zinc-300 light:bg-slate-200 light:text-slate-700'
-                        }`}
-                      >
-                        {sec}s
-                      </button>
-                    ))}
                   </div>
                 </div>
 

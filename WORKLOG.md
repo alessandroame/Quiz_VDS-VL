@@ -14,6 +14,47 @@ Questo documento registra in ordine cronologico tutte le lavorazioni svolte nel 
 - **Impatto sul Desiderata**: <Come questo intervento contribuisce al desiderata (cfr. DESIDERATA.md) e indicazioni per il prossimo agente>
 ```
 
+### [2026-10-02] - Rimozione Icona e Toggle Tutor dalla Top Bar HUD (v1.6.7)
+- **Cosa abbiamo fatto**:
+  - **Rimozione Toggle Tutor dalla Top Bar HUD ([src/components/drive/DriveActiveHUD.tsx](file:///c:/github/Quiz_VDS-VL/src/components/drive/DriveActiveHUD.tsx))**:
+    - Rimosso il pulsante `#btn-drive-tutor-toggle` con icona `GraduationCap` e dicitura `Tutor / Tutor ON` dalla barra superiore (header/top bar) dell'HUD attivo in Modalità Mani Libere.
+    - Resa opzionale la prop `onToggleTutor?: () => void` in `DriveActiveHUDProps` preservando la compatibilità retroattiva dei chiamanti.
+    - Eliminato l'affollamento orizzontale della top bar su viewport mobile stretti (390px), mantenendo il controllo completo della Modalità Tutor nelle posizioni ergonomiche dedicate: nel Launcher iniziale (`#btn-drive-toggle-tutor-launcher`), nel flyout rapido Impostazioni Voce (`#quick-menu-toggle-tutor`), nelle Impostazioni generali (`#setting-drive-tutor-toggle`) e via comandi vocali hands-free (*"Attiva tutor"* / *"Disattiva tutor"*).
+  - **Allineamento Suite di Test**:
+    - In [src/components/drive/DriveActiveHUD.test.ts](file:///c:/github/Quiz_VDS-VL/src/components/drive/DriveActiveHUD.test.ts): introdotto il test `HUD-TOPBAR-01` per verificare categoricamente l'assenza di `#btn-drive-tutor-toggle` e della relativa label dall'header HUD.
+    - In [src/components/drive/DriveTutorMode.test.ts](file:///c:/github/Quiz_VDS-VL/src/components/drive/DriveTutorMode.test.ts): aggiornata l'asserzione per garantire che il toggle non venga renderizzato nella top bar dell'HUD attivo.
+    - In [scripts/test_drive_tutor.js](file:///c:/github/Quiz_VDS-VL/scripts/test_drive_tutor.js): allineato il controllo CDP dell'HUD per riflettere la rimozione del pulsante dalla barra superiore.
+    - Aggiornato [TODO.md](file:///c:/github/Quiz_VDS-VL/TODO.md) per allineare l'elenco dei punti di controllo del tutor.
+    - Tutte le 52 suite di test Vitest (387 test) superate con successo al 100%. Build e typecheck eseguiti con 0 errori.
+- **Scelte architetturali & Rationale**:
+  - *De-cluttering della Top Bar su Mobile (Minimal UI/UX)*: Su schermi smartphone da 390px, la presenza contemporanea di tasto Esci, contatore quiz/timer, indicatore offline, Quick Voice Menu, toggle Autopilota e toggle Tutor generava un affollamento eccessivo con rischio di tap accidentali. Poiché la scelta tra modalità standard e didattica tutor viene effettuata prima dell'avvio nel Launcher o tramite comandi vocali/menu rapido audio, eliminare il toggle dalla top bar attiva garantisce la massima pulizia e leggibilità visiva.
+- **Impatto sul Desiderata**:
+  - Piena aderenza ai principi di ergonomia visiva e zero-distrazioni dell'applicazione durante l'allenamento (cfr. [DESIDERATA.md](file:///c:/github/Quiz_VDS-VL/DESIDERATA.md)).
+
+---
+
+### [2026-10-02] - Rimozione Impostazione Tempo per Pensare alla Risposta & Studio Senza Fretta (v1.6.7)
+- **Cosa abbiamo fatto**:
+  - **Rimozione Impostazione "Tempo per Pensare alla Risposta"**:
+    - Rimossa la sezione con i pulsanti di selezione (3s, 5s, 8s) per "Tempo per Pensare alla Risposta" in [src/components/SettingsModal.tsx](file:///c:/github/Quiz_VDS-VL/src/components/SettingsModal.tsx).
+    - Aggiornato il summary della scheda Mani Libere (`driveSummary`) per non mostrare più l'indicazione dei secondi di attesa.
+    - Deprecata la proprietà `driveModeAutoAdvanceSeconds?: number` in [src/types/database.ts](file:///c:/github/Quiz_VDS-VL/src/types/database.ts) e rimossa da `DEFAULT_SETTINGS` in [src/db/index.ts](file:///c:/github/Quiz_VDS-VL/src/db/index.ts) per mantenere la piena retrocompatibilità senza forzare valori di default.
+  - **Rimozione Timeout di Forzatura Risposta e Countdown in Modalità Guida/Mani Libere**:
+    - In [src/components/DriveModeScreen.tsx](file:///c:/github/Quiz_VDS-VL/src/components/DriveModeScreen.tsx), rimossa la funzione `startWaitingCountdown` e il relativo timer automatico che scattava al termine della riproduzione vocale dei quesiti.
+    - Rimossa la logica di timeout `handleAutoRevealAndAdvance` che forzava la rivelazione della risposta e l'avanzamento dopo 3/5/8 secondi, eliminando qualsiasi pressione temporale sull'allievo.
+    - La domanda rimane attiva e in attesa dell'azione dell'allievo (voce, touch o tastiera) senza limiti o timer ansiogeni, garantendo che l'obiettivo rimanga l'apprendimento approfondito e non la fretta.
+    - In [src/components/drive/DriveActiveHUD.tsx](file:///c:/github/Quiz_VDS-VL/src/components/drive/DriveActiveHUD.tsx), garantita la disponibilità del tasto di riascolto (`#btn-drive-repeat`) e stop anche durante la fase di riflessione prima della risposta.
+  - **Suite di Test Unitari**:
+    - Aggiunto il test `DRIVE-UNHURRIED-01` in [src/components/DriveModeScreen.test.ts](file:///c:/github/Quiz_VDS-VL/src/components/DriveModeScreen.test.ts) a verifica che l'attesa prolungata (oltre 10 secondi) non provochi alcun auto-avanzamento o rivelazione forzata.
+    - Aggiunto test in [src/components/SettingsModal.test.ts](file:///c:/github/Quiz_VDS-VL/src/components/SettingsModal.test.ts) per confermare l'assenza totale della dicitura e dei controlli "Tempo per Pensare alla Risposta".
+    - Tutte le 52 suite di test (387 test totali) superate con successo al 100%.
+- **Scelte architetturali & Rationale**:
+  - *Filosofia di Apprendimento Rilassato (No Rush)*: La presenza di un timer di riflessione a scorrimento rapido (3s, 5s, 8s) generava ansia ingiustificata e penalizzava la comprensione delle risposte più articolate. Lasciare il tempo illimitato all'allievo per riflettere e rispondere quando pronto si allinea perfettamente alla missione didattica della PWA ("l'obiettivo è imparare non fare di corsa").
+- **Impatto sul Desiderata**:
+  - Rispetta in pieno i requisiti di ergonomia di studio zero-distrazioni e studio rilassato definiti in [DESIDERATA.md](file:///c:/github/Quiz_VDS-VL/DESIDERATA.md).
+
+---
+
 ### [2026-10-01] - Arresto Tempestivo Audio e Timers al Debriefing ed alla Chiusura Sessione (v1.6.6)
 - **Cosa abbiamo fatto**:
   - **Risoluzione Riproduzione Audio Indesiderata in Debriefing e Chiusura Sessione**:

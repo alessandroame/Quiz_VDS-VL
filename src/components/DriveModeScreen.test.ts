@@ -22,7 +22,6 @@ vi.mock('../context/QuizContext', () => ({
       driveModeAutopilot: true,
       driveModeVoiceCommands: false,
       driveModeTutor: true,
-      driveModeAutoAdvanceSeconds: 5,
       ttsAutoExplainOnMistake: true,
       driveModeIntroPlayed: true,
       audioOfflinePromptDismissed: true
@@ -372,6 +371,36 @@ describe('DriveModeScreen - Tutor Mode Explanation Playback Contract', () => {
     expect(mockStopVoice).toHaveBeenCalled();
     expect(handleAbandon).toHaveBeenCalled();
     expect(handleClose).toHaveBeenCalled();
+  });
+
+  it('DRIVE-UNHURRIED-01: does NOT start a countdown or auto-advance when thinking (unhurried study)', async () => {
+    const handleAnswer = vi.fn();
+    await act(async () => {
+      root.render(
+        React.createElement(DriveModeScreen, {
+          isOpen: true,
+          onClose: vi.fn(),
+          sessionContext: {
+            questions: [sampleQuestion],
+            currentIndex: 0,
+            answers: {},
+            flags: {},
+            onAnswer: handleAnswer,
+            onToggleFlag: vi.fn(),
+            onNavigateIndex: vi.fn()
+          }
+        })
+      );
+    });
+
+    // Advance timers by 10 seconds (way past old 3s/5s/8s limits)
+    await act(async () => {
+      vi.advanceTimersByTime(10000);
+    });
+
+    // Must NOT have answered or auto-advanced
+    expect(handleAnswer).not.toHaveBeenCalled();
+    expect(mockPlayExplanation).not.toHaveBeenCalled();
   });
 });
 

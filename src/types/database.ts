@@ -57,7 +57,8 @@ export interface AppSettings {
   ttsAutoPlayQuestion: boolean;
   ttsPlaybackRate: number;
   driveModeAutopilot: boolean;
-  driveModeAutoAdvanceSeconds: number;
+  /** @deprecated Removed in favor of untimed learning; preserved for backward compatibility */
+  driveModeAutoAdvanceSeconds?: number;
   driveModeVoiceCommands: boolean;
   driveModeAudioOutput?: 'speaker' | 'headphones';
   driveModeIntroPlayed?: boolean;
