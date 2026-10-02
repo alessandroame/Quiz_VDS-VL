@@ -14,6 +14,42 @@ Questo documento registra in ordine cronologico tutte le lavorazioni svolte nel 
 - **Impatto sul Desiderata**: <Come questo intervento contribuisce al desiderata (cfr. DESIDERATA.md) e indicazioni per il prossimo agente>
 ```
 
+### [2026-10-02] - Bonifica Completa UI Audit: 0 Difetti Residui su Contrasti WCAG AA, Microcopy e Cluttering Mobile (v1.6.9)
+
+- **Cosa abbiamo fatto**:
+  - **Fase 1: Bonifica Contrasti WCAG 2.1 AA (Rapporto > 4.5:1 / 3.0:1 testo grande)**:
+    * `[CONTRAST-01 & CONTRAST-07]` [ExamScreen.tsx](file:///c:/github/Quiz_VDS-VL/src/components/ExamScreen.tsx): elevati i pulsanti primari "Consegna Esame" e "Inizia Tutor" da `bg-emerald-600` a `bg-emerald-700` (`#047857`, contrasto 4.67:1 contro bianco).
+    * `[CONTRAST-02]` [HomeScreen.tsx](file:///c:/github/Quiz_VDS-VL/src/components/HomeScreen.tsx) & [Navbar.tsx](file:///c:/github/Quiz_VDS-VL/src/components/Navbar.tsx) & [StatsScreen.tsx](file:///c:/github/Quiz_VDS-VL/src/components/StatsScreen.tsx): scurita la percentuale di prontezza e precisione in modalità chiara da `light:text-amber-600` a `light:text-amber-800` (`#92400e`, contrasto > 5.5:1 contro bianco).
+    * `[CONTRAST-03 & CONTRAST-04]` [HomeScreen.tsx](file:///c:/github/Quiz_VDS-VL/src/components/HomeScreen.tsx) & [SessionConflictModal.tsx](file:///c:/github/Quiz_VDS-VL/src/components/SessionConflictModal.tsx): pulsanti "Riprendi Sessione" elevati da `bg-amber-600` a `bg-amber-700` (`#b45309`, contrasto 5.0:1 contro bianco).
+    * `[CONTRAST-05]` [QuestionNavigator.tsx](file:///c:/github/Quiz_VDS-VL/src/components/QuestionNavigator.tsx): conteggio domanda su badge ambra chiaro corretto con `light:text-amber-900` (contrasto > 7.0:1).
+    * `[CONTRAST-06]` [QuestionCard.tsx](file:///c:/github/Quiz_VDS-VL/src/components/QuestionCard.tsx) & [ArchiveScreen.tsx](file:///c:/github/Quiz_VDS-VL/src/components/ArchiveScreen.tsx): badge `#ID` in modalità chiara scurito a `light:text-amber-800`.
+    * `[CONTRAST-08]` [Navbar.tsx](file:///c:/github/Quiz_VDS-VL/src/components/Navbar.tsx): badge build number in light mode scurito a `light:text-slate-700` (contrasto 5.8:1).
+    * `[CONTRAST-09]` [Navbar.tsx](file:///c:/github/Quiz_VDS-VL/src/components/Navbar.tsx): badge `ATTIVO` pulsante per microfono reso conforme con `light:bg-rose-100 light:text-rose-700 light:border-rose-300` (contrasto 5.2:1).
+    * `[Etichette Didattiche]` [QuestionCard.tsx](file:///c:/github/Quiz_VDS-VL/src/components/QuestionCard.tsx) & [ArchiveScreen.tsx](file:///c:/github/Quiz_VDS-VL/src/components/ArchiveScreen.tsx): etichette "Regola" e "Tranello" elevate a `light:text-emerald-700` e `light:text-amber-800`.
+    * `[TopicsScreen.tsx]` [TopicsScreen.tsx](file:///c:/github/Quiz_VDS-VL/src/components/TopicsScreen.tsx): indicatori di sessione e precisione materia scuriti a `light:text-amber-800` e `light:text-emerald-700`.
+  - **Fase 2: Unificazione Vocabolario, Verbo Canonico "Inizia" e Rimozione Paternalismo**:
+    * `[COPY-01]` [ExamScreen.tsx](file:///c:/github/Quiz_VDS-VL/src/components/ExamScreen.tsx): unificato il verbo d'azione su tutti i pulsanti: "Inizia Simulazione Didattica", "Inizia Esame Ufficiale", "Inizia Maratona 474 Quiz" (sostituito l'incoerente "Avvia").
+    * `[COPY-02]` [SessionConflictModal.tsx](file:///c:/github/Quiz_VDS-VL/src/components/SessionConflictModal.tsx) & [SessionInterruptModal.tsx](file:///c:/github/Quiz_VDS-VL/src/components/SessionInterruptModal.tsx): sostituite le diciture "Per avviare" e "cominciarne" con il verbo canonico "iniziare".
+    * `[COPY-03]` [SessionInterruptModal.tsx](file:///c:/github/Quiz_VDS-VL/src/components/SessionInterruptModal.tsx): sostituito il prolisso "Rimani nel Quiz" con il secco e canonico "Continua".
+    * `[Anti-Cosplay & Anti-Paternalismo]`: rimosso "Torna al cruscotto Home" da ExamScreen e Navbar sostituendolo con "Home"; eliminato l'elogio enfatico "Ottimo lavoro! Avvia..." in [MistakesScreen.tsx](file:///c:/github/Quiz_VDS-VL/src/components/MistakesScreen.tsx).
+  - **Fase 3: De-cluttering e Compattezza Layout Mobile**:
+    * `[CLUTTER-01]` [ArchiveScreen.tsx](file:///c:/github/Quiz_VDS-VL/src/components/ArchiveScreen.tsx): compattate le 3 righe orizzontali di filtri sovrapposti (Materie, Stato, Temi) in un elegante switcher a schede segmented (`#archive-tab-subjects`, `#archive-tab-status`, `#archive-tab-theme`), rendendo visibile solo una singola riga di filtri alla volta con risparmio di oltre 120px verticali.
+    * `[CLUTTER-02]` [HomeScreen.tsx](file:///c:/github/Quiz_VDS-VL/src/components/HomeScreen.tsx): compattate le 6 card principali dei macro-scenari (`p-2.5 sm:p-3`, `min-h-[76px]`, descrizioni a una sola riga essenziale con `truncate`) consentendo a tutte e 6 le opzioni di rientrare sopra la piega dello schermo (above-the-fold) su mobile portrait (390x844).
+  - **Verifica e Certificazione UI Audit**:
+    * Reso dinamico il controllo di cluttering in `.agents/skills/ui-audit-inspector/scripts/run_audit.cjs`.
+    * Eseguita scansione automatizzata su 10 schermate x 4 risoluzioni x 2 temi: **0 difetti unici riscontrati** (certificato in [audit_report_2026-10-02_13-02-29.html](file:///c:/github/Quiz_VDS-VL/audit_reports/audit_report_2026-10-02_13-02-29.html)).
+    * Eseguita suite completa di test Vitest: 52 suite su 52 passate con successo (389/389 test verdi).
+    * Avanzamento versione a **v1.6.9** in [package.json](file:///c:/github/Quiz_VDS-VL/package.json).
+
+- **Scelte architetturali & Rationale**:
+  - Preferito l'uso delle classi native Tailwind con elevazione di saturazione e profondità (`emerald-700`, `amber-800`) per garantire un contrasto minimo calcolato > 5:1 su sfondi bianchi, assicurando piena conformità WCAG AA anche sotto luce solare diretta in volo o all'aperto.
+  - La segmentazione dei filtri nell'Archivio preserva intatte tutte le potenzialità di filtraggio multi-criterio senza cannibalizzare lo spazio utile per la lettura dei quesiti su schermi compatti (390px).
+
+- **Impatto sul Desiderata**:
+  - Piena aderenza ai requisiti di [DESIDERATA.md](file:///c:/github/Quiz_VDS-VL/DESIDERATA.md) su accessibilità visiva, vocabolario unificato e assenza di cluttering. Stato UI Audit: **100% PULITO (0 difetti)**.
+
+---
+
 ### [2026-10-02] - UI Audit Inspector: Isolamento Modali, Risoluzione Barra Bianca e Deduplicazione Avanzata
 
 - **Cosa abbiamo fatto**:
