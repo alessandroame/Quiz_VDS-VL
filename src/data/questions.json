@@ -1780,8 +1780,8 @@
     ],
     "correctAnswer": 2,
     "explanation": {
-      "rule": "La resistenza indotta è l'unica componente della resistenza totale che diminuisce all'aumentare della velocità all'aria.",
-      "trap": "Sia l'attrito che la forma crescono rapidamente con la velocità; solo la componente indotta gode di questo andamento decrescente."
+      "rule": "La resistenza indotta nasce dai vortici d'estremità generati dalla portanza. All'aumentare della velocità serve meno angolo d'incidenza per sostenere il peso: l'ala è meno inclinata, i vortici marginali si riducono e la resistenza indotta crolla.",
+      "trap": "L'intuito fa credere che ogni resistenza aumenti con la velocità (come per attrito e forma). Si dimentica che l'indotta dipende dall'incidenza: più l'ala vola veloce, minore è l'incidenza necessaria a sostenerla."
     }
   },
   {
