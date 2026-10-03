@@ -293,6 +293,82 @@ describe('DriveActiveHUD - Karaoke Accordion & Long Text Expansion', () => {
     expect(html).not.toContain('Leggi tutto');
   });
 
+  it('HUD-EXPAND-06: renders expand badge for question 7006 long option 3 in SSR fallback', () => {
+    const question7006: Question = {
+      id: 7006,
+      subjectId: 7,
+      subjectName: 'Tecnica di Pilotaggio',
+      discipline: 'all',
+      question: 'Come è possibile ottenere, a prescindere da altre condizioni, il minor tasso di caduta possibile con deltaplano e parapendio?',
+      options: [
+        "Volando in linea retta ed all'incidenza massima consentita.",
+        "Volando comunque al regime di massima efficienza in aria calma.",
+        "Volando in linea retta ad una incidenza compresa tra quella di massima efficienza in aria calma e quella di stallo."
+      ],
+      correctAnswer: 3,
+      explanation: {
+        rule: 'Il regime di minimo tasso di caduta si ottiene volando a velocità inferiore e incidenza maggiore rispetto alla massima efficienza.',
+        trap: "All'incidenza massima consentita l'ala è prossima allo stallo."
+      }
+    };
+
+    const html = renderToString(
+      React.createElement(DriveActiveHUD, {
+        currentQ: question7006,
+        currentIndex: 5,
+        totalCount: 30,
+        isExamSession: true,
+        secondsRemaining: 200,
+        isIntroActive: false,
+        onDismissIntro: () => {},
+        onReplayIntro: () => {},
+        onOpenVoiceGuide: () => {},
+        setIsVoiceMenuOpen: () => {},
+        onClose: () => {},
+        onExecuteClose: () => {},
+        isAutopilotEnabled: true,
+        onToggleAutopilot: () => {},
+        isTutorEnabled: false,
+        onToggleTutor: () => {},
+        isVoiceSupported: true,
+        isVoiceCommandsEnabled: false,
+        voiceError: null,
+        isVoiceReceiving: false,
+        isVoiceListening: false,
+        onToggleVoiceCommands: () => {},
+        isPlaying: false,
+        isPaused: false,
+        isPartPlaying: () => false,
+        isExplanationPlaying: false,
+        onTogglePlayPause: () => {},
+        onRestartCurrentOrSequence: () => {},
+        onStopVoice: () => {},
+        onPlayExplanation: () => {},
+        waitingCountdown: null,
+        assimilationCountdown: null,
+        voiceInterimTranscript: '',
+        voiceLastTranscript: '',
+        lastRecognizedLabel: null,
+        unrecognizedSpeech: null,
+        voiceHint: '',
+        answers: {},
+        flags: {},
+        revealedQuestionId: null,
+        onSelectAnswer: () => {},
+        onPrevQuestion: () => {},
+        onNextQuestion: () => {},
+        onToggleFlag: () => {},
+        onSubmitExam: () => {}
+      })
+    );
+
+    // Option 3 (115 chars > 80) has expand button in SSR
+    expect(html).toContain('id="btn-drive-opt-expand-3"');
+    expect(html).toContain('Leggi tutto');
+    // Question itself (125 chars > 80) has expand button
+    expect(html).toContain('id="btn-drive-question-expand"');
+  });
+
   it('HUD-TOPBAR-01: does not render the tutor toggle button or icon in the top bar header to keep it uncluttered on mobile', () => {
     const html = renderToString(
       React.createElement(DriveActiveHUD, {

@@ -160,31 +160,75 @@ export const DriveActiveHUD: React.FC<DriveActiveHUDProps> = ({
   const updateTruncation = React.useCallback(() => {
     if (typeof window === 'undefined') return;
 
-    // Measure question
-    if (questionTextRef.current) {
-      const el = questionTextRef.current;
+    // Helper to accurately detect whether an element is clamped or exceeds maxLines,
+    // even when -webkit-line-clamp is active and scrollHeight === clientHeight
+    const checkTruncation = (el: HTMLElement | null, maxLines: number): boolean => {
+      if (!el) return false;
+
+      // 1. Direct scrollHeight check (when browser leaks overflow to scrollHeight)
+      if (el.scrollHeight > el.clientHeight + 1) return true;
+
+      // 2. Line-height check against scrollHeight
       const computed = window.getComputedStyle(el);
       const rawLh = parseFloat(computed.lineHeight);
-      const lh = !isNaN(rawLh) && rawLh > 0 ? rawLh : (parseFloat(computed.fontSize) * 1.375) || 22;
+      const lh = !isNaN(rawLh) && rawLh > 0 ? rawLh : (parseFloat(computed.fontSize) * 1.375) || 20;
+      if (el.scrollHeight > (lh * maxLines) + 3) return true;
+
+      // 3. Range getClientRects line counting (unaffected by line-clamp, counts actual text lines)
+      try {
+        const range = document.createRange();
+        range.selectNodeContents(el);
+        const rects = range.getClientRects();
+        if (rects.length > 0) {
+          const lineTops: number[] = [];
+          for (let i = 0; i < rects.length; i++) {
+            const top = Math.round(rects[i].top);
+            if (!lineTops.some((t) => Math.abs(t - top) <= 3)) {
+              lineTops.push(top);
+            }
+          }
+          if (lineTops.length > maxLines) return true;
+        }
+      } catch {
+        // Range measurement not supported or threw
+      }
+
+      // 4. Off-screen clone measurement without line-clamp
+      try {
+        if (el.clientWidth > 0 && typeof document !== 'undefined') {
+          const clone = el.cloneNode(true) as HTMLElement;
+          clone.style.display = 'block';
+          clone.style.webkitLineClamp = 'unset';
+          (clone.style as any).lineClamp = 'unset';
+          clone.style.position = 'absolute';
+          clone.style.visibility = 'hidden';
+          clone.style.pointerEvents = 'none';
+          clone.style.width = el.clientWidth + 'px';
+          document.body.appendChild(clone);
+          const unclampedHeight = clone.offsetHeight;
+          document.body.removeChild(clone);
+
+          if (unclampedHeight > (lh * maxLines) + 3) return true;
+        }
+      } catch {
+        // Clone measurement failed
+      }
+
+      return false;
+    };
+
+    // Measure question
+    if (questionTextRef.current) {
       const isMobile = window.innerWidth < 640;
       const maxLines = isMobile ? 3 : 4;
-      const isClampedNow = el.scrollHeight > el.clientHeight + 1;
-      const exceedsMaxLines = el.scrollHeight > (lh * maxLines) + 3;
-      setIsQuestionTruncated(isClampedNow || exceedsMaxLines);
+      setIsQuestionTruncated(checkTruncation(questionTextRef.current, maxLines));
     }
 
     // Measure options
     const newTruncated: Record<number, boolean> = {};
     ([1, 2, 3] as const).forEach((optNum) => {
       const el = optionTextRefs.current[optNum];
-      if (el) {
-        const computed = window.getComputedStyle(el);
-        const rawLh = parseFloat(computed.lineHeight);
-        const lh = !isNaN(rawLh) && rawLh > 0 ? rawLh : (parseFloat(computed.fontSize) * 1.375) || 20;
-        const isClampedNow = el.scrollHeight > el.clientHeight + 1;
-        const exceeds2Lines = el.scrollHeight > (lh * 2) + 3;
-        newTruncated[optNum] = isClampedNow || exceeds2Lines;
-      }
+      newTruncated[optNum] = checkTruncation(el, 2);
     });
     setTruncatedOpts(newTruncated);
   }, []);
@@ -194,9 +238,27 @@ export const DriveActiveHUD: React.FC<DriveActiveHUDProps> = ({
     const rafId = requestAnimationFrame(updateTruncation);
 
     window.addEventListener('resize', updateTruncation);
+
+    let observer: ResizeObserver | null = null;
+    if (typeof ResizeObserver !== 'undefined') {
+      observer = new ResizeObserver(() => {
+        updateTruncation();
+      });
+      if (questionTextRef.current) {
+        observer.observe(questionTextRef.current);
+      }
+      ([1, 2, 3] as const).forEach((optNum) => {
+        const el = optionTextRefs.current[optNum];
+        if (el) observer?.observe(el);
+      });
+    }
+
     return () => {
       cancelAnimationFrame(rafId);
       window.removeEventListener('resize', updateTruncation);
+      if (observer) {
+        observer.disconnect();
+      }
     };
   }, [currentQ.id, currentQ.question, currentQ.options, isCurrentRevealed, updateTruncation]);
 
@@ -689,7 +751,7 @@ export const DriveActiveHUD: React.FC<DriveActiveHUDProps> = ({
               : isCurrentOptPlaying;
             const isLongOption = truncatedOpts[optNum] !== undefined
               ? truncatedOpts[optNum]
-              : opt.length > 95;
+              : opt.length > 80;
 
             let style =
               'bg-zinc-900/80 border-zinc-800 text-zinc-100 hover:border-zinc-700 active:scale-[0.99] light:bg-white light:border-slate-200 light:text-slate-900 light:hover:border-slate-300 light:shadow-sm';
