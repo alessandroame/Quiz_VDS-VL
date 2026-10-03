@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Settings as SettingsIcon,
   Sun,
@@ -15,7 +15,7 @@ import { useQuiz } from '../context/QuizContext';
 import { VoiceQuickMenu } from './VoiceQuickMenu';
 import { OfflineIndicator } from './OfflineIndicator';
 import { BuildInfoModal } from './BuildInfoModal';
-import { getBuildInfo } from '../utils/buildInfo';
+import { getBuildInfo, BUILD_INFO_UPDATED_EVENT } from '../utils/buildInfo';
 import { getAppIconUrl, getAppFaviconUrl } from '../utils/assets';
 
 import { getHeaderTitle, type NavTab } from '../utils/navigation';
@@ -33,7 +33,15 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab, openSet
   const { theme, cycleTheme, resolvedTheme } = useTheme();
   const { readinessScore, toggleDriveMode, isDriveModeOpen, settings, syncState } = useQuiz();
   const [isBuildInfoOpen, setIsBuildInfoOpen] = useState(false);
-  const buildInfo = getBuildInfo();
+  const [buildInfo, setBuildInfo] = useState(getBuildInfo);
+
+  useEffect(() => {
+    const handleUpdate = () => {
+      setBuildInfo(getBuildInfo());
+    };
+    window.addEventListener(BUILD_INFO_UPDATED_EVENT, handleUpdate);
+    return () => window.removeEventListener(BUILD_INFO_UPDATED_EVENT, handleUpdate);
+  }, []);
 
   const getSyncTooltip = () => {
     switch (syncState.status) {

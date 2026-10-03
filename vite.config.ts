@@ -123,15 +123,47 @@ export default defineConfig({
       }
     },
     {
-      name: 'watch-git-commits',
+      name: 'live-dev-build-info',
       configureServer(server) {
+        server.middlewares.use((req, res, next) => {
+          if (req.url && (req.url === '/__dev_build_info' || req.url.startsWith('/__dev_build_info?'))) {
+            let pkgVersion = '1.0.0';
+            try {
+              const p = JSON.parse(readFileSync(path.resolve(__dirname, 'package.json'), 'utf-8'));
+              pkgVersion = p.version;
+            } catch {}
+
+            let hash = 'dev';
+            try {
+              hash = execSync('git rev-parse --short HEAD').toString().trim();
+            } catch {}
+
+            let count = '0';
+            try {
+              count = execSync('git rev-list --count HEAD').toString().trim();
+            } catch {}
+
+            const time = new Date().toISOString();
+            res.setHeader('Content-Type', 'application/json');
+            return res.end(JSON.stringify({
+              appName: 'Quiz VDS-VL',
+              version: pkgVersion,
+              buildNumber: count,
+              commitHash: hash,
+              buildTime: time,
+              buildId: `Build #${count} (${hash}) - ${time}`
+            }));
+          }
+          next();
+        });
+
         const gitDir = path.resolve(__dirname, '.git');
         if (existsSync(gitDir)) {
           server.watcher.add(path.join(gitDir, 'HEAD'));
           server.watcher.add(path.join(gitDir, 'refs', 'heads'));
           let debounceTimer: NodeJS.Timeout | null = null;
-          server.watcher.on('change', (filePath) => {
-            if (filePath.includes('.git')) {
+          server.watcher.on('all', (event, filePath) => {
+            if (filePath && filePath.includes('.git')) {
               if (debounceTimer) clearTimeout(debounceTimer);
               debounceTimer = setTimeout(() => {
                 server.restart();

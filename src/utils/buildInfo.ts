@@ -22,10 +22,40 @@ export interface BuildInfo {
   buildId: string;
 }
 
+let liveDevBuildInfo: BuildInfo | null = null;
+export const BUILD_INFO_UPDATED_EVENT = 'vds-build-info-updated' as const;
+
+export function initDevBuildInfo(): void {
+  if (typeof window === 'undefined') return;
+  const isDev = Boolean(import.meta?.env?.DEV);
+  if (isDev) {
+    fetch('/__dev_build_info')
+      .then(res => res.json())
+      .then((data: BuildInfo) => {
+        if (data && data.buildNumber) {
+          liveDevBuildInfo = data;
+          if ((window as any).__APP_BUILD_INFO__) {
+            Object.assign((window as any).__APP_BUILD_INFO__, data);
+          }
+          window.dispatchEvent(new CustomEvent(BUILD_INFO_UPDATED_EVENT, { detail: data }));
+        }
+      })
+      .catch(() => {});
+  }
+}
+
+// Auto-initialize in dev environments
+if (typeof window !== 'undefined' && import.meta?.env?.DEV) {
+  initDevBuildInfo();
+}
+
 /**
  * Returns the current application build metadata.
  */
 export function getBuildInfo(): BuildInfo {
+  if (liveDevBuildInfo) {
+    return liveDevBuildInfo;
+  }
   return {
     appName: APP_NAME,
     version: typeof __APP_VERSION__ !== 'undefined' ? __APP_VERSION__ : '1.1.0',
