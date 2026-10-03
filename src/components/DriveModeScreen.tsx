@@ -571,7 +571,7 @@ export const DriveModeScreen: React.FC<DriveModeScreenProps> = ({
 
     if (!isExamSession || isTutorEnabled) {
       setRevealedQuestionId(currentQ.id);
-      if (!sessionContext && !isExamSession) {
+      if (!sessionContext && (!isExamSession || isTutorEnabled)) {
         await recordAnswer(currentQ.id, isCorrect, ans, 'audio_mode');
       }
 

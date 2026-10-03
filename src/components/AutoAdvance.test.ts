@@ -362,4 +362,48 @@ describe('Visual Auto-Advance on Correct Answer Contract', () => {
     });
     container.remove();
   });
+
+  it('AA-06: ExamScreen audio session context preserves all sequential answers without overwriting', async () => {
+    let capturedContext: any = null;
+    mockRegisterAudioSessionContext.mockImplementation((ctx) => {
+      if (ctx) capturedContext = ctx;
+    });
+
+    const container = document.createElement('div');
+    document.body.appendChild(container);
+    const root = createRoot(container);
+
+    act(() => {
+      root.render(React.createElement(ExamScreen, { initialMode: 'tutor' }));
+    });
+
+    // Start exam
+    const startBtn = container.querySelector('#btn-start-tutor-exam') as HTMLButtonElement;
+    expect(startBtn).not.toBeNull();
+    act(() => {
+      startBtn.click();
+    });
+
+    expect(capturedContext).not.toBeNull();
+    expect(capturedContext.onAnswer).toBeDefined();
+
+    // Answer first question (101: 1 - correct)
+    await act(async () => {
+      capturedContext.onAnswer(101, 1);
+    });
+
+    // Answer second question (102: 3 - wrong)
+    await act(async () => {
+      capturedContext.onAnswer(102, 3);
+    });
+
+    // Verify persistActiveSession was called with both answers preserved
+    const lastCall = mockPersistActiveSession.mock.calls[mockPersistActiveSession.mock.calls.length - 1][0];
+    expect(lastCall.answers).toEqual({ 101: 1, 102: 3 });
+
+    act(() => {
+      root.unmount();
+    });
+    container.remove();
+  });
 });

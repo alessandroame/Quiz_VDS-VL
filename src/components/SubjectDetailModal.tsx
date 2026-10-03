@@ -81,7 +81,7 @@ export const SubjectDetailModal: React.FC<SubjectDetailModalProps> = ({
   const correctQuestions = useMemo(() => {
     return subjectQuestions.filter(q => {
       const s = statsMap.get(q.id);
-      return s && s.timesSeen > 0 && s.lastResult === 'correct' && !isMistakeQuestion(s);
+      return s && s.timesSeen > 0 && s.lastResult === 'correct';
     });
   }, [subjectQuestions, statsMap]);
 

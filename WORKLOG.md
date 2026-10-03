@@ -14,6 +14,31 @@ Questo documento registra in ordine cronologico tutte le lavorazioni svolte nel 
 - **Impatto sul Desiderata**: <Come questo intervento contribuisce al desiderata (cfr. DESIDERATA.md) e indicazioni per il prossimo agente>
 ```
 
+### [2026-10-03] - Risoluzione Tracciamento Risposte Esatte in Modalità Mani Libere e Contrasto Navigatore Quiz (v1.7.11)
+
+- **Cosa abbiamo fatto**:
+  - **Risoluzione della Perdita Risposte da Stale Closure in Modalità Mani Libere**:
+    - Individuata la causa scatenante per cui in modalità mani libere le risposte corrette non venivano conteggiate mentre quelle errate sì: `handleSelectAnswer` (e `handleAnswer`) in [src/components/ExamScreen.tsx](file:///c:/github/Quiz_VDS-VL/src/components/ExamScreen.tsx), [src/components/TopicsScreen.tsx](file:///c:/github/Quiz_VDS-VL/src/components/TopicsScreen.tsx) e [src/components/MistakesScreen.tsx](file:///c:/github/Quiz_VDS-VL/src/components/MistakesScreen.tsx) catturava `answers` dallo scope di chiusura. Nelle chiamate sequenziali tramite `sessionContext.onAnswer` da `DriveModeScreen`, ogni risposta successiva ricreava il dizionario sovrascrivendo e cancellando le risposte date in precedenza. Quando poi si verificava un errore, l'autopilota vocale spiegava il tranello e l'utente tornava alla vista normale trovando solo l'ultima risposta (l'errore), mentre tutte le risposte corrette precedenti erano state spazzate via.
+    - Implementato il pattern deterministico con `answersRef` (e `flagsRef`) sincronizzato in tempo reale con lo state React, garantendo che ogni risposta inviata (sia da tastiera, click o telecomando vocale audio) venga cumulata immediatamente senza perdite o sovrascritture.
+    - Sincronizzato dinamicamente `driveSessionContext` in [src/context/QuizContext.tsx](file:///c:/github/Quiz_VDS-VL/src/context/QuizContext.tsx) affinché la sessione audio aperta rifletta sempre l'ultimo stato valido del quiz genitore.
+  - **Accessibilità e Contrasto WCAG AA nel Navigatore Quiz ([src/components/QuestionNavigator.tsx](file:///c:/github/Quiz_VDS-VL/src/components/QuestionNavigator.tsx))**:
+    - Risolto il problema di contrasto dei pallini del navigatore in tema chiaro (Light Mode): le classi `border-emerald-500 bg-emerald-500/25 text-emerald-300` prive di varianti light risultavano quasi invisibili su sfondo bianco/grigio chiaro (~1.3:1), facendo sembrare che i quiz esatti non fossero segnati, mentre il rosso dell'errore risaltava.
+    - Aggiunte le varianti `light:text-emerald-900`, `light:bg-emerald-100`, `light:border-emerald-600` e per gli errori `light:text-rose-900`, `light:bg-rose-100`, `light:border-rose-600` garantendo leggibilità superiore a 7:1 (WCAG AAA) anche sotto luce diretta.
+  - **Perfezionamenti Correlati sul Tracciamento Risposte Esatte**:
+    - In [src/components/DriveModeScreen.tsx](file:///c:/github/Quiz_VDS-VL/src/components/DriveModeScreen.tsx), garantita la persistenza immediata in Dexie (`recordAnswer`) anche nelle sessioni tutor audio standalone.
+    - In [src/components/SubjectDetailModal.tsx](file:///c:/github/Quiz_VDS-VL/src/components/SubjectDetailModal.tsx), rimosso il filtro escludente `&& !isMistakeQuestion(s)` in modo che i quesiti risposti correttamente compaiano sempre nella scheda "Corrette" della materia.
+    - In [src/utils/archiveFilters.ts](file:///c:/github/Quiz_VDS-VL/src/utils/archiveFilters.ts) e [src/components/ArchiveScreen.tsx](file:///c:/github/Quiz_VDS-VL/src/components/ArchiveScreen.tsx), aggiunto il filtro esplicito "Esatte" per filtrare e rivedere rapidamente i quesiti padroneggiati.
+  - **Suite di Test Unitari e Validazione**:
+    - Aggiunto il test `AA-06` in [src/components/AutoAdvance.test.ts](file:///c:/github/Quiz_VDS-VL/src/components/AutoAdvance.test.ts) che simula la chiamata sequenziale di risposte da audio session context verificando la conservazione cumulativa di tutte le risposte.
+    - Aggiornati i test in [src/components/QuestionNavigator.test.ts](file:///c:/github/Quiz_VDS-VL/src/components/QuestionNavigator.test.ts) per verificare le classi di contrasto in Light Mode.
+    - Tutti i 56 file di test unitari (418 test) superati con successo; typecheck e build di produzione completati senza errori.
+- **Scelte architetturali & Rationale**:
+  - *Ref-Guarded State Accumulation per Eventi Asincroni*: Negli ambienti con rendering reattivo asincrono o callback delegati a componenti figli/modali a schermo intero (come la modalità audio), affidarsi al solo closure state di React espone a race condition e sovrascritture. L'uso di `answersRef` sincronizzato contestualmente al `setAnswers` garantisce che il valore sia aggiornato sincronicamente all'istante dell'evento, rendendo immuni da regressioni le chiamate multiple consecutive.
+- **Impatto sul Desiderata**:
+  - Piena affidabilità del tracciamento didattico sia in modalità visiva che in modalità mani libere durante la guida o l'ascolto passivo, conformità WCAG per l'uso dell'app all'aperto su smartphone.
+
+---
+
 ### [2026-10-02] - Coerenza Spaziale Tasto Cuffia in Modalità Mani Libere / DriveActiveHUD (v1.7.10)
 
 - **Cosa abbiamo fatto**:

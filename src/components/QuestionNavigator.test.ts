@@ -119,10 +119,14 @@ describe('QuestionNavigator Component', () => {
       })
     );
 
-    // Question 1 correct should have emerald classes
+    // Question 1 correct should have emerald classes and accessible light mode contrast
     expect(html).toContain('border-emerald-500');
-    // Question 2 wrong should have rose classes
+    expect(html).toContain('light:text-emerald-900');
+    expect(html).toContain('light:bg-emerald-100');
+    // Question 2 wrong should have rose classes and accessible light mode contrast
     expect(html).toContain('border-rose-500');
+    expect(html).toContain('light:text-rose-900');
+    expect(html).toContain('light:bg-rose-100');
     // Flagged count should be shown
     expect(html).toContain('(1 ⚑)');
   });

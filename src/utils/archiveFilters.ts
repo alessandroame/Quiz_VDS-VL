@@ -1,7 +1,7 @@
 import type { Question } from '../types/quiz';
 import type { QuestionStat } from '../types/database';
 
-export type ArchiveStatusFilter = 'all' | 'unseen' | 'incorrect' | 'bookmarked' | 'with_notes';
+export type ArchiveStatusFilter = 'all' | 'unseen' | 'incorrect' | 'correct' | 'bookmarked' | 'with_notes';
 
 export interface ConceptChipDefinition {
   id: string;
@@ -30,6 +30,7 @@ export interface ArchiveStatusCounts {
   all: number;
   unseen: number;
   incorrect: number;
+  correct: number;
   bookmarked: number;
   with_notes: number;
 }
@@ -61,6 +62,7 @@ export function getArchiveStatusCounts(
 
   let unseen = 0;
   let incorrect = 0;
+  let correct = 0;
   let bookmarked = 0;
   let withNotes = 0;
 
@@ -71,6 +73,9 @@ export function getArchiveStatusCounts(
     }
     if (stat && (stat.timesWrong > 0 || stat.lastResult === 'wrong')) {
       incorrect++;
+    }
+    if (stat && stat.timesSeen > 0 && stat.lastResult === 'correct') {
+      correct++;
     }
     if (stat?.isBookmarked) {
       bookmarked++;
@@ -84,6 +89,7 @@ export function getArchiveStatusCounts(
     all: scopedQuestions.length,
     unseen,
     incorrect,
+    correct,
     bookmarked,
     with_notes: withNotes
   };
@@ -125,6 +131,8 @@ export function filterArchiveQuestions(
       if (stat && stat.timesSeen > 0) return false;
     } else if (statusFilter === 'incorrect') {
       if (!stat || (stat.timesWrong === 0 && stat.lastResult !== 'wrong')) return false;
+    } else if (statusFilter === 'correct') {
+      if (!stat || stat.timesSeen === 0 || stat.lastResult !== 'correct') return false;
     } else if (statusFilter === 'bookmarked') {
       if (!stat?.isBookmarked) return false;
     } else if (statusFilter === 'with_notes') {

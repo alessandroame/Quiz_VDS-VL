@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import {
   RotateCcw,
   CheckCircle2,
@@ -38,6 +38,10 @@ export const MistakesScreen: React.FC<MistakesScreenProps> = ({ onNavigateHome }
   const [reviewQuestions, setReviewQuestions] = useState<Question[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [reviewAnswers, setReviewAnswers] = useState<Record<number, 1 | 2 | 3>>({});
+  const reviewAnswersRef = useRef(reviewAnswers);
+  useEffect(() => {
+    reviewAnswersRef.current = reviewAnswers;
+  }, [reviewAnswers]);
   const [showInterruptModal, setShowInterruptModal] = useState(false);
   const [conflictPendingPool, setConflictPendingPool] = useState<Question[] | null>(null);
 
@@ -168,14 +172,22 @@ export const MistakesScreen: React.FC<MistakesScreenProps> = ({ onNavigateHome }
 
   const handleAnswer = async (ans: 1 | 2 | 3, qid?: number) => {
     const targetQid = qid ?? currentQ?.id;
-    if (!targetQid || reviewAnswers[targetQid]) return;
+    if (!targetQid) return;
+    if (reviewAnswersRef.current[targetQid]) return;
+
     const targetQ = reviewQuestions.find(q => q.id === targetQid) || currentQ;
     if (!targetQ) return;
 
-    const updatedAnswers = { ...reviewAnswers, [targetQid]: ans };
+    const updatedAnswers = { ...reviewAnswersRef.current, [targetQid]: ans };
+    reviewAnswersRef.current = updatedAnswers;
     setReviewAnswers(updatedAnswers);
+
     const isCorrect = ans === targetQ.correctAnswer;
-    await recordAnswer(targetQid, isCorrect);
+    try {
+      await recordAnswer(targetQid, isCorrect);
+    } catch (err) {
+      console.error(err);
+    }
 
     persistActiveSession({
       type: 'mistakes',

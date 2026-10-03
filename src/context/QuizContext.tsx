@@ -81,7 +81,10 @@ export const QuizProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const registerAudioSessionContext = useCallback((context: DriveModeSessionContext | null) => {
     activeAudioSessionContextRef.current = context;
-  }, []);
+    if (isDriveModeOpen && context) {
+      setDriveSessionContext(context);
+    }
+  }, [isDriveModeOpen]);
 
 
 

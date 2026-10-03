@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   ArrowRight,
   CheckCircle2,
@@ -41,6 +41,10 @@ export const TopicsScreen: React.FC<TopicsScreenProps> = ({
   const [sessionQuestions, setSessionQuestions] = useState<Question[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [sessionAnswers, setSessionAnswers] = useState<Record<number, 1 | 2 | 3>>({});
+  const sessionAnswersRef = useRef(sessionAnswers);
+  useEffect(() => {
+    sessionAnswersRef.current = sessionAnswers;
+  }, [sessionAnswers]);
   const [showInterruptModal, setShowInterruptModal] = useState(false);
   const [conflictSub, setConflictSub] = useState<{ id: number; mode: 'all' | 'unseen' | 'wrong' } | null>(null);
 
@@ -157,14 +161,22 @@ export const TopicsScreen: React.FC<TopicsScreenProps> = ({
 
   const handleAnswer = async (ans: 1 | 2 | 3, qid?: number) => {
     const targetQid = qid ?? currentQ?.id;
-    if (!targetQid || sessionAnswers[targetQid]) return;
+    if (!targetQid) return;
+    if (sessionAnswersRef.current[targetQid]) return;
+
     const targetQ = sessionQuestions.find(q => q.id === targetQid) || currentQ;
     if (!targetQ) return;
 
-    const updatedAnswers = { ...sessionAnswers, [targetQid]: ans };
+    const updatedAnswers = { ...sessionAnswersRef.current, [targetQid]: ans };
+    sessionAnswersRef.current = updatedAnswers;
     setSessionAnswers(updatedAnswers);
+
     const isCorrect = ans === targetQ.correctAnswer;
-    await recordAnswer(targetQid, isCorrect);
+    try {
+      await recordAnswer(targetQid, isCorrect);
+    } catch (err) {
+      console.error(err);
+    }
 
     if (activeSubjectId !== null) {
       const currentSubjectMeta = subjectsAnalytics.find(s => s.id === activeSubjectId);

@@ -823,6 +823,7 @@ export const ArchiveScreen: React.FC = () => {
                 { id: 'all', label: 'Tutte', count: statusCounts.all },
                 { id: 'unseen', label: 'Non viste', count: statusCounts.unseen },
                 { id: 'incorrect', label: 'Errate', count: statusCounts.incorrect },
+                { id: 'correct', label: 'Esatte', count: statusCounts.correct },
                 { id: 'bookmarked', label: 'Preferiti', count: statusCounts.bookmarked },
                 { id: 'with_notes', label: 'Note', count: statusCounts.with_notes }
               ] as const

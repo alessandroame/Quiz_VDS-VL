@@ -61,6 +61,14 @@ export const ExamScreen: React.FC<ExamScreenProps> = ({
   const [currentIndex, setCurrentIndex] = useState(0);
   const [answers, setAnswers] = useState<Record<number, 1 | 2 | 3>>({});
   const [flags, setFlags] = useState<Record<number, boolean>>({});
+  const answersRef = useRef(answers);
+  useEffect(() => {
+    answersRef.current = answers;
+  }, [answers]);
+  const flagsRef = useRef(flags);
+  useEffect(() => {
+    flagsRef.current = flags;
+  }, [flags]);
   const [secondsRemaining, setSecondsRemaining] = useState(45 * 60);
   const [elapsedSeconds, setElapsedSeconds] = useState(0);
   const [startTime, setStartTime] = useState(0);
@@ -311,11 +319,12 @@ export const ExamScreen: React.FC<ExamScreenProps> = ({
     if (!targetId) return;
 
     // In tutor mode, avoid changing an answer that has already been verified
-    if (examMode === 'tutor' && answers[targetId] !== undefined) {
+    if (examMode === 'tutor' && answersRef.current[targetId] !== undefined) {
       return;
     }
 
-    const updatedAnswers = { ...answers, [targetId]: ans };
+    const updatedAnswers = { ...answersRef.current, [targetId]: ans };
+    answersRef.current = updatedAnswers;
     setAnswers(updatedAnswers);
 
     // In tutor mode, record answer statistics immediately into Dexie
@@ -323,7 +332,11 @@ export const ExamScreen: React.FC<ExamScreenProps> = ({
       const targetQ = examQuestions.find(q => q.id === targetId) || currentQuestion;
       if (targetQ) {
         const isCorrect = ans === targetQ.correctAnswer;
-        await recordAnswer(targetId, isCorrect);
+        try {
+          await recordAnswer(targetId, isCorrect);
+        } catch (err) {
+          console.error(err);
+        }
         recordedQuestionIds.current.add(targetId);
 
         // Auto-advance on correct answer if enabled in settings
@@ -349,7 +362,7 @@ export const ExamScreen: React.FC<ExamScreenProps> = ({
       questionIds: examQuestions.map(q => q.id),
       currentIndex,
       answers: updatedAnswers,
-      flags,
+      flags: flagsRef.current,
       secondsRemaining: examMode === 'tutor' ? elapsedSeconds : secondsRemaining,
       startTime,
       isMarathon,
@@ -360,7 +373,8 @@ export const ExamScreen: React.FC<ExamScreenProps> = ({
   const handleToggleFlag = (qid?: number) => {
     const targetId = qid ?? currentQuestion?.id;
     if (!targetId) return;
-    const updatedFlags = { ...flags, [targetId]: !flags[targetId] };
+    const updatedFlags = { ...flagsRef.current, [targetId]: !flagsRef.current[targetId] };
+    flagsRef.current = updatedFlags;
     setFlags(updatedFlags);
 
     persistActiveSession({
@@ -368,7 +382,7 @@ export const ExamScreen: React.FC<ExamScreenProps> = ({
       examMode,
       questionIds: examQuestions.map(q => q.id),
       currentIndex,
-      answers,
+      answers: answersRef.current,
       flags: updatedFlags,
       secondsRemaining: examMode === 'tutor' ? elapsedSeconds : secondsRemaining,
       startTime,
