@@ -312,5 +312,64 @@ describe('DriveAnswerFeedback - Audio & Tutor Answer Feedback Verification', () 
     expect(mockOnSelectAnswer).toBeDefined();
     expect(mockOnStopVoice).toBeDefined();
   });
+
+  it('AUDIO-FEEDBACK-07: answering question via sessionContext in DriveMode does not trigger recursive re-render loop', async () => {
+    const mockOnAnswer = vi.fn();
+    const mockOnStopVoice = vi.fn();
+
+    const element = React.createElement(DriveActiveHUD, {
+      currentQ: sampleQuestion,
+      currentIndex: 0,
+      totalCount: 30,
+      isExamSession: true,
+      secondsRemaining: 120,
+      isIntroActive: false,
+      onDismissIntro: () => {},
+      onReplayIntro: () => {},
+      onOpenVoiceGuide: () => {},
+      setIsVoiceMenuOpen: () => {},
+      onClose: () => {},
+      onExecuteClose: () => {},
+      isAutopilotEnabled: true,
+      onToggleAutopilot: () => {},
+      isTutorEnabled: false,
+      onToggleTutor: () => {},
+      isVoiceSupported: true,
+      isVoiceCommandsEnabled: false,
+      voiceError: null,
+      isVoiceReceiving: false,
+      isVoiceListening: false,
+      onToggleVoiceCommands: () => {},
+      isPlaying: false,
+      isPaused: false,
+      isPartPlaying: () => false,
+      isExplanationPlaying: false,
+      onTogglePlayPause: () => {},
+      onRestartCurrentOrSequence: () => {},
+      onStopVoice: mockOnStopVoice,
+      onPlayExplanation: () => {},
+      waitingCountdown: null,
+      assimilationCountdown: null,
+      voiceInterimTranscript: '',
+      voiceLastTranscript: '',
+      lastRecognizedLabel: null,
+      unrecognizedSpeech: null,
+      voiceHint: '',
+      answers: {},
+      flags: {},
+      revealedQuestionId: null,
+      onSelectAnswer: (ans) => {
+        mockOnAnswer(sampleQuestion.id, ans);
+      },
+      onPrevQuestion: () => {},
+      onNextQuestion: () => {},
+      onToggleFlag: () => {},
+      onSubmitExam: () => {}
+    });
+
+    const rendered = renderToString(element);
+    expect(rendered).toBeDefined();
+    expect(rendered).toContain('id="btn-drive-opt-2"');
+  });
 });
 

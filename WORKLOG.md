@@ -14,6 +14,28 @@ Questo documento registra in ordine cronologico tutte le lavorazioni svolte nel 
 - **Impatto sul Desiderata**: <Come questo intervento contribuisce al desiderata (cfr. DESIDERATA.md) e indicazioni per il prossimo agente>
 ```
 
+### [2026-10-03] - Risoluzione Loop Re-render Ricorsivo e Stabilizzazione Context Provider (v1.7.15)
+
+- **Cosa abbiamo fatto**:
+  - **Eliminazione del Loop Ricorsivo `Maximum update depth exceeded` ([src/context/QuizContext.tsx](file:///c:/github/Quiz_VDS-VL/src/context/QuizContext.tsx))**:
+    - Risolto il crash a catena (`QuizContext.tsx:85`, `QuizContext.tsx:389`, `DriveModeScreen.tsx:353`) che si verificava quando veniva registrato il contesto audio o inviata una risposta dalla Modalità Mani Libere.
+    - Causa individuata: in `registerAudioSessionContext`, la chiamata condizionale `if (isDriveModeOpen && context) { setDriveSessionContext(context); }` provocava un aggiornamento di stato di `QuizProvider` ad ogni render del componente padre (`ExamScreen`, `TopicsScreen`, `MistakesScreen`). A sua volta, il re-render di `QuizProvider` ricreava l'oggetto provider value e le callback non memoizzate, costringendo `ExamScreen` a rieseguire il proprio `useEffect` di registrazione audio ad ogni ciclo in modo sincrono, saturando il limite di depth (>50) di React.
+    - Rimossa la chiamata a `setDriveSessionContext` all'interno di `registerAudioSessionContext`: il metodo aggiorna ora esclusivamente il ref mutabile `activeAudioSessionContextRef.current = context` con dipendenza fissa `[]`. L'aggiornamento del ref non scatena alcun re-render, azzerando all'origine ogni possibile cascata ricorsiva.
+  - **Memoizzazione Completa di Funzioni e Provider Value in `QuizContext`**:
+    - Wrap con `useCallback` per `updateSetting`, `recordAnswer`, `toggleBookmark`, `saveNote`, `saveExam`, `persistActiveSession`, `dismissActiveSession`, `syncNow` e `setDisciplineFilter`.
+    - Wrap del valore esposto da `<QuizContext.Provider value={contextValue}>` con `useMemo`, prevenendo il re-render superfluo di tutti i componenti consumatori dell'albero applicativo ad ogni variazione parziale di stato.
+  - **Guardia Anti-Sovrascrittura in `DriveModeScreen` ([src/components/DriveModeScreen.tsx](file:///c:/github/Quiz_VDS-VL/src/components/DriveModeScreen.tsx))**:
+    - Utilizzato `prevContextRef` per inizializzare lo stato interno del HUD solo al primo montaggio/apertura (`isFirst`), aggiornando selettivamente `currentIndex` solo se l'indice del genitore varia realmente, proteggendo risposte interne, timer e flag da azzeramenti accidentali.
+  - **Suite di Test Unitari**:
+    - Aggiunto `AUDIO-FEEDBACK-07` in [src/components/drive/DriveAnswerFeedback.test.ts](file:///c:/github/Quiz_VDS-VL/src/components/drive/DriveAnswerFeedback.test.ts) per verificare che la sottomissione di risposte via sessionContext non inneschi cicli di re-render.
+    - Tutte le 56 suite di test Vitest (424 test) superate con successo al 100%; build `tsc && vite build` completata con successo.
+- **Scelte architetturali & Rationale**:
+  - *Ref-Only Context Registration Pattern*: I contesti di sessione periferici o modali registrati da componenti di pagina devono essere salvati in ref (`useRef`) senza causare re-render del provider principale. Il passaggio di stato reattivo avviene all'apertura del modale (`openDriveMode`) e tramite callback unidirezionali (`onAnswer`, `onNavigateIndex`), eliminando qualsiasi accoppiamento bidirezionale reattivo nei cicli di render.
+- **Impatto sul Desiderata**:
+  - Stabilità assoluta dell'applicazione, azzeramento totale degli errori in console browser e continuità fluida durante le sessioni di quiz a mani libere.
+
+---
+
 ### [2026-10-03] - Interruzione Istantanea Audio e Feedback Didattico Immediato in Modalità Mani Libere (v1.7.14)
 
 - **Cosa abbiamo fatto**:

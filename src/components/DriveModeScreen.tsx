@@ -233,26 +233,35 @@ export const DriveModeScreen: React.FC<DriveModeScreenProps> = ({
   }, []);
 
   // Sincronizza stato iniziale all'apertura o cambio di context
+  const prevContextRef = useRef<DriveModeSessionContext | null>(null);
+
   useEffect(() => {
     if (!isOpen) {
       setInternalMode('launcher');
       prevQuestionIdRef.current = null;
       setIsQuestionSwitching(false);
+      prevContextRef.current = null;
       return;
     }
     if (sessionContext) {
-      setInternalQuestions(sessionContext.questions);
-      setCurrentIndex(sessionContext.currentIndex);
-      setAnswers(sessionContext.answers);
-      setFlags(sessionContext.flags);
-      setIsExamSession(sessionContext.isExam ?? false);
-      if (sessionContext.isTutor !== undefined) {
-        setIsTutorEnabled(sessionContext.isTutor);
+      const isFirst = !prevContextRef.current;
+      if (isFirst) {
+        setInternalQuestions(sessionContext.questions);
+        setCurrentIndex(sessionContext.currentIndex || 0);
+        setAnswers(sessionContext.answers || {});
+        setFlags(sessionContext.flags || {});
+        setIsExamSession(sessionContext.isExam ?? false);
+        if (sessionContext.isTutor !== undefined) {
+          setIsTutorEnabled(sessionContext.isTutor);
+        }
+        if (sessionContext.secondsRemaining !== undefined) {
+          setSecondsRemaining(sessionContext.secondsRemaining);
+        }
+        setInternalMode('running');
+      } else if (sessionContext.currentIndex !== undefined && sessionContext.currentIndex !== prevContextRef.current?.currentIndex) {
+        setCurrentIndex(sessionContext.currentIndex);
       }
-      if (sessionContext.secondsRemaining !== undefined) {
-        setSecondsRemaining(sessionContext.secondsRemaining);
-      }
-      setInternalMode('running');
+      prevContextRef.current = sessionContext;
     }
   }, [sessionContext, isOpen]);
 

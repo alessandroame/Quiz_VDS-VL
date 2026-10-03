@@ -81,10 +81,7 @@ export const QuizProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const registerAudioSessionContext = useCallback((context: DriveModeSessionContext | null) => {
     activeAudioSessionContextRef.current = context;
-    if (isDriveModeOpen && context) {
-      setDriveSessionContext(context);
-    }
-  }, [isDriveModeOpen]);
+  }, []);
 
 
 
@@ -139,10 +136,6 @@ export const QuizProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   // Backward-compatible discipline filter, permanently fixed to paraglider (474 questions)
   const disciplineFilter: Discipline = 'paraglider';
-
-  const setDisciplineFilter = async (discipline: Discipline) => {
-    await updateSetting('disciplinePreference', discipline);
-  };
 
   const filteredQuestions = questions;
 
@@ -210,16 +203,16 @@ export const QuizProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   }, [readinessScore, totalSeen, filteredQuestions.length, mistakesCount, sessions, statsList, filteredQuestionIdSet, isExamRunning]);
 
-  const updateSetting = async <K extends keyof AppSettings>(key: K, value: AppSettings[K]) => {
+  const updateSetting = useCallback(async <K extends keyof AppSettings>(key: K, value: AppSettings[K]) => {
     await setSetting(key, value);
     if (key === 'autoSyncDrive') {
       syncEngine.setAutoSyncEnabled(Boolean(value));
     } else {
       syncEngine.schedulePush();
     }
-  };
+  }, []);
 
-  const recordAnswer = async (
+  const recordAnswer = useCallback(async (
     questionId: number,
     isCorrect: boolean,
     selectedOption?: 1 | 2 | 3,
@@ -240,7 +233,7 @@ export const QuizProvider: React.FC<{ children: React.ReactNode }> = ({ children
         mode: mode || 'topics'
       });
     }
-  };
+  }, [questions]);
 
   const openDriveMode = useCallback((context?: DriveModeSessionContext) => {
     let targetContext = context ?? activeAudioSessionContextRef.current;
@@ -314,18 +307,18 @@ export const QuizProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   }, [isDriveModeOpen, filteredQuestions, recordAnswer]);
 
-  const toggleBookmark = async (questionId: number) => {
+  const toggleBookmark = useCallback(async (questionId: number) => {
     const res = await toggleQuestionBookmark(questionId);
     syncEngine.schedulePush();
     return res;
-  };
+  }, []);
 
-  const saveNote = async (questionId: number, note: string) => {
+  const saveNote = useCallback(async (questionId: number, note: string) => {
     await saveQuestionNote(questionId, note);
     syncEngine.schedulePush();
-  };
+  }, []);
 
-  const saveExam = async (session: ExamSession): Promise<number> => {
+  const saveExam = useCallback(async (session: ExamSession): Promise<number> => {
     const id = await db.sessions.add(session);
     await clearActiveSession();
     if (syncEngine.getState().isAutoSyncEnabled) {
@@ -383,62 +376,96 @@ export const QuizProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
 
     return id;
-  };
+  }, [questions, readinessScore]);
 
-  const persistActiveSession = async (session: InProgressSession) => {
+  const persistActiveSession = useCallback(async (session: InProgressSession) => {
     setIsLocallyDismissed(false);
     await saveActiveSession(session);
     syncEngine.schedulePush();
-  };
+  }, []);
 
-  const dismissActiveSession = async () => {
+  const dismissActiveSession = useCallback(async () => {
     voiceService.stop();
     setIsLocallyDismissed(true);
     await clearActiveSession();
     syncEngine.schedulePush();
-  };
+  }, []);
 
-  const syncNow = async (interactive = true) => {
+  const syncNow = useCallback(async (interactive = true) => {
     return await syncEngine.fullSync(interactive);
-  };
+  }, []);
+
+  const setDisciplineFilter = useCallback(async (discipline: Discipline) => {
+    await updateSetting('disciplinePreference', discipline);
+  }, [updateSetting]);
+
+  const contextValue = useMemo<QuizContextType>(() => ({
+    questions,
+    statsMap,
+    sessions,
+    settings,
+    isExamRunning,
+    setIsExamRunning,
+    isDriveModeOpen,
+    driveSessionContext,
+    activeAudioSessionContext: activeAudioSessionContextRef.current,
+    registerAudioSessionContext,
+    openDriveMode,
+    closeDriveMode,
+    toggleDriveMode,
+    updateSetting,
+    recordAnswer,
+    toggleBookmark,
+    saveNote,
+    saveExam,
+    totalSeen,
+    readinessScore,
+    mistakesCount,
+    bookmarksCount,
+    subjectsAnalytics,
+    activeSession,
+    persistActiveSession,
+    dismissActiveSession,
+    syncState,
+    syncNow,
+    disciplineFilter,
+    setDisciplineFilter,
+    filteredQuestions,
+    isSettingsLoaded
+  }), [
+    questions,
+    statsMap,
+    sessions,
+    settings,
+    isExamRunning,
+    isDriveModeOpen,
+    driveSessionContext,
+    registerAudioSessionContext,
+    openDriveMode,
+    closeDriveMode,
+    toggleDriveMode,
+    updateSetting,
+    recordAnswer,
+    toggleBookmark,
+    saveNote,
+    saveExam,
+    totalSeen,
+    readinessScore,
+    mistakesCount,
+    bookmarksCount,
+    subjectsAnalytics,
+    activeSession,
+    persistActiveSession,
+    dismissActiveSession,
+    syncState,
+    syncNow,
+    setDisciplineFilter,
+    filteredQuestions,
+    isSettingsLoaded
+  ]);
 
   return (
-    <QuizContext.Provider
-      value={{
-        questions,
-        statsMap,
-        sessions,
-        settings,
-        isExamRunning,
-        setIsExamRunning,
-        isDriveModeOpen,
-        driveSessionContext,
-        activeAudioSessionContext: activeAudioSessionContextRef.current,
-        registerAudioSessionContext,
-        openDriveMode,
-        closeDriveMode,
-        toggleDriveMode,
-        updateSetting,
-        recordAnswer,
-        toggleBookmark,
-        saveNote,
-        saveExam,
-        totalSeen,
-        readinessScore,
-        mistakesCount,
-        bookmarksCount,
-        subjectsAnalytics,
-        activeSession,
-        persistActiveSession,
-        dismissActiveSession,
-        syncState,
-        syncNow,
-        disciplineFilter,
-        setDisciplineFilter,
-        filteredQuestions,
-        isSettingsLoaded
-      }}
-    >
+    <QuizContext.Provider value={contextValue}>
       {children}
     </QuizContext.Provider>
   );
