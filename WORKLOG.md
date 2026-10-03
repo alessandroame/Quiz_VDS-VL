@@ -14,6 +14,21 @@ Questo documento registra in ordine cronologico tutte le lavorazioni svolte nel 
 - **Impatto sul Desiderata**: <Come questo intervento contribuisce al desiderata (cfr. DESIDERATA.md) e indicazioni per il prossimo agente>
 ```
 
+### [2026-10-03] - Vincolo di Sicurezza: Divieto Assoluto di Git Push Autonomo
+
+- **Cosa abbiamo fatto**:
+  - **Recepimento Direttiva Utente & Self-Correction Loop**:
+    - Recepito il divieto categorico e vincolante di eseguire `git push` in autonomia o di propria iniziativa da parte dell'agente.
+    - Aggiornata la memoria permanente ([MEMORY.md](file:///c:/github/Quiz_VDS-VL/MEMORY.md), sezioni 4 e 8) con la regola esplicita che vieta il push automatico.
+    - Aggiornato il regolamento operativo centrale ([.agents/AGENTS.md](file:///c:/github/Quiz_VDS-VL/.agents/AGENTS.md), punto 10) e i vincoli architetturali ([.agents/rules/constraints.md](file:///c:/github/Quiz_VDS-VL/.agents/rules/constraints.md), sezioni 4 e 5).
+    - Aggiornata la skill Git ([.agents/skills/git-pro/SKILL.md](file:///c:/github/Quiz_VDS-VL/.agents/skills/git-pro/SKILL.md), sezione 8) specificando che tutte le operazioni (staging chirurgico, commit atomici, bump SemVer) si fermano rigorosamente nel repository locale e che `git push` è riservato all'utente o eseguibile solo su esplicito e diretto comando.
+- **Scelte architetturali & Rationale**:
+  - *User-Controlled Deployment Pattern*: Evitare pubblicazioni remote indesiderate o disallineamenti con il remote mantenendo il controllo del comando `git push` nelle mani esclusive dell'utente, prevenendo deployment prematuri o non supervisionati su GitHub Pages.
+- **Impatto sul Desiderata**:
+  - Massima sicurezza e controllo da parte dell'utente sul flusso di pubblicazione e rilascio.
+
+---
+
 ### [2026-10-03] - Risoluzione Mancata Comparsa 'Leggi tutto' su Risposte Troncate in Modalità Mani Libere (v1.7.17)
 
 - **Cosa abbiamo fatto**:

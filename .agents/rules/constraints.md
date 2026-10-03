@@ -30,6 +30,7 @@
   - In sessione singola su `main`: registrare direttamente in [WORKLOG.md](file:///c:/github/Quiz_VDS-VL/WORKLOG.md).
   - Allineare sempre lo stato in [DESIDERATA.md](file:///c:/github/Quiz_VDS-VL/DESIDERATA.md).
 - **Staging Chirurgico Obbligatorio & Divieto `git add .`**: È fatto espresso divieto di usare `git add .`, `git add -A` o `git commit -a`. Aggiungere esclusivamente i file correlati al singolo argomento ed eseguire `git diff --cached --stat` prima del commit.
+- **Divieto Assoluto di Git Push Autonomo**: L'agente NON DEVE MAI eseguire `git push` in autonomia. Tutto lo sviluppo e i commit avvengono in locale. Il push su remote (`origin`) è sotto il controllo esclusivo dell'utente, oppure viene lanciato dall'agente solo su richiesta esplicita.
 - **Isolamento Sessioni Parallele**: In caso di task concorrenti, operare sempre in un Git Worktree dedicato (`.worktrees/<topic>`) per azzerare collisioni di file, lock Git e falsi fallimenti nei test.
 - **Allineamento Continuo del README.md**: Ogni volta che vengono introdotte nuove funzionalità o modificate quelle esistenti, aggiornare tempestivamente il [README.md](file:///c:/github/Quiz_VDS-VL/README.md) per mantenere la documentazione utente allineata allo stato del software.
 - **Divieto di Amnesia e Inizio al Buio**: Nessun agente può avviare modifiche senza consultare prima la triade di conoscenza ([DESIDERATA.md](file:///c:/github/Quiz_VDS-VL/DESIDERATA.md), [MEMORY.md](file:///c:/github/Quiz_VDS-VL/MEMORY.md), [WORKLOG.md](file:///c:/github/Quiz_VDS-VL/WORKLOG.md)), né può chiudere un task senza aver documentato il lavoro svolto per chi subentrerà.
@@ -37,7 +38,7 @@
 ## 5. Versionamento e Tracciabilità di Build (SemVer & Mobile Verifiability)
 - **Doppio Canale Build vs Release**:
   - **Locale & Commit**: Ad ogni commit, Git (`git rev-list --count HEAD` e `git rev-parse --short HEAD`) fornisce identificazione univoca automatica e progressiva (`__APP_BUILD_NUMBER__`, `__APP_COMMIT_HASH__`). Non modificare `package.json` nei micro-commit atomici.
-  - **Push & Milestone**: Prima del push o completamento di milestone, avanzare la versione semantica in `package.json` (`patch` o `minor`) e generare il commit convenzionale `chore(release): bump version to X.Y.Z`.
+  - **Release & Milestone**: Prima della release o completamento di milestone, avanzare la versione semantica in `package.json` (`patch` o `minor`) e generare il commit convenzionale `chore(release): bump version to X.Y.Z`. Non eseguire push autonomo.
 - **Accessibilità Mobile Obbligatoria**:
   - Il badge `#app-version-badge` deve restare visibile (`inline-flex`) anche su smartphone a 390px.
   - Il badge deve essere interattivo (apertura del modal diagnostico `BuildInfoModal` con dettagli build e tasto per forzare l'aggiornamento e la pulizia cache della PWA).

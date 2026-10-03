@@ -177,8 +177,8 @@ Per consentire sia lo sviluppo rapido in locale sia la verifica immediata su sma
 - Non è necessario (ed è sconsigliato) modificare `package.json` su ogni micro-commit atomico: questo evita merge conflict su branch paralleli e mantiene pulita la cronologia.
 - Quando si prova l'app in locale (`npm run dev` o smartphone connesso alla rete locale), il contatore e l'hash identificano con precisione matematica il commit esatto in esecuzione.
 
-### B. Livello Push / Integrazione (SemVer Ufficiale)
-- Prima di eseguire il `push` su `origin/main` o alla conclusione di una lavorazione / traguardo:
+### B. Livello Release / Integrazione (SemVer Ufficiale)
+- Alla conclusione di una lavorazione o traguardo (prima che l'utente effettui il push su `origin/main`):
   1. Avanzare la versione in `package.json`:
      - **`patch`** (es. `1.1.0` -> `1.1.1`): bug fix, rifiniture UI, correzioni dati quiz o audio, test.
      - **`minor`** (es. `1.1.0` -> `1.2.0`): nuove funzionalità, nuove schermate o flussi operativi completi.
@@ -190,4 +190,12 @@ Per consentire sia lo sviluppo rapido in locale sia la verifica immediata su sma
      ```
   3. Eseguire la verifica di build (`npm run build`) e test (`npm run test:unit`).
   4. L'integrazione su GitHub Pages compilerà con `fetch-depth: 0`, allineando il contatore di build e garantendo che la PWA offra la nuova versione con possibilità di forzare il refresh direttamente dal badge touch della UI.
+
+---
+
+## 8. Divieto Categorico di Git Push in Autonomia (User-Controlled Push)
+
+- **Controllo Utente Assoluto**: L'agente **NON DEVE MAI** eseguire `git push` di propria iniziativa o in autonomia al termine di un task, bugfix o release.
+- **Ambito Locale Stretto**: Tutte le operazioni di staging chirurgico, commit atomici, risoluzione conflitti, merge locali e bump di versione si fermano rigorosamente nel repository locale.
+- **Esecuzione su Richiesta Esplicita**: Il comando `git push` è riservato all'utente, oppure viene eseguito dall'agente **esclusivamente** quando l'utente impartisce un ordine esplicito e inequivocabile in chat (es. *"fai il push"*, *"pusha su main"*).
 
