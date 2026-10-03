@@ -14,6 +14,32 @@ Questo documento registra in ordine cronologico tutte le lavorazioni svolte nel 
 - **Impatto sul Desiderata**: <Come questo intervento contribuisce al desiderata (cfr. DESIDERATA.md) e indicazioni per il prossimo agente>
 ```
 
+### [2026-10-03] - Modalità Tutor Flessibile: Flash 10, Standard 30 e Continuo
+- **Cosa abbiamo fatto**:
+  - **Architettura Multi-Formato della Modalità Tutor**:
+    - Introdotto il tipo `TutorFormat = 'flash' | 'standard' | 'endless'` in `src/types/database.ts` e propagato in `ExamSession` e `InProgressSession`.
+    - Progettata e implementata la funzione pura `generateFlashTutorQuestions` in `src/utils/fairRandomizer.ts` che estrae 10 domande secondo il Fair Coverage Multi-Bucket bilanciato (prioritizzando domande mai viste Bucket 0, errori attivi Bucket 1, e domande con tasso d'errore elevato Bucket 2 con jitter casuale deterministico).
+    - Aggiunta la soglia di idoneità proporzionale del 90% (massimo 1 errore concesso su 10 quesiti) in `src/services/examEvaluator.ts` (`isPassingScore`).
+    - Aggiornato `evaluateExam` per valutare in modalità continua (`tutorFormat === 'endless'`) esclusivamente i quesiti a cui l'allievo ha effettivamente risposto, azzerando qualsiasi penalità per i quiz non visualizzati.
+    - Aggiornato `QuestionNavigator.tsx`: quando `tutorFormat === 'endless'`, la griglia a 30 slot viene sostituita da un compatto HUD avionico (`Quiz #X`, live `{correct} ✓ / {wrong} ✗` e percentuale di accuratezza in tempo reale).
+    - Aggiornata la schermata iniziale di Tutor in `ExamScreen.tsx`: selezione tattile a 3 card con Flash (10 Quiz) `#btn-start-tutor-flash`, Standard (30 Quiz) `#btn-start-tutor-exam` / `data-testid="btn-start-tutor-standard"`, e Continuo `#btn-start-tutor-endless`.
+    - Aggiunto il pulsante `[Continua (+10 Quiz)]` (`#btn-extend-flash-modal`) nella modale di conclusione della sessione Flash, consentendo all'allievo di estendere la sessione con un nuovo blocco di 10 quiz senza uscire dal flusso.
+    - Sincronizzata la ripresa delle sessioni in sospeso (`HomeScreen.tsx`, `App.tsx`, `SessionConflictModal`, `SessionInterruptModal`) con visualizzazione contestuale del formato (`Tutor Flash (10 Quiz)`, `Tutor Continuo`, `Tutor Standard (30 Quiz)`).
+  - **Suite di Test Unitari & Integrazione**:
+    - Aggiunti test `RAND-07`, `RAND-08`, `RAND-09` in `src/utils/fairRandomizer.test.ts`.
+    - Aggiunti test `EVAL-12` e `EVAL-13` in `src/services/examEvaluator.test.ts`.
+    - Creata la suite di test dedicata `src/components/ExamScreenTutorFormats.test.ts` con 3 test approfonditi (idle buttons, avvio ed estensione sessione Flash +10, e avvio sessione Continua con HUD avionico e debriefing privo di penalità).
+    - Tutte le 57 suite Vitest passanti al 100% (435 test passati, 0 errori).
+    - Build di produzione TypeScript e Vite completata con successo (`npm run build`).
+- **Scelte architetturali & Rationale**:
+  - **Microlearning e Pockets of Time**: Per sfruttare i buchi di tempo quotidiani da 3 a 5 minuti (trasporti, pause caffè), l'estrazione a 10 domande con Fair Coverage riduce il carico cognitivo dell'allievo senza compromettere la copertura delle 9 materie. L'azione rapida `[Continua (+10 Quiz)]` trasforma la sessione in un flusso estensibile a checkpoint incrementali.
+  - **Zero Penalità nel Flusso Continuo**: In modalità infinita, forzare il calcolo su tutti i 474 quiz del catalogo genererebbe falsi errori per le centinaia di quiz non visti. Valutare dinamicamente solo `answers[q.id] !== undefined` rispetta la promessa d'interfaccia di uscita libera in qualsiasi momento.
+  - **Retrocompatibilità e Contratti Test**: Il pulsante Standard (30 Quiz) ha mantenuto l'ID `#btn-start-tutor-exam` per preservare il 100% di compatibilità con tutte le suite di test e gli script CDP esistenti.
+- **Impatto sul Desiderata**:
+  - Pienamente implementato il requisito di usabilità e microlearning richiesto dall'utente, allineando `DESIDERATA.md` e `README.md`.
+
+---
+
 # Aggiornamento Registro di Bordo (2026-10-03) - Fix Consegna e Revisione Debriefing Tutor
 
 ## Cosa abbiamo fatto

@@ -337,4 +337,29 @@ describe('Suite 3: Motore di Valutazione Esame AeCI (src/services/examEvaluator.
     expect(failedFlash.wrongAnswers).toBe(2);
     expect(failedFlash.tutorFormat).toBe('flash');
   });
+
+  it('EVAL-13: should evaluate endless tutor sessions based only on answered questions without penalty for unvisited questions', () => {
+    // 50 questions in pool, user answers only 12 questions (11 correct, 1 wrong)
+    const pool = allQuestions.slice(0, 50);
+    const answers: Record<number, 1 | 2 | 3> = {};
+    for (let i = 0; i < 12; i++) {
+      const q = pool[i];
+      answers[q.id] = i === 0 ? ((q.correctAnswer === 1 ? 2 : 1) as 1 | 2 | 3) : q.correctAnswer;
+    }
+
+    const session = evaluateExam({
+      questions: pool,
+      answers,
+      durationSeconds: 300,
+      examMode: 'tutor',
+      tutorFormat: 'endless'
+    });
+
+    expect(session.totalQuestions).toBe(12);
+    expect(session.correctAnswers).toBe(11);
+    expect(session.wrongAnswers).toBe(1);
+    expect(session.snapshots.length).toBe(12);
+    expect(session.isPassed).toBe(true);
+    expect(session.tutorFormat).toBe('endless');
+  });
 });

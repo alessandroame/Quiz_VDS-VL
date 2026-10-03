@@ -65,10 +65,13 @@
 ### 3. Simulatore d'Esame & Simulazione Didattica (Tutor)
 - **Due Modalità di Simulazione Dedicate**:
   - 🎯 **Simulazione Didattica (Tutor - Consigliata per imparare)**:
-    - 30 quesiti estratti con le quote ministeriali AeCI tramite il *Fair Coverage Randomizer*.
+    - **Tre Formati d'Allenamento Flessibili a 1 Tocco**:
+      * ⚡ **Flash (10 Quiz)**: progettato per sfruttare i buchi di tempo quotidiani (3-5 minuti, pause caffè, trasporti) con selezione equilibrata ad alta priorità su quiz non ancora visti ed errori recenti. Include il checkpoint immediato `[Continua (+10 Quiz)]` nella modale di conclusione per prolungare la sessione al volo senza uscire. Criterio idoneità proporzionale al 90% (massimo 1 errore concesso).
+      * 🎯 **Standard (30 Quiz)**: allenamento canonico secondo le quote ufficiali d'esame AeCI (9 aerodinamica, 8 meteo, ecc.) per sessioni approfondite da 15-20 minuti.
+      * ♾️ **Continuo (Endless Stream)**: flusso ininterrotto ad alta priorità senza limiti di domande, con HUD avionico compatto (`Quiz #X`, statistiche live `✓ / ✗` e percentuale di accuratezza) al posto della griglia a 30 slot. L'allievo può concludere in qualsiasi momento senza alcuna penalità o conteggio d'errore sui quiz non visualizzati.
     - **Nessun limite di tempo**: studio rilassato senza countdown, con cronometro discreto del tempo trascorso.
     - **Verifica e Feedback Immediato**: alla selezione di una risposta, l'opzione viene validata all'istante (verde/rosso), con visualizzazione esplicita della soluzione esatta e della spiegazione contestuale didattica (**Regola** e **Tranello**).
-    - **Mappa Interattiva a 30 Bolle**: la griglia dei quesiti colora ciascuno slot in tempo reale (verde smeraldo per le risposte esatte, rosso per gli errori) consentendo un'analisi immediata del proprio rendimento.
+    - **Mappa Interattiva a 30 Bolle (Standard/Flash)**: la griglia dei quesiti colora ciascuno slot in tempo reale (verde smeraldo per le risposte esatte, rosso per gli errori) consentendo un'analisi immediata del proprio rendimento.
     - **Avanzamento Fluido a 1 Tocco & Auto-Advance su Risposta Esatta**:
       * In caso di risposta corretta, l'applicazione attende un intervallo percettivo di 900ms con conferma visiva verde smeraldo e avanza automaticamente alla domanda successiva, velocizzando le sessioni di studio sia in **Tutor**, sia in **Studio per Materie**, sia nel **Quaderno Errori**.
       * In caso di risposta errata, l'avanzamento automatico si arresta tassativamente per permettere all'allievo di consultare con calma la scheda didattica (**Regola** e **Tranello**).

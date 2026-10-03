@@ -21,16 +21,17 @@ export interface EvaluateExamParams {
  * - Esame Maratona (60 domande): max 6 errori (>= 54 risposte esatte)
  */
 export function isPassingScore(wrongCount: number, isMarathon = false, totalQuestions = 30): boolean {
+  if (totalQuestions <= 0) return true;
   if (totalQuestions <= 10) {
-    return wrongCount <= 1;
+    return totalQuestions >= 10 ? wrongCount <= 1 : wrongCount === 0;
   }
-  const maxErrors = isMarathon ? MAX_ALLOWED_ERRORS_MARATHON : MAX_ALLOWED_ERRORS_STANDARD;
+  const maxErrors = isMarathon ? MAX_ALLOWED_ERRORS_MARATHON : Math.max(1, Math.floor(totalQuestions * 0.1));
   return wrongCount <= maxErrors;
 }
 
 /**
  * Valuta deterministicamente una sessione d'esame.
- * Le domande non risposte o saltate vengono conteggiate come errate.
+ * Le domande non risposte o saltate vengono conteggiate come errate, tranne nel flusso continuo tutor.
  */
 export function evaluateExam({
   questions,
@@ -41,12 +42,17 @@ export function evaluateExam({
   examMode = isMarathon ? 'marathon' : 'official',
   tutorFormat
 }: EvaluateExamParams): ExamSession {
+  const evaluatedQuestions =
+    tutorFormat === 'endless'
+      ? questions.filter(q => answers[q.id] !== undefined)
+      : questions;
+
   let correctCount = 0;
   let wrongCount = 0;
   const subjectMap: Record<number, { total: number; correct: number; wrong: number }> = {};
   const snapshots: ExamQuestionSnapshot[] = [];
 
-  for (const q of questions) {
+  for (const q of evaluatedQuestions) {
     const userAns = answers[q.id];
     const isCorrect = userAns !== undefined && userAns === q.correctAnswer;
 
@@ -75,12 +81,13 @@ export function evaluateExam({
     });
   }
 
-  const isPassed = isPassingScore(wrongCount, isMarathon, questions.length);
+  const totalQuestions = evaluatedQuestions.length;
+  const isPassed = totalQuestions === 0 ? true : isPassingScore(wrongCount, isMarathon, totalQuestions);
 
   return {
     date: Date.now(),
     durationSeconds,
-    totalQuestions: questions.length,
+    totalQuestions,
     correctAnswers: correctCount,
     wrongAnswers: wrongCount,
     isPassed,
