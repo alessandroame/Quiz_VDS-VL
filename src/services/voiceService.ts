@@ -603,6 +603,40 @@ export class VoiceService {
     }
   }
 
+  /**
+   * Speaks a short spoken announcement/prompt via SpeechSynthesis in Italian.
+   * Cancels any active audio, speaks the message and invokes onEnd on completion.
+   */
+  public speakSpokenPrompt(text: string, onEnd?: () => void): void {
+    if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
+      try {
+        this.stop();
+        window.speechSynthesis.cancel();
+        const utterance = new SpeechSynthesisUtterance(text);
+        utterance.lang = 'it-IT';
+
+        const itVoice = this.getItalianSpeechVoice(this.effectiveVoice || this.voiceName);
+        if (itVoice) {
+          utterance.voice = itVoice;
+        }
+
+        utterance.rate = this.playbackRate;
+        utterance.onend = () => {
+          onEnd?.();
+        };
+        utterance.onerror = () => {
+          onEnd?.();
+        };
+        window.speechSynthesis.speak(utterance);
+      } catch (err) {
+        console.warn('Speech synthesis prompt error:', err);
+        onEnd?.();
+      }
+    } else {
+      onEnd?.();
+    }
+  }
+
   private clearSequence() {
     if (this.sequenceTimeout) {
       clearTimeout(this.sequenceTimeout);

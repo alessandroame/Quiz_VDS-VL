@@ -165,6 +165,36 @@ describe('Suite: voiceCommandParser (Parser comandi vocali Modalità Guida)', ()
     expect(parseVoiceCommand('modalita tutor')).toBe('toggle_tutor');
   });
 
+  it('VC-10: riconosce comandi di conclusione e consegna sessione', () => {
+    expect(parseVoiceCommand('consegna')).toBe('submit');
+    expect(parseVoiceCommand('consegna esame')).toBe('submit');
+    expect(parseVoiceCommand('consegna quiz')).toBe('submit');
+    expect(parseVoiceCommand('consegna la sessione')).toBe('submit');
+    expect(parseVoiceCommand('concludi')).toBe('submit');
+    expect(parseVoiceCommand('concludi sessione')).toBe('submit');
+    expect(parseVoiceCommand('concludi tutor')).toBe('submit');
+    expect(parseVoiceCommand('concludi esame')).toBe('submit');
+    expect(parseVoiceCommand('termina')).toBe('submit');
+    expect(parseVoiceCommand('termina sessione')).toBe('submit');
+    expect(parseVoiceCommand('termina quiz')).toBe('submit');
+    expect(parseVoiceCommand('fine sessione')).toBe('submit');
+    expect(parseVoiceCommand('chiudi sessione')).toBe('submit');
+  });
+
+  it('VC-11: riconosce comandi di conferma e annullamento per dialoghi di sicurezza', () => {
+    expect(parseVoiceCommand('conferma')).toBe('confirm');
+    expect(parseVoiceCommand('confermo')).toBe('confirm');
+    expect(parseVoiceCommand('si')).toBe('confirm');
+    expect(parseVoiceCommand('sì')).toBe('confirm');
+    expect(parseVoiceCommand('procedi')).toBe('confirm');
+    expect(parseVoiceCommand('esegui')).toBe('confirm');
+
+    expect(parseVoiceCommand('annulla')).toBe('cancel');
+    expect(parseVoiceCommand('annulla tutto')).toBe('cancel');
+    expect(parseVoiceCommand('no')).toBe('cancel');
+    expect(parseVoiceCommand('lascia stare')).toBe('cancel');
+  });
+
   it('VC-07: ignora input vuoti o frasi non correlate', () => {
     expect(parseVoiceCommand('')).toBeNull();
     expect(parseVoiceCommand('buongiorno')).toBeNull();

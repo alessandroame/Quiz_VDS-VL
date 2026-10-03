@@ -456,5 +456,127 @@ describe('DriveModeScreen - Tutor Mode Explanation Playback Contract', () => {
     // Answer is now successfully submitted
     expect(handleAnswer).toHaveBeenCalledWith(1002, 2);
   });
+
+  it('DRIVE-SUBMIT-TOP-01: clicking #btn-drive-submit-top in top bar opens confirmation modal', async () => {
+    const handleSubmit = vi.fn();
+    await act(async () => {
+      root.render(
+        React.createElement(DriveModeScreen, {
+          isOpen: true,
+          onClose: vi.fn(),
+          sessionContext: {
+            questions: [sampleQuestion],
+            currentIndex: 0,
+            answers: { 1001: 2 },
+            flags: {},
+            onAnswer: vi.fn(),
+            onToggleFlag: vi.fn(),
+            onNavigateIndex: vi.fn(),
+            isExam: true,
+            isTutor: true,
+            onSubmitExam: handleSubmit
+          }
+        })
+      );
+    });
+
+    const submitTopBtn = container.querySelector('#btn-drive-submit-top') as HTMLButtonElement;
+    expect(submitTopBtn).not.toBeNull();
+    expect(submitTopBtn.textContent).toContain('Concludi');
+
+    // Initially modal is not open
+    expect(container.querySelector('#drive-submit-modal')).toBeNull();
+
+    // Click submit in top bar
+    await act(async () => {
+      submitTopBtn.click();
+    });
+
+    // Modal is now open
+    const modal = container.querySelector('#drive-submit-modal');
+    expect(modal).not.toBeNull();
+    expect(container.querySelector('#drive-submit-title')?.textContent).toContain('Concludere la sessione?');
+    expect(container.querySelector('#btn-drive-confirm-submit')).not.toBeNull();
+    expect(container.querySelector('#btn-drive-cancel-submit')).not.toBeNull();
+  });
+
+  it('DRIVE-SUBMIT-CONFIRM-01: confirming submit in modal submits the session', async () => {
+    const handleSubmit = vi.fn();
+    await act(async () => {
+      root.render(
+        React.createElement(DriveModeScreen, {
+          isOpen: true,
+          onClose: vi.fn(),
+          sessionContext: {
+            questions: [sampleQuestion],
+            currentIndex: 0,
+            answers: { 1001: 2 },
+            flags: {},
+            onAnswer: vi.fn(),
+            onToggleFlag: vi.fn(),
+            onNavigateIndex: vi.fn(),
+            isExam: true,
+            isTutor: true,
+            onSubmitExam: handleSubmit
+          }
+        })
+      );
+    });
+
+    // Open modal
+    const submitTopBtn = container.querySelector('#btn-drive-submit-top') as HTMLButtonElement;
+    await act(async () => {
+      submitTopBtn.click();
+    });
+
+    // Click confirm
+    const confirmBtn = container.querySelector('#btn-drive-confirm-submit') as HTMLButtonElement;
+    expect(confirmBtn).not.toBeNull();
+    await act(async () => {
+      confirmBtn.click();
+    });
+
+    expect(handleSubmit).toHaveBeenCalled();
+  });
+
+  it('DRIVE-SUBMIT-CANCEL-01: cancelling submit closes modal without submitting', async () => {
+    const handleSubmit = vi.fn();
+    await act(async () => {
+      root.render(
+        React.createElement(DriveModeScreen, {
+          isOpen: true,
+          onClose: vi.fn(),
+          sessionContext: {
+            questions: [sampleQuestion],
+            currentIndex: 0,
+            answers: { 1001: 2 },
+            flags: {},
+            onAnswer: vi.fn(),
+            onToggleFlag: vi.fn(),
+            onNavigateIndex: vi.fn(),
+            isExam: true,
+            isTutor: true,
+            onSubmitExam: handleSubmit
+          }
+        })
+      );
+    });
+
+    // Open modal
+    const submitTopBtn = container.querySelector('#btn-drive-submit-top') as HTMLButtonElement;
+    await act(async () => {
+      submitTopBtn.click();
+    });
+
+    // Click cancel
+    const cancelBtn = container.querySelector('#btn-drive-cancel-submit') as HTMLButtonElement;
+    expect(cancelBtn).not.toBeNull();
+    await act(async () => {
+      cancelBtn.click();
+    });
+
+    expect(handleSubmit).not.toHaveBeenCalled();
+    expect(container.querySelector('#drive-submit-modal')).toBeNull();
+  });
 });
 

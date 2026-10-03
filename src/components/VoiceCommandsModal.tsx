@@ -106,6 +106,13 @@ export const VoiceCommandsModal: React.FC<VoiceCommandsModalProps> = ({
       description: 'Abilita la lettura didattica continua sincronizzata prima dell\'avanzamento automatico.'
     },
     {
+      icon: <CheckCircle2 className="w-5 h-5 text-emerald-400" />,
+      title: 'Concludi o Consegna',
+      primaryPhrase: '"Concludi" • "Consegna"',
+      alternatives: ['"Termina"', '"Fine sessione"', '"Conferma"', '"Annulla"'],
+      description: 'Termina la sessione o consegna l\'esame con dialogo vocale di conferma di sicurezza.'
+    },
+    {
       icon: <HelpCircle className="w-5 h-5 text-indigo-400" />,
       title: 'Guida Vocale',
       primaryPhrase: '"Aiuto"',

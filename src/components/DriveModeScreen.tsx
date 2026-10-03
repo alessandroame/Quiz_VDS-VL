@@ -52,6 +52,7 @@ const VOICE_HINTS = [
   'Dì "Avanti" o "Indietro" per scorrere i quesiti',
   'Dì "Pausa", "Stop" o "Continua" per l\'avanzamento automatico',
   'Dì "Bandiera" per contrassegnare il quiz',
+  'Dì "Concludi" o "Consegna" per terminare la sessione',
   'Dì "Aiuto" o "Comandi" per l\'elenco comandi a voce'
 ];
 
@@ -141,6 +142,11 @@ export const DriveModeScreen: React.FC<DriveModeScreenProps> = ({
   const [unrecognizedSpeech, setUnrecognizedSpeech] = useState<string | null>(null);
   const recognizedLabelTimerRef = useRef<any>(null);
   const unrecognizedTimerRef = useRef<any>(null);
+  const [isSubmitConfirmOpen, setIsSubmitConfirmOpen] = useState<boolean>(false);
+  const [isSpeakingPrompt, setIsSpeakingPrompt] = useState<boolean>(false);
+  const submitConfirmTimeoutRef = useRef<any>(null);
+  const isSubmitConfirmOpenRef = useRef<boolean>(false);
+  isSubmitConfirmOpenRef.current = isSubmitConfirmOpen;
 
   // Registra sub-modali interne con il coordinatore back navigation
   useEffect(() => {
@@ -207,6 +213,9 @@ export const DriveModeScreen: React.FC<DriveModeScreenProps> = ({
   const autoPlayTimerRef = useRef<any>(null);
   const handleNextQuestionRef = useRef<() => void>(() => {});
   const handleSubmitExamRef = useRef<() => Promise<void> | void>(() => {});
+  const handleConfirmSubmitRef = useRef<() => void>(() => {});
+  const handleCancelSubmitRef = useRef<() => void>(() => {});
+  const handleRequestSubmitRef = useRef<(viaVoice?: boolean) => void>(() => {});
   const touchStartXRef = useRef<number | null>(null);
   const touchStartYRef = useRef<number | null>(null);
 
@@ -630,7 +639,10 @@ export const DriveModeScreen: React.FC<DriveModeScreenProps> = ({
       tutor_on: 'Attiva Tutor',
       tutor_off: 'Disattiva Tutor',
       toggle_tutor: 'Tutor',
-      help: 'Guida Comandi'
+      help: 'Guida Comandi',
+      submit: 'Consegna / Concludi',
+      confirm: 'Conferma',
+      cancel: 'Annulla'
     };
 
     if (recognizedLabelTimerRef.current) clearTimeout(recognizedLabelTimerRef.current);
@@ -638,6 +650,24 @@ export const DriveModeScreen: React.FC<DriveModeScreenProps> = ({
     recognizedLabelTimerRef.current = setTimeout(() => {
       setLastRecognizedLabel(null);
     }, 2500);
+
+    // Gestione dialogo vocale di conferma per Consegna / Concludi
+    if (isSubmitConfirmOpenRef.current) {
+      if (cmd === 'confirm' || cmd === 'submit') {
+        showToast('🗣️ "Conferma"');
+        handleConfirmSubmitRef.current();
+      } else if (cmd === 'cancel' || cmd === 'resume') {
+        showToast('🗣️ "Annulla"');
+        handleCancelSubmitRef.current();
+      }
+      return;
+    }
+
+    if (cmd === 'submit') {
+      showToast('🗣️ "Concludi / Consegna"');
+      handleRequestSubmitRef.current(true);
+      return;
+    }
 
     if (cmd === 'repeat_question') {
       showToast('🗣️ "Ripeti Domanda"');
@@ -759,12 +789,14 @@ export const DriveModeScreen: React.FC<DriveModeScreenProps> = ({
   };
 
   // In speaker mode, suspend microphone during speech playback to prevent self-triggering from loudspeaker
-  const shouldSuspendVoiceCommands = shouldSuspendVoiceMic(audioOutputMode, {
-    isPlaying,
-    isSequencePlaying,
-    isDriveIntroPlaying,
-    isPaused
-  });
+  const shouldSuspendVoiceCommands =
+    isSpeakingPrompt ||
+    shouldSuspendVoiceMic(audioOutputMode, {
+      isPlaying,
+      isSequencePlaying,
+      isDriveIntroPlaying,
+      isPaused
+    });
 
   // Hook Comandi Vocali
   const {
@@ -810,7 +842,7 @@ export const DriveModeScreen: React.FC<DriveModeScreenProps> = ({
     }
   }, [internalMode, clearAllDriveTimers, stopVoice]);
 
-  // Consegna Esame
+  // Consegna Esame / Conclusione Sessione
   const handleSubmitExam = async () => {
     clearAllDriveTimers();
     stopVoice();
@@ -826,14 +858,25 @@ export const DriveModeScreen: React.FC<DriveModeScreenProps> = ({
       return;
     }
 
+    // Se la sessione proviene da una schermata di studio (es. TopicsScreen o MistakesScreen), chiamiamo onAbandonSession
+    if (sessionContext?.onAbandonSession) {
+      sessionContext.onAbandonSession();
+      onClose();
+      return;
+    }
+
     setInternalMode('debriefing');
+
+    const isEndlessTutor = internalQuestions.length > 30 || isTutorEnabled || !isExamSession;
 
     const session = evaluateExam({
       questions: internalQuestions,
       answers: effectiveAnswers,
       flags: effectiveFlags,
       durationSeconds,
-      isMarathon
+      isMarathon,
+      examMode: isMarathon ? 'marathon' : (isExamSession ? 'official' : 'tutor'),
+      tutorFormat: isEndlessTutor ? 'endless' : undefined
     });
 
     for (const snap of session.snapshots) {
@@ -847,6 +890,58 @@ export const DriveModeScreen: React.FC<DriveModeScreenProps> = ({
   };
 
   handleSubmitExamRef.current = handleSubmitExam;
+
+  const handleCancelSubmit = useCallback(() => {
+    if (submitConfirmTimeoutRef.current) {
+      clearTimeout(submitConfirmTimeoutRef.current);
+      submitConfirmTimeoutRef.current = null;
+    }
+    setIsSpeakingPrompt(false);
+    setIsSubmitConfirmOpen(false);
+    showToast('Sessione ripresa');
+  }, []);
+
+  const handleConfirmSubmit = useCallback(() => {
+    if (submitConfirmTimeoutRef.current) {
+      clearTimeout(submitConfirmTimeoutRef.current);
+      submitConfirmTimeoutRef.current = null;
+    }
+    setIsSpeakingPrompt(false);
+    setIsSubmitConfirmOpen(false);
+    handleSubmitExamRef.current();
+  }, []);
+
+  const handleRequestSubmit = useCallback((viaVoice = false) => {
+    clearAllDriveTimers();
+    stopVoice();
+    setIsAutopilotEnabled(false);
+    setIsSubmitConfirmOpen(true);
+
+    if (submitConfirmTimeoutRef.current) {
+      clearTimeout(submitConfirmTimeoutRef.current);
+      submitConfirmTimeoutRef.current = null;
+    }
+
+    // Safety timeout of 10s: auto-dismiss if no user input
+    submitConfirmTimeoutRef.current = setTimeout(() => {
+      handleCancelSubmit();
+    }, 10000);
+
+    if (viaVoice || isVoiceCommandsEnabled) {
+      const isTutor = isTutorEnabled || (sessionContext?.isTutor ?? !isExamSession) || Boolean(sessionContext?.title?.includes('Tutor'));
+      const promptText = isTutor
+        ? "Vuoi concludere la sessione? Dì Conferma per terminare, o Annulla per continuare."
+        : "Vuoi consegnare l'esame? Dì Conferma per consegnare, o Annulla per continuare.";
+      setIsSpeakingPrompt(true);
+      voiceService.speakSpokenPrompt(promptText, () => {
+        setIsSpeakingPrompt(false);
+      });
+    }
+  }, [clearAllDriveTimers, stopVoice, isVoiceCommandsEnabled, isTutorEnabled, sessionContext, isExamSession, handleCancelSubmit]);
+
+  handleConfirmSubmitRef.current = handleConfirmSubmit;
+  handleCancelSubmitRef.current = handleCancelSubmit;
+  handleRequestSubmitRef.current = handleRequestSubmit;
 
   // Keyboard Navigation per telecomandi Bluetooth da volante o tastierini
   useEffect(() => {
@@ -1035,6 +1130,8 @@ export const DriveModeScreen: React.FC<DriveModeScreenProps> = ({
     stopVoice();
     stopDriveIntro();
     setIsIntroActive(false);
+    setIsSubmitConfirmOpen(false);
+    setIsSpeakingPrompt(false);
     onClose();
   };
 
@@ -1152,6 +1249,10 @@ export const DriveModeScreen: React.FC<DriveModeScreenProps> = ({
           onNextQuestion={handleNextQuestion}
           onToggleFlag={handleToggleFlag}
           onSubmitExam={handleSubmitExam}
+          isSubmitConfirmOpen={isSubmitConfirmOpen}
+          onRequestSubmit={() => handleRequestSubmit(false)}
+          onConfirmSubmit={handleConfirmSubmit}
+          onCancelSubmit={handleCancelSubmit}
           isQuestionSwitching={isQuestionSwitching}
           isCooldownActive={isQuestionSwitching}
         />

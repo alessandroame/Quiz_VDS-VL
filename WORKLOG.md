@@ -14,6 +14,35 @@ Questo documento registra in ordine cronologico tutte le lavorazioni svolte nel 
 - **Impatto sul Desiderata**: <Come questo intervento contribuisce al desiderata (cfr. DESIDERATA.md) e indicazioni per il prossimo agente>
 ```
 
+### [2026-10-03] - Modalità Mani Libere: Conclusione e Consegna Sessione (Touch + Vocale) con Conferma Spoken
+- **Cosa abbiamo fatto**:
+  - **Riconoscimento Vocale Esteso**:
+    - Aggiunti i comandi `'submit' | 'confirm' | 'cancel'` all'unione `VoiceCommand` in `src/utils/voiceCommandParser.ts`.
+    - Definite espressioni regolari per intercettare variazioni italiane naturali: *"consegna"*, *"concludi"*, *"termina"*, *"fine sessione"* (`submit`), *"conferma"*, *"si"* (`confirm`), e *"annulla"*, *"no"* (`cancel`), collocate prioritariamente prima del toggle tutor generico.
+    - Implementati test unitari `VC-10` e `VC-11` in `src/utils/voiceCommandParser.test.ts`.
+  - **Interfaccia HUD e Modale di Sicurezza a Mani Libere (`DriveActiveHUD.tsx`)**:
+    - Aggiunto il pulsante `#btn-drive-submit-top` nell'header HUD: etichetta dinamica *"Concludi"* (per sessioni Tutor continuo/studio) o *"Consegna"* (per Esame Ufficiale AeCI a 30 quiz).
+    - Risolto il deficit semantico dell'icona cuffie: `#btn-drive-exit` ora adotta l'icona `Minimize2` con label chiara *"Vista Normale"*, eliminando l'ambiguità tra uscita dalla modalità audio e termine della sessione quiz.
+    - Implementato `DriveSubmitModal`: modale ad altissimo contrasto con comandi tattili generosi (`#btn-drive-confirm-submit`, `#btn-drive-cancel-submit`), visualizzazione del comando vocale atteso, listener tasto Escape e registrazione al coordinatore di navigazione indietro (`backNavigation`).
+  - **Coordinamento Vocale, Sintesi Vocale e Anti-Feedback Mic Gating (`DriveModeScreen.tsx`, `voiceService.ts`)**:
+    - Introdotta la funzione `speakSpokenPrompt` in `src/services/voiceService.ts` per pronunciare a voce alta: *"Vuoi concludere la sessione? Dì Conferma o Annulla"*.
+    - Progettata la macchina a stati per la conferma vocale: alla richiesta di submit (vocale o touch), si apre il modal, viene pronunciato il prompt vocale e viene avviato un timer di sicurezza di 10 secondi.
+    - Integrato `isSpeakingPrompt` nel gating del microfono (`shouldSuspendVoiceCommands`) per prevenire auto-inneschi e falsi positivi mentre l'app sta parlando, con riarmo a 250ms dalla conclusione del parlato.
+    - Se l'allievo dice *"Conferma"* (o preme il tasto), la sessione viene conclusa immediatamente; se dice *"Annulla"* (o scade il timeout), il modal si chiude e l'allievo prosegue senza interruzioni.
+    - Nel flusso di consegna anticipata in modalità continua (`isEndlessTutor`), viene passato `tutorFormat: 'endless'`, assicurando che il debriefing valuti unicamente i quiz risposti senza penalizzare quelli non visualizzati.
+  - **Aggiornamento Documentazione & Guida Comandi Vocali**:
+    - Aggiornato `VoiceCommandsModal.tsx` con la nuova sezione *"Concludi o Consegna"* (`"Consegna"`, `"Concludi"`, `"Termina"`).
+    - Aggiornati `README.md` e `DESIDERATA.md` (Sezione 7 e checklist funzionalità).
+    - Creati i test di integrazione `DRIVE-SUBMIT-TOP-01`, `DRIVE-SUBMIT-CONFIRM-01` e `DRIVE-SUBMIT-CANCEL-01` in `src/components/DriveModeScreen.test.ts`.
+- **Scelte architetturali & Rationale**:
+  - **Conferma a Due Fasi (Two-Step Verification) e Timeout di Sicurezza**: Nelle attività dinamiche (guida, corsa, bicicletta), rumori ambientali improvvisi o parole colloquiali potrebbero innescare accidentalmente il comando *"concludi"*. La richiesta vocale esplicita con finestra di ascolto limitata a 10s e comando *"conferma"* garantisce che l'allievo non perda mai involontariamente la propria sessione.
+  - **Distinzione Semantica Netta tra Ritorno a Vista Normale e Termine Sessione**: In precedenza, toccare l'icona con le cuffie non terminava la sessione ma faceva semplicemente collassare la modalità a schermo intero. L'aggiunta del pulsante visibile in alto a destra e il re-branding a *"Vista Normale"* rendono cristallina la differenza tra cambiare interfaccia e consegnare il quiz.
+  - **Sospensione Temporanea Microfono durante TTS**: Per evitare che il microfono catturi la propria voce di sintesi mentre formula la domanda di conferma, l'ascolto vocale viene abortito e riattivato solo quando la sintesi termina, scongiurando loop di parsing fantasma.
+- **Impatto sul Desiderata**:
+  - Risolta la frizione fondamentale di utilizzo della modalità continua a mani libere (Tutor Continuo su 474 quiz): ora l'allievo può interrompere lo studio in qualsiasi momento con un semplice comando vocale o un singolo tocco, atterrando direttamente sul debriefing con il calcolo esatto delle risposte fornite.
+
+---
+
 ### [2026-10-03] - Modalità Tutor Flessibile: Flash 10, Standard 30 e Continuo
 - **Cosa abbiamo fatto**:
   - **Architettura Multi-Formato della Modalità Tutor**:

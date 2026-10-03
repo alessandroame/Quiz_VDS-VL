@@ -17,6 +17,7 @@ import {
   Square,
   GraduationCap,
   Headphones,
+  Minimize2,
   ChevronDown,
   ChevronUp
 } from 'lucide-react';
@@ -25,6 +26,7 @@ import { formatTime } from '../../utils/timer';
 import { OfflineHUDTag } from '../OfflineIndicator';
 import { VoiceQuickMenu } from '../VoiceQuickMenu';
 import { voiceService } from '../../services/voiceService';
+import { backNavigation } from '../../utils/backNavigation';
 import type { DriveModeSessionContext } from '../DriveModeScreen';
 
 export interface DriveActiveHUDProps {
@@ -79,6 +81,10 @@ export interface DriveActiveHUDProps {
   onNextQuestion: () => void;
   onToggleFlag: () => void;
   onSubmitExam: () => void;
+  isSubmitConfirmOpen?: boolean;
+  onRequestSubmit?: () => void;
+  onConfirmSubmit?: () => void;
+  onCancelSubmit?: () => void;
   isQuestionSwitching?: boolean;
   isCooldownActive?: boolean;
 }
@@ -89,6 +95,7 @@ export const DriveActiveHUD: React.FC<DriveActiveHUDProps> = ({
   totalCount,
   isExamSession,
   secondsRemaining,
+  sessionContext,
   isIntroActive,
   onDismissIntro,
   onReplayIntro,
@@ -132,12 +139,42 @@ export const DriveActiveHUD: React.FC<DriveActiveHUDProps> = ({
   onNextQuestion,
   onToggleFlag,
   onSubmitExam,
+  isSubmitConfirmOpen = false,
+  onRequestSubmit,
+  onConfirmSubmit = onSubmitExam,
+  onCancelSubmit = () => {},
   isQuestionSwitching = false,
   isCooldownActive = false
 }) => {
   const isCurrentRevealed =
     revealedQuestionId === currentQ.id || answers[currentQ.id] !== undefined;
   const isLocked = isCurrentRevealed || isCooldownActive || isQuestionSwitching;
+
+  const isTutorSession =
+    isTutorEnabled ||
+    (sessionContext?.isTutor ?? !isExamSession) ||
+    Boolean(sessionContext?.title?.includes('Tutor'));
+
+  // Synchronize modal dismiss on Escape or Enter confirm
+  React.useEffect(() => {
+    if (!isSubmitConfirmOpen) return;
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        onCancelSubmit();
+      } else if (e.key === 'Enter') {
+        onConfirmSubmit();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isSubmitConfirmOpen, onCancelSubmit, onConfirmSubmit]);
+
+  // Synchronize with back navigation coordinator
+  React.useEffect(() => {
+    if (!isSubmitConfirmOpen) return;
+    const unregister = backNavigation.registerSubModal('drive-submit-modal', onCancelSubmit);
+    return () => unregister();
+  }, [isSubmitConfirmOpen, onCancelSubmit]);
 
   // DOM element refs for accurate overflow / truncation measurement
   const questionTextRef = React.useRef<HTMLHeadingElement | null>(null);
@@ -329,17 +366,29 @@ export const DriveActiveHUD: React.FC<DriveActiveHUDProps> = ({
           <OfflineHUDTag />
         </div>
 
-        {/* Destra: Tasto Cuffia (stessa posizione della Navbar) + Controlli Audio */}
+        {/* Destra: Tasto Concludi/Consegna + Tasto Vista Classica + Controlli Audio */}
         <div className="flex items-center gap-1 sm:gap-1.5 flex-shrink-0">
-          {/* Tasto Ritorno a Vista Normale (posizionato a destra in corrispondenza del pulsante Mani Libere della Navbar) */}
+          {/* Tasto Concludi / Consegna Rapido (sempre accessibile sia in Tutor Continuo che Esame) */}
+          <button
+            id="btn-drive-submit-top"
+            onClick={onRequestSubmit || onSubmitExam}
+            className="px-2 py-1 sm:px-2.5 sm:py-1.5 rounded-xl bg-emerald-600/90 hover:bg-emerald-500 text-white font-black text-xs flex items-center gap-1 shadow-sm transition-all active:scale-95 flex-shrink-0"
+            title={isTutorSession ? 'Concludi la sessione di studio' : 'Consegna la prova d\'esame'}
+            aria-label={isTutorSession ? 'Concludi sessione' : 'Consegna esame'}
+          >
+            <CheckCircle2 className="w-3.5 h-3.5" />
+            <span>{isTutorSession ? 'Concludi' : 'Consegna'}</span>
+          </button>
+
+          {/* Tasto Ritorno a Vista Normale (esci da fullscreen hands-free) */}
           <button
             id="btn-drive-exit"
             onClick={onExecuteClose}
-            className="p-1.5 sm:px-3 sm:py-1.5 rounded-xl border border-amber-500 bg-amber-500/20 text-amber-300 light:bg-amber-100 light:border-amber-400 light:text-amber-800 font-bold flex items-center gap-1.5 transition-all flex-shrink-0 shadow-sm active:scale-95"
-            title="Torna alla vista normale del quiz"
-            aria-label="Torna alla vista normale"
+            className="p-1.5 sm:px-3 sm:py-1.5 rounded-xl border border-zinc-700 bg-zinc-800/80 hover:bg-zinc-700 text-zinc-300 hover:text-white light:bg-slate-100 light:border-slate-300 light:text-slate-700 font-bold flex items-center gap-1 transition-all flex-shrink-0 shadow-sm active:scale-95 text-xs"
+            title="Torna alla visualizzazione normale del quiz"
+            aria-label="Torna alla visualizzazione normale"
           >
-            <Headphones className="w-4 h-4 text-amber-400 light:text-amber-700" />
+            <Minimize2 className="w-3.5 h-3.5 text-zinc-400 light:text-slate-600" />
             <span className="hidden sm:inline">Vista Normale</span>
           </button>
 
@@ -1027,6 +1076,70 @@ export const DriveActiveHUD: React.FC<DriveActiveHUDProps> = ({
           </button>
         )}
       </div>
+
+      {/* Modale Hands-Free di Conferma Consegna / Conclusione */}
+      {isSubmitConfirmOpen && (
+        <div
+          id="drive-submit-modal"
+          className="fixed inset-0 z-[70] bg-black/85 backdrop-blur-sm flex items-center justify-center p-4 select-none animate-in fade-in duration-150"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="drive-submit-title"
+          onClick={onCancelSubmit}
+        >
+          <div
+            className="bg-zinc-900 border-2 border-emerald-500/60 light:bg-white light:border-emerald-600 rounded-3xl p-5 sm:p-6 max-w-sm w-full space-y-4 shadow-2xl text-center animate-in zoom-in-95"
+            onClick={e => e.stopPropagation()}
+          >
+            <div className="w-12 h-12 rounded-2xl bg-emerald-500/20 text-emerald-400 light:bg-emerald-100 light:text-emerald-700 flex items-center justify-center mx-auto">
+              <CheckCircle2 className="w-7 h-7" />
+            </div>
+
+            <div>
+              <h3 id="drive-submit-title" className="text-lg font-black text-white light:text-slate-900">
+                {isTutorSession ? 'Concludere la sessione?' : 'Consegnare l\'esame?'}
+              </h3>
+              <p className="text-xs text-zinc-300 light:text-slate-600 mt-1 leading-relaxed">
+                {isTutorSession
+                  ? `Hai risposto a ${Object.keys(answers).length} domande su ${totalCount}. I progressi e gli errori saranno salvati nel riepilogo.`
+                  : `Hai risposto a ${Object.keys(answers).length} domande su ${totalCount}. I quesiti non risposti conteranno come errati.`}
+              </p>
+            </div>
+
+            {/* Banner Istruzioni Vocali (se comandi attivi) */}
+            {isVoiceCommandsEnabled && (
+              <div className="p-2.5 rounded-xl bg-emerald-950/40 border border-emerald-700/60 light:bg-emerald-50 light:border-emerald-300 text-xs flex items-center justify-center gap-2">
+                <Mic className="w-4 h-4 text-emerald-400 animate-pulse flex-shrink-0" />
+                <span className="text-emerald-200 light:text-emerald-800 font-medium">
+                  Dì <strong>"Conferma"</strong> per terminare, o <strong>"Annulla"</strong>
+                </span>
+              </div>
+            )}
+
+            {/* Macro-Pulsanti Tattili */}
+            <div className="space-y-2 pt-2">
+              <button
+                type="button"
+                id="btn-drive-confirm-submit"
+                onClick={onConfirmSubmit}
+                className="w-full py-3.5 rounded-2xl bg-emerald-600 hover:bg-emerald-500 text-white font-black text-sm flex items-center justify-center gap-2 shadow-lg shadow-emerald-950/40 active:scale-[0.98] transition-transform"
+              >
+                <CheckCircle2 className="w-5 h-5" />
+                <span>{isTutorSession ? 'Conferma e Concludi' : 'Conferma e Consegna'}</span>
+              </button>
+
+              <button
+                type="button"
+                id="btn-drive-cancel-submit"
+                onClick={onCancelSubmit}
+                className="w-full py-3 rounded-2xl bg-zinc-800 hover:bg-zinc-700 text-zinc-300 hover:text-white light:bg-slate-100 light:hover:bg-slate-200 light:text-slate-700 font-bold text-xs flex items-center justify-center gap-1.5 active:scale-[0.98] transition-transform"
+              >
+                <span>Continua il Quiz</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

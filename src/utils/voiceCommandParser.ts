@@ -17,7 +17,10 @@ export type VoiceCommand =
   | 'tutor_on'
   | 'tutor_off'
   | 'toggle_tutor'
-  | 'help';
+  | 'help'
+  | 'submit'
+  | 'confirm'
+  | 'cancel';
 
 /**
  * Deterministic parser for Italian voice commands in Drive Mode.
@@ -116,7 +119,22 @@ export function parseVoiceCommand(raw: string): VoiceCommand | null {
     return 'flag';
   }
 
-  // 5. Tutor Mode activation / deactivation / toggle (prioritized before generic start/stop)
+  // 5. Session Finish / Submit (prioritized before tutor/pause/stop)
+  // Matches: "consegna", "consegna esame", "concludi", "concludi sessione", "termina", "termina sessione", "fine sessione"
+  if (/\b(consegna(\s+(la\s+)?(sessione|prova|quiz|esame))?|concludi(\s+(la\s+)?(sessione|prova|quiz|esame|tutor))?|termina(\s+(la\s+)?(sessione|prova|quiz|esame))?|fine\s+sessione|chiudi\s+sessione)\b/i.test(clean)) {
+    return 'submit';
+  }
+
+  // 6. Confirmation and Cancellation (for voice confirmation dialogues)
+  if (/^(conferma|confermo|si|procedi|esegui)\b/i.test(clean)) {
+    return 'confirm';
+  }
+
+  if (/^(annulla|annulla tutto|no|lascia stare)\b/i.test(clean)) {
+    return 'cancel';
+  }
+
+  // 7. Tutor Mode activation / deactivation / toggle
   if (/\b(attiva tutor|abilita tutor|avvia tutor|accendi tutor|tutor on|metti tutor)\b/i.test(clean)) {
     return 'tutor_on';
   }
@@ -129,13 +147,13 @@ export function parseVoiceCommand(raw: string): VoiceCommand | null {
     return 'toggle_tutor';
   }
 
-  // 6. Explanation and Didactics (Regola / Tranello)
+  // 8. Explanation and Didactics (Regola / Tranello)
   // Matches: "spiega", "spiegami", "spiegazione", "regola", "la regola", "tranello", "il tranello", "perche", "motivo"
   if (/\b(spiega|spiegami|spiegazione|regola|la regola|tranello|il tranello|perche|motivo)\b/i.test(clean)) {
     return 'explain';
   }
 
-  // 7. Autopilot Control (Pause / Stop / Play)
+  // 9. Autopilot Control (Pause / Stop / Play)
   if (/\b(stop|ferma|basta|azzera|interrompi)\b/i.test(clean)) {
     return 'stop';
   }
@@ -148,7 +166,7 @@ export function parseVoiceCommand(raw: string): VoiceCommand | null {
     return 'resume';
   }
 
-  // 8. Help and Contextual Guide
+  // 10. Help and Contextual Guide
   // Matches: "aiuto", "guida", "comandi", "istruzioni", "tutorial", "cosa posso dire", "help"
   if (/\b(aiuto|guida|comandi|istruzioni|tutorial|cosa posso dire|help)\b/i.test(clean)) {
     return 'help';
