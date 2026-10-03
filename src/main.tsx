@@ -3,7 +3,7 @@ import ReactDOM from 'react-dom/client';
 import App from './App';
 import './index.css';
 import { audioDownloadManager } from './services/audioDownloadManager';
-import { APP_NAME } from './utils/buildInfo';
+import { APP_NAME, getBuildInfo, BUILD_INFO_UPDATED_EVENT } from './utils/buildInfo';
 
 // In development mode, unregister any stale service workers to prevent cache interception
 if (import.meta.env.DEV && typeof window !== 'undefined' && 'serviceWorker' in navigator) {
@@ -16,25 +16,33 @@ if (import.meta.env.DEV && typeof window !== 'undefined' && 'serviceWorker' in n
 }
 
 // Log build info to browser console for verification and cache invalidation diagnosis
-const buildInfo = {
-  version: typeof __APP_VERSION__ !== 'undefined' ? __APP_VERSION__ : '1.0.0',
-  buildNumber: typeof __APP_BUILD_NUMBER__ !== 'undefined' ? __APP_BUILD_NUMBER__ : '0',
-  commitHash: typeof __APP_COMMIT_HASH__ !== 'undefined' ? __APP_COMMIT_HASH__ : 'dev',
-  buildTime: typeof __APP_BUILD_TIME__ !== 'undefined' ? __APP_BUILD_TIME__ : new Date().toISOString(),
-  buildId: typeof __APP_BUILD_ID__ !== 'undefined' ? __APP_BUILD_ID__ : 'dev',
+const logBuildInfo = (info: ReturnType<typeof getBuildInfo>, isLiveUpdate = false) => {
+  const prefix = isLiveUpdate ? `[${APP_NAME} Dev Live]` : `[${APP_NAME}]`;
+  const badgeBg = isLiveUpdate ? '#059669' : '#0284c7';
+  console.log(
+    `%c${prefix}%c v${info.version} (Build #${info.buildNumber} • ${info.commitHash}) - Built: ${info.buildTime}`,
+    `background: ${badgeBg}; color: #ffffff; font-weight: bold; padding: 2px 6px; border-radius: 4px;`,
+    'color: #38bdf8; font-weight: bold; margin-left: 4px;'
+  );
+  console.log(`[VDS-VL Build ID] ${info.buildId}`);
 };
 
-if (typeof window !== 'undefined') {
-  window.__APP_BUILD_INFO__ = buildInfo;
-  (window as any).audioDownloadManager = audioDownloadManager;
-}
+const initialBuildInfo = getBuildInfo();
 
-console.log(
-  `%c[${APP_NAME}]%c v${buildInfo.version} (Build #${buildInfo.buildNumber} • ${buildInfo.commitHash}) - Built: ${buildInfo.buildTime}`,
-  'background: #0284c7; color: #ffffff; font-weight: bold; padding: 2px 6px; border-radius: 4px;',
-  'color: #38bdf8; font-weight: bold; margin-left: 4px;'
-);
-console.log(`[VDS-VL Build ID] ${buildInfo.buildId}`);
+if (typeof window !== 'undefined') {
+  window.__APP_BUILD_INFO__ = initialBuildInfo;
+  (window as any).audioDownloadManager = audioDownloadManager;
+
+  if (import.meta.env.DEV) {
+    window.addEventListener(BUILD_INFO_UPDATED_EVENT, (e: any) => {
+      if (e.detail) {
+        logBuildInfo(e.detail, true);
+      }
+    });
+  } else {
+    logBuildInfo(initialBuildInfo, false);
+  }
+}
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>

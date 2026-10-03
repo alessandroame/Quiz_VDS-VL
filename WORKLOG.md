@@ -14,6 +14,23 @@ Questo documento registra in ordine cronologico tutte le lavorazioni svolte nel 
 - **Impatto sul Desiderata**: <Come questo intervento contribuisce al desiderata (cfr. DESIDERATA.md) e indicazioni per il prossimo agente>
 ```
 
+### [2026-10-03] - Risoluzione Disallineamento Build Info in Dev Locale (v1.7.13)
+
+- **Cosa abbiamo fatto**:
+  - **Risoluzione Mancata Esecuzione di `initDevBuildInfo()` in Ambiente Dev ([src/utils/buildInfo.ts](file:///c:/github/Quiz_VDS-VL/src/utils/buildInfo.ts))**:
+    - Individuata la causa esatta per cui il badge di versione nel browser dell'allievo continuava a mostrare la versione vecchia (`v1.7.11 #225 • a7e48162`): la guardia condizionale era scritta con optional chaining `import.meta?.env?.DEV`. Il parser AST statico di Vite ignora le espressioni con `?.`, non rimpiazzando `import.meta.env` nel modulo e lasciando `import.meta?.env?.DEV` come `undefined`. Di conseguenza, `initDevBuildInfo()` non veniva mai invocata al caricamento della pagina e il badge rimaneva congelato sul valore statico di quando Vite era stato avviato nel terminale.
+    - Sostituita con l'espressione canonica di Vite `Boolean(import.meta.env && import.meta.env.DEV && import.meta.env.MODE !== 'test')`, consentendo a Vite di sostituirla deterministicamente con `true` a compile-time.
+  - **Logging Console Dinamico e Azzeramento Log Stale ([src/main.tsx](file:///c:/github/Quiz_VDS-VL/src/main.tsx))**:
+    - In modalità di sviluppo, `main.tsx` attende l'evento `BUILD_INFO_UPDATED_EVENT` prima di loggare le info di build, stampando in console `[Quiz VDS-VL Dev Live]` con il numero reale aggiornato in tempo reale ad ogni commit locale (in badge verde smeraldo `#059669`), eliminando la confusione generata dai log con build fisse obsolete.
+  - **Validazione con Headless Chrome CDP**:
+    - Eseguito test di navigazione headless su Chrome: verificato che all'avvio il badge `#app-version-badge` e `window.__APP_BUILD_INFO__` recepiscono all'istante l'aggiornamento reale dal middleware Vite senza richiedere il riavvio manuale del terminale.
+- **Scelte architetturali & Rationale**:
+  - *Vite AST Replacement Constraints*: Vite effettua la sostituzione statica delle variabili d'ambiente solo su pattern rigorosi di tipo `MemberExpression`. L'uso di optional chaining su `import.meta` impedisce il matching del compilatore e deve essere tassativamente evitato nei file sorgente web.
+- **Impatto sul Desiderata**:
+  - Piena corrispondenza e trasparenza visiva per l'utente tra i commit locali e il badge di versione mostrato a schermo.
+
+---
+
 ### [2026-10-03] - Interruzione Istantanea Audio alla Selezione della Risposta e Feedback Didattico Immediato (v1.7.12)
 
 - **Cosa abbiamo fatto**:

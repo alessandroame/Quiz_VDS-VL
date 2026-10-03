@@ -27,7 +27,7 @@ export const BUILD_INFO_UPDATED_EVENT = 'vds-build-info-updated' as const;
 
 export function initDevBuildInfo(): void {
   if (typeof window === 'undefined') return;
-  const isDev = Boolean(import.meta?.env?.DEV);
+  const isDev = Boolean(import.meta.env && import.meta.env.DEV && import.meta.env.MODE !== 'test');
   if (isDev) {
     fetch('/__dev_build_info')
       .then(res => res.json())
@@ -44,8 +44,8 @@ export function initDevBuildInfo(): void {
   }
 }
 
-// Auto-initialize in dev environments
-if (typeof window !== 'undefined' && import.meta?.env?.DEV) {
+// Auto-initialize in dev environments (except automated tests)
+if (typeof window !== 'undefined' && import.meta.env.DEV && import.meta.env.MODE !== 'test') {
   initDevBuildInfo();
 }
 
