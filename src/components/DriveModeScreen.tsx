@@ -32,7 +32,7 @@ export interface DriveModeSessionContext {
   isExam?: boolean;
   isTutor?: boolean;
   secondsRemaining?: number;
-  onSubmitExam?: () => void;
+  onSubmitExam?: (answers?: Record<number, 1 | 2 | 3>, durationSeconds?: number) => void;
   onAbandonSession?: () => void;
   title?: string;
 }
@@ -81,6 +81,20 @@ export const DriveModeScreen: React.FC<DriveModeScreenProps> = ({
   const [flags, setFlags] = useState<Record<number, boolean>>(
     sessionContext ? sessionContext.flags : {}
   );
+  const answersRef = useRef<Record<number, 1 | 2 | 3>>(sessionContext ? sessionContext.answers : {});
+  const flagsRef = useRef<Record<number, boolean>>(sessionContext ? sessionContext.flags : {});
+
+  useEffect(() => {
+    if (sessionContext?.answers) {
+      answersRef.current = sessionContext.answers;
+    }
+  }, [sessionContext?.answers]);
+
+  useEffect(() => {
+    if (sessionContext?.flags) {
+      flagsRef.current = sessionContext.flags;
+    }
+  }, [sessionContext?.flags]);
   const [isExamSession, setIsExamSession] = useState<boolean>(
     sessionContext?.isExam ?? false
   );
@@ -528,7 +542,9 @@ export const DriveModeScreen: React.FC<DriveModeScreenProps> = ({
     triggerHapticFeedback(isCorrect ? 'success' : 'error');
 
     // Aggiorna stato locale e notifica context padre se esistente
-    setAnswers(prev => ({ ...prev, [currentQ.id]: ans }));
+    const updatedAnswers = { ...answersRef.current, [currentQ.id]: ans };
+    answersRef.current = updatedAnswers;
+    setAnswers(updatedAnswers);
     if (sessionContext) {
       sessionContext.onAnswer(currentQ.id, ans);
     }
@@ -575,8 +591,10 @@ export const DriveModeScreen: React.FC<DriveModeScreenProps> = ({
   const handleToggleFlag = () => {
     if (!currentQ) return;
     triggerHapticFeedback('warning');
-    const nextVal = !flags[currentQ.id];
-    setFlags(prev => ({ ...prev, [currentQ.id]: nextVal }));
+    const nextVal = !flagsRef.current[currentQ.id];
+    const updatedFlags = { ...flagsRef.current, [currentQ.id]: nextVal };
+    flagsRef.current = updatedFlags;
+    setFlags(updatedFlags);
     if (sessionContext) sessionContext.onToggleFlag(currentQ.id);
     if (settings.soundEnabled) soundFX.playClick();
     showToast(nextVal ? '⚑ Contrassegnata' : 'Bandierina rimossa');
@@ -797,20 +815,23 @@ export const DriveModeScreen: React.FC<DriveModeScreenProps> = ({
     clearAllDriveTimers();
     stopVoice();
 
+    const durationSeconds = Math.max(1, Math.round((Date.now() - startTime) / 1000));
+    const effectiveAnswers = Object.keys(answersRef.current).length > 0 ? answersRef.current : answers;
+    const effectiveFlags = Object.keys(flagsRef.current).length > 0 ? flagsRef.current : flags;
+
     // Se l'esame proviene da una sessione genitore (es. ExamScreen), deleghiamo il salvataggio
     if (sessionContext?.onSubmitExam) {
-      sessionContext.onSubmitExam();
+      sessionContext.onSubmitExam(effectiveAnswers, durationSeconds);
       onClose();
       return;
     }
 
     setInternalMode('debriefing');
-    const durationSeconds = Math.round((Date.now() - startTime) / 1000);
 
     const session = evaluateExam({
       questions: internalQuestions,
-      answers,
-      flags,
+      answers: effectiveAnswers,
+      flags: effectiveFlags,
       durationSeconds,
       isMarathon
     });

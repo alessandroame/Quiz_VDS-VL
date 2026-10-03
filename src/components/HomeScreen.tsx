@@ -186,7 +186,15 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectTab }) => {
                 )}
               </div>
               <div className="font-bold text-xs sm:text-sm text-zinc-100 light:text-slate-900 truncate">
-                {activeSession.subjectName || (activeSession.type === 'exam' ? 'Simulazione Esame' : 'Quaderno Errori')}
+                {activeSession.subjectName || (activeSession.type === 'exam'
+                  ? (activeSession.examMode === 'tutor'
+                      ? (activeSession.tutorFormat === 'flash'
+                          ? 'Tutor Flash (10 Quiz)'
+                          : activeSession.tutorFormat === 'endless'
+                          ? 'Tutor Continuo'
+                          : 'Tutor Standard (30 Quiz)')
+                      : 'Simulazione Esame')
+                  : 'Quaderno Errori')}
               </div>
               <div className="text-[11px] text-zinc-400 light:text-slate-600 truncate">
                 Domanda {activeSession.currentIndex + 1} di {activeSession.questionIds.length} • {activeSession.answers ? Object.keys(activeSession.answers).length : 0} risposte date
@@ -248,7 +256,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectTab }) => {
             </div>
 
             <p className="text-xs text-zinc-400 light:text-slate-600 truncate">
-              30 quiz con feedback didattico immediato (Regola e Tranello).
+              Flash 10, Standard 30 o Continuo con spiegazione Regola/Tranello.
             </p>
           </div>
         </button>

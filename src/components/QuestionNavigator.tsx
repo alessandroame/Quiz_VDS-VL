@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import { ChevronDown, ChevronUp } from 'lucide-react';
+import { ChevronDown, ChevronUp, Infinity as InfinityIcon } from 'lucide-react';
 import type { Question } from '../types/quiz';
-import type { ExamModeType } from '../types/database';
+import type { ExamModeType, TutorFormat } from '../types/database';
 
 export interface QuestionNavigatorProps {
   questions: Question[];
@@ -9,6 +9,7 @@ export interface QuestionNavigatorProps {
   answers: Record<number, 1 | 2 | 3>;
   flags: Record<number, boolean>;
   examMode: ExamModeType;
+  tutorFormat?: TutorFormat;
   onSelectIndex: (index: number) => void;
   defaultCompressed?: boolean;
 }
@@ -26,6 +27,7 @@ export const QuestionNavigator: React.FC<QuestionNavigatorProps> = ({
   answers,
   flags,
   examMode,
+  tutorFormat,
   onSelectIndex,
   defaultCompressed = false
 }) => {
@@ -62,6 +64,48 @@ export const QuestionNavigator: React.FC<QuestionNavigatorProps> = ({
   };
 
   const flaggedCount = Object.values(flags).filter(Boolean).length;
+
+  if (tutorFormat === 'endless') {
+    const answeredCount = Object.keys(answers).length;
+    const correctCount = Object.entries(answers).filter(([qid, ans]) => {
+      const q = questions.find(item => item.id === Number(qid));
+      return q && q.correctAnswer === ans;
+    }).length;
+    const wrongCount = answeredCount - correctCount;
+    const accuracy = answeredCount > 0 ? Math.round((correctCount / answeredCount) * 100) : 0;
+
+    return (
+      <div
+        data-testid="navigator-endless-bar"
+        className="p-2 sm:p-2.5 bg-zinc-900/80 border border-zinc-700 rounded-xl light:bg-white light:border-slate-300 light:shadow-sm transition-all"
+      >
+        <div className="flex items-center justify-between gap-2">
+          <div className="flex items-center gap-2">
+            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 light:bg-emerald-100 light:text-emerald-800 text-[10px] font-bold uppercase tracking-wider font-mono border border-emerald-500/30">
+              <InfinityIcon className="w-3 h-3" />
+              <span>Continuo</span>
+            </span>
+            <span className="font-mono text-xs font-bold text-amber-400 light:text-amber-900 bg-amber-500/10 light:bg-amber-100 px-2 py-0.5 rounded">
+              Quiz #{currentIndex + 1}
+            </span>
+          </div>
+
+          <div className="flex items-center gap-2.5 text-xs font-mono">
+            {answeredCount > 0 ? (
+              <>
+                <span className="text-emerald-400 light:text-emerald-600 font-bold">{correctCount} ✓</span>
+                <span className="text-zinc-500 light:text-slate-400">•</span>
+                <span className="text-rose-400 light:text-rose-600 font-bold">{wrongCount} ✗</span>
+                <span className="text-zinc-400 light:text-slate-500 text-[11px]">({accuracy}%)</span>
+              </>
+            ) : (
+              <span className="text-[11px] text-zinc-400 light:text-slate-500 font-sans">Rispondi al tuo ritmo</span>
+            )}
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   const getBubbleStatus = (q: Question, idx: number) => {
     const isAnswered = answers[q.id] !== undefined;

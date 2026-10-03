@@ -87,3 +87,76 @@ export function generateExamQuestions(
   // Mescola l'ordine finale per non avere le domande raggruppate rigidamente per materia
   return shuffleArray(selected);
 }
+
+/**
+ * Global Fair Coverage Randomizer for Flash & Endless Tutor sessions:
+ * Selects a prioritized batch of questions across the entire question pool,
+ * ranking unseen questions first (Bucket 0), followed by active errors
+ * (Bucket 1: timesWrong > 0 with consecutiveCorrect < 2), then higher error rates,
+ * with random jitter to ensure pedagogical variety.
+ *
+ * @param allQuestions Active pool of questions (e.g. 474 paragliding questions)
+ * @param statsMap User question telemetry map from database
+ * @param count Number of questions to return (default 10)
+ * @param excludeIds Optional set of question IDs to skip (e.g. questions already answered in active session)
+ */
+export function generateFlashTutorQuestions(
+  allQuestions: Question[],
+  statsMap: Map<number, QuestionStat>,
+  count = 10,
+  excludeIds?: Set<number>
+): Question[] {
+  let pool = excludeIds && excludeIds.size > 0
+    ? allQuestions.filter(q => !excludeIds.has(q.id))
+    : allQuestions;
+
+  // Fallback to full pool if all available questions were already excluded
+  if (pool.length === 0) {
+    pool = allQuestions;
+  }
+
+  const scored = pool.map(q => {
+    const stat = statsMap.get(q.id);
+    const timesSeen = stat?.timesSeen || 0;
+    const timesWrong = stat?.timesWrong || 0;
+    const consecutiveCorrect = stat?.consecutiveCorrect || 0;
+    const isActiveMistake = timesWrong > 0 && consecutiveCorrect < 2;
+    const errorRate = timesSeen > 0 ? timesWrong / timesSeen : 0.5;
+
+    // Bucket scoring:
+    // Bucket 0 (unseen): priority 0
+    // Bucket 1 (active mistake): priority 1
+    // Bucket 2 (seen, no active mistake): priority 2
+    let priorityBucket = 2;
+    if (timesSeen === 0) {
+      priorityBucket = 0;
+    } else if (isActiveMistake) {
+      priorityBucket = 1;
+    }
+
+    return {
+      question: q,
+      priorityBucket,
+      timesSeen,
+      errorRate,
+      randomJitter: Math.random()
+    };
+  });
+
+  scored.sort((a, b) => {
+    if (a.priorityBucket !== b.priorityBucket) {
+      return a.priorityBucket - b.priorityBucket;
+    }
+    if (a.timesSeen !== b.timesSeen) {
+      return a.timesSeen - b.timesSeen;
+    }
+    if (Math.abs(a.errorRate - b.errorRate) > 0.2) {
+      return b.errorRate - a.errorRate;
+    }
+    return a.randomJitter - b.randomJitter;
+  });
+
+  const chosen = scored.slice(0, count).map(s => s.question);
+  return shuffleArray(chosen);
+}
+

@@ -304,3 +304,81 @@ describe('QuestionCard Autoplay Suppression in Debriefing and Review', () => {
   });
 });
 
+describe('QuestionCard Review / Debriefing Mode (isReviewMode)', () => {
+  let container: HTMLDivElement;
+  let root: ReturnType<typeof createRoot>;
+
+  beforeEach(() => {
+    vi.clearAllMocks();
+    container = document.createElement('div');
+    document.body.appendChild(container);
+    root = createRoot(container);
+  });
+
+  afterEach(() => {
+    act(() => {
+      root.unmount();
+    });
+    container.remove();
+  });
+
+  it('renders correct answer in emerald and shows Non risposta (Errata) when selectedAnswer is undefined in review mode', async () => {
+    await act(async () => {
+      root.render(
+        React.createElement(QuestionCard, {
+          question: mockQuestion,
+          selectedAnswer: undefined,
+          showFeedback: true,
+          isReviewMode: true,
+          disableAutoPlay: true,
+          onSelectAnswer: vi.fn()
+        })
+      );
+    });
+
+    // Header explanation shows "Non risposta (Errata)"
+    expect(container.textContent).toContain('Non risposta (Errata)');
+
+    // Didactical explanations are visible
+    expect(container.textContent).toContain('Regola:');
+    expect(container.textContent).toContain('Isobare vicine indicano un forte gradiente barico orizzontale');
+    expect(container.textContent).toContain('Tranello:');
+
+    // Correct option button (option 2) has emerald classes
+    const opt2Btn = container.querySelector('#btn-option-2');
+    expect(opt2Btn).not.toBeNull();
+    expect(opt2Btn?.className).toContain('border-emerald-500');
+
+    // All options are disabled in review mode
+    const opt1Btn = container.querySelector('#btn-option-1');
+    const opt3Btn = container.querySelector('#btn-option-3');
+    expect((opt1Btn as HTMLButtonElement)?.disabled).toBe(true);
+    expect((opt2Btn as HTMLButtonElement)?.disabled).toBe(true);
+    expect((opt3Btn as HTMLButtonElement)?.disabled).toBe(true);
+  });
+
+  it('renders answered wrong question correctly in review mode', async () => {
+    await act(async () => {
+      root.render(
+        React.createElement(QuestionCard, {
+          question: mockQuestion,
+          selectedAnswer: 1,
+          showFeedback: true,
+          isReviewMode: true,
+          disableAutoPlay: true,
+          onSelectAnswer: vi.fn()
+        })
+      );
+    });
+
+    expect(container.textContent).toContain('Errata');
+    expect(container.textContent).not.toContain('Non risposta');
+    expect(container.textContent).toContain('Regola:');
+
+    const opt1Btn = container.querySelector('#btn-option-1');
+    const opt2Btn = container.querySelector('#btn-option-2');
+    expect(opt1Btn?.className).toContain('border-rose-500');
+    expect(opt2Btn?.className).toContain('border-emerald-500');
+  });
+});
+

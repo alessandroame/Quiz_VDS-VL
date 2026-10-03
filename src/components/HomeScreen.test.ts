@@ -101,7 +101,7 @@ describe('HomeScreen Component (Home Hub Contracts)', () => {
       activeSession: {
         id: 'exam-123',
         type: 'exam',
-        examMode: 'tutor',
+        examMode: 'official',
         questionIds: [1, 2, 3],
         currentIndex: 1,
         answers: { 1: 2 },

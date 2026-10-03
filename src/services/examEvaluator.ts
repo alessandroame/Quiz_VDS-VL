@@ -1,5 +1,5 @@
 import type { Question } from '../types/quiz';
-import type { ExamSession, ExamQuestionSnapshot, ExamModeType } from '../types/database';
+import type { ExamSession, ExamQuestionSnapshot, ExamModeType, TutorFormat } from '../types/database';
 
 export const MAX_ALLOWED_ERRORS_STANDARD = 3;
 export const MAX_ALLOWED_ERRORS_MARATHON = 6;
@@ -11,14 +11,19 @@ export interface EvaluateExamParams {
   durationSeconds: number;
   isMarathon?: boolean;
   examMode?: ExamModeType;
+  tutorFormat?: TutorFormat;
 }
 
 /**
  * Verifica se l'esame è superato (Idoneo) secondo i criteri ufficiali AeCI:
+ * - Esame Flash (10 domande): max 1 errore (>= 90% idoneità)
  * - Esame Standard (30 domande): max 3 errori (>= 27 risposte esatte)
  * - Esame Maratona (60 domande): max 6 errori (>= 54 risposte esatte)
  */
-export function isPassingScore(wrongCount: number, isMarathon = false): boolean {
+export function isPassingScore(wrongCount: number, isMarathon = false, totalQuestions = 30): boolean {
+  if (totalQuestions <= 10) {
+    return wrongCount <= 1;
+  }
   const maxErrors = isMarathon ? MAX_ALLOWED_ERRORS_MARATHON : MAX_ALLOWED_ERRORS_STANDARD;
   return wrongCount <= maxErrors;
 }
@@ -33,7 +38,8 @@ export function evaluateExam({
   flags = {},
   durationSeconds,
   isMarathon = false,
-  examMode = isMarathon ? 'marathon' : 'official'
+  examMode = isMarathon ? 'marathon' : 'official',
+  tutorFormat
 }: EvaluateExamParams): ExamSession {
   let correctCount = 0;
   let wrongCount = 0;
@@ -69,7 +75,7 @@ export function evaluateExam({
     });
   }
 
-  const isPassed = isPassingScore(wrongCount, isMarathon);
+  const isPassed = isPassingScore(wrongCount, isMarathon, questions.length);
 
   return {
     date: Date.now(),
@@ -80,6 +86,7 @@ export function evaluateExam({
     isPassed,
     isMarathon,
     examMode,
+    tutorFormat,
     subjectBreakdown: subjectMap,
     snapshots
   };

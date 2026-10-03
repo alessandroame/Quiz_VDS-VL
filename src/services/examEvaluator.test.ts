@@ -303,4 +303,38 @@ describe('Suite 3: Motore di Valutazione Esame AeCI (src/services/examEvaluator.
     });
     expect(marathonSession.examMode).toBe('marathon');
   });
+
+  it('EVAL-12: should evaluate 10-question flash tutor sessions with 90% threshold (max 1 error) and propagate tutorFormat', () => {
+    const sample10 = allQuestions.slice(0, 10);
+    const answers1Error: Record<number, 1 | 2 | 3> = {};
+    sample10.forEach((q, idx) => {
+      answers1Error[q.id] = idx === 0 ? ((q.correctAnswer === 1 ? 2 : 1) as 1 | 2 | 3) : q.correctAnswer;
+    });
+
+    const passedFlash = evaluateExam({
+      questions: sample10,
+      answers: answers1Error,
+      durationSeconds: 180,
+      examMode: 'tutor',
+      tutorFormat: 'flash'
+    });
+    expect(passedFlash.isPassed).toBe(true);
+    expect(passedFlash.wrongAnswers).toBe(1);
+    expect(passedFlash.correctAnswers).toBe(9);
+    expect(passedFlash.tutorFormat).toBe('flash');
+
+    const answers2Errors: Record<number, 1 | 2 | 3> = { ...answers1Error };
+    answers2Errors[sample10[1].id] = (sample10[1].correctAnswer === 1 ? 2 : 1) as 1 | 2 | 3;
+
+    const failedFlash = evaluateExam({
+      questions: sample10,
+      answers: answers2Errors,
+      durationSeconds: 200,
+      examMode: 'tutor',
+      tutorFormat: 'flash'
+    });
+    expect(failedFlash.isPassed).toBe(false);
+    expect(failedFlash.wrongAnswers).toBe(2);
+    expect(failedFlash.tutorFormat).toBe('flash');
+  });
 });

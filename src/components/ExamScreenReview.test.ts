@@ -154,6 +154,19 @@ describe('ExamScreen Debriefing & Review Filters', () => {
     // Now in review/debriefing state
     expect(container.textContent).toContain('Revisione Quesiti');
 
+    // Verify answers were preserved and correctly evaluated in saved session
+    expect(mockSaveExam).toHaveBeenCalledWith(
+      expect.objectContaining({
+        correctAnswers: 1,
+        wrongAnswers: 2,
+        snapshots: expect.arrayContaining([
+          expect.objectContaining({ questionId: 201, userAnswer: 1, isCorrect: true }),
+          expect.objectContaining({ questionId: 202, userAnswer: 1, isCorrect: false }),
+          expect.objectContaining({ questionId: 203, userAnswer: undefined, isCorrect: false })
+        ])
+      })
+    );
+
     // Filter chips should be present
     const btnFilterAll = container.querySelector('#btn-filter-review-all');
     const btnFilterWrong = container.querySelector('#btn-filter-review-wrong');

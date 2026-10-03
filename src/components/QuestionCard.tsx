@@ -16,6 +16,7 @@ interface QuestionCardProps {
   onToggleFlag?: () => void;
   indexNumber?: number; // es. "Domanda 4 di 30"
   totalNumber?: number;
+  isReviewMode?: boolean;
 }
 
 export const QuestionCard: React.FC<QuestionCardProps> = ({
@@ -27,7 +28,8 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({
   isFlagged = false,
   onToggleFlag,
   indexNumber,
-  totalNumber
+  totalNumber,
+  isReviewMode = false
 }) => {
   const { statsMap, toggleBookmark, saveNote, settings } = useQuiz();
   const stat = statsMap.get(question.id);
@@ -102,7 +104,7 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({
         } else {
           playQuestion();
         }
-      } else if ((e.key === 'e' || e.key === 'E') && !e.altKey && !e.ctrlKey && showFeedback && selectedAnswer) {
+      } else if ((e.key === 'e' || e.key === 'E') && !e.altKey && !e.ctrlKey && showFeedback && (selectedAnswer || isReviewMode)) {
         if (e.shiftKey) {
           restartExplanation();
         } else {
@@ -144,6 +146,7 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({
     showNoteEditor,
     showFeedback,
     selectedAnswer,
+    isReviewMode,
     togglePlayPause,
     restartCurrentOrSequence,
     playQuestion,
@@ -469,7 +472,7 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({
           // Stili in base al feedback immediato o selezione neutra
           let btnStyle = 'border-zinc-700 hover:border-zinc-600 bg-zinc-950/80 text-zinc-200 light:border-slate-300 light:bg-slate-50/90 light:text-slate-800 light:hover:bg-slate-100 light:hover:border-slate-400 shadow-sm';
 
-          if (showFeedback && selectedAnswer) {
+          if (showFeedback && (selectedAnswer !== undefined || isReviewMode)) {
             if (isCorrectAnswer) {
               btnStyle = 'border-emerald-500/80 bg-emerald-950/30 text-emerald-200 light:border-emerald-600 light:bg-emerald-50 light:text-emerald-900 font-medium';
             } else if (isSelected && !isCorrectAnswer) {
@@ -498,12 +501,12 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({
               lang="it"
               translate="no"
               onClick={() => handleSelect(optNum)}
-              disabled={showFeedback && selectedAnswer !== undefined}
+              disabled={isReviewMode || (showFeedback && selectedAnswer !== undefined)}
               className={`w-full text-left p-2.5 sm:p-3 min-h-[44px] sm:min-h-[48px] rounded-xl border transition-all flex items-start gap-2.5 sm:gap-3 text-xs sm:text-sm leading-snug ${btnStyle}`}
             >
               <span
                 className={`w-5 h-5 sm:w-6 sm:h-6 rounded-full flex-shrink-0 flex items-center justify-center font-bold text-[11px] sm:text-xs mt-0.5 ${
-                  showFeedback && selectedAnswer
+                  showFeedback && (selectedAnswer !== undefined || isReviewMode)
                     ? isCorrectAnswer
                       ? 'bg-emerald-500 text-white'
                       : isSelected
@@ -603,10 +606,10 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({
                 )
               )}
 
-              {showFeedback && selectedAnswer && isCorrectAnswer && (
+              {showFeedback && (selectedAnswer !== undefined || isReviewMode) && isCorrectAnswer && (
                 <CheckCircle2 className="w-5 h-5 text-emerald-400 flex-shrink-0 mt-0.5" />
               )}
-              {showFeedback && selectedAnswer && isSelected && !isCorrectAnswer && (
+              {showFeedback && selectedAnswer !== undefined && isSelected && !isCorrectAnswer && (
                 <XCircle className="w-5 h-5 text-rose-400 flex-shrink-0 mt-0.5" />
               )}
             </button>
@@ -614,8 +617,8 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({
         })}
       </div>
 
-      {/* Spiegazione Sintetica (visibile se feedback attivo e risposta data) */}
-      {showFeedback && selectedAnswer && (
+      {/* Spiegazione Sintetica (visibile se feedback attivo e risposta data oppure modalità review) */}
+      {showFeedback && (selectedAnswer !== undefined || isReviewMode) && (
         <div className="mt-2.5 pt-2 border-t border-zinc-700/60 light:border-slate-200 text-xs animate-in fade-in duration-150">
           <div className="flex items-center justify-between font-bold mb-1">
             <div className="flex items-center gap-1.5">
@@ -623,9 +626,13 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({
                 <span className="text-emerald-400 light:text-emerald-600 flex items-center gap-1">
                   <CheckCircle2 className="w-3.5 h-3.5" /> Esatta
                 </span>
-              ) : (
+              ) : selectedAnswer !== undefined ? (
                 <span className="text-rose-400 light:text-rose-600 flex items-center gap-1">
                   <XCircle className="w-3.5 h-3.5" /> Errata
+                </span>
+              ) : (
+                <span className="text-rose-400 light:text-rose-600 flex items-center gap-1">
+                  <XCircle className="w-3.5 h-3.5" /> Non risposta (Errata)
                 </span>
               )}
             </div>

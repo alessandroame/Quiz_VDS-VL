@@ -10,12 +10,15 @@ import {
   ListFilter,
   BookOpen,
   Filter,
-  Pause
+  Pause,
+  Zap,
+  Infinity as InfinityIcon,
+  Plus
 } from 'lucide-react';
 import type { Question } from '../types/quiz';
-import type { ExamSession, ExamModeType } from '../types/database';
+import type { ExamSession, ExamModeType, TutorFormat } from '../types/database';
 import { useQuiz } from '../context/QuizContext';
-import { generateExamQuestions } from '../utils/fairRandomizer';
+import { generateExamQuestions, generateFlashTutorQuestions } from '../utils/fairRandomizer';
 import { evaluateExam } from '../services/examEvaluator';
 import { formatTime } from '../utils/timer';
 import { QuestionCard } from './QuestionCard';
@@ -77,6 +80,18 @@ export const ExamScreen: React.FC<ExamScreenProps> = ({
   const [showInterruptModal, setShowInterruptModal] = useState(false);
   const [isPaused, setIsPaused] = useState(false);
   const [conflictPendingMode, setConflictPendingMode] = useState<ExamModeType | null>(null);
+  const [conflictPendingFormat, setConflictPendingFormat] = useState<TutorFormat | undefined>(undefined);
+  const [tutorFormat, setTutorFormat] = useState<TutorFormat>(() => {
+    try {
+      const saved = localStorage.getItem('vds_last_tutor_format');
+      if (saved === 'flash' || saved === 'standard' || saved === 'endless') {
+        return saved;
+      }
+    } catch {
+      // Storage unavailable, fallback to flash
+    }
+    return 'flash';
+  });
   const [completedSession, setCompletedSession] = useState<ExamSession | null>(null);
   const [reviewFilter, setReviewFilter] = useState<'all' | 'wrong' | 'flagged' | 'correct'>('all');
 
@@ -153,9 +168,15 @@ export const ExamScreen: React.FC<ExamScreenProps> = ({
         setExamMode(mode);
         setCurrentIndex(Math.min(activeSession.currentIndex || 0, ordered.length - 1));
         const resumedAnswers = activeSession.answers || {};
+        const resumedFlags = activeSession.flags || {};
         setAnswers(resumedAnswers);
-        setFlags(activeSession.flags || {});
+        answersRef.current = resumedAnswers;
+        setFlags(resumedFlags);
+        flagsRef.current = resumedFlags;
         if (mode === 'tutor') {
+          if (activeSession.tutorFormat) {
+            setTutorFormat(activeSession.tutorFormat);
+          }
           setElapsedSeconds(activeSession.elapsedSeconds || activeSession.secondsRemaining || 0);
         } else {
           setSecondsRemaining(activeSession.secondsRemaining || 45 * 60);
@@ -169,16 +190,39 @@ export const ExamScreen: React.FC<ExamScreenProps> = ({
     }
   }, [activeSession, examState, questions]);
 
-  const startExam = (mode: ExamModeType = 'tutor') => {
+  const startExam = (mode: ExamModeType = 'tutor', format: TutorFormat = tutorFormat) => {
     isDismissedRef.current = false;
     const marathon = mode === 'marathon';
     setIsMarathon(marathon);
     setExamMode(mode);
-    const generated = generateExamQuestions(filteredQuestions, statsMap, marathon);
+    setTutorFormat(format);
+    try {
+      if (mode === 'tutor') {
+        localStorage.setItem('vds_last_tutor_format', format);
+      }
+    } catch {
+      // Storage error ignored
+    }
+
+    let generated: Question[];
+    if (mode === 'tutor') {
+      if (format === 'flash') {
+        generated = generateFlashTutorQuestions(filteredQuestions, statsMap, 10);
+      } else if (format === 'endless') {
+        generated = generateFlashTutorQuestions(filteredQuestions, statsMap, filteredQuestions.length);
+      } else {
+        generated = generateExamQuestions(filteredQuestions, statsMap, false);
+      }
+    } else {
+      generated = generateExamQuestions(filteredQuestions, statsMap, marathon);
+    }
+
     setExamQuestions(generated);
     setCurrentIndex(0);
     setAnswers({});
+    answersRef.current = {};
     setFlags({});
+    flagsRef.current = {};
     recordedQuestionIds.current.clear();
     const totalMinutes = marathon ? 60 : settings.examTimerMinutes || 45;
     const initialSeconds = totalMinutes * 60;
@@ -193,6 +237,7 @@ export const ExamScreen: React.FC<ExamScreenProps> = ({
     persistActiveSession({
       type: 'exam',
       examMode: mode,
+      tutorFormat: mode === 'tutor' ? format : undefined,
       questionIds: generated.map(q => q.id),
       currentIndex: 0,
       answers: {},
@@ -213,12 +258,45 @@ export const ExamScreen: React.FC<ExamScreenProps> = ({
     });
   };
 
-  const handleRequestStartExam = (mode: ExamModeType = 'tutor') => {
+  const handleRequestStartExam = (mode: ExamModeType = 'tutor', format?: TutorFormat) => {
+    const targetFormat = format || tutorFormat;
     if (activeSession && activeSession.questionIds?.length > 0 && !isDismissedRef.current) {
       setConflictPendingMode(mode);
+      setConflictPendingFormat(targetFormat);
     } else {
-      startExam(mode);
+      startExam(mode, targetFormat);
     }
+  };
+
+  const handleExtendFlashSession = () => {
+    voiceService.stop();
+    if (autoAdvanceTimerRef.current) {
+      clearTimeout(autoAdvanceTimerRef.current);
+      autoAdvanceTimerRef.current = null;
+    }
+    const existingIds = new Set(examQuestions.map(q => q.id));
+    const additionalQuestions = generateFlashTutorQuestions(filteredQuestions, statsMap, 10, existingIds);
+    if (additionalQuestions.length === 0) return;
+
+    const updatedQuestions = [...examQuestions, ...additionalQuestions];
+    const nextIndex = examQuestions.length;
+    setExamQuestions(updatedQuestions);
+    setCurrentIndex(nextIndex);
+
+    persistActiveSession({
+      type: 'exam',
+      examMode: 'tutor',
+      tutorFormat: 'flash',
+      questionIds: updatedQuestions.map(q => q.id),
+      currentIndex: nextIndex,
+      answers: answersRef.current,
+      flags: flagsRef.current,
+      secondsRemaining: 0,
+      elapsedSeconds,
+      startTime,
+      isMarathon: false,
+      updatedAt: Date.now()
+    });
   };
 
   // Timer interval: count up for tutor mode (no time limit), countdown for official/marathon
@@ -274,10 +352,11 @@ export const ExamScreen: React.FC<ExamScreenProps> = ({
       persistActiveSession({
         type: 'exam',
         examMode,
+        tutorFormat: examMode === 'tutor' ? tutorFormat : undefined,
         questionIds: examQuestions.map(q => q.id),
         currentIndex: newIndex,
-        answers,
-        flags,
+        answers: answersRef.current,
+        flags: flagsRef.current,
         secondsRemaining: examMode === 'tutor' ? elapsedSeconds : secondsRemaining,
         startTime,
         isMarathon,
@@ -298,10 +377,11 @@ export const ExamScreen: React.FC<ExamScreenProps> = ({
     persistActiveSession({
       type: 'exam',
       examMode,
+      tutorFormat: examMode === 'tutor' ? tutorFormat : undefined,
       questionIds: examQuestions.map(q => q.id),
       currentIndex,
-      answers,
-      flags,
+      answers: answersRef.current,
+      flags: flagsRef.current,
       secondsRemaining: examMode === 'tutor' ? 0 : secondsRemaining,
       elapsedSeconds: examMode === 'tutor' ? elapsedSeconds : 0,
       startTime,
@@ -359,6 +439,7 @@ export const ExamScreen: React.FC<ExamScreenProps> = ({
     persistActiveSession({
       type: 'exam',
       examMode,
+      tutorFormat: examMode === 'tutor' ? tutorFormat : undefined,
       questionIds: examQuestions.map(q => q.id),
       currentIndex,
       answers: updatedAnswers,
@@ -380,6 +461,7 @@ export const ExamScreen: React.FC<ExamScreenProps> = ({
     persistActiveSession({
       type: 'exam',
       examMode,
+      tutorFormat: examMode === 'tutor' ? tutorFormat : undefined,
       questionIds: examQuestions.map(q => q.id),
       currentIndex,
       answers: answersRef.current,
@@ -413,7 +495,10 @@ export const ExamScreen: React.FC<ExamScreenProps> = ({
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [examState, currentIndex, currentQuestion, totalCount, answers, flags]);
 
-  const handleSubmitExam = useCallback(async () => {
+  const handleSubmitExam = useCallback(async (
+    overrideAnswers?: Record<number, 1 | 2 | 3> | any,
+    overrideDuration?: number
+  ) => {
     if (autoAdvanceTimerRef.current) {
       clearTimeout(autoAdvanceTimerRef.current);
       autoAdvanceTimerRef.current = null;
@@ -421,17 +506,46 @@ export const ExamScreen: React.FC<ExamScreenProps> = ({
     voiceService.stop();
     setShowSubmitModal(false);
     setIsExamRunning(false);
-    const durationSeconds = examMode === 'tutor'
-      ? Math.max(1, elapsedSeconds)
-      : Math.max(1, Math.round((Date.now() - startTime) / 1000));
+
+    // Sanitize overrideAnswers in case a React SyntheticEvent or click event was passed
+    const hasValidOverrideAnswers =
+      overrideAnswers &&
+      typeof overrideAnswers === 'object' &&
+      !('nativeEvent' in overrideAnswers) &&
+      !('preventDefault' in overrideAnswers) &&
+      !('target' in overrideAnswers);
+
+    const safeOverrideAnswers = hasValidOverrideAnswers
+      ? (overrideAnswers as Record<number, 1 | 2 | 3>)
+      : undefined;
+
+    const safeOverrideDuration = typeof overrideDuration === 'number'
+      ? overrideDuration
+      : undefined;
+
+    // Resolve answers: explicitly passed > answersRef.current > answers state
+    const effectiveAnswers = safeOverrideAnswers ?? (
+      Object.keys(answersRef.current).length > 0 ? answersRef.current : answers
+    );
+    const effectiveFlags = flagsRef.current && Object.keys(flagsRef.current).length > 0
+      ? flagsRef.current
+      : flags;
+
+    const realDurationSeconds = Math.max(1, Math.round((Date.now() - startTime) / 1000));
+    const durationSeconds = safeOverrideDuration !== undefined
+      ? Math.max(1, safeOverrideDuration)
+      : (examMode === 'tutor'
+          ? Math.max(elapsedSeconds, realDurationSeconds)
+          : realDurationSeconds);
 
     const session = evaluateExam({
       questions: examQuestions,
-      answers,
-      flags,
+      answers: effectiveAnswers,
+      flags: effectiveFlags,
       durationSeconds,
       isMarathon,
-      examMode
+      examMode,
+      tutorFormat: examMode === 'tutor' ? tutorFormat : undefined
     });
 
     // Record telemetry in Dexie for answers not yet recorded
@@ -458,7 +572,7 @@ export const ExamScreen: React.FC<ExamScreenProps> = ({
         // Ignore
       }
     }
-  }, [answers, examQuestions, flags, isMarathon, examMode, elapsedSeconds, recordAnswer, saveExam, startTime, dismissActiveSession, setIsExamRunning]);
+  }, [answers, examQuestions, flags, isMarathon, examMode, tutorFormat, elapsedSeconds, recordAnswer, saveExam, startTime, dismissActiveSession, setIsExamRunning]);
 
   const handleReviewMistakesNow = () => {
     if (!completedSession) return;
@@ -472,7 +586,9 @@ export const ExamScreen: React.FC<ExamScreenProps> = ({
     setExamQuestions(wrongQuestions);
     setCurrentIndex(0);
     setAnswers({});
+    answersRef.current = {};
     setFlags({});
+    flagsRef.current = {};
     recordedQuestionIds.current.clear();
     setExamMode('tutor');
     setElapsedSeconds(0);
@@ -505,15 +621,15 @@ export const ExamScreen: React.FC<ExamScreenProps> = ({
     registerAudioSessionContext({
       questions: examQuestions,
       currentIndex,
-      answers,
-      flags,
+      answers: answersRef.current,
+      flags: flagsRef.current,
       onAnswer: (qid, ans) => handleSelectAnswer(ans, qid),
       onToggleFlag: (qid) => handleToggleFlag(qid),
       onNavigateIndex: (idx) => setCurrentIndex(idx),
       isExam: true,
       isTutor: examMode === 'tutor',
       secondsRemaining: examMode === 'tutor' ? elapsedSeconds : secondsRemaining,
-      onSubmitExam: handleSubmitExam,
+      onSubmitExam: (overrideAnswers, overrideDuration) => handleSubmitExam(overrideAnswers, overrideDuration),
       onAbandonSession: () => {
         voiceService.stop();
         if (autoAdvanceTimerRef.current) {
@@ -528,7 +644,13 @@ export const ExamScreen: React.FC<ExamScreenProps> = ({
         setFlags({});
         setCurrentIndex(0);
       },
-      title: examMode === 'tutor' ? 'Tutor' : 'Esame Ufficiale'
+      title: examMode === 'tutor'
+        ? (tutorFormat === 'flash'
+            ? 'Tutor Flash'
+            : tutorFormat === 'endless'
+            ? 'Tutor Continuo'
+            : 'Tutor Standard')
+        : 'Esame Ufficiale'
     });
 
     return () => {
@@ -541,6 +663,7 @@ export const ExamScreen: React.FC<ExamScreenProps> = ({
     answers,
     flags,
     examMode,
+    tutorFormat,
     handleSubmitExam,
     registerAudioSessionContext
   ]);
@@ -558,47 +681,120 @@ export const ExamScreen: React.FC<ExamScreenProps> = ({
   if (examState === 'idle') {
     if (examMode === 'tutor') {
       return (
-        <div className="max-w-2xl mx-auto px-4 py-4 space-y-4">
-          {/* Card Principale: Simulazione Didattica (Tutor) */}
-          <div className="p-5 sm:p-6 bg-zinc-900 border border-zinc-700 hover:border-emerald-500/80 rounded-2xl transition-all shadow-md light:bg-white light:border-slate-300 light:shadow-sm light:hover:border-emerald-500 space-y-4">
-            <div className="space-y-2">
-              <div className="flex items-center justify-between gap-2">
-                <span className="px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 light:bg-emerald-100 light:text-emerald-800 text-[10px] font-bold uppercase tracking-wider font-mono border border-emerald-500/30">
-                  Studio Guidato
-                </span>
-                <span className="text-[11px] font-mono text-zinc-400 light:text-slate-500">
-                  30 Quiz • Senza limiti di tempo
-                </span>
-              </div>
-              <h2 className="font-bold text-lg sm:text-xl text-zinc-100 light:text-slate-900 flex items-center gap-2.5">
-                <BookOpen className="w-6 h-6 text-emerald-400" />
-                <span>Tutor (Studio Guidato)</span>
-              </h2>
-              <p className="text-xs sm:text-sm text-zinc-400 light:text-slate-600 leading-relaxed">
-                Esercitazione guidata sui 30 quesiti ufficiali AeCI ripartiti per materia. Correzione istantanea ad ogni risposta con spiegazione dettagliata <strong>Regola</strong> e <strong>Tranello</strong>.
-              </p>
+        <div className="max-w-2xl mx-auto px-4 py-4 space-y-3.5 animate-in fade-in">
+          {/* Header didattico */}
+          <div className="space-y-1">
+            <div className="flex items-center justify-between gap-2">
+              <span className="px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 light:bg-emerald-100 light:text-emerald-800 text-[10px] font-bold uppercase tracking-wider font-mono border border-emerald-500/30">
+                Studio Guidato
+              </span>
+              <span className="text-[11px] font-mono text-zinc-400 light:text-slate-500">
+                Feedback immediato • Regola & Tranello
+              </span>
             </div>
+            <h2 className="font-bold text-lg sm:text-xl text-zinc-100 light:text-slate-900 flex items-center gap-2.5">
+              <BookOpen className="w-5 h-5 sm:w-6 sm:h-6 text-emerald-400" />
+              <span>Modalità Tutor</span>
+            </h2>
+            <p className="text-xs text-zinc-400 light:text-slate-600">
+              Scegli il formato più adatto al tuo tempo a disposizione:
+            </p>
+          </div>
 
-            <div className="p-3.5 bg-zinc-950/70 light:bg-slate-50 border border-zinc-700/70 light:border-slate-300 rounded-xl space-y-2 text-xs text-zinc-300 light:text-slate-700">
-              <div className="font-semibold text-zinc-200 light:text-slate-800 flex items-center gap-1.5">
-                <CheckCircle2 className="w-4 h-4 text-emerald-400 flex-shrink-0" />
-                <span>Cosa prevede questa modalità:</span>
+          {/* Formato 1: Flash 10 Quiz (Consigliato per buchi di tempo) */}
+          <div className="p-4 sm:p-5 bg-zinc-900 border-2 border-emerald-500/60 hover:border-emerald-500 rounded-2xl transition-all shadow-md light:bg-white light:border-emerald-500/70 space-y-3">
+            <div className="flex items-start justify-between gap-2">
+              <div className="flex items-center gap-2.5">
+                <div className="w-8 h-8 rounded-xl bg-amber-500/20 text-amber-400 light:bg-amber-100 light:text-amber-800 flex items-center justify-center flex-shrink-0">
+                  <Zap className="w-4 h-4" />
+                </div>
+                <div>
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <h3 className="font-bold text-sm sm:text-base text-zinc-100 light:text-slate-900">
+                      Flash (10 Quiz)
+                    </h3>
+                    <span className="px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 light:bg-amber-100 light:text-amber-800 text-[10px] font-bold uppercase font-mono">
+                      Buchi di tempo (3-5 min)
+                    </span>
+                  </div>
+                  <p className="text-xs text-zinc-400 light:text-slate-600 mt-0.5">
+                    10 quesiti prioritari (non visti ed errori aperti). Al termine puoi estendere con altri 10 quiz o concludere.
+                  </p>
+                </div>
               </div>
-              <ul className="space-y-1.5 pl-6 list-disc text-zinc-400 light:text-slate-600">
-                <li><strong>30 quiz bilanciati</strong> estratti con algoritmo Fair Coverage AeCI.</li>
-                <li><strong>Nessun timer</strong>: rifletti con calma su ogni concetto teorico.</li>
-                <li><strong>Feedback immediato</strong> con la spiegazione normativa e i tranelli tipici.</li>
-                <li>Gli errori confluiscono automaticamente nel tuo <strong>Quaderno Errori</strong>.</li>
-              </ul>
             </div>
+            <button
+              id="btn-start-tutor-flash"
+              onClick={() => handleRequestStartExam('tutor', 'flash')}
+              className="w-full py-3 rounded-xl bg-emerald-700 hover:bg-emerald-600 text-white font-bold text-xs sm:text-sm flex items-center justify-center gap-2 shadow-md transition-all active:scale-[0.99]"
+            >
+              <Zap className="w-4 h-4" />
+              <span>Inizia Flash (10 Quiz)</span>
+            </button>
+          </div>
 
+          {/* Formato 2: Standard 30 Quiz AeCI */}
+          <div className="p-4 sm:p-5 bg-zinc-900 border border-zinc-700 hover:border-zinc-500 rounded-2xl transition-all shadow-sm light:bg-white light:border-slate-300 space-y-3">
+            <div className="flex items-start justify-between gap-2">
+              <div className="flex items-center gap-2.5">
+                <div className="w-8 h-8 rounded-xl bg-emerald-500/20 text-emerald-400 light:bg-emerald-100 light:text-emerald-800 flex items-center justify-center flex-shrink-0">
+                  <BookOpen className="w-4 h-4" />
+                </div>
+                <div>
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <h3 className="font-bold text-sm sm:text-base text-zinc-100 light:text-slate-900">
+                      Standard (30 Quiz AeCI)
+                    </h3>
+                    <span className="px-2 py-0.5 rounded-full bg-zinc-800 text-zinc-300 light:bg-slate-200 light:text-slate-700 text-[10px] font-bold uppercase font-mono">
+                      Quote Esame (15-20 min)
+                    </span>
+                  </div>
+                  <p className="text-xs text-zinc-400 light:text-slate-600 mt-0.5">
+                    30 quesiti distribuiti per materia secondo le quote ufficiali d'esame (9 aerodinamica, 8 meteo, ecc.).
+                  </p>
+                </div>
+              </div>
+            </div>
             <button
               id="btn-start-tutor-exam"
-              onClick={() => handleRequestStartExam('tutor')}
-              className="w-full py-3.5 rounded-xl bg-emerald-700 hover:bg-emerald-600 text-white font-bold text-sm shadow-lg shadow-emerald-950/40 flex items-center justify-center gap-2 transition-all active:scale-[0.99]"
+              data-testid="btn-start-tutor-standard"
+              onClick={() => handleRequestStartExam('tutor', 'standard')}
+              className="w-full py-2.5 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-zinc-100 light:bg-slate-200 light:text-slate-800 light:hover:bg-slate-300 font-bold text-xs sm:text-sm flex items-center justify-center gap-2 shadow-sm transition-all active:scale-[0.99]"
             >
-              <span>Inizia Tutor (30 Quiz)</span>
-              <ArrowRight className="w-4 h-4" />
+              <BookOpen className="w-3.5 h-3.5" />
+              <span>Inizia Standard (30 Quiz)</span>
+            </button>
+          </div>
+
+          {/* Formato 3: Continuo Senza Limiti */}
+          <div className="p-4 sm:p-5 bg-zinc-900 border border-zinc-700 hover:border-zinc-500 rounded-2xl transition-all shadow-sm light:bg-white light:border-slate-300 space-y-3">
+            <div className="flex items-start justify-between gap-2">
+              <div className="flex items-center gap-2.5">
+                <div className="w-8 h-8 rounded-xl bg-sky-500/20 text-sky-400 light:bg-sky-100 light:text-sky-800 flex items-center justify-center flex-shrink-0">
+                  <InfinityIcon className="w-4 h-4" />
+                </div>
+                <div>
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <h3 className="font-bold text-sm sm:text-base text-zinc-100 light:text-slate-900">
+                      Continuo (Senza Limiti)
+                    </h3>
+                    <span className="px-2 py-0.5 rounded-full bg-sky-500/20 text-sky-300 light:bg-sky-100 light:text-sky-800 text-[10px] font-bold uppercase font-mono">
+                      Flusso Libero
+                    </span>
+                  </div>
+                  <p className="text-xs text-zinc-400 light:text-slate-600 mt-0.5">
+                    Flusso progressivo ininterrotto. Rispondi finché hai tempo ed esci liberamente quando vuoi.
+                  </p>
+                </div>
+              </div>
+            </div>
+            <button
+              id="btn-start-tutor-endless"
+              onClick={() => handleRequestStartExam('tutor', 'endless')}
+              className="w-full py-2.5 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-zinc-100 light:bg-slate-200 light:text-slate-800 light:hover:bg-slate-300 font-bold text-xs sm:text-sm flex items-center justify-center gap-2 shadow-sm transition-all active:scale-[0.99]"
+            >
+              <InfinityIcon className="w-3.5 h-3.5" />
+              <span>Inizia Flusso Continuo</span>
             </button>
           </div>
 
@@ -730,7 +926,15 @@ export const ExamScreen: React.FC<ExamScreenProps> = ({
             )}
           </div>
           <div className="text-[11px] font-bold uppercase tracking-wider text-zinc-400 light:text-slate-500">
-            {isTutor ? 'Tutor' : completedSession.isMarathon ? 'Maratona Intensiva' : 'Esame Ufficiale'}
+            {isTutor
+              ? (completedSession.tutorFormat === 'flash'
+                  ? 'Tutor Flash (10 Quiz)'
+                  : completedSession.tutorFormat === 'endless'
+                  ? 'Tutor Continuo'
+                  : 'Tutor Standard (30 Quiz)')
+              : completedSession.isMarathon
+              ? 'Maratona Intensiva'
+              : 'Esame Ufficiale'}
           </div>
           <h2
             className={`text-2xl font-black tracking-tight ${
@@ -743,9 +947,15 @@ export const ExamScreen: React.FC<ExamScreenProps> = ({
             {correct}/{total} esatte ({errors} {errors === 1 ? 'errore' : 'errori'}) • Tempo: {formatTime(completedSession.durationSeconds)}
           </div>
           <p className="text-xs text-zinc-400 light:text-slate-600">
-            {isPassed
-              ? 'Complimenti! Hai superato la soglia ufficiale del 90% (max 3 errori).'
-              : 'Soglia massima di 3 errori superata. Rivedi subito gli errori qui sotto.'}
+            {isTutor
+              ? (completedSession.tutorFormat === 'flash'
+                  ? (isPassed ? 'Complimenti! Hai superato la prova rapida da 10 quiz.' : 'Esercitazione completata. Rivedi subito gli errori qui sotto.')
+                  : completedSession.tutorFormat === 'endless'
+                  ? 'Flusso continuo completato! Ottimo allenamento.'
+                  : (isPassed ? 'Complimenti! Hai superato la soglia ufficiale del 90% (max 3 errori).' : 'Soglia massima di 3 errori superata. Rivedi subito gli errori qui sotto.'))
+              : (isPassed
+                  ? 'Complimenti! Hai superato la soglia ufficiale del 90% (max 3 errori).'
+                  : 'Soglia massima di 3 errori superata. Rivedi subito gli errori qui sotto.')}
           </p>
         </div>
 
@@ -788,14 +998,25 @@ export const ExamScreen: React.FC<ExamScreenProps> = ({
 
         {/* Pulsanti Azione */}
         <div className="flex flex-col sm:flex-row gap-3">
-          <button
-            id="btn-restart-tutor"
-            onClick={() => startExam('tutor')}
-            className="flex-1 py-3 rounded-xl bg-amber-600 hover:bg-amber-500 text-white font-bold text-xs sm:text-sm flex items-center justify-center gap-2 shadow-md transition-colors"
-          >
-            <RotateCcw className="w-4 h-4" />
-            <span>Nuova Sessione Tutor</span>
-          </button>
+          {completedSession.tutorFormat === 'flash' ? (
+            <button
+              id="btn-restart-tutor"
+              onClick={() => startExam('tutor', 'flash')}
+              className="flex-1 py-3 rounded-xl bg-emerald-700 hover:bg-emerald-600 text-white font-bold text-xs sm:text-sm flex items-center justify-center gap-2 shadow-md transition-colors"
+            >
+              <Zap className="w-4 h-4" />
+              <span>Nuovo Flash (10 Quiz)</span>
+            </button>
+          ) : (
+            <button
+              id="btn-restart-tutor"
+              onClick={() => startExam('tutor', completedSession.tutorFormat || 'standard')}
+              className="flex-1 py-3 rounded-xl bg-amber-600 hover:bg-amber-500 text-white font-bold text-xs sm:text-sm flex items-center justify-center gap-2 shadow-md transition-colors"
+            >
+              <RotateCcw className="w-4 h-4" />
+              <span>Nuova Sessione Tutor</span>
+            </button>
+          )}
           <button
             id="btn-restart-official"
             onClick={() => startExam('official')}
@@ -943,6 +1164,7 @@ export const ExamScreen: React.FC<ExamScreenProps> = ({
                       selectedAnswer={item.snap?.userAnswer}
                       onSelectAnswer={() => {}}
                       showFeedback={true}
+                      isReviewMode={true}
                       disableAutoPlay={true}
                       indexNumber={item.idx + 1}
                       totalNumber={totalCount}
@@ -967,7 +1189,9 @@ export const ExamScreen: React.FC<ExamScreenProps> = ({
             <div className="flex items-center gap-1.5 font-mono font-bold text-sm px-2.5 py-1 rounded-lg bg-zinc-950 text-zinc-100 light:bg-slate-100 light:text-slate-800 border border-emerald-500/30">
               <Timer className="w-4 h-4 text-emerald-400" />
               <span>{formatTime(elapsedSeconds)}</span>
-              <span className="text-[10px] text-emerald-400/90 font-sans font-medium hidden sm:inline ml-1">Senza limiti</span>
+              <span className="text-[10px] text-emerald-400/90 font-sans font-medium hidden sm:inline ml-1">
+                {tutorFormat === 'flash' ? 'Flash (10)' : tutorFormat === 'endless' ? 'Continuo' : 'Senza limiti'}
+              </span>
             </div>
           ) : (
             <div
@@ -983,7 +1207,7 @@ export const ExamScreen: React.FC<ExamScreenProps> = ({
           )}
 
           <div className="text-xs text-zinc-300 light:text-slate-700 font-medium flex items-center gap-1.5">
-            <span>{answeredCount}/{totalCount}</span>
+            <span>{tutorFormat === 'endless' ? `${answeredCount} risposte` : `${answeredCount}/${totalCount}`}</span>
             {flaggedCount > 0 && (
               <span className="text-amber-400 font-medium">
                 ({flaggedCount} ⚑)
@@ -1025,7 +1249,9 @@ export const ExamScreen: React.FC<ExamScreenProps> = ({
             className="px-2.5 py-1.5 sm:px-3.5 rounded-lg bg-emerald-700 hover:bg-emerald-600 text-white font-bold text-xs shadow-sm transition-all"
           >
             {examMode === 'tutor' ? 'Concludi' : 'Consegna'}
-            <span className="hidden sm:inline"> ({answeredCount}/{totalCount})</span>
+            {tutorFormat !== 'endless' && (
+              <span className="hidden sm:inline"> ({answeredCount}/{totalCount})</span>
+            )}
           </button>
         </div>
       </div>
@@ -1037,6 +1263,7 @@ export const ExamScreen: React.FC<ExamScreenProps> = ({
         answers={answers}
         flags={flags}
         examMode={examMode}
+        tutorFormat={examMode === 'tutor' ? tutorFormat : undefined}
         onSelectIndex={changeIndex}
       />
 
@@ -1070,9 +1297,15 @@ export const ExamScreen: React.FC<ExamScreenProps> = ({
           id: 'btn-flag-question-bottom'
         } : undefined}
         centerContent={
-          <span className="font-mono text-zinc-400 light:text-slate-500 font-medium">
-            {currentIndex + 1} / {totalCount}
-          </span>
+          examMode === 'tutor' && tutorFormat === 'endless' ? (
+            <span className="font-mono text-zinc-400 light:text-slate-500 font-medium">
+              Quiz #{currentIndex + 1}
+            </span>
+          ) : (
+            <span className="font-mono text-zinc-400 light:text-slate-500 font-medium">
+              {currentIndex + 1} / {totalCount}
+            </span>
+          )
         }
         primaryAction={
           currentQuestion && answers[currentQuestion.id] !== undefined
@@ -1116,15 +1349,26 @@ export const ExamScreen: React.FC<ExamScreenProps> = ({
             <div className="flex items-center gap-2 text-amber-400">
               <AlertCircle className="w-6 h-6" />
               <h3 className="font-bold text-base text-zinc-100 light:text-slate-900">
-                {examMode === 'tutor' ? 'Concludi Tutor' : 'Consegna Esame'}
+                {examMode === 'tutor'
+                  ? tutorFormat === 'flash'
+                    ? 'Concludi Flash (10 Quiz)'
+                    : tutorFormat === 'endless'
+                    ? 'Concludi Flusso Continuo'
+                    : 'Concludi Tutor'
+                  : 'Consegna Esame'}
               </h3>
             </div>
 
             <div className="text-xs text-zinc-300 light:text-slate-600 space-y-2">
               <p>
-                Hai risposto a <strong>{answeredCount}</strong> su <strong>{totalCount}</strong> quesiti.
+                Hai risposto a <strong>{answeredCount}</strong> {tutorFormat === 'endless' ? 'quesiti.' : <>su <strong>{totalCount}</strong> quesiti.</>}
               </p>
-              {totalCount - answeredCount > 0 && (
+              {examMode === 'tutor' && tutorFormat === 'endless' && (
+                <p className="text-zinc-400 light:text-slate-500">
+                  Nel flusso continuo puoi terminare in qualsiasi momento senza alcuna penalità sui quiz non visualizzati.
+                </p>
+              )}
+              {tutorFormat !== 'endless' && totalCount - answeredCount > 0 && (
                 <p className="text-rose-400 font-medium">
                   Attenzione: {totalCount - answeredCount} domande non risposte verranno considerate errate.
                 </p>
@@ -1137,6 +1381,21 @@ export const ExamScreen: React.FC<ExamScreenProps> = ({
             </div>
 
             <div className="space-y-2 pt-2">
+              {/* Opzione Continua (+10 Quiz) per Flash Tutor */}
+              {examMode === 'tutor' && tutorFormat === 'flash' && (
+                <button
+                  id="btn-extend-flash-modal"
+                  onClick={() => {
+                    setShowSubmitModal(false);
+                    handleExtendFlashSession();
+                  }}
+                  className="w-full py-2.5 rounded-xl border border-amber-500/50 bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 hover:text-amber-200 light:bg-amber-100 light:border-amber-400 light:text-amber-900 text-xs font-bold flex items-center justify-center gap-2 transition-colors shadow-sm cursor-pointer"
+                >
+                  <Plus className="w-4 h-4 text-amber-400" />
+                  <span>Continua (+10 Quiz)</span>
+                </button>
+              )}
+
               <div className="flex gap-2">
                 <button
                   onClick={() => setShowSubmitModal(false)}
@@ -1196,7 +1455,11 @@ export const ExamScreen: React.FC<ExamScreenProps> = ({
         }}
         sessionTitle={
           examMode === 'tutor'
-            ? 'Tutor'
+            ? tutorFormat === 'flash'
+              ? 'Tutor Flash (10 Quiz)'
+              : tutorFormat === 'endless'
+              ? 'Tutor Flusso Continuo'
+              : 'Tutor Standard'
             : isMarathon
             ? 'Maratona 60 Quiz'
             : 'Simulazione Esame Ufficiale'
@@ -1214,9 +1477,13 @@ export const ExamScreen: React.FC<ExamScreenProps> = ({
       {/* Modale Conflitto Sessione in Sospeso per Avvio Nuova Prova */}
       <SessionConflictModal
         isOpen={conflictPendingMode !== null}
-        onClose={() => setConflictPendingMode(null)}
+        onClose={() => {
+          setConflictPendingMode(null);
+          setConflictPendingFormat(undefined);
+        }}
         onResumeExisting={() => {
           setConflictPendingMode(null);
+          setConflictPendingFormat(undefined);
           if (activeSession) {
             isDismissedRef.current = false;
             const ordered = activeSession.questionIds
@@ -1226,9 +1493,16 @@ export const ExamScreen: React.FC<ExamScreenProps> = ({
               const resMode = activeSession.examMode || (activeSession.isMarathon ? 'marathon' : 'official');
               setExamQuestions(ordered);
               setExamMode(resMode);
+              if (activeSession.tutorFormat) {
+                setTutorFormat(activeSession.tutorFormat);
+              }
               setCurrentIndex(Math.min(activeSession.currentIndex || 0, ordered.length - 1));
-              setAnswers(activeSession.answers || {});
-              setFlags(activeSession.flags || {});
+              const resAnswers = activeSession.answers || {};
+              const resFlags = activeSession.flags || {};
+              setAnswers(resAnswers);
+              answersRef.current = resAnswers;
+              setFlags(resFlags);
+              flagsRef.current = resFlags;
               if (resMode === 'tutor') {
                 setElapsedSeconds(activeSession.elapsedSeconds || activeSession.secondsRemaining || 0);
               } else {
@@ -1243,15 +1517,23 @@ export const ExamScreen: React.FC<ExamScreenProps> = ({
         }}
         onDiscardAndStartNew={async () => {
           const mode = conflictPendingMode || 'tutor';
+          const format = conflictPendingFormat;
           setConflictPendingMode(null);
+          setConflictPendingFormat(undefined);
           await dismissActiveSession();
-          startExam(mode);
+          startExam(mode, format);
         }}
         existingTitle={
           activeSession?.subjectName ||
           (activeSession?.type === 'exam'
             ? activeSession.examMode === 'tutor'
-              ? 'Tutor'
+              ? activeSession.tutorFormat === 'flash'
+                ? 'Tutor Flash (10 Quiz)'
+                : activeSession.tutorFormat === 'endless'
+                ? 'Tutor Continuo'
+                : 'Tutor Standard (30 Quiz)'
+              : activeSession.isMarathon
+              ? 'Maratona 60 Quiz'
               : 'Esame Ufficiale'
             : 'Sessione di Studio')
         }
@@ -1260,7 +1542,11 @@ export const ExamScreen: React.FC<ExamScreenProps> = ({
         } • ${activeSession?.answers ? Object.keys(activeSession.answers).length : 0} risposte date`}
         newSessionTitle={
           conflictPendingMode === 'tutor'
-            ? 'Nuova Sessione Tutor'
+            ? conflictPendingFormat === 'flash'
+              ? 'Nuova Sessione Tutor Flash (10 Quiz)'
+              : conflictPendingFormat === 'endless'
+              ? 'Nuovo Flusso Continuo Tutor'
+              : 'Nuova Sessione Tutor (30 Quiz)'
             : conflictPendingMode === 'marathon'
             ? 'Nuova Maratona 60 Quiz'
             : 'Nuova Simulazione Esame Ufficiale'

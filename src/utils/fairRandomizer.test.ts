@@ -4,6 +4,7 @@ import type { Question } from '../types/quiz';
 import type { QuestionStat } from '../types/database';
 import {
   generateExamQuestions,
+  generateFlashTutorQuestions,
   OFFICIAL_EXAM_QUOTAS,
   MARATHON_EXAM_QUOTAS
 } from './fairRandomizer';
@@ -171,4 +172,84 @@ describe('Suite 2: Fair Coverage Randomizer (src/utils/fairRandomizer.ts)', () =
       expect(stat!.timesSeen).toBeGreaterThanOrEqual(1);
     }
   });
+
+  it('RAND-07: generateFlashTutorQuestions extracts exactly requested count (default 10) without duplicates', () => {
+    // Arrange
+    const statsMap = new Map<number, QuestionStat>();
+
+    // Act
+    const flashQuestions = generateFlashTutorQuestions(allQuestions, statsMap, 10);
+
+    // Assert
+    expect(flashQuestions.length).toBe(10);
+    const uniqueIds = new Set(flashQuestions.map(q => q.id));
+    expect(uniqueIds.size).toBe(10);
+  });
+
+  it('RAND-08: generateFlashTutorQuestions prioritizes unseen questions (timesSeen=0) and active mistakes', () => {
+    // Arrange: mark 500 questions as seen and mastered
+    const statsMap = new Map<number, QuestionStat>();
+    for (let i = 0; i < 500; i++) {
+      const q = allQuestions[i];
+      statsMap.set(q.id, {
+        questionId: q.id,
+        timesSeen: 4,
+        timesCorrect: 4,
+        timesWrong: 0,
+        consecutiveCorrect: 4,
+        isBookmarked: false
+      });
+    }
+
+    // Leave exactly 4 questions unseen (timesSeen=0)
+    const unseenQuestions = allQuestions.slice(500, 504);
+
+    // Pick 2 questions from the mastered group and make them active mistakes
+    const activeMistake1 = allQuestions[10];
+    const activeMistake2 = allQuestions[20];
+    statsMap.set(activeMistake1.id, {
+      questionId: activeMistake1.id,
+      timesSeen: 3,
+      timesCorrect: 1,
+      timesWrong: 2,
+      consecutiveCorrect: 0,
+      isBookmarked: false
+    });
+    statsMap.set(activeMistake2.id, {
+      questionId: activeMistake2.id,
+      timesSeen: 4,
+      timesCorrect: 2,
+      timesWrong: 2,
+      consecutiveCorrect: 0,
+      isBookmarked: false
+    });
+
+    // Act
+    const batch = generateFlashTutorQuestions(allQuestions, statsMap, 10);
+    const batchIds = new Set(batch.map(q => q.id));
+
+    // Assert: all 4 unseen questions and both active mistakes MUST be included in the top 10 batch
+    for (const unseen of unseenQuestions) {
+      expect(batchIds.has(unseen.id)).toBe(true);
+    }
+    expect(batchIds.has(activeMistake1.id)).toBe(true);
+    expect(batchIds.has(activeMistake2.id)).toBe(true);
+  });
+
+  it('RAND-09: generateFlashTutorQuestions respects excludeIds when extending session (+10 questions)', () => {
+    // Arrange
+    const statsMap = new Map<number, QuestionStat>();
+    const firstBatch = generateFlashTutorQuestions(allQuestions, statsMap, 10);
+    const firstBatchIds = new Set(firstBatch.map(q => q.id));
+
+    // Act: request 10 more questions excluding the first batch
+    const secondBatch = generateFlashTutorQuestions(allQuestions, statsMap, 10, firstBatchIds);
+
+    // Assert
+    expect(secondBatch.length).toBe(10);
+    for (const q of secondBatch) {
+      expect(firstBatchIds.has(q.id)).toBe(false);
+    }
+  });
 });
+

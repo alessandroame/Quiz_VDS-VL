@@ -393,7 +393,15 @@ function AppContent() {
               </div>
               <div className="min-w-0">
                 <div className="font-bold text-amber-100 light:text-amber-900 truncate">
-                  Riprendi: {activeSession.subjectName || (activeSession.type === 'exam' ? 'Simulazione Esame' : 'Quaderno Errori')}
+                  Riprendi: {activeSession.subjectName || (activeSession.type === 'exam'
+                    ? (activeSession.examMode === 'tutor'
+                        ? (activeSession.tutorFormat === 'flash'
+                            ? 'Tutor Flash (10 Quiz)'
+                            : activeSession.tutorFormat === 'endless'
+                            ? 'Tutor Continuo'
+                            : 'Tutor Standard (30 Quiz)')
+                        : 'Simulazione Esame')
+                    : 'Quaderno Errori')}
                 </div>
                 <div className="text-[11px] text-amber-300/80 light:text-amber-700 truncate">
                   Domanda {activeSession.currentIndex + 1} di {activeSession.questionIds.length} • {activeSession.answers ? Object.keys(activeSession.answers).length : 0} risposte date
@@ -514,7 +522,13 @@ function AppContent() {
           sessionTitle={
             activeSession?.subjectName ||
             (activeSession?.type === 'exam'
-              ? (activeSession.examMode === 'tutor' ? 'Tutor Didattico' : 'Simulazione Esame')
+              ? (activeSession.examMode === 'tutor'
+                  ? (activeSession.tutorFormat === 'flash'
+                      ? 'Tutor Flash (10 Quiz)'
+                      : activeSession.tutorFormat === 'endless'
+                      ? 'Tutor Continuo'
+                      : 'Tutor Standard (30 Quiz)')
+                  : 'Simulazione Esame')
               : 'Quaderno Errori')
           }
           currentIndex={activeSession?.currentIndex || 0}
