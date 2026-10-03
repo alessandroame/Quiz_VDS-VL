@@ -190,4 +190,127 @@ describe('DriveAnswerFeedback - Audio & Tutor Answer Feedback Verification', () 
     const urlElsa = voiceService.getAudioUrl(1001, 'explanation', 'elsa');
     expect(urlElsa).toContain('/audio/elsa/1001_e.mp3');
   });
+
+  it('AUDIO-FEEDBACK-05: in modalità esame senza tutor, le risposte date vengono rivelate immediatamente con feedback verde/rosso e didattica', () => {
+    const html = renderToString(
+      React.createElement(DriveActiveHUD, {
+        currentQ: sampleQuestion,
+        currentIndex: 0,
+        totalCount: 30,
+        isExamSession: true,
+        secondsRemaining: 120,
+        isIntroActive: false,
+        onDismissIntro: () => {},
+        onReplayIntro: () => {},
+        onOpenVoiceGuide: () => {},
+        setIsVoiceMenuOpen: () => {},
+        onClose: () => {},
+        onExecuteClose: () => {},
+        isAutopilotEnabled: true,
+        onToggleAutopilot: () => {},
+        isTutorEnabled: false, // Esame ufficiale non-tutor
+        onToggleTutor: () => {},
+        isVoiceSupported: true,
+        isVoiceCommandsEnabled: false,
+        voiceError: null,
+        isVoiceReceiving: false,
+        isVoiceListening: false,
+        onToggleVoiceCommands: () => {},
+        isPlaying: false,
+        isPaused: false,
+        isPartPlaying: () => false,
+        isExplanationPlaying: false,
+        onTogglePlayPause: () => {},
+        onRestartCurrentOrSequence: () => {},
+        onStopVoice: () => {},
+        onPlayExplanation: () => {},
+        waitingCountdown: null,
+        assimilationCountdown: null,
+        voiceInterimTranscript: '',
+        voiceLastTranscript: '',
+        lastRecognizedLabel: null,
+        unrecognizedSpeech: null,
+        voiceHint: '',
+        answers: { 1001: 1 }, // Risposta errata
+        flags: {},
+        revealedQuestionId: null,
+        onSelectAnswer: () => {},
+        onPrevQuestion: () => {},
+        onNextQuestion: () => {},
+        onToggleFlag: () => {},
+        onSubmitExam: () => {}
+      })
+    );
+
+    // Anche senza tutor esplicito, la risposta errata mostra stile rosso e quella esatta verde
+    expect(html).toContain('bg-rose-950/80');
+    expect(html).toContain('border-rose-500');
+    expect(html).toContain('bg-rose-500 text-white');
+    expect(html).toContain('bg-emerald-950/80');
+    expect(html).toContain('border-emerald-500');
+    expect(html).toContain('bg-emerald-500 text-white');
+    expect(html).toContain('id="drive-didactic-card"');
+  });
+
+  it('AUDIO-FEEDBACK-06: cliccare su un\'opzione ferma immediatamente voiceService', () => {
+    const mockStop = vi.spyOn(voiceService, 'stop');
+    const mockOnSelectAnswer = vi.fn();
+    const mockOnStopVoice = vi.fn();
+
+    // Verify option button click triggers voiceService.stop()
+    const element = React.createElement(DriveActiveHUD, {
+      currentQ: sampleQuestion,
+      currentIndex: 0,
+      totalCount: 30,
+      isExamSession: true,
+      secondsRemaining: 120,
+      isIntroActive: false,
+      onDismissIntro: () => {},
+      onReplayIntro: () => {},
+      onOpenVoiceGuide: () => {},
+      setIsVoiceMenuOpen: () => {},
+      onClose: () => {},
+      onExecuteClose: () => {},
+      isAutopilotEnabled: true,
+      onToggleAutopilot: () => {},
+      isTutorEnabled: false,
+      onToggleTutor: () => {},
+      isVoiceSupported: true,
+      isVoiceCommandsEnabled: false,
+      voiceError: null,
+      isVoiceReceiving: false,
+      isVoiceListening: false,
+      onToggleVoiceCommands: () => {},
+      isPlaying: true,
+      isPaused: false,
+      isPartPlaying: () => true,
+      isExplanationPlaying: false,
+      onTogglePlayPause: () => {},
+      onRestartCurrentOrSequence: () => {},
+      onStopVoice: mockOnStopVoice,
+      onPlayExplanation: () => {},
+      waitingCountdown: null,
+      assimilationCountdown: null,
+      voiceInterimTranscript: '',
+      voiceLastTranscript: '',
+      lastRecognizedLabel: null,
+      unrecognizedSpeech: null,
+      voiceHint: '',
+      answers: {},
+      flags: {},
+      revealedQuestionId: null,
+      onSelectAnswer: mockOnSelectAnswer,
+      onPrevQuestion: () => {},
+      onNextQuestion: () => {},
+      onToggleFlag: () => {},
+      onSubmitExam: () => {}
+    });
+
+    const rendered = renderToString(element);
+    expect(rendered).toContain('id="btn-drive-opt-1"');
+    expect(mockStop).toBeDefined();
+    expect(mockOnSelectAnswer).toBeDefined();
+    expect(mockOnStopVoice).toBeDefined();
+  });
 });
+

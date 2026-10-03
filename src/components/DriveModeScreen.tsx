@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import type { Question } from '../types/quiz';
 import type { ExamSession } from '../types/database';
-import type { AudioPart } from '../types/audio';
 import { useQuiz } from '../context/QuizContext';
 import { generateExamQuestions } from '../utils/fairRandomizer';
 import { evaluateExam } from '../services/examEvaluator';
@@ -202,11 +201,6 @@ export const DriveModeScreen: React.FC<DriveModeScreenProps> = ({
   const questionSwitchTimeoutRef = useRef<any>(null);
   const prevQuestionIdRef = useRef<number | null>(null);
 
-  // Safety micro-cooldown (500ms) when voice switches option to prevent accidental clicks during expansion
-  const [isOptionSwitchingCooldown, setIsOptionSwitchingCooldown] = useState<boolean>(false);
-  const optionSwitchTimeoutRef = useRef<any>(null);
-  const prevActivePartRef = useRef<AudioPart | null>(null);
-
   const clearAllDriveTimers = useCallback(() => {
     if (countdownTimerRef.current) {
       clearInterval(countdownTimerRef.current);
@@ -232,15 +226,10 @@ export const DriveModeScreen: React.FC<DriveModeScreenProps> = ({
       clearTimeout(questionSwitchTimeoutRef.current);
       questionSwitchTimeoutRef.current = null;
     }
-    if (optionSwitchTimeoutRef.current) {
-      clearTimeout(optionSwitchTimeoutRef.current);
-      optionSwitchTimeoutRef.current = null;
-    }
     setWaitingCountdown(null);
     setAssimilationCountdown(null);
     setIsWaitingForExplanationEnd(false);
     isWaitingForExplanationEndRef.current = false;
-    setIsOptionSwitchingCooldown(false);
   }, []);
 
   // Sincronizza stato iniziale all'apertura o cambio di context
@@ -248,9 +237,7 @@ export const DriveModeScreen: React.FC<DriveModeScreenProps> = ({
     if (!isOpen) {
       setInternalMode('launcher');
       prevQuestionIdRef.current = null;
-      prevActivePartRef.current = null;
       setIsQuestionSwitching(false);
-      setIsOptionSwitchingCooldown(false);
       return;
     }
     if (sessionContext) {
@@ -312,37 +299,8 @@ export const DriveModeScreen: React.FC<DriveModeScreenProps> = ({
     stopDriveIntro,
     stop: stopVoice,
     pause: pauseVoice,
-    resume: resumeVoice,
-    activePart
+    resume: resumeVoice
   } = useAviationVoice(currentQ?.id);
-
-  // Anti-misclick micro-cooldown (500ms) when voice switches spoken option
-  useEffect(() => {
-    if (!isOpen || internalMode !== 'running') return;
-
-    if (
-      isPlaying &&
-      prevActivePartRef.current &&
-      activePart &&
-      prevActivePartRef.current !== activePart &&
-      (activePart.startsWith('opt') || prevActivePartRef.current.startsWith('opt'))
-    ) {
-      setIsOptionSwitchingCooldown(true);
-      if (optionSwitchTimeoutRef.current) clearTimeout(optionSwitchTimeoutRef.current);
-      optionSwitchTimeoutRef.current = setTimeout(() => {
-        setIsOptionSwitchingCooldown(false);
-        optionSwitchTimeoutRef.current = null;
-      }, 500);
-    }
-
-    prevActivePartRef.current = activePart;
-
-    return () => {
-      if (optionSwitchTimeoutRef.current) {
-        clearTimeout(optionSwitchTimeoutRef.current);
-      }
-    };
-  }, [isOpen, internalMode, activePart, isPlaying]);
 
   const isExplanationPlaying = isPartPlaying('explanation');
 
@@ -544,16 +502,18 @@ export const DriveModeScreen: React.FC<DriveModeScreenProps> = ({
   const handleSelectAnswer = async (ans: 1 | 2 | 3) => {
     if (!currentQ || internalMode !== 'running') return;
 
-    // Ignore clicks during safety micro-cooldown (250ms on question switch or 500ms on spoken option switch with layout shift)
-    if (isQuestionSwitching || isOptionSwitchingCooldown) return;
+    // Ignore clicks during safety question switch micro-cooldown (250ms)
+    if (isQuestionSwitching) return;
 
-    // Se l'esame è già terminato o la domanda è già rivelata
-    if (answers[currentQ.id] !== undefined && (!isExamSession || isTutorEnabled)) return;
+    // Se la domanda ha già una risposta, non sovrascrivere
+    if (answers[currentQ.id] !== undefined) return;
+
+    // FERMA IMMEDIATAMENTE LA VOCE E TUTTI I TIMER AUDIO!
+    voiceService.stop();
+    stopVoice();
+    clearAllDriveTimers();
 
     triggerHapticFeedback('tap');
-
-    clearAllDriveTimers();
-    stopVoice();
 
     const isCorrect = ans === currentQ.correctAnswer;
     triggerHapticFeedback(isCorrect ? 'success' : 'error');
@@ -569,26 +529,26 @@ export const DriveModeScreen: React.FC<DriveModeScreenProps> = ({
       else soundFX.playWrong();
     }
 
-    if (!isExamSession || isTutorEnabled) {
-      setRevealedQuestionId(currentQ.id);
-      if (!sessionContext && (!isExamSession || isTutorEnabled)) {
-        await recordAnswer(currentQ.id, isCorrect, ans, 'audio_mode');
-      }
+    // Rivelazione immediata dell'esito (Verde se corretta, Rosso se errata con card didattica)
+    setRevealedQuestionId(currentQ.id);
 
-      if (!isCorrect && (isTutorEnabled || settings.ttsAutoExplainOnMistake)) {
-        // MODALITÀ TUTOR su errore o spiegazione automatica su errore:
-        // riproduce la spiegazione didattica (Regola + Tranello) e sincronizza l'autopilota
-        isWaitingForExplanationEndRef.current = true;
-        setIsWaitingForExplanationEnd(true);
-        if (autoExplainTimerRef.current) clearTimeout(autoExplainTimerRef.current);
-        autoExplainTimerRef.current = setTimeout(() => {
-          autoExplainTimerRef.current = null;
-          if (internalMode === 'running') {
-            playExplanation();
-          }
-        }, 300);
-        return; // L'avanzamento avverrà al termine della lettura vocale + pausa di assimilazione
-      }
+    // Registra risposta in Dexie per tracciamento didattico
+    if (!sessionContext) {
+      await recordAnswer(currentQ.id, isCorrect, ans, 'audio_mode');
+    }
+
+    if (!isCorrect && (isTutorEnabled || settings.ttsAutoExplainOnMistake !== false)) {
+      // Riproduce la spiegazione didattica (Regola + Tranello) e sincronizza l'autopilota
+      isWaitingForExplanationEndRef.current = true;
+      setIsWaitingForExplanationEnd(true);
+      if (autoExplainTimerRef.current) clearTimeout(autoExplainTimerRef.current);
+      autoExplainTimerRef.current = setTimeout(() => {
+        autoExplainTimerRef.current = null;
+        if (internalMode === 'running') {
+          playExplanation();
+        }
+      }, 300);
+      return; // L'avanzamento avverrà al termine della lettura vocale + pausa di assimilazione
     }
 
     // Se il pilota automatico è attivo (risposta corretta o modalità senza spiegazione), avanza dopo tempo standard
@@ -1163,7 +1123,7 @@ export const DriveModeScreen: React.FC<DriveModeScreenProps> = ({
           onToggleFlag={handleToggleFlag}
           onSubmitExam={handleSubmitExam}
           isQuestionSwitching={isQuestionSwitching}
-          isCooldownActive={isQuestionSwitching || isOptionSwitchingCooldown}
+          isCooldownActive={isQuestionSwitching}
         />
       )}
 

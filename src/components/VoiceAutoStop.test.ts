@@ -43,6 +43,7 @@ vi.mock('../services/examEvaluator', () => ({
 import { ExamScreen } from './ExamScreen';
 import { TopicsScreen } from './TopicsScreen';
 import { MistakesScreen } from './MistakesScreen';
+import { DriveActiveHUD } from './drive/DriveActiveHUD';
 
 describe('Voice Auto-Stop on Back & Quiz Termination Contracts', () => {
   let container: HTMLDivElement;
@@ -370,5 +371,71 @@ describe('Voice Auto-Stop on Back & Quiz Termination Contracts', () => {
 
     expect(mockStop).toHaveBeenCalled();
   });
+
+  it('VOICE-STOP-12: clicking an option in DriveActiveHUD stops voiceService immediately', async () => {
+    mockStop.mockClear();
+
+    await act(async () => {
+      root.render(
+        React.createElement(DriveActiveHUD, {
+          currentQ: sampleQuestion,
+          currentIndex: 0,
+          totalCount: 30,
+          isExamSession: true,
+          secondsRemaining: 120,
+          isIntroActive: false,
+          onDismissIntro: () => {},
+          onReplayIntro: () => {},
+          onOpenVoiceGuide: () => {},
+          setIsVoiceMenuOpen: () => {},
+          onClose: () => {},
+          onExecuteClose: () => {},
+          isAutopilotEnabled: true,
+          onToggleAutopilot: () => {},
+          isTutorEnabled: false,
+          onToggleTutor: () => {},
+          isVoiceSupported: true,
+          isVoiceCommandsEnabled: false,
+          voiceError: null,
+          isVoiceReceiving: false,
+          isVoiceListening: false,
+          onToggleVoiceCommands: () => {},
+          isPlaying: true,
+          isPaused: false,
+          isPartPlaying: () => true,
+          isExplanationPlaying: false,
+          onTogglePlayPause: () => {},
+          onRestartCurrentOrSequence: () => {},
+          onStopVoice: () => {},
+          onPlayExplanation: () => {},
+          waitingCountdown: null,
+          assimilationCountdown: null,
+          voiceInterimTranscript: '',
+          voiceLastTranscript: '',
+          lastRecognizedLabel: null,
+          unrecognizedSpeech: null,
+          voiceHint: '',
+          answers: {},
+          flags: {},
+          revealedQuestionId: null,
+          onSelectAnswer: () => {},
+          onPrevQuestion: () => {},
+          onNextQuestion: () => {},
+          onToggleFlag: () => {},
+          onSubmitExam: () => {}
+        })
+      );
+    });
+
+    const optBtn = container.querySelector('#btn-drive-opt-1') as HTMLButtonElement;
+    expect(optBtn).not.toBeNull();
+
+    await act(async () => {
+      optBtn.click();
+    });
+
+    expect(mockStop).toHaveBeenCalled();
+  });
 });
+
 

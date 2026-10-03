@@ -24,6 +24,7 @@ import type { Question } from '../../types/quiz';
 import { formatTime } from '../../utils/timer';
 import { OfflineHUDTag } from '../OfflineIndicator';
 import { VoiceQuickMenu } from '../VoiceQuickMenu';
+import { voiceService } from '../../services/voiceService';
 import type { DriveModeSessionContext } from '../DriveModeScreen';
 
 export interface DriveActiveHUDProps {
@@ -134,10 +135,9 @@ export const DriveActiveHUD: React.FC<DriveActiveHUDProps> = ({
   isQuestionSwitching = false,
   isCooldownActive = false
 }) => {
-  const isLocked = isCooldownActive || isQuestionSwitching;
   const isCurrentRevealed =
-    revealedQuestionId === currentQ.id ||
-    ((!isExamSession || isTutorEnabled) && answers[currentQ.id] !== undefined);
+    revealedQuestionId === currentQ.id || answers[currentQ.id] !== undefined;
+  const isLocked = isCurrentRevealed || isCooldownActive || isQuestionSwitching;
 
   // DOM element refs for accurate overflow / truncation measurement
   const questionTextRef = React.useRef<HTMLHeadingElement | null>(null);
@@ -720,7 +720,11 @@ export const DriveActiveHUD: React.FC<DriveActiveHUDProps> = ({
                 lang="it"
                 translate="no"
                 disabled={isLocked}
-                onClick={() => onSelectAnswer(optNum)}
+                onClick={() => {
+                  voiceService.stop();
+                  onStopVoice();
+                  onSelectAnswer(optNum);
+                }}
                 className={`overflow-hidden ${
                   isCurrentRevealed
                     ? 'w-full rounded-xl border p-2 sm:p-2.5 flex items-center gap-2.5 sm:gap-3 text-left transition-all duration-300'
@@ -735,6 +739,8 @@ export const DriveActiveHUD: React.FC<DriveActiveHUDProps> = ({
                   } flex items-center justify-center flex-shrink-0 transition-transform ${
                     isCurrentRevealed && isCorrectAnswer
                       ? 'bg-emerald-500 text-white'
+                      : isCurrentRevealed && isSelected && !isCorrectAnswer
+                      ? 'bg-rose-500 text-white'
                       : isSelected
                       ? 'bg-amber-500 text-zinc-950'
                       : isCurrentOptPlaying

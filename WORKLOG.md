@@ -14,6 +14,27 @@ Questo documento registra in ordine cronologico tutte le lavorazioni svolte nel 
 - **Impatto sul Desiderata**: <Come questo intervento contribuisce al desiderata (cfr. DESIDERATA.md) e indicazioni per il prossimo agente>
 ```
 
+### [2026-10-03] - Interruzione Istantanea Audio e Feedback Didattico Immediato in Modalità Mani Libere (v1.7.14)
+
+- **Cosa abbiamo fatto**:
+  - **Interruzione Istantanea Audio alla Selezione in Modalità Mani Libere ([src/components/DriveModeScreen.tsx](file:///c:/github/Quiz_VDS-VL/src/components/DriveModeScreen.tsx), [src/components/drive/DriveActiveHUD.tsx](file:///c:/github/Quiz_VDS-VL/src/components/drive/DriveActiveHUD.tsx))**:
+    - Risolto il difetto per cui, selezionando un'opzione (es. opzione 1) mentre la voce stava ancora parlando (es. opzione 2), la sintesi vocale continuava imperterrita fino a pronunciare l'opzione 3.
+    - Rimosso il timeout di cooldown `isOptionSwitchingCooldown` (500ms) in `DriveModeScreen.tsx`, che ad ogni passaggio di lettura tra un'opzione e la successiva disabilitava i pulsanti (`disabled`, `pointer-events-none`), causando l'annullamento/ignoramento dei tap utente mentre la voce continuava a parlare.
+    - Inserita la chiamata sincrona a `voiceService.stop()` e `stopVoice()` come prima operazione assoluta sia nell'`onClick` del pulsante opzione in `DriveActiveHUD.tsx` sia all'inizio di `handleSelectAnswer` in `DriveModeScreen.tsx`, garantendo l'arresto immediato di qualsiasi stream audio o timer vocale.
+  - **Feedback Visivo e Card Didattica Immediata in Mani Libere**:
+    - Risolto il blocco che manteneva l'opzione selezionata in colore ambra (`bg-amber-950 border-amber-500`) senza mai mostrare il feedback verde/rosso e senza mostrare la card didattica (Regola + Tranello).
+    - Rimosso il blocco condizionale `(!isExamSession || isTutorEnabled)` sia in `DriveActiveHUD` (`isCurrentRevealed`) sia in `DriveModeScreen` (`setRevealedQuestionId`), rendendo visibile il feedback didattico immediato (verde smeraldo se corretta, rosa/rosso se errata con scheda didattica `#drive-didactic-card`) anche nelle sessioni d'esame.
+    - Aggiornato il badge circolare del numero opzione in `DriveActiveHUD`: evidenziato in rosso chiaro (`bg-rose-500 text-white`) se la risposta selezionata è errata, azzerando la persistenza dell'ambra.
+  - **Suite di Test Unitari**:
+    - Aggiunto `AUDIO-FEEDBACK-05` e `AUDIO-FEEDBACK-06` in [src/components/drive/DriveAnswerFeedback.test.ts](file:///c:/github/Quiz_VDS-VL/src/components/drive/DriveAnswerFeedback.test.ts) per verificare che la modalità Mani Libere mostri sempre lo stile corretto/errato e interrompa la voce al click.
+    - Aggiunto `VOICE-STOP-12` in [src/components/VoiceAutoStop.test.ts](file:///c:/github/Quiz_VDS-VL/src/components/VoiceAutoStop.test.ts) per verificare l'invocazione di `voiceService.stop()` al click delle opzioni in HUD.
+- **Scelte architetturali & Rationale**:
+  - *Rimozione del Cooldown di Selezione*: Il cooldown di 500ms tra opzioni causava perdita di eventi utente durante l'ascolto. La priorità assoluta dell'interfaccia deve essere l'immediatezza della reazione dell'allievo: se l'allievo riconosce la risposta corretta, il tocco deve interrompere l'audio e registrare la scelta senza alcuna latenza artificiale.
+- **Impatto sul Desiderata**:
+  - Piena coerenza di comportamento tra la modalità normale e la modalità Mani Libere, azzeramento delle sovrapposizioni audio e feedback visivo istantaneo.
+
+---
+
 ### [2026-10-03] - Risoluzione Disallineamento Build Info in Dev Locale (v1.7.13)
 
 - **Cosa abbiamo fatto**:
