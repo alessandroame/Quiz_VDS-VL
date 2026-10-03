@@ -20,11 +20,17 @@ const logBuildInfo = (info: ReturnType<typeof getBuildInfo>, isLiveUpdate = fals
   const prefix = isLiveUpdate ? `[${APP_NAME} Dev Live]` : `[${APP_NAME}]`;
   const badgeBg = isLiveUpdate ? '#059669' : '#0284c7';
   console.log(
-    `%c${prefix}%c v${info.version} (Build #${info.buildNumber} • ${info.commitHash}) - Built: ${info.buildTime}`,
+    `%c${prefix}%c #${info.buildNumber} %c v${info.version} (${info.commitHash}) - Built: ${info.buildTime}`,
     `background: ${badgeBg}; color: #ffffff; font-weight: bold; padding: 2px 6px; border-radius: 4px;`,
-    'color: #38bdf8; font-weight: bold; margin-left: 4px;'
+    'background: #f59e0b; color: #000000; font-weight: 900; padding: 2px 6px; border-radius: 4px; margin-left: 4px;',
+    'color: #38bdf8; font-weight: bold; margin-left: 6px;'
   );
-  console.log(`[VDS-VL Build ID] ${info.buildId}`);
+  console.log(
+    `%c[VDS-VL Build ID]%c #${info.buildNumber} %c(${info.commitHash}) - ${info.buildTime}`,
+    'background: #3f3f46; color: #ffffff; font-weight: bold; padding: 2px 6px; border-radius: 4px;',
+    'background: #f59e0b; color: #000000; font-weight: 900; padding: 2px 6px; border-radius: 4px; margin-left: 4px;',
+    'color: #94a3b8; font-weight: 600; margin-left: 4px;'
+  );
 };
 
 const initialBuildInfo = getBuildInfo();

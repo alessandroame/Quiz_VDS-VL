@@ -14,6 +14,21 @@ Questo documento registra in ordine cronologico tutte le lavorazioni svolte nel 
 - **Impatto sul Desiderata**: <Come questo intervento contribuisce al desiderata (cfr. DESIDERATA.md) e indicazioni per il prossimo agente>
 ```
 
+### [2026-10-03] - Badge Console ad Alto Contrasto per Numero di Build (v1.7.16)
+
+- **Cosa abbiamo fatto**:
+  - **Badge Console Dedicato ad Alto Contrasto ([src/main.tsx](file:///c:/github/Quiz_VDS-VL/src/main.tsx))**:
+    - Introdotto un badge cromatico dedicato e separato in console per il numero di build, posizionato immediatamente a destra dell'etichetta `[Quiz VDS-VL Dev Live]` (o `[Quiz VDS-VL]`).
+    - Stile del badge: sfondo ambra acceso `#f59e0b` con testo nero assoluto `#000000`, peso font 900 (ultra-bold) e padding `2px 6px` con angoli arrotondati `4px`.
+    - Rapporto di contrasto superiore a 12.5:1 (conforme WCAG AAA), garantendo che il numero progressivo di build (es. `#235`) risalti all'istante all'apertura dei DevTools sia su tema scuro che su tema chiaro.
+    - Uniformata anche la seconda riga di log `[VDS-VL Build ID]` per includere il medesimo pill badge ambra.
+- **Scelte architetturali & Rationale**:
+  - *Immediate Visual Scan in DevTools*: Raggruppare versione, build e commit hash in un unico blocco di testo monocromatico rallentava l'ispezione visiva del log. L'isolamento del contatore in un badge ad alto contrasto dedicato rende la verifica immediata per l'allievo/sviluppatore.
+- **Impatto sul Desiderata**:
+  - Massima rapidità e chiarezza nella verifica visiva della build corrente direttamente dai log della console.
+
+---
+
 ### [2026-10-03] - Risoluzione Loop Re-render Ricorsivo e Stabilizzazione Context Provider (v1.7.15)
 
 - **Cosa abbiamo fatto**:
