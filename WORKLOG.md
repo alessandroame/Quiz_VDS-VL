@@ -14,6 +14,30 @@ Questo documento registra in ordine cronologico tutte le lavorazioni svolte nel 
 - **Impatto sul Desiderata**: <Come questo intervento contribuisce al desiderata (cfr. DESIDERATA.md) e indicazioni per il prossimo agente>
 ```
 
+### [2026-10-03] - Risoluzione Mancata Comparsa 'Leggi tutto' su Risposte Troncate in Modalità Mani Libere (v1.7.17)
+
+- **Cosa abbiamo fatto**:
+  - **Algoritmo di Rilevamento Troncamento Multi-Strategia ([src/components/drive/DriveActiveHUD.tsx](file:///c:/github/Quiz_VDS-VL/src/components/drive/DriveActiveHUD.tsx))**:
+    - Risolto il difetto segnalato dall'allievo (evidenziato sul quesito #7006 e diffuso su molti quesiti) in cui risposte con testo lungo troncato a 2 righe con ellipsis (`...`) non mostravano il controllo `[Leggi tutto]`, impedendo la lettura del testo completo prima di rispondere.
+    - Causa individuata: quando `line-clamp-2` (`display: -webkit-box; -webkit-line-clamp: 2; overflow: hidden;`) viene applicato dai browser (Chromium/WebKit), per testi che debordano di poche parole su una 3ª riga la proprietà `scrollHeight` viene spesso calcolata pari a `clientHeight` (entrambi 39px su viewport mobile). Di conseguenza, i controlli `scrollHeight > clientHeight + 1` ed `exceeds2Lines` fallivano entrambi, impostando falsamente `truncatedOpts[optNum] = false`. Inoltre, la soglia di fallback basata sui caratteri (95 caratteri) era troppo elevata per linee corte su mobile (dove 2 righe contano solo ~50-60 caratteri).
+    - Implementata funzione pura `checkTruncation` multi-strategia:
+      1. *Direct scrollHeight check*: verifica se `scrollHeight > clientHeight + 1` (efficace quando il browser propaga l'overflow).
+      2. *Line height check*: verifica se `scrollHeight > (lineHeight * maxLines) + 3`.
+      3. *Range `getClientRects()` line counting*: calcolo deterministico del numero effettivo di frammenti di riga di testo renderizzati nel DOM (`document.createRange().selectNodeContents(el)`). Non risente del ritaglio CSS di `line-clamp` e restituisce esattamente il conteggio delle righe (es. 3 righe per l'opzione 1 e 2 di #7006), identificando senza eccezioni qualsiasi debordamento oltre `maxLines`.
+      4. *Off-screen clone measurement*: misurazione di sicurezza su clone temporaneo de-clamped (`webkitLineClamp: unset`) alla stessa larghezza `clientWidth` del contenitore.
+    - Integrato `ResizeObserver` per monitorare in tempo reale il ridimensionamento di domanda e opzioni, ricalcolando la troncatura all'istante anche al cambio di orientamento (portrait/landscape) o al caricamento asincrono dei font.
+    - Abbassata la soglia di fallback SSR per le opzioni da 95 a 80 caratteri, garantendo la compatibilità con i test unitari in `renderToString`.
+  - **Suite di Test Unitari ([src/components/drive/DriveActiveHUD.test.ts](file:///c:/github/Quiz_VDS-VL/src/components/drive/DriveActiveHUD.test.ts))**:
+    - Aggiunto test `HUD-EXPAND-06` sul quesito ufficiale #7006 per verificare la corretta presenza dei pulsanti di espansione `[Leggi tutto]` e la robustezza del fallback.
+    - Eseguita l'intera suite Vitest: tutti i 425 test unitari (56 file di test) superati con successo al 100%. Build di produzione `tsc && vite build` completata con zero errori.
+    - Collaudo visivo headless CDP eseguito su viewport mobile smartphone portrait (390x844): verificata la corretta comparsa dei micro-badge `[Leggi tutto]` su tutte le opzioni con testo debordante e zero errori in console.
+- **Scelte architetturali & Rationale**:
+  - *Multi-Strategy Geometry Detection Pattern*: Poiché la specifica CSS non definisce in modo univoco il comportamento di `scrollHeight` per elementi con `display: -webkit-box; -webkit-line-clamp`, affidarsi a una singola proprietà geometrica porta inevitabilmente a falsi negativi su differenti motori grafici. L'utilizzo combinato di `getClientRects()` sul `Range` di testo e del clone off-screen assicura una misurazione deterministica a prova di browser.
+- **Impatto sul Desiderata**:
+  - Piena leggibilità delle risposte per l'allievo pilota in Modalità Mani Libere: nessun testo resta celato o inaccessibile senza possibilità di espansione.
+
+---
+
 ### [2026-10-03] - Badge Console ad Alto Contrasto per Numero di Build (v1.7.16)
 
 - **Cosa abbiamo fatto**:
