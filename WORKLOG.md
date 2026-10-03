@@ -14,6 +14,43 @@ Questo documento registra in ordine cronologico tutte le lavorazioni svolte nel 
 - **Impatto sul Desiderata**: <Come questo intervento contribuisce al desiderata (cfr. DESIDERATA.md) e indicazioni per il prossimo agente>
 ```
 
+# Aggiornamento Registro di Bordo (2026-10-03) - Fix Consegna e Revisione Debriefing Tutor
+
+## Cosa abbiamo fatto
+- **Risoluzione Bug Perdita Risposte alla Consegna Esame / Tutor (`ExamScreen.tsx`)**:
+  - Individuata la causa scatenante per cui al click del tasto di conferma consegna nel modal (`#btn-confirm-submit-exam`), il gestore `onClick={handleSubmitExam}` passava l'evento nativo `MouseEvent` come primo parametro a `handleSubmitExam(overrideAnswers)`. Poiché un oggetto `MouseEvent` è truthy e non è nullo, `effectiveAnswers` lo considerava un dizionario di risposte, causando l'azzeramento di tutte le risposte (`answers[q.id]` risultava `undefined` per tutti i 30 quiz) e assegnando punteggio `0/30 esatte (30 errori) • Tempo: 00:01`.
+  - Introdotta la sanitizzazione difensiva di `overrideAnswers` e `overrideDuration` in `handleSubmitExam`: ignora qualsiasi evento che contenga proprietà `nativeEvent`, `preventDefault` o `target`.
+  - Corretto il callback del pulsante di conferma: `onClick={() => handleSubmitExam()}` per evitare il passaggio dell'evento.
+  - Sincronizzati rigorosamente `answersRef` e `flagsRef` su ogni selezione (`handleSelectAnswer`), toggle bandierina (`handleToggleFlag`), cambio indice (`changeIndex`) e messa in pausa (`handlePauseExamSession`), garantendo che la consegna attinga sempre allo stato più fresco senza soffrire di closure stale.
+- **Risoluzione Passaggio Dati da Modalità Guida (`DriveModeScreen.tsx`)**:
+  - Estesa l'interfaccia `DriveModeSessionContext` con `secondsRemaining?: number` e firma `onSubmitExam?: (answers?: Record<number, 1 | 2 | 3>, durationSeconds?: number) => void`.
+  - Aggiunti `answersRef` e `flagsRef` in `DriveModeScreen.tsx` per prevenire closure asincrone stale in comandi vocali, tastiera e timer dell'autopilota.
+  - Al momento della consegna da sessione collegata, `sessionContext.onSubmitExam(effectiveAnswers, durationSeconds)` inoltra le risposte reali e il tempo trascorso effettivo.
+- **Miglioramento Visualizzazione Modalità Revisione (`QuestionCard.tsx`)**:
+  - Introdotta la prop `isReviewMode?: boolean` in `QuestionCard`.
+  - Gestito il caso di quesito non risposto (`selectedAnswer === undefined`) in fase di debriefing:
+    - Etichetta chiara `<XCircle /> Non risposta (Errata)` con styling rose.
+    - Evidenziazione in verde smeraldo (`border-emerald-500`, badge numerico smeraldo e icona `<CheckCircle2 />`) della risposta corretta.
+    - Opacità attenuata per le opzioni scorrette non selezionate.
+    - Mostra sempre la spiegazione didattica integrale (`Regola:` e `Tranello:`) per massimizzare l'apprendimento anche sulle domande omesse.
+    - Disabilitati tutti i pulsanti di selezione in review mode.
+    - Abilitata la scorciatoia da tastiera `E` per ascoltare la spiegazione didattica anche per i quesiti non risposti.
+- **Test di Regressione e Validazione**:
+  - Test unitari dedicati in `QuestionCard.test.ts` per il rendering in `isReviewMode` di quesiti risposti e non risposti.
+  - Asserzioni puntuali in `ExamScreenReview.test.ts` sulla persistenza di `mockSaveExam` con il conteggio corretto di risposte esatte, errate e non risposte.
+  - Tutti i 56 file di test e 431 test unitari Vitest superati con successo.
+  - Build TypeScript e Vite completata con zero errori.
+
+## Scelte Architetturali & Rationale
+- **Sanitizzazione Eventi in Funzioni Polimorfiche**: Le funzioni callback di React possono essere chiamate sia programmaticamente con parametri (`(answers, duration) => ...`) sia direttamente come event listener (`onClick={...}`). Il controllo difensivo `!('nativeEvent' in overrideAnswers)` previene in modo definitivo che gli eventi DOM inquinino i payload dei dati.
+- **Ref come Verità Immediata per Submit Asincroni**: In contesti con interazioni veloci, timers audio e navigazione Bluetooth/hands-free, i React state updater (`setAnswers`) sono asincroni. L'aggiornamento sincrono preventivo di `answersRef.current` garantisce zero discrepanze temporali tra l'input dell'utente e la consegna.
+
+## Impatto sul Desiderata
+- Rispettato il principio guida di affidabilità della simulazione d'esame e fedeltà dei dati didattici di [DESIDERATA.md](file:///c:/github/Quiz_VDS-VL/DESIDERATA.md).
+- Nessuna risposta dell'allievo andrà più perduta al momento della visualizzazione del debriefing.
+
+---
+
 ### [2026-10-03] - Vincolo di Sicurezza: Divieto Assoluto di Git Push Autonomo
 
 - **Cosa abbiamo fatto**:
