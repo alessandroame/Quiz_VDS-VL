@@ -157,6 +157,7 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({
 
   const handleSelect = (idx: 1 | 2 | 3) => {
     if (showFeedback && selectedAnswer) return; // Non cambiare se già verificato in modalità feedback
+    stop(); // Stop voice speech immediately upon user answer selection!
     onSelectAnswer(idx);
 
     if (settings.soundEnabled) {
@@ -174,8 +175,6 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({
         if (settings.ttsAutoExplainOnMistake) {
           playExplanation();
         }
-      } else {
-        stop();
       }
     }
   };

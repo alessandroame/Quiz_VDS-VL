@@ -308,5 +308,67 @@ describe('Voice Auto-Stop on Back & Quiz Termination Contracts', () => {
 
     expect(mockStop).toHaveBeenCalled();
   });
+
+  it('VOICE-STOP-10: selecting an option in ExamScreen stops voiceService immediately', async () => {
+    mockUseQuiz.mockReturnValue({
+      ...mockUseQuiz(),
+      activeSession: {
+        type: 'exam',
+        examMode: 'tutor',
+        questionIds: [1001],
+        currentIndex: 0,
+        answers: {},
+        flags: {},
+        startTime: Date.now()
+      }
+    });
+
+    await act(async () => {
+      root.render(React.createElement(ExamScreen, { initialMode: 'tutor' }));
+    });
+
+    mockStop.mockClear();
+
+    const optionBtn = container.querySelector('#btn-option-1') as HTMLButtonElement;
+    expect(optionBtn).not.toBeNull();
+
+    await act(async () => {
+      optionBtn.click();
+    });
+
+    expect(mockStop).toHaveBeenCalled();
+  });
+
+  it('VOICE-STOP-11: changing question in ExamScreen stops voiceService immediately', async () => {
+    mockUseQuiz.mockReturnValue({
+      ...mockUseQuiz(),
+      questions: [sampleQuestion, { ...sampleQuestion, id: 1002 }],
+      filteredQuestions: [sampleQuestion, { ...sampleQuestion, id: 1002 }],
+      activeSession: {
+        type: 'exam',
+        examMode: 'tutor',
+        questionIds: [1001, 1002],
+        currentIndex: 0,
+        answers: { 1001: 2 },
+        flags: {},
+        startTime: Date.now()
+      }
+    });
+
+    await act(async () => {
+      root.render(React.createElement(ExamScreen, { initialMode: 'tutor' }));
+    });
+
+    mockStop.mockClear();
+
+    const nextBtn = container.querySelector('#btn-tutor-next-question') as HTMLButtonElement;
+    expect(nextBtn).not.toBeNull();
+
+    await act(async () => {
+      nextBtn.click();
+    });
+
+    expect(mockStop).toHaveBeenCalled();
+  });
 });
 

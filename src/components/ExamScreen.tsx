@@ -264,6 +264,7 @@ export const ExamScreen: React.FC<ExamScreenProps> = ({
   }, [currentIndex]);
 
   const changeIndex = (newIndex: number) => {
+    voiceService.stop();
     if (autoAdvanceTimerRef.current) {
       clearTimeout(autoAdvanceTimerRef.current);
       autoAdvanceTimerRef.current = null;
@@ -315,11 +316,12 @@ export const ExamScreen: React.FC<ExamScreenProps> = ({
   };
 
   const handleSelectAnswer = async (ans: 1 | 2 | 3, qid?: number) => {
+    voiceService.stop();
     const targetId = qid ?? currentQuestion?.id;
     if (!targetId) return;
 
-    // In tutor mode, avoid changing an answer that has already been verified
-    if (examMode === 'tutor' && answersRef.current[targetId] !== undefined) {
+    // Avoid changing an answer that has already been verified
+    if (answersRef.current[targetId] !== undefined) {
       return;
     }
 
@@ -327,31 +329,29 @@ export const ExamScreen: React.FC<ExamScreenProps> = ({
     answersRef.current = updatedAnswers;
     setAnswers(updatedAnswers);
 
-    // In tutor mode, record answer statistics immediately into Dexie
-    if (examMode === 'tutor') {
-      const targetQ = examQuestions.find(q => q.id === targetId) || currentQuestion;
-      if (targetQ) {
-        const isCorrect = ans === targetQ.correctAnswer;
-        try {
-          await recordAnswer(targetId, isCorrect);
-        } catch (err) {
-          console.error(err);
-        }
-        recordedQuestionIds.current.add(targetId);
+    // Record answer statistics immediately into Dexie
+    const targetQ = examQuestions.find(q => q.id === targetId) || currentQuestion;
+    if (targetQ) {
+      const isCorrect = ans === targetQ.correctAnswer;
+      try {
+        await recordAnswer(targetId, isCorrect);
+      } catch (err) {
+        console.error(err);
+      }
+      recordedQuestionIds.current.add(targetId);
 
-        // Auto-advance on correct answer if enabled in settings
-        if (
-          isCorrect &&
-          settings.autoAdvanceOnCorrect !== false &&
-          targetId === currentQuestion?.id
-        ) {
-          const nextIdx = getNextQuestionIndex(currentIndex, examQuestions, updatedAnswers, { fallbackToEndIfComplete: true });
-          if (nextIdx !== currentIndex) {
-            if (autoAdvanceTimerRef.current) clearTimeout(autoAdvanceTimerRef.current);
-            autoAdvanceTimerRef.current = setTimeout(() => {
-              changeIndex(nextIdx);
-            }, 900);
-          }
+      // Auto-advance on correct answer if enabled in settings
+      if (
+        isCorrect &&
+        settings.autoAdvanceOnCorrect !== false &&
+        targetId === currentQuestion?.id
+      ) {
+        const nextIdx = getNextQuestionIndex(currentIndex, examQuestions, updatedAnswers, { fallbackToEndIfComplete: true });
+        if (nextIdx !== currentIndex) {
+          if (autoAdvanceTimerRef.current) clearTimeout(autoAdvanceTimerRef.current);
+          autoAdvanceTimerRef.current = setTimeout(() => {
+            changeIndex(nextIdx);
+          }, 900);
         }
       }
     }
@@ -1046,7 +1046,7 @@ export const ExamScreen: React.FC<ExamScreenProps> = ({
           question={currentQuestion}
           selectedAnswer={answers[currentQuestion.id]}
           onSelectAnswer={handleSelectAnswer}
-          showFeedback={examMode === 'tutor'}
+          showFeedback={true}
           isFlagged={flags[currentQuestion.id]}
           onToggleFlag={handleToggleFlag}
           indexNumber={currentIndex + 1}
@@ -1075,7 +1075,7 @@ export const ExamScreen: React.FC<ExamScreenProps> = ({
           </span>
         }
         primaryAction={
-          examMode === 'tutor' && currentQuestion && answers[currentQuestion.id] !== undefined
+          currentQuestion && answers[currentQuestion.id] !== undefined
             ? (currentIndex < totalCount - 1
                 ? {
                     id: 'btn-tutor-next-question',
@@ -1086,7 +1086,7 @@ export const ExamScreen: React.FC<ExamScreenProps> = ({
                   }
                 : {
                     id: 'btn-tutor-complete-exam',
-                    label: 'Completa',
+                    label: examMode === 'tutor' ? 'Completa' : 'Consegna',
                     variant: 'emerald',
                     icon: <CheckCircle2 className="w-4 h-4" />,
                     onClick: () => {

@@ -14,6 +14,30 @@ Questo documento registra in ordine cronologico tutte le lavorazioni svolte nel 
 - **Impatto sul Desiderata**: <Come questo intervento contribuisce al desiderata (cfr. DESIDERATA.md) e indicazioni per il prossimo agente>
 ```
 
+### [2026-10-03] - Interruzione Istantanea Audio alla Selezione della Risposta e Feedback Didattico Immediato (v1.7.12)
+
+- **Cosa abbiamo fatto**:
+  - **Interruzione Istantanea della Sintesi Vocale alla Selezione dell'Opzione**:
+    - Risolto il problema per cui selezionando un'opzione (es. opzione 1) mentre la voce stava ancora leggendo le opzioni (es. opzione 2), la sintesi vocale continuava imperterrita fino a terminare la lettura dell'opzione 3.
+    - In [src/components/QuestionCard.tsx](file:///c:/github/Quiz_VDS-VL/src/components/QuestionCard.tsx), inserito `stop()` come primissima istruzione in `handleSelect(idx)`, interrompendo immediatamente il flusso vocale al tocco o click dell'allievo su qualunque opzione prima di calcolare feedback o spiegazioni didattiche.
+    - In [src/components/ExamScreen.tsx](file:///c:/github/Quiz_VDS-VL/src/components/ExamScreen.tsx), [src/components/TopicsScreen.tsx](file:///c:/github/Quiz_VDS-VL/src/components/TopicsScreen.tsx) e [src/components/MistakesScreen.tsx](file:///c:/github/Quiz_VDS-VL/src/components/MistakesScreen.tsx), aggiunto `voiceService.stop()` all'inizio dei gestori di risposta e al cambio di quesito (`changeIndex`).
+  - **Feedback Immediato e Colorazione Esatta/Sbagliata in Tutte le Modalità d'Esame**:
+    - Risolto il comportamento per cui selezionando una risposta in modalità simulazione esame l'opzione rimaneva colorata in giallo/ambra senza svelare se fosse giusta o sbagliata e senza mostrare la didattica (Regola/Tranello).
+    - In [src/components/ExamScreen.tsx](file:///c:/github/Quiz_VDS-VL/src/components/ExamScreen.tsx), impostato `showFeedback={true}` su `QuestionCard`, consentendo la colorazione immediata verde (esatta) o rossa (errata con box didattico Regola/Tranello), il salvataggio immediato delle statistiche in Dexie e l'auto-avanzamento fluido configurabile su risposta corretta.
+    - Aggiornata la barra inferiore `QuizBottomBar`: il pulsante primario propone ora "Successiva" (o "Completa"/"Consegna") non appena una risposta viene data.
+  - **Colorazione Indicatori nel Navigatore Quiz ([src/components/QuestionNavigator.tsx](file:///c:/github/Quiz_VDS-VL/src/components/QuestionNavigator.tsx))**:
+    - Rimosso il vincolo che colorava i pallini in ambra generica nelle modalità non-tutor: tutti i quesiti risposti evidenziano ora chiaramente l'esito (verde smeraldo per corrette, rosa/rosso per errate) con contrasto elevato conforme WCAG AAA.
+  - **Suite di Test Unitari e Validazione**:
+    - Aggiunti i test `VOICE-STOP-10` e `VOICE-STOP-11` in [src/components/VoiceAutoStop.test.ts](file:///c:/github/Quiz_VDS-VL/src/components/VoiceAutoStop.test.ts) a garanzia che la selezione di qualsiasi opzione o il passaggio alla domanda successiva interrompano istantaneamente la sintesi vocale.
+    - Aggiornati i test di `QuestionNavigator.test.ts` con i selettori corretti/errati.
+    - 56 suite di test Vitest (420 test) superate con successo al 100%; build Vite e typecheck completati senza errori.
+- **Scelte architetturali & Rationale**:
+  - *Interruzione Vocale Sincrona a Monte (Fail-Fast Audio Stop)*: L'arresto del parlato deve avvenire nel gestore dell'evento utente prima di qualsiasi calcolo asincrono o dispatch React. Questo previene code audio pendenti e garantisce una risposta immediata all'allievo.
+- **Impatto sul Desiderata**:
+  - Esperienza utente reattiva, azzeramento della cacofonia audio durante la risoluzione dei quiz e feedback didattico immediato per massimizzare l'apprendimento.
+
+---
+
 ### [2026-10-03] - Risoluzione Tracciamento Risposte Esatte in Modalità Mani Libere e Contrasto Navigatore Quiz (v1.7.11)
 
 - **Cosa abbiamo fatto**:

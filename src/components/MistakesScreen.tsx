@@ -155,6 +155,7 @@ export const MistakesScreen: React.FC<MistakesScreenProps> = ({ onNavigateHome }
   }, [currentIndex]);
 
   const changeIndex = (newIndex: number) => {
+    voiceService.stop();
     if (autoAdvanceTimerRef.current) {
       clearTimeout(autoAdvanceTimerRef.current);
       autoAdvanceTimerRef.current = null;
@@ -171,6 +172,7 @@ export const MistakesScreen: React.FC<MistakesScreenProps> = ({ onNavigateHome }
   };
 
   const handleAnswer = async (ans: 1 | 2 | 3, qid?: number) => {
+    voiceService.stop();
     const targetQid = qid ?? currentQ?.id;
     if (!targetQid) return;
     if (reviewAnswersRef.current[targetQid]) return;

@@ -131,7 +131,7 @@ describe('QuestionNavigator Component', () => {
     expect(html).toContain('(1 ⚑)');
   });
 
-  it('displays amber indicator for answered questions in official exam mode', () => {
+  it('displays correct/wrong indicator for answered questions in official exam mode', () => {
     const html = renderToString(
       React.createElement(QuestionNavigator, {
         questions: mockQuestions,
@@ -144,8 +144,8 @@ describe('QuestionNavigator Component', () => {
       })
     );
 
-    // In official mode, answers are marked as answered in amber, not revealing correct/wrong
-    expect(html).toContain('bg-amber-500 text-zinc-950');
+    // In official mode, answers are now verified with feedback
+    expect(html).toContain('border-rose-500');
   });
 
   it('renders active question dot and ring in compressed mode', () => {

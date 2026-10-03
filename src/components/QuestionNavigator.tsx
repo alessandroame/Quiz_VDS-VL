@@ -70,14 +70,10 @@ export const QuestionNavigator: React.FC<QuestionNavigatorProps> = ({
 
     let baseStyle = 'border-zinc-700 bg-zinc-950/90 text-zinc-300 light:border-slate-300 light:bg-slate-100 light:text-slate-700 font-medium';
     if (isAnswered) {
-      if (examMode === 'tutor') {
-        const isCorrect = answers[q.id] === q.correctAnswer;
-        baseStyle = isCorrect
-          ? 'border-emerald-500 bg-emerald-500/25 text-emerald-300 light:border-emerald-600 light:bg-emerald-100 light:text-emerald-900 font-bold border shadow-sm'
-          : 'border-rose-500 bg-rose-500/25 text-rose-300 light:border-rose-600 light:bg-rose-100 light:text-rose-900 font-bold border shadow-sm';
-      } else {
-        baseStyle = 'border-amber-500 bg-amber-500 text-zinc-950 light:border-amber-600 light:bg-amber-500 light:text-zinc-950 font-bold shadow-sm';
-      }
+      const isCorrect = answers[q.id] === q.correctAnswer;
+      baseStyle = isCorrect
+        ? 'border-emerald-500 bg-emerald-500/25 text-emerald-300 light:border-emerald-600 light:bg-emerald-100 light:text-emerald-900 font-bold border shadow-sm'
+        : 'border-rose-500 bg-rose-500/25 text-rose-300 light:border-rose-600 light:bg-rose-100 light:text-rose-900 font-bold border shadow-sm';
     }
 
     return { isAnswered, isFlagged, isCurrent, baseStyle };
