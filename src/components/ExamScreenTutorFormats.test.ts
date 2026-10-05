@@ -91,7 +91,7 @@ describe('ExamScreen Flexible Tutor Formats (Flash 10, Standard 30, Endless)', (
     expect(endlessBtn).not.toBeNull();
 
     expect(flashBtn?.textContent).toContain('Flash (10 Quiz)');
-    expect(standardBtn?.textContent).toContain('Standard (30 Quiz)');
+    expect(standardBtn?.textContent).toContain('Standard (30 Quiz AeCI)');
     expect(endlessBtn?.textContent).toContain('Continuo');
   });
 

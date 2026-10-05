@@ -6,6 +6,7 @@ import {
   CheckCircle2,
   XCircle,
   ArrowRight,
+  ChevronRight,
   RotateCcw,
   ListFilter,
   BookOpen,
@@ -702,101 +703,89 @@ export const ExamScreen: React.FC<ExamScreenProps> = ({
           </div>
 
           {/* Formato 1: Flash 10 Quiz (Consigliato per buchi di tempo) */}
-          <div className="p-4 sm:p-5 bg-zinc-900 border-2 border-emerald-500/60 hover:border-emerald-500 rounded-2xl transition-all shadow-md light:bg-white light:border-emerald-500/70 space-y-3">
-            <div className="flex items-start justify-between gap-2">
-              <div className="flex items-center gap-2.5">
-                <div className="w-8 h-8 rounded-xl bg-amber-500/20 text-amber-400 light:bg-amber-100 light:text-amber-800 flex items-center justify-center flex-shrink-0">
-                  <Zap className="w-4 h-4" />
+          <button
+            type="button"
+            id="btn-start-tutor-flash"
+            onClick={() => handleRequestStartExam('tutor', 'flash')}
+            className="w-full text-left p-4 sm:p-5 bg-zinc-900 border-2 border-emerald-500/60 hover:border-emerald-500 hover:bg-zinc-800/80 active:scale-[0.99] rounded-2xl transition-all shadow-md light:bg-white light:border-emerald-500/70 light:hover:bg-emerald-50/40 group cursor-pointer focus:outline-none focus:ring-2 focus:ring-emerald-500/40 flex items-center justify-between gap-3 sm:gap-4"
+          >
+            <div className="flex items-start gap-3 min-w-0">
+              <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-amber-500/20 text-amber-400 light:bg-amber-100 light:text-amber-800 flex items-center justify-center flex-shrink-0 mt-0.5">
+                <Zap className="w-4 h-4 sm:w-5 sm:h-5" />
+              </div>
+              <div className="min-w-0 space-y-1">
+                <div className="flex items-center gap-2 flex-wrap">
+                  <h3 className="font-bold text-sm sm:text-base text-zinc-100 light:text-slate-900 group-hover:text-emerald-400 light:group-hover:text-emerald-700 transition-colors">
+                    Flash (10 Quiz)
+                  </h3>
+                  <span className="px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 light:bg-amber-100 light:text-amber-800 text-[10px] font-bold uppercase font-mono">
+                    Buchi di tempo (3-5 min)
+                  </span>
                 </div>
-                <div>
-                  <div className="flex items-center gap-2 flex-wrap">
-                    <h3 className="font-bold text-sm sm:text-base text-zinc-100 light:text-slate-900">
-                      Flash (10 Quiz)
-                    </h3>
-                    <span className="px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 light:bg-amber-100 light:text-amber-800 text-[10px] font-bold uppercase font-mono">
-                      Buchi di tempo (3-5 min)
-                    </span>
-                  </div>
-                  <p className="text-xs text-zinc-400 light:text-slate-600 mt-0.5">
-                    10 quesiti prioritari (non visti ed errori aperti). Al termine puoi estendere con altri 10 quiz o concludere.
-                  </p>
-                </div>
+                <p className="text-xs text-zinc-400 light:text-slate-600 leading-relaxed">
+                  10 quesiti prioritari (non visti ed errori aperti). Al termine puoi estendere con altri 10 quiz o concludere.
+                </p>
               </div>
             </div>
-            <button
-              id="btn-start-tutor-flash"
-              onClick={() => handleRequestStartExam('tutor', 'flash')}
-              className="w-full py-3 rounded-xl bg-emerald-700 hover:bg-emerald-600 text-white font-bold text-xs sm:text-sm flex items-center justify-center gap-2 shadow-md transition-all active:scale-[0.99]"
-            >
-              <Zap className="w-4 h-4" />
-              <span>Inizia Flash (10 Quiz)</span>
-            </button>
-          </div>
+            <ChevronRight className="w-5 h-5 text-zinc-500 group-hover:text-emerald-400 group-hover:translate-x-0.5 light:text-slate-400 light:group-hover:text-emerald-600 transition-all flex-shrink-0" />
+          </button>
 
           {/* Formato 2: Standard 30 Quiz AeCI */}
-          <div className="p-4 sm:p-5 bg-zinc-900 border border-zinc-700 hover:border-zinc-500 rounded-2xl transition-all shadow-sm light:bg-white light:border-slate-300 space-y-3">
-            <div className="flex items-start justify-between gap-2">
-              <div className="flex items-center gap-2.5">
-                <div className="w-8 h-8 rounded-xl bg-emerald-500/20 text-emerald-400 light:bg-emerald-100 light:text-emerald-800 flex items-center justify-center flex-shrink-0">
-                  <BookOpen className="w-4 h-4" />
+          <button
+            type="button"
+            id="btn-start-tutor-exam"
+            data-testid="btn-start-tutor-standard"
+            onClick={() => handleRequestStartExam('tutor', 'standard')}
+            className="w-full text-left p-4 sm:p-5 bg-zinc-900 border border-zinc-700 hover:border-emerald-500/70 hover:bg-zinc-800/80 active:scale-[0.99] rounded-2xl transition-all shadow-sm light:bg-white light:border-slate-300 light:hover:border-emerald-500/70 light:hover:bg-slate-50 group cursor-pointer focus:outline-none focus:ring-2 focus:ring-emerald-500/40 flex items-center justify-between gap-3 sm:gap-4"
+          >
+            <div className="flex items-start gap-3 min-w-0">
+              <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-emerald-500/20 text-emerald-400 light:bg-emerald-100 light:text-emerald-800 flex items-center justify-center flex-shrink-0 mt-0.5">
+                <BookOpen className="w-4 h-4 sm:w-5 sm:h-5" />
+              </div>
+              <div className="min-w-0 space-y-1">
+                <div className="flex items-center gap-2 flex-wrap">
+                  <h3 className="font-bold text-sm sm:text-base text-zinc-100 light:text-slate-900 group-hover:text-emerald-400 light:group-hover:text-emerald-700 transition-colors">
+                    Standard (30 Quiz AeCI)
+                  </h3>
+                  <span className="px-2 py-0.5 rounded-full bg-zinc-800 text-zinc-300 light:bg-slate-200 light:text-slate-700 text-[10px] font-bold uppercase font-mono">
+                    Quote Esame (15-20 min)
+                  </span>
                 </div>
-                <div>
-                  <div className="flex items-center gap-2 flex-wrap">
-                    <h3 className="font-bold text-sm sm:text-base text-zinc-100 light:text-slate-900">
-                      Standard (30 Quiz AeCI)
-                    </h3>
-                    <span className="px-2 py-0.5 rounded-full bg-zinc-800 text-zinc-300 light:bg-slate-200 light:text-slate-700 text-[10px] font-bold uppercase font-mono">
-                      Quote Esame (15-20 min)
-                    </span>
-                  </div>
-                  <p className="text-xs text-zinc-400 light:text-slate-600 mt-0.5">
-                    30 quesiti distribuiti per materia secondo le quote ufficiali d'esame (9 aerodinamica, 8 meteo, ecc.).
-                  </p>
-                </div>
+                <p className="text-xs text-zinc-400 light:text-slate-600 leading-relaxed">
+                  30 quesiti distribuiti per materia secondo le quote ufficiali d'esame (9 aerodinamica, 8 meteo, ecc.).
+                </p>
               </div>
             </div>
-            <button
-              id="btn-start-tutor-exam"
-              data-testid="btn-start-tutor-standard"
-              onClick={() => handleRequestStartExam('tutor', 'standard')}
-              className="w-full py-2.5 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-zinc-100 light:bg-slate-200 light:text-slate-800 light:hover:bg-slate-300 font-bold text-xs sm:text-sm flex items-center justify-center gap-2 shadow-sm transition-all active:scale-[0.99]"
-            >
-              <BookOpen className="w-3.5 h-3.5" />
-              <span>Inizia Standard (30 Quiz)</span>
-            </button>
-          </div>
+            <ChevronRight className="w-5 h-5 text-zinc-500 group-hover:text-emerald-400 group-hover:translate-x-0.5 light:text-slate-400 light:group-hover:text-emerald-600 transition-all flex-shrink-0" />
+          </button>
 
           {/* Formato 3: Continuo Senza Limiti */}
-          <div className="p-4 sm:p-5 bg-zinc-900 border border-zinc-700 hover:border-zinc-500 rounded-2xl transition-all shadow-sm light:bg-white light:border-slate-300 space-y-3">
-            <div className="flex items-start justify-between gap-2">
-              <div className="flex items-center gap-2.5">
-                <div className="w-8 h-8 rounded-xl bg-sky-500/20 text-sky-400 light:bg-sky-100 light:text-sky-800 flex items-center justify-center flex-shrink-0">
-                  <InfinityIcon className="w-4 h-4" />
+          <button
+            type="button"
+            id="btn-start-tutor-endless"
+            onClick={() => handleRequestStartExam('tutor', 'endless')}
+            className="w-full text-left p-4 sm:p-5 bg-zinc-900 border border-zinc-700 hover:border-sky-500/70 hover:bg-zinc-800/80 active:scale-[0.99] rounded-2xl transition-all shadow-sm light:bg-white light:border-slate-300 light:hover:border-sky-500/70 light:hover:bg-slate-50 group cursor-pointer focus:outline-none focus:ring-2 focus:ring-sky-500/40 flex items-center justify-between gap-3 sm:gap-4"
+          >
+            <div className="flex items-start gap-3 min-w-0">
+              <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-sky-500/20 text-sky-400 light:bg-sky-100 light:text-sky-800 flex items-center justify-center flex-shrink-0 mt-0.5">
+                <InfinityIcon className="w-4 h-4 sm:w-5 sm:h-5" />
+              </div>
+              <div className="min-w-0 space-y-1">
+                <div className="flex items-center gap-2 flex-wrap">
+                  <h3 className="font-bold text-sm sm:text-base text-zinc-100 light:text-slate-900 group-hover:text-sky-400 light:group-hover:text-sky-700 transition-colors">
+                    Continuo (Senza Limiti)
+                  </h3>
+                  <span className="px-2 py-0.5 rounded-full bg-sky-500/20 text-sky-300 light:bg-sky-100 light:text-sky-800 text-[10px] font-bold uppercase font-mono">
+                    Flusso Libero
+                  </span>
                 </div>
-                <div>
-                  <div className="flex items-center gap-2 flex-wrap">
-                    <h3 className="font-bold text-sm sm:text-base text-zinc-100 light:text-slate-900">
-                      Continuo (Senza Limiti)
-                    </h3>
-                    <span className="px-2 py-0.5 rounded-full bg-sky-500/20 text-sky-300 light:bg-sky-100 light:text-sky-800 text-[10px] font-bold uppercase font-mono">
-                      Flusso Libero
-                    </span>
-                  </div>
-                  <p className="text-xs text-zinc-400 light:text-slate-600 mt-0.5">
-                    Flusso progressivo ininterrotto. Rispondi finché hai tempo ed esci liberamente quando vuoi.
-                  </p>
-                </div>
+                <p className="text-xs text-zinc-400 light:text-slate-600 leading-relaxed">
+                  Flusso progressivo ininterrotto. Rispondi finché hai tempo ed esci liberamente quando vuoi.
+                </p>
               </div>
             </div>
-            <button
-              id="btn-start-tutor-endless"
-              onClick={() => handleRequestStartExam('tutor', 'endless')}
-              className="w-full py-2.5 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-zinc-100 light:bg-slate-200 light:text-slate-800 light:hover:bg-slate-300 font-bold text-xs sm:text-sm flex items-center justify-center gap-2 shadow-sm transition-all active:scale-[0.99]"
-            >
-              <InfinityIcon className="w-3.5 h-3.5" />
-              <span>Inizia Flusso Continuo</span>
-            </button>
-          </div>
+            <ChevronRight className="w-5 h-5 text-zinc-500 group-hover:text-sky-400 group-hover:translate-x-0.5 light:text-slate-400 light:group-hover:text-sky-600 transition-all flex-shrink-0" />
+          </button>
 
           {/* Switch rapido a Esame Ufficiale */}
           <div className="text-center pt-1">

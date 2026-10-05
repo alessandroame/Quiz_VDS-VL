@@ -14,6 +14,24 @@ Questo documento registra in ordine cronologico tutte le lavorazioni svolte nel 
 - **Impatto sul Desiderata**: <Come questo intervento contribuisce al desiderata (cfr. DESIDERATA.md) e indicazioni per il prossimo agente>
 ```
 
+### [2026-10-05] - Ottimizzazione Ergonomica Selettore Modalità Tutor: Pannelli Interattivi a Tutta Card
+- **Cosa abbiamo fatto**:
+  - **Sostituzione dei Tre Pulsanti Interni con Pannelli Cliccabili**:
+    - In [src/components/ExamScreen.tsx](file:///c:/github/Quiz_VDS-VL/src/components/ExamScreen.tsx): rimossi i 3 pulsanti nidificati all'interno delle card (`Inizia Flash (10 Quiz)`, `Inizia Standard (30 Quiz)`, `Inizia Flusso Continuo`) nella schermata iniziale di selezione della Modalità Tutor.
+    - Convertite le 3 card dei formati (*Flash 10*, *Standard 30 AeCI*, *Continuo Senza Limiti*) direttamente in pannelli/bottoni cliccabili a tutta ampiezza (`<button type="button" ... className="w-full text-left p-4 sm:p-5 ...">`).
+    - Aggiunto l'indicatore d'azione visivo con icona `ChevronRight` a scorrimento dinamico su hover (`group-hover:translate-x-0.5`), feedback tattile `active:scale-[0.99]`, e transizione di colore sui titoli.
+    - Preservati tutti gli ID e testID storici (`#btn-start-tutor-flash`, `#btn-start-tutor-exam`, `data-testid="btn-start-tutor-standard"`, `#btn-start-tutor-endless`) direttamente sui pannelli cliccabili per piena accessibilità tastiera (Tab, Space, Enter) e retrocompatibilità al 100% con test e script di automazione.
+  - **Allineamento Suite di Test**:
+    - In [src/components/ExamScreenTutorFormats.test.ts](file:///c:/github/Quiz_VDS-VL/src/components/ExamScreenTutorFormats.test.ts): allineata l'asserzione del titolo della card Standard su `#btn-start-tutor-exam` a `Standard (30 Quiz AeCI)`.
+  - **Collaudo Visivo CDP (Zero User Delegation)**:
+    - Verificata la resa visiva pixel-perfect sia su monitor desktop (1440x900) che su mobile portrait (390x844). L'interfaccia si inserisce perfettamente nel viewport verticale senza scroll superfluo, migliorando l'ergonomia per il pollice. Zero errori in console browser.
+- **Scelte architetturali & Rationale**:
+  - **Eliminazione del Clutter Visivo & Ridondanza Microcopy**: Avere un pulsante ripetitivo all'interno di una card che già dichiara il formato aumentava inutilmente l'altezza delle card, costringendo allo scroll verticale sui dispositivi mobili. Rendere l'intero pannello cliccabile rispetta i principi cardine di [minimal-ui-ux](file:///c:/github/Quiz_VDS-VL/.agents/skills/minimal-ui-ux/SKILL.md) e le convenzioni standard iOS/Android, offrendo un'area touch massimizzata per l'allievo.
+- **Impatto sul Desiderata**:
+  - Semplificazione e velocizzazione dell'accesso alla Modalità Tutor: ora basta un solo tocco su qualsiasi punto del pannello desiderato per avviare istantaneamente la sessione di studio.
+
+---
+
 ### [2026-10-03] - Modalità Mani Libere: Conclusione e Consegna Sessione (Touch + Vocale) con Conferma Spoken
 - **Cosa abbiamo fatto**:
   - **Riconoscimento Vocale Esteso**:
