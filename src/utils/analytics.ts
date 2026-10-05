@@ -1,5 +1,6 @@
 import type { Question } from '../types/quiz';
 import type { QuestionStat, ExamSession } from '../types/database';
+import { hasSessionAnswers } from '../services/examEvaluator';
 
 export interface SubjectAnalytics {
   id: number;
@@ -85,10 +86,11 @@ export function calculateReadinessScore(
   const correctCount = statsList.filter(s => s.lastResult === 'correct').length;
   const accuracy = totalSeen > 0 ? correctCount / totalSeen : 0;
 
-  // Componente 3: Media ultime 3 simulazioni (30%)
+  // Componente 3: Media ultime 3 simulazioni valide con risposte (30%)
   let examScoreFactor = 0;
-  if (sessions.length > 0) {
-    const recent = sessions.slice(0, 3);
+  const answeredSessions = sessions.filter(hasSessionAnswers);
+  if (answeredSessions.length > 0) {
+    const recent = answeredSessions.slice(0, 3);
     const passedCount = recent.filter(s => s.isPassed).length;
     examScoreFactor = passedCount / recent.length;
   }

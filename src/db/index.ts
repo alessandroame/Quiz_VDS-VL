@@ -7,6 +7,7 @@ import type {
   BackupDataPayload
 } from '../types/database';
 import { smartMergeBackups, type SmartMergeResult } from '../services/smartMerge';
+import { hasSessionAnswers } from '../services/examEvaluator';
 
 export const DEFAULT_SETTINGS: AppSettings = {
   theme: 'system',
@@ -198,7 +199,7 @@ export async function exportDatabaseBackup(): Promise<string> {
     version: 2,
     exportedAt: Date.now(),
     stats,
-    sessions,
+    sessions: sessions.filter(hasSessionAnswers),
     settings: filteredSettings,
     activeSession: activeSession || null
   };

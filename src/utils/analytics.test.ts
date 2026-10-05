@@ -128,6 +128,61 @@ describe('Suite 6: Calcolo Metriche & Quaderno Errori (src/utils/analytics.ts)',
       const maxScore = calculateReadinessScore(504, 504, statsListAllCorrect, allPassedSessions);
       expect(maxScore).toBe(100);
     });
+
+    it('STAT-06: ignores sessions with zero answers when calculating exam score component', () => {
+      const totalCatalog = 474;
+      const totalSeen = 100;
+      const statsList: QuestionStat[] = [];
+      for (let i = 0; i < totalSeen; i++) {
+        statsList.push({
+          questionId: i + 1,
+          timesSeen: 1,
+          timesCorrect: 1,
+          timesWrong: 0,
+          consecutiveCorrect: 1,
+          lastResult: 'correct',
+          isBookmarked: false
+        });
+      }
+
+      // Valid passed session with answers
+      const validSession: ExamSession = {
+        date: 100,
+        durationSeconds: 1200,
+        totalQuestions: 30,
+        correctAnswers: 28,
+        wrongAnswers: 2,
+        isPassed: true,
+        isMarathon: false,
+        subjectBreakdown: {},
+        snapshots: [{ questionId: 1, userAnswer: 1, correctAnswer: 1, isCorrect: true, wasFlagged: false }]
+      };
+
+      // Empty session (0 answers, 30 wrong due to unanswered penalty, isPassed: false)
+      const emptySession: ExamSession = {
+        date: 200,
+        durationSeconds: 10,
+        totalQuestions: 30,
+        correctAnswers: 0,
+        wrongAnswers: 30,
+        isPassed: false,
+        isMarathon: false,
+        subjectBreakdown: {},
+        snapshots: Array.from({ length: 30 }, (_, idx) => ({
+          questionId: idx + 1,
+          userAnswer: undefined,
+          correctAnswer: 1,
+          isCorrect: false,
+          wasFlagged: false
+        }))
+      };
+
+      const scoreWithoutEmpty = calculateReadinessScore(totalCatalog, totalSeen, statsList, [validSession]);
+      const scoreWithEmpty = calculateReadinessScore(totalCatalog, totalSeen, statsList, [emptySession, validSession]);
+
+      // Both should yield identical readiness score because the empty session is ignored
+      expect(scoreWithEmpty).toBe(scoreWithoutEmpty);
+    });
   });
 
   describe('Statistiche per Materia (calculateSubjectAnalytics)', () => {

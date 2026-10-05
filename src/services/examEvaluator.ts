@@ -98,3 +98,22 @@ export function evaluateExam({
     snapshots
   };
 }
+
+/**
+ * Counts how many questions the user actually answered in the session.
+ */
+export function countSessionAnsweredQuestions(session: ExamSession): number {
+  if (session.snapshots && session.snapshots.length > 0) {
+    return session.snapshots.filter(s => s.userAnswer !== undefined).length;
+  }
+  return session.correctAnswers;
+}
+
+/**
+ * Checks whether an exam session contains at least one answered question.
+ * Sessions where the user did not give any answer (e.g. submitted immediately or expired with 0 answers)
+ * are excluded from history and analytics.
+ */
+export function hasSessionAnswers(session: ExamSession): boolean {
+  return countSessionAnsweredQuestions(session) > 0;
+}

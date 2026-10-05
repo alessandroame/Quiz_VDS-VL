@@ -4,6 +4,7 @@ import type {
   InProgressSession,
   BackupDataPayload
 } from '../types/database';
+import { hasSessionAnswers } from './examEvaluator';
 
 export interface SmartMergeResult {
   stats: QuestionStat[];
@@ -111,10 +112,15 @@ export function mergeExamSessions(
   let addedCount = 0;
 
   for (const session of localSessions) {
-    sessionMap.set(getSessionKey(session), session);
+    if (hasSessionAnswers(session)) {
+      sessionMap.set(getSessionKey(session), session);
+    }
   }
 
   for (const incoming of incomingSessions) {
+    if (!hasSessionAnswers(incoming)) {
+      continue;
+    }
     const key = getSessionKey(incoming);
     if (!sessionMap.has(key)) {
       // New session from another device: remove existing local auto-increment id

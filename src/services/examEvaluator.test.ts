@@ -4,6 +4,8 @@ import type { Question } from '../types/quiz';
 import {
   evaluateExam,
   isPassingScore,
+  countSessionAnsweredQuestions,
+  hasSessionAnswers,
   MAX_ALLOWED_ERRORS_STANDARD,
   MAX_ALLOWED_ERRORS_MARATHON
 } from './examEvaluator';
@@ -361,5 +363,56 @@ describe('Suite 3: Motore di Valutazione Esame AeCI (src/services/examEvaluator.
     expect(session.snapshots.length).toBe(12);
     expect(session.isPassed).toBe(true);
     expect(session.tutorFormat).toBe('endless');
+  });
+
+  it('EVAL-14: should detect zero-answer sessions where all questions were skipped/unanswered', () => {
+    // 30 questions evaluated, but user gave no answers
+    const emptySession = evaluateExam({
+      questions: sample30,
+      answers: {},
+      durationSeconds: 60,
+      isMarathon: false
+    });
+
+    expect(emptySession.totalQuestions).toBe(30);
+    expect(emptySession.correctAnswers).toBe(0);
+    expect(emptySession.wrongAnswers).toBe(30);
+    expect(countSessionAnsweredQuestions(emptySession)).toBe(0);
+    expect(hasSessionAnswers(emptySession)).toBe(false);
+  });
+
+  it('EVAL-15: should detect answered sessions even if all answered questions were incorrect', () => {
+    // User answered 2 questions, both wrong, skipped 28
+    const answers: Record<number, 1 | 2 | 3> = {
+      [sample30[0].id]: ((sample30[0].correctAnswer === 1 ? 2 : 1) as 1 | 2 | 3),
+      [sample30[1].id]: ((sample30[1].correctAnswer === 1 ? 2 : 1) as 1 | 2 | 3)
+    };
+
+    const sessionWithErrorsOnly = evaluateExam({
+      questions: sample30,
+      answers,
+      durationSeconds: 120,
+      isMarathon: false
+    });
+
+    expect(sessionWithErrorsOnly.correctAnswers).toBe(0);
+    expect(sessionWithErrorsOnly.wrongAnswers).toBe(30);
+    expect(countSessionAnsweredQuestions(sessionWithErrorsOnly)).toBe(2);
+    expect(hasSessionAnswers(sessionWithErrorsOnly)).toBe(true);
+  });
+
+  it('EVAL-16: should handle endless tutor with 0 questions as zero-answer session', () => {
+    const emptyEndless = evaluateExam({
+      questions: allQuestions,
+      answers: {},
+      durationSeconds: 15,
+      examMode: 'tutor',
+      tutorFormat: 'endless'
+    });
+
+    expect(emptyEndless.totalQuestions).toBe(0);
+    expect(emptyEndless.snapshots.length).toBe(0);
+    expect(countSessionAnsweredQuestions(emptyEndless)).toBe(0);
+    expect(hasSessionAnswers(emptyEndless)).toBe(false);
   });
 });

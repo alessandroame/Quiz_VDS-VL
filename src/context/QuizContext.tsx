@@ -22,6 +22,7 @@ import {
   calculateSubjectAnalytics,
   calculateReadinessScore
 } from '../utils/analytics';
+import { hasSessionAnswers } from '../services/examEvaluator';
 import { telemetry } from '../services/telemetry';
 import type { StudyModeType } from '../types/telemetry';
 
@@ -87,7 +88,23 @@ export const QuizProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   // Reattività istantanea con Dexie live queries
   const statsList = useLiveQuery(() => db.stats.toArray(), []) || [];
-  const sessions = useLiveQuery(() => db.sessions.orderBy('date').reverse().toArray(), []) || [];
+  const rawSessions = useLiveQuery(() => db.sessions.orderBy('date').reverse().toArray(), []) || [];
+  const sessions = useMemo(() => rawSessions.filter(hasSessionAnswers), [rawSessions]);
+
+  // Prune any orphan/legacy sessions with 0 answers from Dexie
+  useEffect(() => {
+    if (rawSessions.length > 0) {
+      const emptySessionIds = rawSessions
+        .filter(s => !hasSessionAnswers(s) && s.id !== undefined)
+        .map(s => s.id as number);
+      if (emptySessionIds.length > 0) {
+        db.sessions.bulkDelete(emptySessionIds).catch(err => {
+          console.error('Error pruning empty sessions from db:', err);
+        });
+      }
+    }
+  }, [rawSessions]);
+
   const rawSettings = useLiveQuery(() => db.settings.toArray(), []);
   const settingsList = rawSettings || [];
   const isSettingsLoaded = rawSettings !== undefined;
@@ -319,6 +336,10 @@ export const QuizProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, []);
 
   const saveExam = useCallback(async (session: ExamSession): Promise<number> => {
+    if (!hasSessionAnswers(session)) {
+      await clearActiveSession();
+      return 0;
+    }
     const id = await db.sessions.add(session);
     await clearActiveSession();
     if (syncEngine.getState().isAutoSyncEnabled) {

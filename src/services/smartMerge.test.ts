@@ -228,6 +228,62 @@ describe('smartMerge service', () => {
       expect(addedCount).toBe(0);
       expect(sessions[0].id).toBe(1);
     });
+
+    it('should discard sessions where zero answers were given from both local and incoming', () => {
+      const validSession: ExamSession = {
+        id: 1,
+        date: 1727500000000,
+        durationSeconds: 1200,
+        totalQuestions: 30,
+        correctAnswers: 28,
+        wrongAnswers: 2,
+        isPassed: true,
+        isMarathon: false,
+        subjectBreakdown: {},
+        snapshots: [{ questionId: 1, userAnswer: 1, correctAnswer: 1, isCorrect: true, wasFlagged: false }]
+      };
+
+      const emptyLocalSession: ExamSession = {
+        id: 2,
+        date: 1727510000000,
+        durationSeconds: 20,
+        totalQuestions: 30,
+        correctAnswers: 0,
+        wrongAnswers: 30,
+        isPassed: false,
+        isMarathon: false,
+        subjectBreakdown: {},
+        snapshots: Array.from({ length: 30 }, (_, idx) => ({
+          questionId: idx + 1,
+          userAnswer: undefined,
+          correctAnswer: 1,
+          isCorrect: false,
+          wasFlagged: false
+        }))
+      };
+
+      const emptyIncomingSession: ExamSession = {
+        id: 3,
+        date: 1727520000000,
+        durationSeconds: 15,
+        totalQuestions: 0,
+        correctAnswers: 0,
+        wrongAnswers: 0,
+        isPassed: true,
+        isMarathon: false,
+        subjectBreakdown: {},
+        snapshots: []
+      };
+
+      const { sessions, addedCount } = mergeExamSessions(
+        [validSession, emptyLocalSession],
+        [emptyIncomingSession]
+      );
+
+      expect(sessions).toHaveLength(1);
+      expect(sessions[0].id).toBe(1);
+      expect(addedCount).toBe(0);
+    });
   });
 
   describe('mergeSettings', () => {

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import {
   TrendingUp,
   Award,
@@ -9,6 +9,7 @@ import {
 } from 'lucide-react';
 import type { Question } from '../types/quiz';
 import { useQuiz } from '../context/QuizContext';
+import { hasSessionAnswers } from '../services/examEvaluator';
 import { SubjectDetailModal } from './SubjectDetailModal';
 import { QuestionDetailModal } from './QuestionDetailModal';
 
@@ -29,6 +30,8 @@ export const StatsScreen: React.FC<StatsScreenProps> = ({ onTrainSubject }) => {
 
   const [selectedSubjectId, setSelectedSubjectId] = useState<number | null>(null);
   const [selectedQuestion, setSelectedQuestion] = useState<Question | null>(null);
+
+  const answeredSessions = useMemo(() => sessions.filter(hasSessionAnswers), [sessions]);
 
   const totalQuestionsCount = questions.length;
   const coveragePercent = Math.round((totalSeen / totalQuestionsCount) * 100);
@@ -109,10 +112,10 @@ export const StatsScreen: React.FC<StatsScreenProps> = ({ onTrainSubject }) => {
           <div className="p-2.5 rounded-xl bg-zinc-950/60 light:bg-slate-50 border border-zinc-700/80 light:border-slate-300">
             <div className="text-zinc-400 light:text-slate-600 text-[10px]">Simulazioni</div>
             <div className="font-bold text-zinc-200 light:text-slate-800 mt-0.5">
-              {sessions.length}
+              {answeredSessions.length}
             </div>
             <div className="text-[10px] text-emerald-400">
-              {sessions.filter(s => s.isPassed).length} superate
+              {answeredSessions.filter(s => s.isPassed).length} superate
             </div>
           </div>
         </div>
@@ -188,13 +191,13 @@ export const StatsScreen: React.FC<StatsScreenProps> = ({ onTrainSubject }) => {
           <span>Storico Simulazioni d'Esame</span>
         </h3>
 
-        {sessions.length === 0 ? (
+        {answeredSessions.length === 0 ? (
           <p className="text-xs text-zinc-400 light:text-slate-600 py-3 text-center">
             Nessuna simulazione completata finora.
           </p>
         ) : (
           <div className="space-y-2">
-            {sessions.slice(0, 5).map((s, idx) => {
+            {answeredSessions.slice(0, 5).map((s, idx) => {
               const dateStr = new Date(s.date).toLocaleDateString('it-IT', {
                 day: '2-digit',
                 month: 'short',
