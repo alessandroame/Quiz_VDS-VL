@@ -10,13 +10,15 @@ const mockPlayOption = vi.fn();
 const mockStopVoice = vi.fn();
 const mockRecordAnswer = vi.fn();
 const mockUpdateSetting = vi.fn();
+const mockToggleBookmark = vi.fn();
 
 vi.mock('../context/QuizContext', () => ({
   useQuiz: () => ({
     questions: [],
-    statsMap: {},
+    statsMap: new Map(),
     saveExam: vi.fn(),
     recordAnswer: mockRecordAnswer,
+    toggleBookmark: mockToggleBookmark,
     settings: {
       soundEnabled: false,
       driveModeAutopilot: true,
@@ -577,6 +579,61 @@ describe('DriveModeScreen - Tutor Mode Explanation Playback Contract', () => {
 
     expect(handleSubmit).not.toHaveBeenCalled();
     expect(container.querySelector('#drive-submit-modal')).toBeNull();
+  });
+
+  it('DRIVE-BOOKMARK-01: clicking bookmark button in HUD calls toggleBookmark', async () => {
+    await act(async () => {
+      root.render(
+        React.createElement(DriveModeScreen, {
+          isOpen: true,
+          onClose: vi.fn(),
+          sessionContext: {
+            questions: [sampleQuestion],
+            currentIndex: 0,
+            answers: {},
+            flags: {},
+            onAnswer: vi.fn(),
+            onToggleFlag: vi.fn(),
+            onNavigateIndex: vi.fn()
+          }
+        })
+      );
+    });
+
+    const bookmarkBtn = container.querySelector('#btn-drive-bookmark') as HTMLButtonElement;
+    expect(bookmarkBtn).not.toBeNull();
+
+    await act(async () => {
+      bookmarkBtn.click();
+    });
+
+    expect(mockToggleBookmark).toHaveBeenCalledWith(sampleQuestion.id);
+  });
+
+  it('DRIVE-BOOKMARK-02: pressing key B toggles bookmark for current question', async () => {
+    await act(async () => {
+      root.render(
+        React.createElement(DriveModeScreen, {
+          isOpen: true,
+          onClose: vi.fn(),
+          sessionContext: {
+            questions: [sampleQuestion],
+            currentIndex: 0,
+            answers: {},
+            flags: {},
+            onAnswer: vi.fn(),
+            onToggleFlag: vi.fn(),
+            onNavigateIndex: vi.fn()
+          }
+        })
+      );
+    });
+
+    await act(async () => {
+      window.dispatchEvent(new KeyboardEvent('keydown', { key: 'b' }));
+    });
+
+    expect(mockToggleBookmark).toHaveBeenCalledWith(sampleQuestion.id);
   });
 });
 

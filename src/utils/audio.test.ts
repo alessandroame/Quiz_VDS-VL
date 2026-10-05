@@ -42,12 +42,14 @@ describe('Suite 8: Audio Synthesis SoundFX & Mic Gating (src/utils/audio.ts)', (
       resume: vi.fn()
     };
 
-    // Iniettiamo mock AudioContext
+    // Inject mock AudioContext
     (soundFX as any).ctx = mockCtx;
 
     soundFX.playCorrect();
     expect(mockCtx.createOscillator).toHaveBeenCalled();
     expect(mockCtx.createGain).toHaveBeenCalled();
+    expect(mockOscillator.frequency.setValueAtTime).toHaveBeenCalledWith(783.99, 10);
+    expect(mockOscillator.frequency.setValueAtTime).toHaveBeenCalledWith(1046.5, 10.06);
     expect(mockOscillator.start).toHaveBeenCalled();
 
     soundFX.playWrong();
@@ -55,6 +57,8 @@ describe('Suite 8: Audio Synthesis SoundFX & Mic Gating (src/utils/audio.ts)', (
 
     soundFX.playClick();
     expect(mockOscillator.start).toHaveBeenCalled();
+
+    expect(() => soundFX.unlock()).not.toThrow();
   });
 
   it('AUDIO-03: suspends microphone when in speaker mode and speech is actively playing', () => {

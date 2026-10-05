@@ -110,6 +110,18 @@ describe('Suite: voiceCommandParser (Parser comandi vocali Modalità Guida)', ()
     expect(parseVoiceCommand('segna')).toBe('flag');
   });
 
+  it('VC-04b: riconosce salvataggio preferiti e bookmark permanente', () => {
+    expect(parseVoiceCommand('bookmark')).toBe('bookmark');
+    expect(parseVoiceCommand('segnalibro')).toBe('bookmark');
+    expect(parseVoiceCommand('segnalibri')).toBe('bookmark');
+    expect(parseVoiceCommand('preferiti')).toBe('bookmark');
+    expect(parseVoiceCommand('preferito')).toBe('bookmark');
+    expect(parseVoiceCommand('salva')).toBe('bookmark');
+    expect(parseVoiceCommand('salva domanda')).toBe('bookmark');
+    expect(parseVoiceCommand('salva quesito')).toBe('bookmark');
+    expect(parseVoiceCommand('salva nei preferiti')).toBe('bookmark');
+  });
+
   it('VC-05: riconosce controllo avanzamento automatico (pausa, stop, ripresa)', () => {
     expect(parseVoiceCommand('pausa')).toBe('pause');
     expect(parseVoiceCommand('alt')).toBe('pause');

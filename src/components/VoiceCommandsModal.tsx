@@ -6,6 +6,7 @@ import {
   ArrowRight,
   RotateCcw,
   Flag,
+  Bookmark,
   Play,
   HelpCircle,
   Headphones,
@@ -83,6 +84,13 @@ export const VoiceCommandsModal: React.FC<VoiceCommandsModalProps> = ({
       primaryPhrase: '"Bandiera"',
       alternatives: ['"Flag"', '"Segna"', '"Rivedere"', '"Da rivedere"'],
       description: 'Applica o rimuove la bandierina per il ripasso a fine sessione.'
+    },
+    {
+      icon: <Bookmark className="w-5 h-5 text-amber-400" />,
+      title: 'Salva nei Preferiti (Bookmark)',
+      primaryPhrase: '"Bookmark" • "Segnalibro"',
+      alternatives: ['"Preferiti"', '"Salva"', '"Ricorda"'],
+      description: 'Aggiunge o rimuove il quesito dai preferiti permanenti per ritrovarlo nell\'Archivio.'
     },
     {
       icon: <Play className="w-5 h-5 text-rose-400" />,

@@ -25,6 +25,7 @@ import { formatTime } from '../utils/timer';
 import { QuestionCard } from './QuestionCard';
 import { QuestionNavigator } from './QuestionNavigator';
 import { voiceService } from '../services/voiceService';
+import { soundFX } from '../utils/audio';
 import { QuizBottomBar } from './QuizBottomBar';
 import { backNavigation } from '../utils/backNavigation';
 import { SessionInterruptModal } from './SessionInterruptModal';
@@ -396,7 +397,7 @@ export const ExamScreen: React.FC<ExamScreenProps> = ({
     }
   };
 
-  const handleSelectAnswer = async (ans: 1 | 2 | 3, qid?: number) => {
+  const handleSelectAnswer = async (ans: 1 | 2 | 3, qid?: number, fromKeyboard = false) => {
     voiceService.stop();
     const targetId = qid ?? currentQuestion?.id;
     if (!targetId) return;
@@ -420,6 +421,13 @@ export const ExamScreen: React.FC<ExamScreenProps> = ({
         console.error(err);
       }
       recordedQuestionIds.current.add(targetId);
+
+      // Play audio feedback for keyboard answering
+      if (fromKeyboard && settings.soundEnabled) {
+        if (isCorrect) soundFX.playCorrect();
+        else if (examMode === 'tutor') soundFX.playWrong();
+        else soundFX.playClick();
+      }
 
       // Auto-advance on correct answer if enabled in settings
       if (
@@ -481,9 +489,9 @@ export const ExamScreen: React.FC<ExamScreenProps> = ({
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) return;
 
-      if (e.key === '1') handleSelectAnswer(1);
-      else if (e.key === '2') handleSelectAnswer(2);
-      else if (e.key === '3') handleSelectAnswer(3);
+      if (e.key === '1') handleSelectAnswer(1, undefined, true);
+      else if (e.key === '2') handleSelectAnswer(2, undefined, true);
+      else if (e.key === '3') handleSelectAnswer(3, undefined, true);
       else if (e.key.toLowerCase() === 'f') handleToggleFlag();
       else if (e.key === 'ArrowLeft' && currentIndex > 0) changeIndex(currentIndex - 1);
       else if (e.key === 'ArrowRight' && currentIndex < totalCount - 1) {

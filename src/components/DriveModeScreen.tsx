@@ -52,6 +52,7 @@ const VOICE_HINTS = [
   'Dì "Avanti" o "Indietro" per scorrere i quesiti',
   'Dì "Pausa", "Stop" o "Continua" per l\'avanzamento automatico',
   'Dì "Bandiera" per contrassegnare il quiz',
+  'Dì "Bookmark" o "Segnalibro" per salvare nei preferiti',
   'Dì "Concludi" o "Consegna" per terminare la sessione',
   'Dì "Aiuto" o "Comandi" per l\'elenco comandi a voce'
 ];
@@ -61,7 +62,7 @@ export const DriveModeScreen: React.FC<DriveModeScreenProps> = ({
   onClose,
   sessionContext
 }) => {
-  const { questions, statsMap, saveExam, recordAnswer, settings, updateSetting } = useQuiz();
+  const { questions, statsMap, saveExam, recordAnswer, settings, updateSetting, toggleBookmark } = useQuiz();
 
   // Screen Wake Lock API sempre attivo in Modalità Guida
   const { isActive: isWakeLockActive } = useWakeLock(isOpen);
@@ -609,6 +610,14 @@ export const DriveModeScreen: React.FC<DriveModeScreenProps> = ({
     showToast(nextVal ? '⚑ Contrassegnata' : 'Bandierina rimossa');
   };
 
+  const handleToggleBookmark = useCallback(async () => {
+    if (!currentQ) return;
+    triggerHapticFeedback('tap');
+    const nextVal = await toggleBookmark(currentQ.id);
+    if (settings.soundEnabled) soundFX.playClick();
+    showToast(nextVal ? '🔖 Salvata nei preferiti' : 'Segnalibro rimosso');
+  }, [currentQ, toggleBookmark, settings.soundEnabled]);
+
   const showToast = (msg: string) => {
     setVoiceToast(msg);
     setTimeout(() => {
@@ -632,6 +641,7 @@ export const DriveModeScreen: React.FC<DriveModeScreenProps> = ({
       prev: 'Precedente ("Indietro")',
       repeat: 'Ripeti Audio',
       flag: 'Bandierina',
+      bookmark: 'Preferiti (Bookmark)',
       pause: 'Pausa',
       stop: 'Stop',
       resume: 'Riprendi',
@@ -706,6 +716,8 @@ export const DriveModeScreen: React.FC<DriveModeScreenProps> = ({
       restartCurrentOrSequence();
     } else if (cmd === 'flag') {
       handleToggleFlag();
+    } else if (cmd === 'bookmark') {
+      handleToggleBookmark();
     } else if (cmd === 'pause') {
       showToast('🗣️ "Pausa"');
       setIsAutopilotEnabled(false);
@@ -763,7 +775,7 @@ export const DriveModeScreen: React.FC<DriveModeScreenProps> = ({
       setIsAutopilotEnabled(false);
       pauseVoice();
     }
-  }, [currentQ, handleSelectAnswer, handleNextQuestion, handlePrevQuestion, handlePlayQuestion, handlePlayOption, playFullSequence, restartCurrentOrSequence, handleToggleFlag, pauseVoice, stopVoice, resumeVoice, isPaused, playExplanation, updateSetting]);
+  }, [currentQ, handleSelectAnswer, handleNextQuestion, handlePrevQuestion, handlePlayQuestion, handlePlayOption, playFullSequence, restartCurrentOrSequence, handleToggleFlag, handleToggleBookmark, pauseVoice, stopVoice, resumeVoice, isPaused, playExplanation, updateSetting]);
 
   // Audio output preference: 'speaker' (mic only after speech/paused) or 'headphones' (continuous listening)
   const audioOutputMode = settings.driveModeAudioOutput || 'speaker';
@@ -983,6 +995,7 @@ export const DriveModeScreen: React.FC<DriveModeScreenProps> = ({
       else if (e.key === 'ArrowRight' || e.key === ' ') handleNextQuestion();
       else if (e.key === 'ArrowLeft') handlePrevQuestion();
       else if (e.key.toLowerCase() === 'f') handleToggleFlag();
+      else if (e.key.toLowerCase() === 'b') handleToggleBookmark();
       else if (e.key.toLowerCase() === 'q' && !e.altKey && !e.ctrlKey && !e.metaKey) {
         e.preventDefault();
         handlePlayQuestion();
@@ -1020,7 +1033,7 @@ export const DriveModeScreen: React.FC<DriveModeScreenProps> = ({
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [isOpen, internalMode, currentQ, currentIndex, totalCount, isAutopilotEnabled, isPlaying, isPaused, isVoiceGuideOpen, showOfflinePrompt, isVoiceMenuOpen, handlePlayQuestion, handlePlayOption, restartCurrentOrSequence, togglePlayPause, pauseVoice, stopVoice, resumeVoice]);
+  }, [isOpen, internalMode, currentQ, currentIndex, totalCount, isAutopilotEnabled, isPlaying, isPaused, isVoiceGuideOpen, showOfflinePrompt, isVoiceMenuOpen, handlePlayQuestion, handlePlayOption, restartCurrentOrSequence, togglePlayPause, pauseVoice, stopVoice, resumeVoice, handleToggleBookmark]);
 
   // Gestione Swipe Touch a schermo intero
   const handleTouchStart = (e: React.TouchEvent) => {
@@ -1243,11 +1256,13 @@ export const DriveModeScreen: React.FC<DriveModeScreenProps> = ({
           voiceHint={VOICE_HINTS[voiceHintIndex]}
           answers={answers}
           flags={flags}
+          isBookmarked={Boolean(currentQ && statsMap.get(currentQ.id)?.isBookmarked)}
           revealedQuestionId={revealedQuestionId}
           onSelectAnswer={handleSelectAnswer}
           onPrevQuestion={handlePrevQuestion}
           onNextQuestion={handleNextQuestion}
           onToggleFlag={handleToggleFlag}
+          onToggleBookmark={handleToggleBookmark}
           onSubmitExam={handleSubmitExam}
           isSubmitConfirmOpen={isSubmitConfirmOpen}
           onRequestSubmit={() => handleRequestSubmit(false)}

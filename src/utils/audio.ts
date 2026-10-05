@@ -1,9 +1,9 @@
-// Generatore sonoro avionico leggero basato su Web Audio API (senza file esterni)
+// Lightweight avionics sound generator based on Web Audio API (zero external assets)
 
 class SoundFX {
   private ctx: AudioContext | null = null;
 
-  private initCtx() {
+  private initCtx(): AudioContext | null {
     if (!this.ctx && typeof window !== 'undefined') {
       const AudioCtx = window.AudioContext || (window as any).webkitAudioContext;
       if (AudioCtx) {
@@ -11,86 +11,124 @@ class SoundFX {
       }
     }
     if (this.ctx && this.ctx.state === 'suspended') {
-      this.ctx.resume();
+      this.ctx.resume().catch(() => {});
+    }
+    return this.ctx;
+  }
+
+  public unlock() {
+    try {
+      this.initCtx();
+    } catch {
+      // Silently ignore unlock errors
     }
   }
 
+  /**
+   * Plays a short, bright, unmistakably positive two-tone ascending chime (G5 -> C6).
+   */
   public playCorrect() {
     try {
-      this.initCtx();
-      if (!this.ctx) return;
+      const ctx = this.initCtx();
+      if (!ctx) return;
 
-      const osc = this.ctx.createOscillator();
-      const gain = this.ctx.createGain();
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
 
       osc.type = 'sine';
-      osc.frequency.setValueAtTime(587.33, this.ctx.currentTime); // D5
-      osc.frequency.exponentialRampToValueAtTime(880, this.ctx.currentTime + 0.12); // A5
+      const now = Math.max(ctx.currentTime, 0.001);
 
-      gain.gain.setValueAtTime(0.08, this.ctx.currentTime);
-      gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + 0.2);
+      // Ascending two-tone interval: G5 (783.99 Hz) for 60ms, then C6 (1046.50 Hz) for 160ms
+      osc.frequency.setValueAtTime(783.99, now);
+      osc.frequency.setValueAtTime(1046.50, now + 0.06);
+
+      // Smooth attack to prevent pops, clean sustain, and gentle exponential decay
+      gain.gain.setValueAtTime(0.001, now);
+      gain.gain.exponentialRampToValueAtTime(0.16, now + 0.008);
+      gain.gain.setValueAtTime(0.14, now + 0.055);
+      gain.gain.exponentialRampToValueAtTime(0.20, now + 0.068);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.22);
 
       osc.connect(gain);
-      gain.connect(this.ctx.destination);
+      gain.connect(ctx.destination);
 
-      osc.start();
-      osc.stop(this.ctx.currentTime + 0.2);
+      osc.start(now);
+      osc.stop(now + 0.22);
     } catch {
-      // Ignora silenziosamente errori audio
+      // Silently ignore audio errors
     }
   }
 
+  /**
+   * Plays a descending negative tone sequence for mistakes.
+   */
   public playWrong() {
     try {
-      this.initCtx();
-      if (!this.ctx) return;
+      const ctx = this.initCtx();
+      if (!ctx) return;
 
-      const osc = this.ctx.createOscillator();
-      const gain = this.ctx.createGain();
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
 
       osc.type = 'triangle';
-      osc.frequency.setValueAtTime(220, this.ctx.currentTime); // A3
-      osc.frequency.exponentialRampToValueAtTime(164.81, this.ctx.currentTime + 0.18); // E3
+      const now = Math.max(ctx.currentTime, 0.001);
 
-      gain.gain.setValueAtTime(0.09, this.ctx.currentTime);
-      gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + 0.22);
+      osc.frequency.setValueAtTime(220, now); // A3
+      osc.frequency.exponentialRampToValueAtTime(164.81, now + 0.18); // E3
+
+      gain.gain.setValueAtTime(0.10, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.22);
 
       osc.connect(gain);
-      gain.connect(this.ctx.destination);
+      gain.connect(ctx.destination);
 
-      osc.start();
-      osc.stop(this.ctx.currentTime + 0.22);
+      osc.start(now);
+      osc.stop(now + 0.22);
     } catch {
-      // Ignora silenziosamente
+      // Silently ignore
     }
   }
 
+  /**
+   * Plays a crisp, subtle mechanical tap sound for neutral clicks and toggles.
+   */
   public playClick() {
     try {
-      this.initCtx();
-      if (!this.ctx) return;
+      const ctx = this.initCtx();
+      if (!ctx) return;
 
-      const osc = this.ctx.createOscillator();
-      const gain = this.ctx.createGain();
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
 
       osc.type = 'sine';
-      osc.frequency.setValueAtTime(440, this.ctx.currentTime);
+      const now = Math.max(ctx.currentTime, 0.001);
 
-      gain.gain.setValueAtTime(0.03, this.ctx.currentTime);
-      gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + 0.05);
+      osc.frequency.setValueAtTime(440, now);
+
+      gain.gain.setValueAtTime(0.04, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.05);
 
       osc.connect(gain);
-      gain.connect(this.ctx.destination);
+      gain.connect(ctx.destination);
 
-      osc.start();
-      osc.stop(this.ctx.currentTime + 0.05);
+      osc.start(now);
+      osc.stop(now + 0.05);
     } catch {
-      // Ignora silenziosamente
+      // Silently ignore
     }
   }
 }
 
 export const soundFX = new SoundFX();
+
+// Auto-unlock AudioContext on first user interaction (mobile & desktop)
+if (typeof window !== 'undefined') {
+  const unlockAudio = () => {
+    soundFX.unlock();
+  };
+  window.addEventListener('pointerdown', unlockAudio, { once: true, passive: true });
+  window.addEventListener('keydown', unlockAudio, { once: true, passive: true });
+}
 
 /**
  * Determines whether voice recognition microphone should be suspended to avoid

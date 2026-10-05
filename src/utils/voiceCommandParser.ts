@@ -10,6 +10,7 @@ export type VoiceCommand =
   | 'prev'
   | 'repeat'
   | 'flag'
+  | 'bookmark'
   | 'pause'
   | 'stop'
   | 'resume'
@@ -113,7 +114,13 @@ export function parseVoiceCommand(raw: string): VoiceCommand | null {
     return 'repeat';
   }
 
-  // 4. Bookmark / Review Flag
+  // 4a. Permanent Bookmark (Preferiti / Segnalibro)
+  // Matches: "bookmark", "segnalibro", "segnalibri", "preferito", "preferiti", "salva", "salva domanda", "salva quesito", "salva nei preferiti"
+  if (/\b(bookmark|segnalibr[oi]|preferit[oi]|salva(\s+(la\s+)?(domanda|quesito|nei\s+preferiti))?)\b/i.test(clean)) {
+    return 'bookmark';
+  }
+
+  // 4b. Session Review Flag
   // Matches: "bandiera", "flag", "rivedere", "segna", "da rivedere"
   if (/\b(bandiera|flag|segna|rivedere|da rivedere)\b/i.test(clean)) {
     return 'flag';

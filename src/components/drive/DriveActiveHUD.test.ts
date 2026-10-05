@@ -658,6 +658,80 @@ describe('DriveActiveHUD - Karaoke Accordion & Long Text Expansion', () => {
     expect(exitBtnIndex).toBeGreaterThan(counterIndex);
     expect(voiceMenuIndex).toBeGreaterThan(exitBtnIndex);
   });
+
+  it('HUD-BOOKMARK-01: renders bookmark button and applies active styling when question is bookmarked', () => {
+    const baseProps = {
+      currentQ: sampleLongQuestion,
+      currentIndex: 0,
+      totalCount: 30,
+      isExamSession: true,
+      secondsRemaining: 200,
+      isIntroActive: false,
+      onDismissIntro: () => {},
+      onReplayIntro: () => {},
+      onOpenVoiceGuide: () => {},
+      setIsVoiceMenuOpen: () => {},
+      onClose: () => {},
+      onExecuteClose: () => {},
+      isAutopilotEnabled: false,
+      onToggleAutopilot: () => {},
+      isTutorEnabled: false,
+      isVoiceSupported: true,
+      isVoiceCommandsEnabled: false,
+      voiceError: null,
+      isVoiceReceiving: false,
+      isVoiceListening: false,
+      onToggleVoiceCommands: () => {},
+      isPlaying: false,
+      isPaused: false,
+      isPartPlaying: () => false,
+      isExplanationPlaying: false,
+      onTogglePlayPause: () => {},
+      onRestartCurrentOrSequence: () => {},
+      onStopVoice: () => {},
+      onPlayExplanation: () => {},
+      waitingCountdown: null,
+      assimilationCountdown: null,
+      voiceInterimTranscript: '',
+      voiceLastTranscript: '',
+      lastRecognizedLabel: null,
+      unrecognizedSpeech: null,
+      voiceHint: '',
+      answers: {},
+      flags: {},
+      revealedQuestionId: null,
+      onSelectAnswer: () => {},
+      onPrevQuestion: () => {},
+      onNextQuestion: () => {},
+      onToggleFlag: () => {},
+      onSubmitExam: () => {}
+    };
+
+    // When not bookmarked
+    const htmlUnsaved = renderToString(
+      React.createElement(DriveActiveHUD, {
+        ...baseProps,
+        isBookmarked: false,
+        onToggleBookmark: () => {}
+      })
+    );
+    expect(htmlUnsaved).toContain('id="btn-drive-bookmark"');
+    expect(htmlUnsaved).toContain('Salva nei preferiti');
+    expect(htmlUnsaved).not.toContain('fill-amber-400');
+
+    // When bookmarked
+    const htmlSaved = renderToString(
+      React.createElement(DriveActiveHUD, {
+        ...baseProps,
+        isBookmarked: true,
+        onToggleBookmark: () => {}
+      })
+    );
+    expect(htmlSaved).toContain('id="btn-drive-bookmark"');
+    expect(htmlSaved).toContain('Rimuovi dai preferiti');
+    expect(htmlSaved).toContain('fill-amber-400');
+    expect(htmlSaved).toContain('Salvato');
+  });
 });
 
 

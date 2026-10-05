@@ -2,6 +2,7 @@ import React from 'react';
 import {
   Volume2,
   Flag,
+  Bookmark,
   ArrowRight,
   ArrowLeft,
   CheckCircle2,
@@ -75,11 +76,13 @@ export interface DriveActiveHUDProps {
   voiceHint: string;
   answers: Record<number, 1 | 2 | 3>;
   flags: Record<number, boolean>;
+  isBookmarked?: boolean;
   revealedQuestionId: number | null;
   onSelectAnswer: (answer: 1 | 2 | 3) => void;
   onPrevQuestion: () => void;
   onNextQuestion: () => void;
   onToggleFlag: () => void;
+  onToggleBookmark?: () => void;
   onSubmitExam: () => void;
   isSubmitConfirmOpen?: boolean;
   onRequestSubmit?: () => void;
@@ -133,11 +136,13 @@ export const DriveActiveHUD: React.FC<DriveActiveHUDProps> = ({
   voiceHint,
   answers,
   flags,
+  isBookmarked = false,
   revealedQuestionId,
   onSelectAnswer,
   onPrevQuestion,
   onNextQuestion,
   onToggleFlag,
+  onToggleBookmark,
   onSubmitExam,
   isSubmitConfirmOpen = false,
   onRequestSubmit,
@@ -556,23 +561,45 @@ export const DriveActiveHUD: React.FC<DriveActiveHUDProps> = ({
                 {currentQ.subjectName}
               </span>
             </div>
-            <button
-              type="button"
-              id="btn-drive-play-question"
-              onClick={(e) => {
-                e.stopPropagation();
-                onPlayQuestion();
-              }}
-              className={`px-2 py-0.5 rounded-lg text-xs font-bold border transition-colors flex items-center gap-1 ${
-                isPartPlaying('question')
-                  ? 'bg-amber-500/20 border-amber-500 text-amber-300 ring-1 ring-amber-400 light:bg-amber-100 light:border-amber-400 light:text-amber-800'
-                  : 'bg-zinc-800/80 border-zinc-700 text-zinc-300 hover:text-white hover:border-zinc-500 light:bg-slate-100 light:border-slate-300 light:text-slate-700'
-              }`}
-              title="Riascolta solo la domanda (Tasto Q)"
-            >
-              <Volume2 className={`w-3.5 h-3.5 ${isPartPlaying('question') ? 'text-amber-400 animate-pulse' : ''}`} />
-              <span className="hidden sm:inline">Solo Domanda</span>
-            </button>
+            <div className="flex items-center gap-1.5 flex-shrink-0">
+              {onToggleBookmark && (
+                <button
+                  type="button"
+                  id="btn-drive-bookmark"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onToggleBookmark();
+                  }}
+                  className={`px-2 py-0.5 rounded-lg text-xs font-bold border transition-colors flex items-center gap-1 active:scale-95 ${
+                    isBookmarked
+                      ? 'bg-amber-500/20 border-amber-500 text-amber-300 ring-1 ring-amber-400 light:bg-amber-100 light:border-amber-400 light:text-amber-800'
+                      : 'bg-zinc-800/80 border-zinc-700 text-zinc-400 hover:text-white hover:border-zinc-500 light:bg-slate-100 light:border-slate-300 light:text-slate-600'
+                  }`}
+                  title={isBookmarked ? 'Rimuovi dai preferiti (Tasto B)' : 'Salva nei preferiti (Tasto B)'}
+                  aria-label={isBookmarked ? 'Rimuovi dai preferiti' : 'Salva nei preferiti'}
+                >
+                  <Bookmark className={`w-3.5 h-3.5 ${isBookmarked ? 'fill-amber-400 text-amber-400' : ''}`} />
+                  <span className="hidden sm:inline">{isBookmarked ? 'Salvato' : 'Salva'}</span>
+                </button>
+              )}
+              <button
+                type="button"
+                id="btn-drive-play-question"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onPlayQuestion();
+                }}
+                className={`px-2 py-0.5 rounded-lg text-xs font-bold border transition-colors flex items-center gap-1 ${
+                  isPartPlaying('question')
+                    ? 'bg-amber-500/20 border-amber-500 text-amber-300 ring-1 ring-amber-400 light:bg-amber-100 light:border-amber-400 light:text-amber-800'
+                    : 'bg-zinc-800/80 border-zinc-700 text-zinc-300 hover:text-white hover:border-zinc-500 light:bg-slate-100 light:border-slate-300 light:text-slate-700'
+                }`}
+                title="Riascolta solo la domanda (Tasto Q)"
+              >
+                <Volume2 className={`w-3.5 h-3.5 ${isPartPlaying('question') ? 'text-amber-400 animate-pulse' : ''}`} />
+                <span className="hidden sm:inline">Solo Domanda</span>
+              </button>
+            </div>
           </div>
           <h2
             ref={questionTextRef}
