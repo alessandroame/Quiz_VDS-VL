@@ -14,6 +14,33 @@ Questo documento registra in ordine cronologico tutte le lavorazioni svolte nel 
 - **Impatto sul Desiderata**: <Come questo intervento contribuisce al desiderata (cfr. DESIDERATA.md) e indicazioni per il prossimo agente>
 ```
 
+### [2026-10-05] - Suono Breve per Risposta Esatta e Segnalibro/Bookmark in Modalità Mani Libere (v1.10.0)
+- **Cosa abbiamo fatto**:
+  - **Sintesi Audio Positiva & Unlock Automatico (`src/utils/audio.ts`)**:
+    - Riprogettato completamente `soundFX.playCorrect()`: sostituito il precedente fischio continuo e debole (0.08 di gain a salire) con un doppio rintocco armonico ascendente (Major Chime: Nota 1 Sol 5 a 783.99 Hz per 60ms seguito da Nota 2 Do 6 a 1046.50 Hz per 160ms, per una durata complessiva di 220ms).
+    - Implementato un attacco ultra-rapido (8ms) e decadimento esponenziale (`exponentialRampToValueAtTime`) privo di click o pop audio e perfettamente distinguibile anche su smartphone e altoparlanti veicolari in movimento.
+    - Introdotto `soundFX.unlock()` con registrazione automatica ai primi eventi di interazione utente (`pointerdown`, `keydown`) per riattivare istantaneamente l'`AudioContext` sospeso dalle policy di autoplay dei browser moderni.
+    - Esteso [src/components/ExamScreen.tsx](file:///d:/Github/Quiz_VDS-VL/src/components/ExamScreen.tsx) per suonare `soundFX.playCorrect()` anche quando la risposta viene selezionata via tastiera (tasti `1`, `2`, `3`).
+  - **Funzionalità Segnalibro / Preferiti in Modalità Mani Libere (`DriveActiveHUD.tsx`, `DriveModeScreen.tsx`)**:
+    - Aggiunto il pulsante touch dedicato `#btn-drive-bookmark` nell'intestazione della card quesito HUD in [src/components/drive/DriveActiveHUD.tsx](file:///d:/Github/Quiz_VDS-VL/src/components/drive/DriveActiveHUD.tsx), con icona segnalibro, stato attivo ambra e feedback aptico + audio click.
+    - Esteso il parser vocale in [src/utils/voiceCommandParser.ts](file:///d:/Github/Quiz_VDS-VL/src/utils/voiceCommandParser.ts) con il nuovo comando `'bookmark'` e supporto a varianti naturali italiane (*"bookmark"*, *"segnalibro"*, *"segnalibri"*, *"preferiti"*, *"preferito"*, *"salva"*, *"salva domanda"*, *"salva nei preferiti"*).
+    - Integrata la scorciatoia da tastiera `B`/`b` per attivare o disattivare il segnalibro anche in modalità Guida/Mani libere.
+    - Visualizzazione toast di notifica (`🔖 Salvata nei preferiti` / `Segnalibro rimosso`) sincronizzata in tempo reale con Dexie DB (`toggleBookmark`).
+    - Aggiornata la guida comandi vocali in [src/components/VoiceCommandsModal.tsx](file:///d:/Github/Quiz_VDS-VL/src/components/VoiceCommandsModal.tsx).
+  - **Filtraggio Sessioni a Zero Risposte nelle Statistiche (`examEvaluator.ts`, `analytics.ts`, `smartMerge.ts`, `db/index.ts`)**:
+    - Modificato il calcolo delle statistiche d'esame per ignorare le sessioni con 0 risposte date, evitando che un avvio accidentale seguito da chiusura immediata sporchi le medie o generi falsi fallimenti.
+    - Aggiunta la funzione di potatura nel database per epurare le sessioni fantasma vuote.
+  - **Suite di Test & Documentazione**:
+    - Aggiornati o creati test unitari e di integrazione in `audio.test.ts`, `voiceCommandParser.test.ts`, `DriveActiveHUD.test.ts`, `DriveModeScreen.test.ts`, `examEvaluator.test.ts`, `analytics.test.ts`, `smartMerge.test.ts`. Totale: 449 test passanti al 100%.
+    - Aggiornati [README.md](file:///d:/Github/Quiz_VDS-VL/README.md) e [DESIDERATA.md](file:///d:/Github/Quiz_VDS-VL/DESIDERATA.md).
+- **Scelte architetturali & Rationale**:
+  - **Doppio Rintocco Armonico (G5 -> C6)**: Un singolo bip rischia di confondersi con notifiche di sistema o rumore di fondo. Il chime ascendente a due toni (intervallo di quarta perfetta Sol-Do) è universalmente associato a successo/conferma, dura solo 220ms e non distrae né stanca l'allievo durante sessioni lunghe.
+  - **Segnalibro a Mani Libere Multi-Canale**: L'allievo mentre guida o fa jogging non può fermarsi a leggere spiegazioni complesse; poter pronunciare semplicemente *"segnalibro"* o *"preferiti"* (o toccare l'icona sul cruscotto) gli consente di marcare il quesito dubbio per riesaminarlo comodamente a casa nel Quaderno degli Errori o nei Preferiti.
+- **Impatto sul Desiderata**:
+  - Piena soddisfazione della richiesta utente, perfezionamento dell'accessibilità acustica e potenziamento della Modalità Mani Libere per lo studio in mobilità.
+
+---
+
 ### [2026-10-05] - Ottimizzazione Ergonomica Selettore Modalità Tutor: Pannelli Interattivi a Tutta Card
 - **Cosa abbiamo fatto**:
   - **Sostituzione dei Tre Pulsanti Interni con Pannelli Cliccabili**:
