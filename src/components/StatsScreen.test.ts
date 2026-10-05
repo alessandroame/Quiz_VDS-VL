@@ -33,23 +33,25 @@ const mockStatsMap = new Map([
   [102, { questionId: 102, timesSeen: 2, timesWrong: 0, consecutiveCorrect: 2, lastResult: 'correct' }]
 ]);
 
+let mockQuizSessions: any[] = [
+  {
+    id: 1,
+    date: Date.now() - 3600000,
+    mode: 'official',
+    durationSeconds: 1200,
+    totalQuestions: 30,
+    correctAnswers: 28,
+    wrongAnswers: 2,
+    isPassed: true
+  }
+];
+
 vi.mock('../context/QuizContext', () => ({
   useQuiz: () => ({
     questions: mockQuestions,
     filteredQuestions: mockQuestions,
     statsMap: mockStatsMap,
-    sessions: [
-      {
-        id: 1,
-        date: Date.now() - 3600000,
-        mode: 'official',
-        durationSeconds: 1200,
-        totalQuestions: 30,
-        correctAnswers: 28,
-        wrongAnswers: 2,
-        isPassed: true
-      }
-    ],
+    sessions: mockQuizSessions,
     totalSeen: 2,
     readinessScore: 85,
     mistakesCount: 1,
@@ -85,6 +87,18 @@ describe('StatsScreen Component Interactive Drilldown', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
+    mockQuizSessions = [
+      {
+        id: 1,
+        date: Date.now() - 3600000,
+        mode: 'official',
+        durationSeconds: 1200,
+        totalQuestions: 30,
+        correctAnswers: 28,
+        wrongAnswers: 2,
+        isPassed: true
+      }
+    ];
     container = document.createElement('div');
     document.body.appendChild(container);
     root = createRoot(container);
@@ -214,5 +228,61 @@ describe('StatsScreen Component Interactive Drilldown', () => {
     expect(handleTrainSubject).toHaveBeenCalledWith(2);
     // Subject modal should be closed
     expect(container.querySelector('#btn-close-subject-detail')).toBeNull();
+  });
+
+  it('STS-06: filters out sessions where zero answers were given from the history and metric counter', () => {
+    // Valid session with answers
+    const validSession = {
+      id: 10,
+      date: Date.now() - 100000,
+      mode: 'official',
+      durationSeconds: 900,
+      totalQuestions: 30,
+      correctAnswers: 29,
+      wrongAnswers: 1,
+      isPassed: true,
+      snapshots: [{ questionId: 1, userAnswer: 1, correctAnswer: 1, isCorrect: true, wasFlagged: false }]
+    };
+
+    // Ghost/empty session: 0 answers given, 30 unanswered
+    const emptySession = {
+      id: 11,
+      date: Date.now() - 50000,
+      mode: 'official',
+      durationSeconds: 15,
+      totalQuestions: 30,
+      correctAnswers: 0,
+      wrongAnswers: 30,
+      isPassed: false,
+      snapshots: Array.from({ length: 30 }, (_, idx) => ({
+        questionId: idx + 1,
+        userAnswer: undefined,
+        correctAnswer: 1,
+        isCorrect: false,
+        wasFlagged: false
+      }))
+    };
+
+    mockQuizSessions = [emptySession, validSession];
+
+    act(() => {
+      root.render(React.createElement(StatsScreen));
+    });
+
+    // The valid session should appear
+    expect(container.textContent).toContain('29/30 (1 err)');
+
+    // The empty session (0/30) should NOT appear
+    expect(container.textContent).not.toContain('0/30');
+    expect(container.textContent).not.toContain('(30 err)');
+
+    // When ONLY empty sessions exist:
+    mockQuizSessions = [emptySession];
+
+    act(() => {
+      root.render(React.createElement(StatsScreen));
+    });
+
+    expect(container.textContent).toContain('Nessuna simulazione completata finora.');
   });
 });
