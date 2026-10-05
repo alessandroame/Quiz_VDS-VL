@@ -278,4 +278,44 @@ describe('Suite 4: Persistenza Dexie IndexedDB (src/db/index.ts)', () => {
     const updatedDisc = await getSetting('disciplinePreference', 'paraglider');
     expect(updatedDisc).toBe('hang_glider');
   });
+
+  it('DB-14: exportDatabaseBackup excludes sessions with zero answered questions', async () => {
+    // Session 1: answered questions (28 correct)
+    await db.sessions.add({
+      date: Date.now() - 2000,
+      durationSeconds: 1200,
+      totalQuestions: 30,
+      correctAnswers: 28,
+      wrongAnswers: 2,
+      isPassed: true,
+      isMarathon: false,
+      subjectBreakdown: {},
+      snapshots: [{ questionId: 1, userAnswer: 1, correctAnswer: 1, isCorrect: true, wasFlagged: false }]
+    });
+
+    // Session 2: zero answers given (30 unanswered)
+    await db.sessions.add({
+      date: Date.now() - 1000,
+      durationSeconds: 10,
+      totalQuestions: 30,
+      correctAnswers: 0,
+      wrongAnswers: 30,
+      isPassed: false,
+      isMarathon: false,
+      subjectBreakdown: {},
+      snapshots: Array.from({ length: 30 }, (_, idx) => ({
+        questionId: idx + 1,
+        userAnswer: undefined,
+        correctAnswer: 1,
+        isCorrect: false,
+        wasFlagged: false
+      }))
+    });
+
+    const backupJson = await exportDatabaseBackup();
+    const backup = JSON.parse(backupJson);
+
+    expect(backup.sessions).toHaveLength(1);
+    expect(backup.sessions[0].correctAnswers).toBe(28);
+  });
 });
