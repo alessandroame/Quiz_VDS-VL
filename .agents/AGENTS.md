@@ -12,25 +12,22 @@ L'alberatura delle configurazioni dell'agente è standardizzata, modulare e ordi
 .agents/
 ├── AGENTS.md                   # Questo documento di regia e direttive operative
 ├── rules/                      # Regole e vincoli architetturali vincolanti
-│   ├── anti_sycophancy_integrity.md  # Rigore tecnico, circuit breaker anti-loop, zero test fittizi
-│   ├── constraints.md                # Vincoli architetturali PWA (Vite, TS strict, Dexie SSOT)
-│   ├── proactive_mentorship.md       # Mentorship critica, anti-sycophancy e prompt refactoring
-│   └── trace_based_debugging.md      # Protocollo deterministico di debug a tracce numerate
-├── skills/                     # Skill specializzate (ciascuna con SKILL.md conforme)
+│   └── constraints.md          # Vincoli architetturali PWA (Vite, TS strict, Dexie SSOT)
+├── skills/                     # Skill specializzate di dominio
 │   ├── test-architect-vitest/  # Piani di test, Unit & Integration test Vitest, mock Dexie e BVA
-│   ├── autonomous-loops/       # Circuit breaker salva-token per cicli di build e test
-│   ├── self-correction-loop/   # Cattura permanente delle correzioni su MEMORY.md
 │   ├── headless-pwa-tester/    # Collaudo visivo CDP zero-dipendenze (mobile 390x844 e desktop)
 │   ├── minimal-ui-ux/          # Design system minimale per lo studio, microcopy essenziale ed ergonomia zero-distrazioni
 │   ├── pwa-quiz-engine/        # Fair Coverage Randomizer, persistenza Dexie e gestione offline
 │   ├── vds-exam-examiner/      # Regolamento esame ufficiale AeCI (30 quiz, 45 min, max 3 errori)
 │   ├── vds-quiz-extractor/     # Pipeline estrazione e normalizzazione dei 504 quiz dal PDF ufficiale
-│   ├── ui-audit-inspector/     # Audit UI/UX, contrasti WCAG AA, anti-cluttering e report HTML con screenshot
-│   └── git-pro/                # Standard Conventional Commits e igiene del repository
+│   └── ui-audit-inspector/     # Audit UI/UX, contrasti WCAG AA, anti-cluttering e report HTML con screenshot
 ├── worklog.d/                  # Frammenti di diario per sessioni parallele (anti-merge conflict)
 └── workflows/                  # Flussi procedurali standardizzati
     ├── task_lifecycle.md       # Pre-flight, gestione processi sincroni e pulizia task
     └── browser_testing.md      # Collaudo visivo PWA e verifica console browser
+
+> [!NOTE]
+> Le direttive ingegneristiche trasversali (anti-sycophancy, watchdog, git pro, circuit breaker, proactive mentorship) sono governate globalmente dai plugin ufficiali di Antigravity.
 ```
 
 ---
