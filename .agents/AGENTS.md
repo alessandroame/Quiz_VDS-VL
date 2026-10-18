@@ -47,7 +47,7 @@ L'alberatura delle configurazioni dell'agente è standardizzata, modulare e ordi
    - Rendere sempre cliccabili tutti i percorsi di file e URL nel markdown (es. `[MEMORY.md](file:///c:/github/Quiz_VDS-VL/MEMORY.md)`).
 
 4. **Proattività Critica e Prompt Refactoring**:
-   - Applicare [proactive_mentorship.md](file:///c:/github/Quiz_VDS-VL/.agents/rules/proactive_mentorship.md) per individuare rischi tecnici, trade-off negativi o ottimizzazioni del prompt prima di avviare interventi massicci.
+   - Applicare il plugin globale `proactive-mentorship` (Gate Anti-Disturbo `0 byte` sui prompt chiari, routing comandi Antigravity e Agent Training Ladder `L0..L3` in `<details>`) per individuare rischi tecnici, trade-off negativi o ottimizzazioni del prompt prima di avviare interventi massicci.
 
 5. **Desiderata di Progetto, Memoria Tecnica e Registro Lavorazioni (WORKLOG)**:
    - **Pre-Flight Obbligatorio**: Prima di modificare codice, consultare tassativamente:
