@@ -14,6 +14,10 @@ Questo documento registra in ordine cronologico tutte le lavorazioni svolte nel 
 - **Impatto sul Desiderata**: <Come questo intervento contribuisce al desiderata (cfr. DESIDERATA.md) e indicazioni per il prossimo agente>
 ```
 
+### [2026-10-19] - Pagine Pubbliche e Documentazione per Pubblicazione Google OAuth (v1.10.1)
+- **Tipo**: `feat(legal)` / `docs(oauth)` — Dettaglio completo in [2026-10-19_google_oauth_legal_pages.md](file:///c:/github/Quiz_VDS-VL/.agents/worklog.d/2026-10-19_google_oauth_legal_pages.md).
+- **Intervento**: Creati [public/about.html](file:///c:/github/Quiz_VDS-VL/public/about.html), [public/privacy-policy.html](file:///c:/github/Quiz_VDS-VL/public/privacy-policy.html), [public/terms-of-service.html](file:///c:/github/Quiz_VDS-VL/public/terms-of-service.html) e i rispettivi Markdown in `docs/`, configurato `navigateFallbackDenylist` in [vite.config.ts](file:///c:/github/Quiz_VDS-VL/vite.config.ts) e aggiunti i link in [index.html](file:///c:/github/Quiz_VDS-VL/index.html) e [SettingsModal.tsx](file:///c:/github/Quiz_VDS-VL/src/components/SettingsModal.tsx).
+
 ### [2026-10-05] - Suono Breve per Risposta Esatta e Segnalibro/Bookmark in Modalità Mani Libere (v1.10.0)
 - **Cosa abbiamo fatto**:
   - **Sintesi Audio Positiva & Unlock Automatico (`src/utils/audio.ts`)**:

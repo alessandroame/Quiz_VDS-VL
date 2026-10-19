@@ -1,0 +1,270 @@
+<!doctype html>
+<html lang="it">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Termini di Servizio (Terms of Service) — Quiz VDS-VL</title>
+    <meta
+      name="description"
+      content="Termini e Condizioni di Servizio di Quiz VDS-VL: utilizzo didattico gratuito, conformità al questionario AeCI D.P.R. 133/2010 e limitazioni di responsabilità."
+    />
+    <link rel="icon" type="image/svg+xml" href="./favicon.svg" />
+    <link rel="apple-touch-icon" href="./apple-touch-icon.png" />
+    <style>
+      :root {
+        --bg: #09090b;
+        --surface: #18181b;
+        --surface-elevated: #27272a;
+        --border: #27272a;
+        --text: #f4f4f5;
+        --text-muted: #a1a1aa;
+        --accent: #f59e0b;
+        --accent-hover: #d97706;
+        --accent-bg: rgba(245, 158, 11, 0.12);
+        --accent-border: rgba(245, 158, 11, 0.35);
+      }
+      @media (prefers-color-scheme: light) {
+        :root {
+          --bg: #f8fafc;
+          --surface: #ffffff;
+          --surface-elevated: #f1f5f9;
+          --border: #cbd5e1;
+          --text: #0f172a;
+          --text-muted: #475569;
+          --accent: #d97706;
+          --accent-hover: #b45309;
+          --accent-bg: rgba(217, 119, 6, 0.1);
+          --accent-border: rgba(217, 119, 6, 0.35);
+        }
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        padding: 0;
+        background-color: var(--bg);
+        color: var(--text);
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        line-height: 1.65;
+        -webkit-font-smoothing: antialiased;
+      }
+      .container {
+        max-width: 820px;
+        margin: 0 auto;
+        padding: 24px 16px 64px;
+      }
+      header {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+        padding-bottom: 20px;
+        border-bottom: 1px solid var(--border);
+        margin-bottom: 28px;
+      }
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        text-decoration: none;
+        color: var(--text);
+      }
+      .brand img {
+        width: 44px;
+        height: 44px;
+        border-radius: 10px;
+        border: 1px solid var(--accent-border);
+      }
+      .brand-title {
+        font-size: 1.25rem;
+        font-weight: 800;
+        letter-spacing: -0.01em;
+        display: block;
+      }
+      .brand-sub {
+        font-size: 0.75rem;
+        color: var(--text-muted);
+        display: block;
+      }
+      nav {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        align-items: center;
+      }
+      .nav-link {
+        color: var(--text-muted);
+        text-decoration: none;
+        font-size: 0.85rem;
+        font-weight: 600;
+        padding: 8px 12px;
+        border-radius: 8px;
+        border: 1px solid transparent;
+      }
+      .nav-link:hover,
+      .nav-link.active {
+        color: var(--text);
+        background-color: var(--surface);
+        border-color: var(--border);
+      }
+      .btn-primary {
+        background-color: var(--accent);
+        color: #09090b;
+        text-decoration: none;
+        font-size: 0.875rem;
+        font-weight: 700;
+        padding: 9px 16px;
+        border-radius: 10px;
+        display: inline-block;
+      }
+      .btn-primary:hover {
+        background-color: var(--accent-hover);
+      }
+      .card {
+        background-color: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 14px;
+        padding: 22px;
+        margin-bottom: 20px;
+      }
+      h1 {
+        font-size: 1.65rem;
+        margin: 0 0 8px;
+        line-height: 1.25;
+      }
+      h2 {
+        font-size: 1.15rem;
+        margin: 0 0 12px;
+        color: var(--text);
+        border-bottom: 1px solid var(--border);
+        padding-bottom: 8px;
+      }
+      p {
+        margin: 0 0 12px;
+        color: var(--text-muted);
+        font-size: 0.95rem;
+      }
+      ul {
+        margin: 0 0 12px;
+        padding-left: 20px;
+        color: var(--text-muted);
+        font-size: 0.93rem;
+      }
+      li {
+        margin-bottom: 8px;
+      }
+      li strong,
+      p strong {
+        color: var(--text);
+      }
+      a {
+        color: var(--accent);
+      }
+      footer {
+        margin-top: 40px;
+        padding-top: 20px;
+        border-top: 1px solid var(--border);
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-between;
+        gap: 12px;
+        font-size: 0.85rem;
+        color: var(--text-muted);
+      }
+      footer a {
+        color: var(--accent);
+        text-decoration: none;
+        font-weight: 600;
+      }
+      footer a:hover {
+        text-decoration: underline;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <header>
+        <a href="./index.html" class="brand">
+          <img src="./icons/icon-192x192.png" alt="Logo Quiz VDS-VL" />
+          <div>
+            <span class="brand-title">Quiz VDS-VL</span>
+            <span class="brand-sub">Termini e Condizioni di Servizio</span>
+          </div>
+        </a>
+        <nav aria-label="Navigazione documenti">
+          <a href="./about.html" class="nav-link">Presentazione</a>
+          <a href="./privacy-policy.html" class="nav-link">Privacy Policy</a>
+          <a href="./terms-of-service.html" class="nav-link active">Termini di Servizio</a>
+          <a href="./index.html" class="btn-primary">Avvia Applicazione</a>
+        </nav>
+      </header>
+
+      <main>
+        <section class="card">
+          <h1>Termini e Condizioni di Servizio (Terms of Service)</h1>
+          <p><strong>Ultimo aggiornamento:</strong> 19 Ottobre 2026</p>
+          <p>
+            L'accesso e l'utilizzo dell'applicazione web progressiva <strong>Quiz VDS-VL</strong> (<em>VDS-VL Quiz Master</em>) sono regolati dai presenti Termini di Servizio. Utilizzando l'applicazione, l'utente dichiara di aver letto, compreso e accettato integralmente le presenti condizioni.
+          </p>
+        </section>
+
+        <section class="card">
+          <h2>1. Finalità Didattica e Assenza di Affiliazione Ufficiale</h2>
+          <ul>
+            <li><strong>Supporto allo Studio Teorico:</strong> Quiz VDS-VL è uno strumento didattico gratuito pensato per agevolare la preparazione all'esame teorico per l'attestato di <em>Volo da Diporto o Sportivo — Volo Libero (VDS/VL, Parapendio)</em>, basato sul questionario ministeriale pubblicato dall'<strong>Aero Club d'Italia (AeCI)</strong> ai sensi del <strong>D.P.R. 9 luglio 2010, n. 133</strong>.</li>
+            <li><strong>Indipendenza del Progetto:</strong> L'applicazione è un progetto indipendente e non è affiliata, approvata, patrocinata né gestita dall'Aero Club d'Italia (AeCI), dall'ENAC o da altri enti governativi. Per i testi ufficiali e i regolamenti d'esame vigenti fanno fede esclusivamente le pubblicazioni ufficiali dell'Aero Club d'Italia.</li>
+          </ul>
+        </section>
+
+        <section class="card">
+          <h2>2. Avvertenza sulla Sicurezza del Volo (Aviation Safety Disclaimer)</h2>
+          <ul>
+            <li><strong>Esclusione di Uso Operativo in Volo:</strong> I quesiti e le spiegazioni didattiche (<em>Regola</em> e <em>Tranello</em>) hanno scopo esclusivamente teorico per il superamento della prova scritta d'esame.</li>
+            <li><strong>Formazione Obbligatoria Certificata:</strong> L'applicazione <strong>non sostituisce in alcun modo l'addestramento teorico e pratico impartito da istruttori certificati presso scuole di volo riconosciute dall'Aero Club d'Italia</strong>, né i manuali operativi dei costruttori delle attrezzature di volo o la consultazione dei bollettini meteorologici e aeronautici ufficiali.</li>
+            <li><strong>Assunzione di Responsabilità:</strong> Il volo libero comporta rischi intrinseci. Lo sviluppatore declina ogni responsabilità per danni diretti o indiretti derivanti dall'uso delle informazioni contenute nell'applicazione o dall'esito delle prove d'esame ufficiali sostenute dal candidato.</li>
+          </ul>
+        </section>
+
+        <section class="card">
+          <h2>3. Archiviazione Locale e Sincronizzazione Google Drive</h2>
+          <p>
+            I progressi di studio vengono salvati localmente nel browser dell'utente (<code>IndexedDB</code>). La rimozione dei dati di navigazione del browser senza aver prima effettuato un backup comporta la perdita dei progressi locali.
+          </p>
+          <p style="margin-bottom: 0;">
+            L'utente può utilizzare facoltativamente il backup manuale su file <code>.json</code> oppure la sincronizzazione cloud sul proprio account personale <strong>Google Drive</strong>, nel rispetto dei <a href="https://policies.google.com/terms" target="_blank" rel="noopener noreferrer">Termini di Servizio di Google</a> e dell'<a href="./privacy-policy.html">Informativa sulla Privacy di Quiz VDS-VL</a>.
+          </p>
+        </section>
+
+        <section class="card">
+          <h2>4. Proprietà Intellettuale e Condizioni d'Uso</h2>
+          <ul>
+            <li><strong>Questionario Ministeriale:</strong> I quesiti ufficiali d'esame appartengono al catalogo pubblico dell'Aero Club d'Italia (Edizione 2017).</li>
+            <li><strong>Licenza per Uso Personale e Didattico:</strong> L'interfaccia, il codice sorgente, gli algoritmi di studio e le spiegazioni didattiche originali sono resi disponibili gratuitamente per uso personale e di studio. È vietata la rivendita commerciale dell'applicazione.</li>
+          </ul>
+        </section>
+
+        <section class="card">
+          <h2>5. Erogazione del Servizio "Così Com'è" (As-Is)</h2>
+          <p>
+            L'applicazione viene fornita gratuitamente <strong>"così com'è" (<em>as-is</em>)</strong> e secondo disponibilità, senza garanzie di assenza di interruzioni o errori materiali. I presenti Termini sono disciplinati dalla legge italiana e dalla normativa dell'Unione Europea.
+          </p>
+          <p style="margin-bottom: 0;">
+            Per segnalazioni tecniche o comunicazioni: <a href="https://github.com/alessandroame/Quiz_VDS-VL/issues" target="_blank" rel="noopener noreferrer">https://github.com/alessandroame/Quiz_VDS-VL/issues</a>.
+          </p>
+        </section>
+      </main>
+
+      <footer>
+        <div>Quiz VDS-VL — Termini e Condizioni di Servizio</div>
+        <div style="display: flex; gap: 16px;">
+          <a href="./index.html">Avvia App</a>
+          <a href="./about.html">Presentazione</a>
+          <a href="./privacy-policy.html">Privacy Policy</a>
+          <a href="https://github.com/alessandroame/Quiz_VDS-VL" target="_blank" rel="noopener noreferrer">GitHub</a>
+        </div>
+      </footer>
+    </div>
+  </body>
+</html>

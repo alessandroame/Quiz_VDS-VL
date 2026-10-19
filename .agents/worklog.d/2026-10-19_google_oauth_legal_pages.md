@@ -1,0 +1,15 @@
+### [2026-10-19] - Creazione Pagine Pubbliche e Documentazione per Pubblicazione Google OAuth (Home, Privacy Policy, Terms of Service)
+- **Cosa abbiamo fatto**:
+  - **Pagine HTML Statiche Pubbliche (`public/about.html`, `public/privacy-policy.html`, `public/terms-of-service.html`)**:
+    - Realizzate 3 pagine HTML5 statiche, autonome e prive di dipendenze JavaScript esterne per soddisfare i requisiti di verifica del *Google Cloud OAuth Consent Screen* (*Application home page*, *Application privacy policy link*, *Application Terms of Service link*).
+    - Inclusa in `public/privacy-policy.html` la clausola obbligatoria *Google API Services User Data Policy — Limited Use Disclosure* (in italiano e in inglese per i revisori OAuth di Google), détaillando l'uso esclusivo client-side degli ambiti ristretti `drive.appdata` e `drive.file` per il file `vds_quiz_master_backup.json`, l'archiviazione locale `IndexedDB`, i permessi microfono `Web Speech API` e la telemetria anonima Opt-Out PostHog EU.
+    - Inclusi in `public/terms-of-service.html` i termini d'uso gratuito, l'assenza di affiliazione istituzionale con AeCI/ENAC e il disclaimer di sicurezza aeronautica (D.P.R. 133/2010).
+  - **Documentazione Markdown Speculare (`docs/APP_OVERVIEW.md`, `docs/PRIVACY_POLICY.md`, `docs/TERMS_OF_SERVICE.md`)**:
+    - Creati i 3 documenti Markdown corrispondenti nella cartella `docs/` per consultazione diretta nel repository.
+  - **Integrazione PWA, Routing Workbox e UI (`vite.config.ts`, `index.html`, `src/components/SettingsModal.tsx`)**:
+    - Aggiunto `navigateFallbackDenylist: [/(?:about|privacy-policy|terms-of-service)\.html$/]` nella configurazione Workbox di `vite.config.ts` per impedire che il Service Worker intercetti le pagine legali reindirizzandole alla SPA `index.html`.
+    - Inseriti i link statici a `about.html`, `privacy-policy.html` e `terms-of-service.html` nello splash screen di `index.html` (visibili ai crawler OAuth senza esecuzione JS) e nella sezione *Informazioni & Regolamento* di `SettingsModal.tsx`.
+- **Scelte architetturali & Rationale**:
+  - **Doppio Formato (HTML Statico su Dominio Autorizzato + Markdown)**: Il crawler di verifica di Google OAuth richiede che i tre URL appartengano al dominio autorizzato (`alessandroame.github.io`) e che la home page esponga link diretti nel markup HTML alla Privacy Policy senza richiedere login o rendering CSR complesso. Servire pagine statiche dalla cartella `public/` garantisce accessibilità immediata (`HTTP 200`) e piena conformità.
+- **Impatto sul Desiderata**:
+  - Prontezza completa per la pubblicazione in produzione della schermata di consenso OAuth di Google Cloud e trasparenza legale GDPR/Limited Use per gli utenti.

@@ -206,6 +206,7 @@ export default defineConfig({
       },
       workbox: {
         globPatterns: ['**/*.{js,css,html,ico,png,svg,json}'],
+        navigateFallbackDenylist: [/(?:about|privacy-policy|terms-of-service)\.html$/],
         runtimeCaching: [
           {
             urlPattern: ({ url }) => url.pathname.includes('/audio/manifest.json'),

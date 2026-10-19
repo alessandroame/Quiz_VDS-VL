@@ -1857,13 +1857,44 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                       <strong className="text-zinc-200 light:text-slate-900">Privacy dei Dati:</strong> Nessun tracciamento o invio a server esterni; i progressi restano sul tuo dispositivo con backup opzionale su Google Drive.
                     </span>
                   </div>
+                  <div className="pt-2 mt-2 border-t border-zinc-700/60 light:border-slate-300 flex flex-wrap items-center justify-center gap-3 text-[11px] font-semibold">
+                    <a
+                      href={`${import.meta.env.BASE_URL || '/'}about.html`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-amber-400 hover:underline light:text-amber-700 flex items-center gap-1"
+                    >
+                      <span>Presentazione App</span>
+                      <ExternalLink className="w-3 h-3" />
+                    </a>
+                    <span className="text-zinc-600 light:text-slate-400">·</span>
+                    <a
+                      href={`${import.meta.env.BASE_URL || '/'}privacy-policy.html`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-amber-400 hover:underline light:text-amber-700 flex items-center gap-1"
+                    >
+                      <span>Privacy Policy</span>
+                      <ExternalLink className="w-3 h-3" />
+                    </a>
+                    <span className="text-zinc-600 light:text-slate-400">·</span>
+                    <a
+                      href={`${import.meta.env.BASE_URL || '/'}terms-of-service.html`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-amber-400 hover:underline light:text-amber-700 flex items-center gap-1"
+                    >
+                      <span>Termini di Servizio</span>
+                      <ExternalLink className="w-3 h-3" />
+                    </a>
+                  </div>
                 </div>
               </div>
 
               {/* Dedica */}
               <div className="p-3 rounded-xl border border-zinc-700/80 bg-zinc-900/40 light:bg-slate-50 light:border-slate-300 text-center">
                 <p className="text-[11px] text-zinc-400 light:text-slate-600">
-                  Progettato per gli allievi piloti di Volo Libero italiani 🪂🦅
+                  Progettato per gli allievi piloti di Volo Libero italiani
                 </p>
               </div>
             </div>

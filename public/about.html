@@ -1,0 +1,306 @@
+<!doctype html>
+<html lang="it">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Quiz VDS-VL — Presentazione Applicazione Esame Volo Libero AeCI</title>
+    <meta
+      name="description"
+      content="Presentazione ufficiale di Quiz VDS-VL: applicazione web progressiva gratuita e offline per la preparazione all'esame teorico VDS/VL (Parapendio) secondo il programma AeCI e D.P.R. 133/2010."
+    />
+    <link rel="icon" type="image/svg+xml" href="./favicon.svg" />
+    <link rel="apple-touch-icon" href="./apple-touch-icon.png" />
+    <style>
+      :root {
+        --bg: #09090b;
+        --surface: #18181b;
+        --surface-elevated: #27272a;
+        --border: #27272a;
+        --text: #f4f4f5;
+        --text-muted: #a1a1aa;
+        --accent: #f59e0b;
+        --accent-hover: #d97706;
+        --accent-bg: rgba(245, 158, 11, 0.12);
+        --accent-border: rgba(245, 158, 11, 0.35);
+      }
+      @media (prefers-color-scheme: light) {
+        :root {
+          --bg: #f8fafc;
+          --surface: #ffffff;
+          --surface-elevated: #f1f5f9;
+          --border: #cbd5e1;
+          --text: #0f172a;
+          --text-muted: #475569;
+          --accent: #d97706;
+          --accent-hover: #b45309;
+          --accent-bg: rgba(217, 119, 6, 0.1);
+          --accent-border: rgba(217, 119, 6, 0.35);
+        }
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        padding: 0;
+        background-color: var(--bg);
+        color: var(--text);
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        line-height: 1.6;
+        -webkit-font-smoothing: antialiased;
+      }
+      .container {
+        max-width: 820px;
+        margin: 0 auto;
+        padding: 24px 16px 64px;
+      }
+      header {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+        padding-bottom: 20px;
+        border-bottom: 1px solid var(--border);
+        margin-bottom: 28px;
+      }
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        text-decoration: none;
+        color: var(--text);
+      }
+      .brand img {
+        width: 44px;
+        height: 44px;
+        border-radius: 10px;
+        border: 1px solid var(--accent-border);
+      }
+      .brand-title {
+        font-size: 1.25rem;
+        font-weight: 800;
+        letter-spacing: -0.01em;
+        display: block;
+      }
+      .brand-sub {
+        font-size: 0.75rem;
+        color: var(--text-muted);
+        display: block;
+      }
+      nav {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        align-items: center;
+      }
+      .nav-link {
+        color: var(--text-muted);
+        text-decoration: none;
+        font-size: 0.85rem;
+        font-weight: 600;
+        padding: 8px 12px;
+        border-radius: 8px;
+        border: 1px solid transparent;
+      }
+      .nav-link:hover,
+      .nav-link.active {
+        color: var(--text);
+        background-color: var(--surface);
+        border-color: var(--border);
+      }
+      .btn-primary {
+        background-color: var(--accent);
+        color: #09090b;
+        text-decoration: none;
+        font-size: 0.875rem;
+        font-weight: 700;
+        padding: 9px 16px;
+        border-radius: 10px;
+        display: inline-block;
+      }
+      .btn-primary:hover {
+        background-color: var(--accent-hover);
+      }
+      .hero-card {
+        background-color: var(--surface);
+        border: 1px solid var(--accent-border);
+        border-radius: 16px;
+        padding: 24px;
+        margin-bottom: 24px;
+      }
+      h1 {
+        font-size: 1.65rem;
+        margin: 0 0 10px;
+        line-height: 1.25;
+      }
+      h2 {
+        font-size: 1.15rem;
+        margin: 0 0 12px;
+        color: var(--text);
+        border-bottom: 1px solid var(--border);
+        padding-bottom: 8px;
+      }
+      p {
+        margin: 0 0 12px;
+        color: var(--text-muted);
+        font-size: 0.95rem;
+      }
+      .card {
+        background-color: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 14px;
+        padding: 20px;
+        margin-bottom: 20px;
+      }
+      .grid-2 {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+        gap: 16px;
+        margin-bottom: 20px;
+      }
+      ul {
+        margin: 0;
+        padding-left: 20px;
+        color: var(--text-muted);
+        font-size: 0.93rem;
+      }
+      li {
+        margin-bottom: 8px;
+      }
+      li strong {
+        color: var(--text);
+      }
+      .badge {
+        display: inline-block;
+        font-size: 0.75rem;
+        font-weight: 700;
+        padding: 3px 10px;
+        border-radius: 999px;
+        background-color: var(--accent-bg);
+        color: var(--accent);
+        border: 1px solid var(--accent-border);
+        margin-bottom: 10px;
+      }
+      code {
+        font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+        font-size: 0.84rem;
+        background-color: var(--surface-elevated);
+        padding: 2px 6px;
+        border-radius: 5px;
+        color: var(--text);
+      }
+      footer {
+        margin-top: 40px;
+        padding-top: 20px;
+        border-top: 1px solid var(--border);
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-between;
+        gap: 12px;
+        font-size: 0.85rem;
+        color: var(--text-muted);
+      }
+      footer a {
+        color: var(--accent);
+        text-decoration: none;
+        font-weight: 600;
+      }
+      footer a:hover {
+        text-decoration: underline;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <header>
+        <a href="./index.html" class="brand">
+          <img src="./icons/icon-192x192.png" alt="Logo Quiz VDS-VL" />
+          <div>
+            <span class="brand-title">Quiz VDS-VL</span>
+            <span class="brand-sub">Simulatore Esame Teorico Volo Libero AeCI</span>
+          </div>
+        </a>
+        <nav aria-label="Navigazione documenti">
+          <a href="./about.html" class="nav-link active">Presentazione</a>
+          <a href="./privacy-policy.html" class="nav-link">Privacy Policy</a>
+          <a href="./terms-of-service.html" class="nav-link">Termini di Servizio</a>
+          <a href="./index.html" class="btn-primary">Avvia Applicazione</a>
+        </nav>
+      </header>
+
+      <main>
+        <section class="hero-card">
+          <span class="badge">PWA Didattica Gratuita &amp; Offline-First</span>
+          <h1>Preparazione all'Esame Teorico VDS/VL (Parapendio)</h1>
+          <p>
+            <strong>Quiz VDS-VL</strong> (<em>VDS-VL Quiz Master</em>) è un'applicazione web progressiva progettata per gli allievi piloti italiani di <strong>Volo Libero (Parapendio)</strong> che preparano l'esame teorico per il conseguimento dell'attestato VDS/VL, in conformità al programma ufficiale dell'<strong>Aero Club d'Italia (AeCI)</strong> e al <strong>D.P.R. 9 luglio 2010, n. 133</strong>.
+          </p>
+          <p style="margin-bottom: 16px;">
+            L'applicazione funziona integralmente nel browser (su smartphone iOS/Android, tablet e PC), anche in assenza di connessione Internet, senza pubblicità e senza obbligo di registrazione.
+          </p>
+          <div style="display: flex; flex-wrap: wrap; gap: 10px;">
+            <a href="./index.html" class="btn-primary">Apri Quiz VDS-VL</a>
+            <a href="./privacy-policy.html" class="nav-link" style="border-color: var(--border); background: var(--surface-elevated);">Informativa sulla Privacy</a>
+            <a href="./terms-of-service.html" class="nav-link" style="border-color: var(--border); background: var(--surface-elevated);">Termini di Servizio</a>
+          </div>
+        </section>
+
+        <div class="grid-2">
+          <section class="card" style="margin-bottom: 0;">
+            <h2>Simulazione Esame &amp; Tutor</h2>
+            <ul>
+              <li><strong>Prova Ufficiale AeCI:</strong> 30 quesiti estratti secondo le quote regolamentari sulle 9 materie, timer di 45 minuti e soglia di idoneità a massimo 3 errori (minimo 27/30).</li>
+              <li><strong>Modalità Tutor Didattico:</strong> allenamento nei formati Flash (10 quiz), Standard (30 quiz) e Continuo, con verifica immediata e spiegazione tecnica strutturata in <em>Regola</em> e <em>Tranello</em>.</li>
+              <li><strong>Copertura Bilanciata:</strong> algoritmo <em>Fair Coverage Randomizer</em> che dà priorità ai quesiti mai incontrati.</li>
+            </ul>
+          </section>
+
+          <section class="card" style="margin-bottom: 0;">
+            <h2>Studio, Errori e Audio Offline</h2>
+            <ul>
+              <li><strong>Studio per Materie e Archivio:</strong> filtro sulle 9 materie ministeriali, ricerca istantanea per parola chiave o codice <code>#ID</code>, segnalibri preferiti e note personali.</li>
+              <li><strong>Quaderno Errori Leitner:</strong> raccolta automatica dei quesiti sbagliati con uscita vincolata a 2 risposte corrette consecutive.</li>
+              <li><strong>Modalità Mani Libere &amp; Voce:</strong> sintesi vocale neurale italiana scaricabile offline e comandi vocali per lo studio in mobilità.</li>
+            </ul>
+          </section>
+        </div>
+
+        <section class="card">
+          <h2>Architettura Locale e Utilizzo di Google Drive (OAuth 2.0)</h2>
+          <p>
+            Tutti i dati di studio dell'allievo (statistiche sui quesiti, storico delle simulazioni, quaderno errori, segnalibri e note personali) vengono salvati <strong>localmente sul dispositivo dell'utente</strong> tramite il database del browser (<code>IndexedDB</code>). Non esiste alcun database centrale proprietario che raccolga i dati personali degli utenti.
+          </p>
+          <ul>
+            <li>
+              <strong>Sincronizzazione Cloud Facoltativa:</strong> L'utente può scegliere volontariamente di collegare il proprio account Google nella sezione <em>Impostazioni &rarr; Backup Cloud</em> per salvare una copia di backup dei propri progressi (<code>vds_quiz_master_backup.json</code>) sul proprio <strong>Google Drive personale</strong> e sincronizzarla tra più dispositivi.
+            </li>
+            <li>
+              <strong>Ambiti OAuth Ristretti e Sicuri:</strong> L'applicazione richiede esclusivamente gli ambiti non sensibili <code>https://www.googleapis.com/auth/drive.appdata</code> e <code>https://www.googleapis.com/auth/drive.file</code>. L'app può accedere unicamente al proprio file di backup senza alcuna possibilità di leggere, visualizzare o modificare altri file personali presenti sul Google Drive dell'utente.
+            </li>
+          </ul>
+        </section>
+
+        <section class="card">
+          <h2>Documentazione Ufficiale e Link Utili</h2>
+          <ul>
+            <li><strong>Applicazione Web Principale:</strong> <a href="./index.html" style="color: var(--accent);">https://alessandroame.github.io/Quiz_VDS-VL/</a></li>
+            <li><strong>Informativa sulla Privacy (Privacy Policy):</strong> <a href="./privacy-policy.html" style="color: var(--accent);">https://alessandroame.github.io/Quiz_VDS-VL/privacy-policy.html</a></li>
+            <li><strong>Termini di Servizio (Terms of Service):</strong> <a href="./terms-of-service.html" style="color: var(--accent);">https://alessandroame.github.io/Quiz_VDS-VL/terms-of-service.html</a></li>
+            <li><strong>Repository GitHub Open-Source:</strong> <a href="https://github.com/alessandroame/Quiz_VDS-VL" target="_blank" rel="noopener noreferrer" style="color: var(--accent);">https://github.com/alessandroame/Quiz_VDS-VL</a></li>
+          </ul>
+        </section>
+      </main>
+
+      <footer>
+        <div>Quiz VDS-VL — Strumento didattico per allievi piloti VDS/VL (D.P.R. 133/2010)</div>
+        <div style="display: flex; gap: 16px;">
+          <a href="./index.html">Avvia App</a>
+          <a href="./privacy-policy.html">Privacy Policy</a>
+          <a href="./terms-of-service.html">Termini di Servizio</a>
+          <a href="https://github.com/alessandroame/Quiz_VDS-VL" target="_blank" rel="noopener noreferrer">GitHub</a>
+        </div>
+      </footer>
+    </div>
+  </body>
+</html>

@@ -336,6 +336,9 @@ npm run worklog:consolidate
 Questo progetto adotta un sistema di **governance della conoscenza inter-agente** strutturato per garantire continuità, integrità architetturale e trasparenza:
 
 - 📘 **[MANUALE_UTENTE.md](file:///c:/github/Quiz_VDS-VL/docs/MANUALE_UTENTE.md)**: Il manuale utente ufficiale illustrato con screenshot reali ad alta risoluzione, tavola delle scorciatoie da tastiera e comandi vocali.
+- 🌐 **[APP_OVERVIEW.md](file:///c:/github/Quiz_VDS-VL/docs/APP_OVERVIEW.md)** ([`public/about.html`](file:///c:/github/Quiz_VDS-VL/public/about.html)): Pagina pubblica di presentazione dell'applicazione e dell'integrazione Google Drive OAuth 2.0.
+- 🔒 **[PRIVACY_POLICY.md](file:///c:/github/Quiz_VDS-VL/docs/PRIVACY_POLICY.md)** ([`public/privacy-policy.html`](file:///c:/github/Quiz_VDS-VL/public/privacy-policy.html)): Informativa sulla Privacy conforme al GDPR e alla *Google API Services User Data Policy (Limited Use)*.
+- ⚖️ **[TERMS_OF_SERVICE.md](file:///c:/github/Quiz_VDS-VL/docs/TERMS_OF_SERVICE.md)** ([`public/terms-of-service.html`](file:///c:/github/Quiz_VDS-VL/public/terms-of-service.html)): Termini e Condizioni di Servizio con disclaimer didattico AeCI / D.P.R. 133/2010.
 - 🧭 **[DESIDERATA.md](file:///c:/github/Quiz_VDS-VL/DESIDERATA.md)**: La visione di prodotto, i requisiti core e la matrice di stato di tutte le funzionalità.
 - 🧠 **[MEMORY.md](file:///c:/github/Quiz_VDS-VL/MEMORY.md)**: La memoria tecnica permanente contenente vincoli tecnici stabili, regole d'esame AeCI e lezioni apprese.
 - 📓 **[WORKLOG.md](file:///c:/github/Quiz_VDS-VL/WORKLOG.md)**: Il registro cronologico di tutte le lavorazioni svolte e delle decisioni architetturali (ADR).
