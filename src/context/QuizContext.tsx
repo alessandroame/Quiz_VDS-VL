@@ -71,7 +71,7 @@ interface QuizContextType {
 const QuizContext = createContext<QuizContextType | null>(null);
 
 export const QuizProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  // Fixed stable pool: 474 paraglider questions (428 common + 46 paraglider, pruning 30 exclusive hang-glider questions)
+  // Fixed stable pool: 473 paraglider questions (427 common + 46 paraglider, pruning 31 exclusive hang-glider questions)
   const questions: Question[] = useMemo(() => {
     return (questionsData as Question[]).filter(q => q.discipline !== 'hang_glider');
   }, []);

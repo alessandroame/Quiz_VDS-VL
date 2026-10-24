@@ -11,7 +11,7 @@
 
 - [📖 Manuale Utente Illustrato (Guida Rapida)](docs/MANUALE_UTENTE.md)
 - [Panoramica delle Funzionalità](#-panoramica-delle-funzionalità)
-  - [1. Database Ufficiale dei Quiz (474 quesiti Parapendio & Teoria Comune)](#1-database-ufficiale-dei-quiz-474-quesiti-parapendio--teoria-comune)
+  - [1. Database Ufficiale dei Quiz (473 quesiti Parapendio & Teoria Comune)](#1-database-ufficiale-dei-quiz-474-quesiti-parapendio--teoria-comune)
   - [2. Architettura Home Hub & Back Navigation Cockpit V2](#2-architettura-home-hub--back-navigation-cockpit-v2)
   - [3. Simulatore d'Esame Ufficiale AeCI & Tutor Didattico](#3-simulatore-desame-ufficiale-aeci--tutor-didattico)
   - [4. Studio Guidato per Materie](#4-studio-guidato-per-materie)
@@ -32,12 +32,12 @@
 
 ## 🌟 Panoramica delle Funzionalità
 
-### 1. Database Ufficiale dei Quiz (474 quesiti Parapendio & Teoria Comune)
-- Catalogo stabile e certificato di **474 quiz ufficiali AeCI**: 428 quesiti di teoria comune a tutti gli allievi piloti VDS/VL + 46 quesiti specifici per il parapendio (fascio funicolare, elevatori, centine, chiusure asimmetriche e manovre specifiche).
-- **Potatura Radicale del Deltaplano (Focus 100% Parapendio)**: eliminati alla radice i 30 quesiti esclusivi dell'ala pendolare (barra di controllo, trapezio, trave di chiglia) e tutti i selettori/badge superflui, garantendo un'applicazione essenziale e priva di distrazioni.
+### 1. Database Ufficiale dei Quiz (473 quesiti Parapendio & Teoria Comune)
+- Catalogo stabile e certificato di **473 quiz ufficiali AeCI**: 427 quesiti di teoria comune a tutti gli allievi piloti VDS/VL + 46 quesiti specifici per il parapendio (fascio funicolare, elevatori, centine, chiusure asimmetriche e manovre specifiche).
+- **Potatura Radicale del Deltaplano (Focus 100% Parapendio)**: eliminati alla radice i 31 quesiti esclusivi dell'ala pendolare (barra di controllo, trapezio, trave di chiglia) e tutti i selettori/badge superflui, garantendo un'applicazione essenziale e priva di distrazioni.
 - Suddivisione canonica nelle 9 materie d'esame ufficiali AeCI.
 - Ciascuna domanda include 3 opzioni di risposta con un'unica soluzione corretta verificata sulle tabelle ministeriali.
-- **Spiegazioni Didattiche Essenziali (100% Bespoke su 474 Quiz)**: ogni quesito è corredato da una spiegazione tecnica specifica, univoca e scientificamente rigorosa articolata in:
+- **Spiegazioni Didattiche Essenziali (100% Bespoke su 473 Quiz)**: ogni quesito è corredato da una spiegazione tecnica specifica, univoca e scientificamente rigorosa articolata in:
   - **Regola**: il principio fisico, aerodinamico o la norma di legge (D.P.R. 133/2010) alla base della risposta corretta.
   - **Tranello**: il bias cognitivo, la misconcezione o l'ambiguità tipica del quesito ministeriale.
 - Ecosistema audio neurale offline (voci Giuseppe ed Elsa) sincronizzato con file MP3 dedicati per domanda, opzioni e spiegazione didattica.

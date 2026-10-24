@@ -14,6 +14,10 @@ Questo documento registra in ordine cronologico tutte le lavorazioni svolte nel 
 - **Impatto sul Desiderata**: <Come questo intervento contribuisce al desiderata (cfr. DESIDERATA.md) e indicazioni per il prossimo agente>
 ```
 
+### [2026-10-24] - Riclassificazione Domanda 2147 come Esclusiva Deltaplano (v1.10.2)
+- **Tipo**: `fix(data)` — Dettaglio completo in [2026-10-24_reclassify_q2147_hang_glider.md](file:///c:/github/Quiz_VDS-VL/.agents/worklog.d/2026-10-24_reclassify_q2147_hang_glider.md).
+- **Intervento**: Riclassificata la domanda `#2147` da `all` a `hang_glider` in [src/data/questions.json](file:///c:/github/Quiz_VDS-VL/src/data/questions.json) (pool Parapendio a 473 quiz: 427 comuni + 46 parapendio, 31 esclusivi deltaplano), reso dinamico il conteggio in [HomeScreen.tsx](file:///c:/github/Quiz_VDS-VL/src/components/HomeScreen.tsx) e [ArchiveScreen.tsx](file:///c:/github/Quiz_VDS-VL/src/components/ArchiveScreen.tsx), e allineati i test `DATA-08` e `DISC-01..08`.
+
 ### [2026-10-19] - Pagine Pubbliche e Documentazione per Pubblicazione Google OAuth (v1.10.1)
 - **Tipo**: `feat(legal)` / `docs(oauth)` — Dettaglio completo in [2026-10-19_google_oauth_legal_pages.md](file:///c:/github/Quiz_VDS-VL/.agents/worklog.d/2026-10-19_google_oauth_legal_pages.md).
 - **Intervento**: Creati [public/about.html](file:///c:/github/Quiz_VDS-VL/public/about.html), [public/privacy-policy.html](file:///c:/github/Quiz_VDS-VL/public/privacy-policy.html), [public/terms-of-service.html](file:///c:/github/Quiz_VDS-VL/public/terms-of-service.html) e i rispettivi Markdown in `docs/`, configurato `navigateFallbackDenylist` in [vite.config.ts](file:///c:/github/Quiz_VDS-VL/vite.config.ts) e aggiunti i link in [index.html](file:///c:/github/Quiz_VDS-VL/index.html) e [SettingsModal.tsx](file:///c:/github/Quiz_VDS-VL/src/components/SettingsModal.tsx).

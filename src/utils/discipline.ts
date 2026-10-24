@@ -22,8 +22,8 @@ export const DISCIPLINE_OPTIONS: DisciplineOption[] = [
     id: 'paraglider',
     label: 'Parapendio',
     shortLabel: 'Parapendio',
-    description: 'Solo Parapendio e quiz comuni (474 quiz, esclude i 30 specifici del deltaplano)',
-    totalCount: 474
+    description: 'Solo Parapendio e quiz comuni (473 quiz, esclude i 31 specifici del deltaplano)',
+    totalCount: 473
   },
   {
     id: 'hang_glider',

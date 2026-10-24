@@ -90,7 +90,7 @@ describe('Suite 1: Integrità Dataset 504 Quiz AeCI (questions.json)', () => {
     }
   });
 
-  it('DATA-08: ogni domanda ha una disciplina valida con ripartizione certificata (428 all, 30 hang_glider, 46 paraglider)', () => {
+  it('DATA-08: ogni domanda ha una disciplina valida con ripartizione certificata (427 all, 31 hang_glider, 46 paraglider)', () => {
     let allCount = 0;
     let hgCount = 0;
     let pgCount = 0;
@@ -102,8 +102,8 @@ describe('Suite 1: Integrità Dataset 504 Quiz AeCI (questions.json)', () => {
       if (q.discipline === 'paraglider') pgCount++;
     }
 
-    expect(allCount).toBe(428);
-    expect(hgCount).toBe(30);
+    expect(allCount).toBe(427);
+    expect(hgCount).toBe(31);
     expect(pgCount).toBe(46);
     expect(allCount + hgCount + pgCount).toBe(504);
   });

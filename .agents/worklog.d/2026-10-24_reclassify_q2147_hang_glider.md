@@ -1,0 +1,13 @@
+### [2026-10-24] - Riclassificazione Domanda 2147 come Esclusiva Deltaplano (`hang_glider`)
+- **Cosa abbiamo fatto**:
+  - **Dataset Quiz ([src/data/questions.json](file:///c:/GitHub/Quiz_VDS-VL/src/data/questions.json))**:
+    - Riclassificata la domanda `#2147` (*"Volando in prossimità del terreno il deltaplano acquista prestazioni. Ciò è dovuto: a un fenomeno detto effetto suolo"*) da `"discipline": "all"` a `"discipline": "hang_glider"`.
+    - Il pool attivo per il Parapendio (`q.discipline !== 'hang_glider'`) passa da 474 a **473 quiz** (427 comuni `"all"` + 46 `"paraglider"`, con 31 esclusivi `"hang_glider"`).
+  - **Componenti UI e Conteggi Dinamici ([src/components/HomeScreen.tsx](file:///c:/GitHub/Quiz_VDS-VL/src/components/HomeScreen.tsx), [src/components/ArchiveScreen.tsx](file:///c:/GitHub/Quiz_VDS-VL/src/components/ArchiveScreen.tsx), [src/utils/discipline.ts](file:///c:/GitHub/Quiz_VDS-VL/src/utils/discipline.ts), [src/utils/navigation.ts](file:///c:/GitHub/Quiz_VDS-VL/src/utils/navigation.ts), [src/context/QuizContext.tsx](file:///c:/GitHub/Quiz_VDS-VL/src/context/QuizContext.tsx))**:
+    - Sostituito il conteggio cablato `474` in `HomeScreen.tsx` e `ArchiveScreen.tsx` con il valore dinamico `totalQuestions` / `questions.length` (473 quiz), allineando anche i metadati in `discipline.ts` e `navigation.ts`.
+  - **Suite di Test ([src/data/questions.test.ts](file:///c:/GitHub/Quiz_VDS-VL/src/data/questions.test.ts), [src/utils/discipline.test.ts](file:///c:/GitHub/Quiz_VDS-VL/src/utils/discipline.test.ts))**:
+    - Aggiornati i test `DATA-08` (427 `all`, 31 `hang_glider`, 46 `paraglider`) e `DISC-01..08` (pool Parapendio a 473 quiz, più asserzione esplicita di esclusione di `q.id === 2147`).
+- **Scelte architetturali & Rationale**:
+  - **Coerenza Semantica del Pool Parapendio**: La domanda `#2147` era l'unica rimasta in `"all"` a citare esclusivamente il deltaplano nel testo della domanda. Il fenomeno aerodinamico dell'effetto suolo resta comunque coperto nel pool comune dalla domanda `#2148` (*"A che cosa è dovuto principalmente l'effetto suolo?"*), mantenendo intatta la copertura teorica di Aerodinamica (149 quesiti disponibili su quota d'esame 9).
+- **Impatto sul Desiderata**:
+  - Eliminata l'ultima domanda con formulazione esclusiva sul deltaplano dal percorso di studio Parapendio; aggiornati [DESIDERATA.md](file:///c:/GitHub/Quiz_VDS-VL/DESIDERATA.md), [README.md](file:///c:/GitHub/Quiz_VDS-VL/README.md) e [WORKLOG.md](file:///c:/GitHub/Quiz_VDS-VL/WORKLOG.md).

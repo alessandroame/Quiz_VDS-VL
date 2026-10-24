@@ -42,7 +42,7 @@ export const SCENARIO_DEFINITIONS: ScenarioDefinition[] = [
     shortcut: '5',
     label: 'Archivio',
     headerTitle: 'Archivio Quiz',
-    description: 'Catalogo completo 474 quiz con ricerca full-text, note e preferiti.'
+    description: 'Catalogo completo 473 quiz con ricerca full-text, note e preferiti.'
   },
   {
     id: 'stats',

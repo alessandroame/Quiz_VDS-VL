@@ -18,7 +18,7 @@ describe('Suite 16: Discipline Filtering & Tagging Logic', () => {
     const hgOpt = DISCIPLINE_OPTIONS.find(o => o.id === 'hang_glider');
 
     expect(allOpt?.totalCount).toBe(504);
-    expect(pgOpt?.totalCount).toBe(474);
+    expect(pgOpt?.totalCount).toBe(473);
     expect(hgOpt?.totalCount).toBe(458);
   });
 
@@ -27,17 +27,17 @@ describe('Suite 16: Discipline Filtering & Tagging Logic', () => {
     expect(filtered.length).toBe(504);
   });
 
-  it('DISC-03: filtro "paraglider" restituisce 474 quiz escludendo tassativamente tutti i 30 quiz hang_glider', () => {
+  it('DISC-03: filtro "paraglider" restituisce 473 quiz escludendo tassativamente tutti i 31 quiz hang_glider', () => {
     const filtered = filterQuestionsByDiscipline(allQuestions, 'paraglider');
-    expect(filtered.length).toBe(474);
+    expect(filtered.length).toBe(473);
 
     const hasHG = filtered.some(q => q.discipline === 'hang_glider');
     expect(hasHG).toBe(false);
 
-    // Deve includere tutte le 428 all + 46 paraglider
+    // Deve includere tutte le 427 all + 46 paraglider
     const allCount = filtered.filter(q => q.discipline === 'all').length;
     const pgCount = filtered.filter(q => q.discipline === 'paraglider').length;
-    expect(allCount).toBe(428);
+    expect(allCount).toBe(427);
     expect(pgCount).toBe(46);
   });
 
@@ -48,11 +48,11 @@ describe('Suite 16: Discipline Filtering & Tagging Logic', () => {
     const hasPG = filtered.some(q => q.discipline === 'paraglider');
     expect(hasPG).toBe(false);
 
-    // Deve includere tutte le 428 all + 30 hang_glider
+    // Deve includere tutte le 427 all + 31 hang_glider
     const allCount = filtered.filter(q => q.discipline === 'all').length;
     const hgCount = filtered.filter(q => q.discipline === 'hang_glider').length;
-    expect(allCount).toBe(428);
-    expect(hgCount).toBe(30);
+    expect(allCount).toBe(427);
+    expect(hgCount).toBe(31);
   });
 
   it('DISC-05: il pool filtrato di ciascuna disciplina soddisfa le quote per tutte le 9 materie', () => {
@@ -89,16 +89,17 @@ describe('Suite 16: Discipline Filtering & Tagging Logic', () => {
     expect(pgBadge?.label).toBe('Parapendio');
   });
 
-  it('DISC-07: filterQuestionsByDiscipline defaults to paraglider (474 questions) when parameter is omitted', () => {
+  it('DISC-07: filterQuestionsByDiscipline defaults to paraglider (473 questions) when parameter is omitted', () => {
     const defaultFiltered = filterQuestionsByDiscipline(allQuestions);
-    expect(defaultFiltered.length).toBe(474);
+    expect(defaultFiltered.length).toBe(473);
     expect(defaultFiltered.some(q => q.discipline === 'hang_glider')).toBe(false);
   });
 
-  it('DISC-08: stable paraglider pool has exactly 474 questions with zero hang_glider questions and meets all 9 subject quotas', () => {
+  it('DISC-08: stable paraglider pool has exactly 473 questions with zero hang_glider questions and meets all 9 subject quotas', () => {
     const paragliderPool = allQuestions.filter(q => q.discipline !== 'hang_glider');
-    expect(paragliderPool.length).toBe(474);
+    expect(paragliderPool.length).toBe(473);
     expect(paragliderPool.every(q => q.discipline !== 'hang_glider')).toBe(true);
+    expect(paragliderPool.some(q => q.id === 2147)).toBe(false);
 
     const counts: Record<number, number> = {};
     for (const q of paragliderPool) {
