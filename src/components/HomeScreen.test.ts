@@ -12,7 +12,7 @@ vi.mock('../context/QuizContext', () => ({
 import { HomeScreen } from './HomeScreen';
 import type { Question } from '../types/quiz';
 
-const mockQuestions: Question[] = Array.from({ length: 474 }, (_, i) => ({
+const mockQuestions: Question[] = Array.from({ length: 473 }, (_, i) => ({
   id: i + 1,
   subjectId: 1,
   subjectName: 'Normativa',
@@ -72,7 +72,7 @@ describe('HomeScreen Component (Home Hub Contracts)', () => {
 
     expect(html).toContain('id="btn-home-archive"');
     expect(html).toContain('Archivio &amp; Cerca');
-    expect(html).toContain('474 Quiz');
+    expect(html).toContain('473 Quiz');
 
     expect(html).toContain('id="btn-home-stats"');
     expect(html).toContain('Statistiche');
@@ -87,7 +87,7 @@ describe('HomeScreen Component (Home Hub Contracts)', () => {
     expect(html).not.toContain('id="btn-home-audio-quick"');
     expect(html).toContain('82');
     expect(html).toContain('210');
-    expect(html).toContain('474');
+    expect(html).toContain('473');
     expect(html).toContain('3');
     expect(html).toContain('da rivedere');
   });

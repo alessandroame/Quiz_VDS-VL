@@ -597,7 +597,7 @@ export const ArchiveScreen: React.FC = () => {
         <div>
           <h1 className="text-xl font-bold tracking-tight">Archivio Completo</h1>
           <p className="text-xs text-zinc-400 light:text-slate-600">
-            Catalogo {questions.length} quiz: Parapendio e teoria comune AeCI
+            {`Catalogo ${questions.length} quiz: Parapendio e teoria comune AeCI`}
           </p>
         </div>
         <div className="text-xs font-mono font-bold px-2.5 py-1 rounded-lg bg-zinc-900 border border-zinc-700 text-amber-400 light:bg-white light:border-slate-300 light:text-amber-700 shrink-0">

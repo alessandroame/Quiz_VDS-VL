@@ -381,7 +381,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectTab }) => {
               </div>
               <div className="flex items-center gap-1.5">
                 <span className="text-[10px] font-bold px-2 py-0.5 rounded-full border border-zinc-700/60 light:border-slate-300 bg-zinc-800 text-zinc-200 light:bg-slate-100 light:text-slate-700 font-mono">
-                  {totalQuestions} Quiz
+                  {`${totalQuestions} Quiz`}
                 </span>
                 <span className="text-[10px] font-mono px-1.5 py-0.5 rounded border border-zinc-700 light:border-slate-300 bg-zinc-800 text-zinc-300 light:bg-slate-100 light:text-slate-700 font-semibold hidden md:inline">
                   [5]
