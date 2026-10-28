@@ -47,6 +47,9 @@ Questo file costituisce la **memoria tecnica permanente** del progetto. Raccogli
   * In `index.html`, `<body>` include sia le classi scure che quelle chiare (`bg-zinc-950 text-zinc-100 light:bg-slate-50 light:text-slate-900`).
   * Il ciclo tema (`cycleTheme`) passa subito da tema scuro a tema chiaro al primo click.
   * In `ThemeContext.tsx`, l'idratazione iniziale verifica l'esistenza reale di una chiave salvata in Dexie prima di sovrascrivere `localStorage`.
+- **Prevenzione Sticky Hover & Focus Mobile sulle Opzioni (`QuestionCard.tsx`, `DriveActiveHUD.tsx`, `tailwind.config.js`)**:
+  * *Insidia*: Su browser mobile touch (Chrome Android / Safari iOS), pulsanti risposta con chiave statica (`key={optNum}`) riutilizzano lo stesso nodo DOM al cambio quesito, mantenendo `:hover` e `:focus` sulla casella toccata alla domanda precedente.
+  * *Regola*: Mantenere attivo `future: { hoverOnlyWhenSupported: true }` in `tailwind.config.js` e usare sempre `key={`${question.id}-${optNum}`}` con `e.currentTarget.blur()` e `focus:outline-none` sui pulsanti opzione (cfr. `QuestionCard.test.ts`).
 
 ---
 
