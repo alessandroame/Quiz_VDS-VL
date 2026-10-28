@@ -17,6 +17,7 @@ import { OfflineIndicator } from './OfflineIndicator';
 import { BuildInfoModal } from './BuildInfoModal';
 import { getBuildInfo, BUILD_INFO_UPDATED_EVENT } from '../utils/buildInfo';
 import { getAppIconUrl, getAppFaviconUrl } from '../utils/assets';
+import { formatSyncTimestamp } from '../services/syncEngine';
 
 import { getHeaderTitle, type NavTab } from '../utils/navigation';
 import type { SettingsTab } from './SettingsModal';
@@ -49,7 +50,7 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab, openSet
         return 'Sincronizzazione in corso...';
       case 'synced':
         return syncState.lastSyncedAt
-          ? `Sincronizzato: ${new Date(syncState.lastSyncedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`
+          ? `Sincronizzato: ${formatSyncTimestamp(syncState.lastSyncedAt)}`
           : 'Sincronizzato con Google Drive';
       case 'offline':
         return 'Offline: i salvataggi verranno inviati appena torni online';

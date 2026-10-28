@@ -1,4 +1,4 @@
-// Servizio di integrazione Google Identity Services (GIS) & Google Drive API v3
+// Google Identity Services (GIS) & Google Drive API v3 integration service
 
 declare global {
   interface Window {
@@ -7,13 +7,58 @@ declare global {
 }
 
 const BACKUP_FILENAME = 'vds_quiz_master_backup.json';
+export const GOOGLE_TOKEN_STORAGE_KEY = 'vds_google_oauth_token_v1';
+
+interface PersistedGoogleToken {
+  accessToken: string;
+  tokenExpiry: number;
+}
 
 export class GoogleDriveService {
   private tokenClient: any = null;
+  private lastClientId: string | undefined = undefined;
   private accessToken: string | null = null;
   private tokenExpiry: number = 0;
   private tokenListeners: Set<(token: string) => void> = new Set();
   private pendingTokenRequests: Array<{ resolve: (token: string) => void; reject: (err: any) => void }> = [];
+
+  constructor() {
+    this.loadPersistedToken();
+  }
+
+  private persistToken(accessToken: string, tokenExpiry: number): void {
+    try {
+      if (typeof globalThis !== 'undefined' && globalThis.localStorage) {
+        const payload: PersistedGoogleToken = { accessToken, tokenExpiry };
+        globalThis.localStorage.setItem(GOOGLE_TOKEN_STORAGE_KEY, JSON.stringify(payload));
+      }
+    } catch {
+      // Ignore storage quota or private browsing errors
+    }
+  }
+
+  private loadPersistedToken(): void {
+    try {
+      if (typeof globalThis !== 'undefined' && globalThis.localStorage) {
+        const raw = globalThis.localStorage.getItem(GOOGLE_TOKEN_STORAGE_KEY);
+        if (!raw) return;
+        const parsed = JSON.parse(raw) as Partial<PersistedGoogleToken>;
+        if (
+          typeof parsed?.accessToken === 'string' &&
+          parsed.accessToken.length > 0 &&
+          typeof parsed?.tokenExpiry === 'number' &&
+          Date.now() < parsed.tokenExpiry - 60000
+        ) {
+          this.accessToken = parsed.accessToken;
+          this.tokenExpiry = parsed.tokenExpiry;
+        } else {
+          globalThis.localStorage.removeItem(GOOGLE_TOKEN_STORAGE_KEY);
+        }
+      }
+    } catch {
+      // Ignore storage access or parse errors
+    }
+  }
 
   public isGisLoaded(): boolean {
     return typeof window !== 'undefined' && !!window.google?.accounts?.oauth2;
@@ -28,7 +73,12 @@ export class GoogleDriveService {
     if (onTokenReceived) {
       this.addTokenListener(onTokenReceived);
     }
-    const effectiveId = clientId || (import.meta.env?.VITE_GOOGLE_CLIENT_ID as string) || '182413802928-q7sphls58ob60s2mu3fspbbkk9kq2am9.apps.googleusercontent.com';
+    const effectiveId =
+      clientId ||
+      this.lastClientId ||
+      (import.meta.env?.VITE_GOOGLE_CLIENT_ID as string) ||
+      '182413802928-q7sphls58ob60s2mu3fspbbkk9kq2am9.apps.googleusercontent.com';
+    this.lastClientId = effectiveId;
     if (!this.isGisLoaded() || !effectiveId) return;
 
     try {
@@ -58,8 +108,10 @@ export class GoogleDriveService {
               req.reject(new Error(errorMsg));
             }
           } else if (resp.access_token) {
-            this.accessToken = resp.access_token;
+            const tokenStr = String(resp.access_token);
+            this.accessToken = tokenStr;
             this.tokenExpiry = Date.now() + (resp.expires_in || 3600) * 1000;
+            this.persistToken(tokenStr, this.tokenExpiry);
             const pending = this.pendingTokenRequests;
             this.pendingTokenRequests = [];
             for (const req of pending) {
@@ -76,22 +128,36 @@ export class GoogleDriveService {
         },
       });
     } catch (err) {
-      console.error('Errore inizializzazione GIS token client:', err);
+      console.error('Error initializing GIS token client:', err);
     }
   }
 
   public hasValidToken(): boolean {
+    if (!this.accessToken) {
+      this.loadPersistedToken();
+    }
     return Boolean(this.accessToken && Date.now() < this.tokenExpiry - 60000);
   }
 
   public clearToken(): void {
     this.accessToken = null;
     this.tokenExpiry = 0;
+    try {
+      if (typeof globalThis !== 'undefined' && globalThis.localStorage) {
+        globalThis.localStorage.removeItem(GOOGLE_TOKEN_STORAGE_KEY);
+      }
+    } catch {
+      // Ignore storage removal errors
+    }
   }
 
   public async getAccessToken(interactive = false): Promise<string> {
     if (this.hasValidToken() && this.accessToken) {
       return this.accessToken;
+    }
+
+    if (!this.tokenClient && this.isGisLoaded()) {
+      this.initTokenClient(this.lastClientId);
     }
 
     if (!this.tokenClient) {
@@ -105,7 +171,7 @@ export class GoogleDriveService {
     return new Promise((resolve, reject) => {
       this.pendingTokenRequests.push({ resolve, reject });
       try {
-        this.tokenClient.requestAccessToken();
+        this.tokenClient.requestAccessToken({ prompt: '' });
       } catch (err: any) {
         this.pendingTokenRequests = this.pendingTokenRequests.filter(r => r.resolve !== resolve);
         const errMsg = String(err?.message || err).toLowerCase();
@@ -125,6 +191,11 @@ export class GoogleDriveService {
       detail = json?.error?.message || JSON.stringify(json);
     } catch {
       detail = await res.text().catch(() => '');
+    }
+
+    if (res.status === 401) {
+      this.clearToken();
+      throw new Error('Token Google scaduto o revocato (401): ricollega Google Drive.');
     }
 
     if (res.status === 403) {

@@ -14,6 +14,10 @@ Questo documento registra in ordine cronologico tutte le lavorazioni svolte nel 
 - **Impatto sul Desiderata**: <Come questo intervento contribuisce al desiderata (cfr. DESIDERATA.md) e indicazioni per il prossimo agente>
 ```
 
+### [2026-10-28] - Persistenza Token OAuth2 Google Drive, Auto-Sync all'Avvio e Formattazione Data/Ora Locale (v1.10.5)
+- **Tipo**: `fix(sync)` — Dettaglio completo in [2026-10-28_google_drive_token_persistence_sync_fix.md](file:///c:/github/Quiz_VDS-VL/.agents/worklog.d/2026-10-28_google_drive_token_persistence_sync_fix.md).
+- **Intervento**: Persistito il token OAuth2 (`vds_google_oauth_token_v1`) con riuso senza popup fino a scadenza e invalidazione su HTTP `401` in [googleDrive.ts](file:///c:/github/Quiz_VDS-VL/src/services/googleDrive.ts), aggiunto `fullSync(false)` automatico all'avvio e `formatSyncTimestamp` in [syncEngine.ts](file:///c:/github/Quiz_VDS-VL/src/services/syncEngine.ts), e resa visibile la barra di stato cloud con data/ora locale e touch target `>= 44px` in [SettingsModal.tsx](file:///c:/github/Quiz_VDS-VL/src/components/SettingsModal.tsx) e [Navbar.tsx](file:///c:/github/Quiz_VDS-VL/src/components/Navbar.tsx).
+
 ### [2026-10-28] - Risoluzione Effetto Sticky Hover / Focus Mobile sulle Opzioni Quiz (v1.10.4)
 - **Tipo**: `fix(ui)` — Dettaglio completo in [2026-10-28_mobile_sticky_hover_fix.md](file:///c:/github/Quiz_VDS-VL/.agents/worklog.d/2026-10-28_mobile_sticky_hover_fix.md).
 - **Intervento**: Abilitato `future: { hoverOnlyWhenSupported: true }` in [tailwind.config.js](file:///c:/github/Quiz_VDS-VL/tailwind.config.js), impostata chiave dinamica `key={`${question.id}-${optNum}`}` con `blur()` al tocco e `focus:outline-none` in [QuestionCard.tsx](file:///c:/github/Quiz_VDS-VL/src/components/QuestionCard.tsx) e [DriveActiveHUD.tsx](file:///c:/github/Quiz_VDS-VL/src/components/drive/DriveActiveHUD.tsx), e aggiunto test di regressione in [QuestionCard.test.ts](file:///c:/github/Quiz_VDS-VL/src/components/QuestionCard.test.ts).

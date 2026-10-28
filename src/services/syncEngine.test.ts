@@ -1,6 +1,6 @@
 // @vitest-environment happy-dom
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { SyncEngine } from './syncEngine';
+import { SyncEngine, formatSyncTimestamp } from './syncEngine';
 import { googleDrive } from './googleDrive';
 import * as dbModule from '../db';
 
@@ -209,5 +209,27 @@ describe('SyncEngine service', () => {
     expect(res.success).toBe(true);
     expect(engine.getState().status).toBe('synced');
     expect(engine.getState().isPopupBlocked).toBe(false);
+  });
+
+  it('should format sync timestamps with local date for previous days and Oggi for same day', () => {
+    const refNow = new Date(2026, 9, 28, 10, 30, 0).getTime();
+    const sameDayTs = new Date(2026, 9, 28, 9, 5, 0).getTime();
+    const olderDayTs = new Date(2026, 9, 20, 18, 45, 0).getTime();
+
+    expect(formatSyncTimestamp(null, refNow)).toBe('Mai salvato');
+    expect(formatSyncTimestamp(sameDayTs, refNow)).toBe('Oggi, 09:05');
+    expect(formatSyncTimestamp(olderDayTs, refNow)).toBe('20/10/2026, 18:45');
+  });
+
+  it('should trigger startup background fullSync in init() when autoSync is enabled and token is valid', async () => {
+    vi.mocked(dbModule.getSetting).mockImplementation(async (key: any) => {
+      if (key === 'autoSyncDrive') return true;
+      return undefined;
+    });
+    vi.spyOn(googleDrive, 'hasValidToken').mockReturnValue(true);
+    const fullSyncSpy = vi.spyOn(engine, 'fullSync').mockResolvedValue({ success: true, message: 'OK' });
+
+    await engine.init('test-client');
+    expect(fullSyncSpy).toHaveBeenCalledWith(false);
   });
 });

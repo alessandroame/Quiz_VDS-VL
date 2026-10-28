@@ -36,7 +36,7 @@ import {
 import { useTheme } from '../context/ThemeContext';
 import { useQuiz } from '../context/QuizContext';
 import { googleDrive } from '../services/googleDrive';
-import { syncEngine } from '../services/syncEngine';
+import { syncEngine, formatSyncTimestamp } from '../services/syncEngine';
 import { voiceService } from '../services/voiceService';
 import { telemetry } from '../services/telemetry';
 import { exportDatabaseBackup, importDatabaseBackup, db } from '../db';
@@ -1485,8 +1485,8 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                   />
                 </label>
 
-                {/* Barra di Stato Sincronizzazione */}
-                {settings.autoSyncDrive && (
+                {/* Cloud Sync Status Bar */}
+                {(settings.autoSyncDrive || Boolean(syncState.lastSyncedAt)) && (
                   <div className="p-2.5 rounded-xl border border-zinc-700/80 bg-zinc-950/40 light:bg-slate-100/60 light:border-slate-300 text-xs flex items-center justify-between">
                     <div className="flex items-center gap-2 min-w-0 pr-2">
                       <div className={`w-2 h-2 rounded-full flex-shrink-0 ${
@@ -1508,7 +1508,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                     <div className="flex items-center gap-2 flex-shrink-0">
                       <span className="text-[11px] text-zinc-400 light:text-slate-600 font-mono">
                         {syncState.lastSyncedAt
-                          ? `Ultimo: ${new Date(syncState.lastSyncedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`
+                          ? `Ultimo: ${formatSyncTimestamp(syncState.lastSyncedAt)}`
                           : 'Mai salvato'}
                       </span>
                       <button
@@ -1539,7 +1539,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                         disabled={isProcessing || syncState.status === 'syncing'}
                         title="Sincronizza adesso con Google Drive"
                         aria-label="Sincronizza adesso con Google Drive"
-                        className="p-1 rounded-lg hover:bg-zinc-800 light:hover:bg-slate-200 text-zinc-300 hover:text-white light:text-slate-700 light:hover:text-slate-900 transition-colors cursor-pointer disabled:opacity-50"
+                        className="min-w-[44px] min-h-[44px] -my-1.5 -mr-1.5 flex items-center justify-center rounded-lg hover:bg-zinc-800 light:hover:bg-slate-200 text-zinc-300 hover:text-white light:text-slate-700 light:hover:text-slate-900 transition-colors cursor-pointer disabled:opacity-50"
                       >
                         <RefreshCw className={`w-3.5 h-3.5 ${syncState.status === 'syncing' ? 'animate-spin text-amber-400' : ''}`} />
                       </button>

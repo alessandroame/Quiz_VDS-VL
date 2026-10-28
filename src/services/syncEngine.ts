@@ -19,6 +19,39 @@ const isDeviceOnline = (): boolean => {
     : true;
 };
 
+/**
+ * Formats a synchronization epoch timestamp in local timezone.
+ * Shows "Oggi, HH:MM" when synced on the same local calendar day,
+ * or "DD/MM/YYYY, HH:MM" for previous days.
+ */
+export function formatSyncTimestamp(timestamp: number | null | undefined, nowMs: number = Date.now()): string {
+  if (!timestamp || !Number.isFinite(timestamp)) {
+    return 'Mai salvato';
+  }
+  const date = new Date(timestamp);
+  if (isNaN(date.getTime())) {
+    return 'Mai salvato';
+  }
+  const now = new Date(nowMs);
+  const hours = String(date.getHours()).padStart(2, '0');
+  const minutes = String(date.getMinutes()).padStart(2, '0');
+  const timeStr = `${hours}:${minutes}`;
+
+  const isSameDay =
+    date.getFullYear() === now.getFullYear() &&
+    date.getMonth() === now.getMonth() &&
+    date.getDate() === now.getDate();
+
+  if (isSameDay) {
+    return `Oggi, ${timeStr}`;
+  }
+
+  const day = String(date.getDate()).padStart(2, '0');
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const year = date.getFullYear();
+  return `${day}/${month}/${year}, ${timeStr}`;
+}
+
 export class SyncEngine {
   private status: SyncStatus = 'idle';
   private lastSyncedAt: number | null = null;
@@ -80,6 +113,20 @@ export class SyncEngine {
     );
   }
 
+  private checkIsAuthRequired(message?: string): boolean {
+    if (!message) return false;
+    const lower = message.toLowerCase();
+    return (
+      lower.includes('token') ||
+      lower.includes('inizializzato') ||
+      lower.includes('401') ||
+      lower.includes('403') ||
+      lower.includes('richiesto') ||
+      lower.includes('scaduto') ||
+      lower.includes('revocato')
+    );
+  }
+
   public async init(clientId?: string): Promise<void> {
     if (this.isInitialized) return;
     this.isInitialized = true;
@@ -93,6 +140,16 @@ export class SyncEngine {
 
     if (typeof window !== 'undefined') {
       googleDrive.initTokenClient(clientId);
+      if (!googleDrive.isGisLoaded()) {
+        window.addEventListener(
+          'load',
+          () => {
+            googleDrive.initTokenClient(clientId);
+          },
+          { once: true }
+        );
+      }
+
       googleDrive.addTokenListener(() => {
         // Token received: clear needs_auth/error and auto-sync if enabled
         this.isPopupBlocked = false;
@@ -121,6 +178,10 @@ export class SyncEngine {
 
       if (!isDeviceOnline()) {
         this.setStatus('offline');
+      } else if (this.isAutoSyncEnabled && googleDrive.hasValidToken()) {
+        this.fullSync(false).catch(err => {
+          console.warn('SyncEngine startup background fullSync error:', err);
+        });
       }
     }
 
@@ -194,7 +255,7 @@ export class SyncEngine {
             success: false,
             message: 'Popup bloccato dal browser: abilita i popup nella barra degli indirizzi e riprova'
           };
-        } else if (res.message?.includes('token') || res.message?.includes('inizializzato') || res.message?.includes('403') || res.message?.includes('richiesto')) {
+        } else if (this.checkIsAuthRequired(res.message)) {
           this.setStatus('needs_auth', res.message, false);
         } else {
           this.setStatus('error', res.message, false);
@@ -213,7 +274,7 @@ export class SyncEngine {
           success: false,
           message: 'Popup bloccato dal browser: abilita i popup nella barra degli indirizzi e riprova'
         };
-      } else if (msg.includes('token') || msg.includes('inizializzato') || msg.includes('403') || msg.includes('richiesto')) {
+      } else if (this.checkIsAuthRequired(msg)) {
         this.setStatus('needs_auth', msg, false);
       } else {
         this.setStatus('error', msg, false);
@@ -250,7 +311,7 @@ export class SyncEngine {
             success: false,
             message: 'Popup bloccato dal browser: abilita i popup nella barra degli indirizzi e riprova'
           };
-        } else if (res.message?.includes('token') || res.message?.includes('inizializzato') || res.message?.includes('403') || res.message?.includes('richiesto')) {
+        } else if (this.checkIsAuthRequired(res.message)) {
           this.setStatus('needs_auth', res.message, false);
         } else {
           this.setStatus('error', res.message, false);
@@ -281,7 +342,7 @@ export class SyncEngine {
           success: false,
           message: 'Popup bloccato dal browser: abilita i popup nella barra degli indirizzi e riprova'
         };
-      } else if (msg.includes('token') || msg.includes('inizializzato') || msg.includes('403') || msg.includes('richiesto')) {
+      } else if (this.checkIsAuthRequired(msg)) {
         this.setStatus('needs_auth', msg, false);
       } else {
         this.setStatus('error', msg, false);
@@ -318,7 +379,7 @@ export class SyncEngine {
             success: false,
             message: 'Popup bloccato dal browser: abilita i popup nella barra degli indirizzi e riprova'
           };
-        } else if (pullRes.message?.includes('token') || pullRes.message?.includes('inizializzato') || pullRes.message?.includes('403') || pullRes.message?.includes('richiesto')) {
+        } else if (this.checkIsAuthRequired(pullRes.message)) {
           this.setStatus('needs_auth', pullRes.message, false);
         } else {
           this.setStatus('error', pullRes.message, false);
@@ -347,7 +408,7 @@ export class SyncEngine {
             success: false,
             message: 'Popup bloccato dal browser: abilita i popup nella barra degli indirizzi e riprova'
           };
-        } else if (pushRes.message?.includes('token') || pushRes.message?.includes('inizializzato') || pushRes.message?.includes('403') || pushRes.message?.includes('richiesto')) {
+        } else if (this.checkIsAuthRequired(pushRes.message)) {
           this.setStatus('needs_auth', pushRes.message, false);
         } else {
           this.setStatus('error', pushRes.message, false);
@@ -366,7 +427,7 @@ export class SyncEngine {
           success: false,
           message: 'Popup bloccato dal browser: abilita i popup nella barra degli indirizzi e riprova'
         };
-      } else if (msg.includes('token') || msg.includes('inizializzato') || msg.includes('403') || msg.includes('richiesto')) {
+      } else if (this.checkIsAuthRequired(msg)) {
         this.setStatus('needs_auth', msg, false);
       } else {
         this.setStatus('error', msg, false);

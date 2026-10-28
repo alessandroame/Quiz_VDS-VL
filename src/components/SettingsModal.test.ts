@@ -400,4 +400,37 @@ describe('SettingsModal Component (Accordion & Mobile Ergonomics)', () => {
     });
     container.remove();
   });
+
+  it('displays formatted lastSyncedAt status bar even when autoSyncDrive is false', () => {
+    const olderTs = new Date(2026, 9, 15, 14, 25, 0).getTime();
+    mockUseQuiz.mockReturnValue({
+      settings: { ...defaultSettings, autoSyncDrive: false },
+      updateSetting: vi.fn(),
+      updateSettings: vi.fn(),
+      syncState: {
+        status: 'synced',
+        lastSyncedAt: olderTs,
+        isAutoSyncEnabled: false
+      },
+      syncNow: vi.fn(),
+      resetAllStats: vi.fn(),
+      resetAllData: vi.fn()
+    });
+
+    const container = document.createElement('div');
+    document.body.appendChild(container);
+    const root = createRoot(container);
+
+    act(() => {
+      root.render(React.createElement(SettingsModal, { isOpen: true, onClose: () => {}, defaultTab: 'cloud' }));
+    });
+
+    expect(container.textContent).toContain('Ultimo: 15/10/2026, 14:25');
+    expect(container.querySelector('#btn-sync-now')).not.toBeNull();
+
+    act(() => {
+      root.unmount();
+    });
+    container.remove();
+  });
 });

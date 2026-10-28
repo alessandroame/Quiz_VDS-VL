@@ -1,0 +1,22 @@
+### [2026-10-28] - Persistenza Token OAuth2 Google Drive, Auto-Sync all'Avvio e Formattazione Data/Ora Locale (v1.10.5)
+
+- **Cosa abbiamo fatto**:
+  - **Persistenza Token OAuth2 con Validazione Scadenza e Pulizia su HTTP 401 (`src/services/googleDrive.ts`)**:
+    - Persistito il token di accesso OAuth2 (`accessToken` e `tokenExpiry`) in `localStorage` (`vds_google_oauth_token_v1`) con idratazione automatica all'avvio di `GoogleDriveService` e verifica di validità (`Date.now() < tokenExpiry - 60000`).
+    - In `getAccessToken(interactive)`, riutilizzo immediato del token persistito valido senza invocare `requestAccessToken()` (zero popup al ricaricamento della PWA o su click manuale `Sincronizza adesso` / `Salva adesso` finché il token è valido).
+    - Passato `{ prompt: '' }` a `tokenClient.requestAccessToken({ prompt: '' })` per evitare la schermata completa di consenso quando l'account è già stato autorizzato.
+    - Aggiunta inizializzazione pigra (`lazy init`) di `tokenClient` in `getAccessToken` qualora lo script GIS sia stato caricato in differita, e invalidazione automatica del token (`clearToken()`) in caso di risposta HTTP `401`.
+  - **Allineamento Iniziale Auto-Sync e Gestione Script GIS Asincrono (`src/services/syncEngine.ts`)**:
+    - In `SyncEngine.init()`, registrato listener su `window.load` se `googleDrive.isGisLoaded()` è ancora `false` al mount iniziale, ed eseguito automaticamente `fullSync(false)` in background all'avvio quando `autoSyncDrive` è attivo e il token OAuth persistito è valido.
+    - Esteso il riconoscimento degli errori di autenticazione (`checkIsAuthRequired`) ai codici HTTP `401`, `scaduto` e `revocato` (case-insensitive).
+    - Introdotta la funzione pura `formatSyncTimestamp(timestamp, nowMs)` che formatta l'ultimo salvataggio in fuso orario locale mostrando `Oggi, HH:MM` per la giornata corrente e `GG/MM/AAAA, HH:MM` per i giorni precedenti.
+  - **Visibilità Stato Cloud e Touch Target Mobile (`src/components/SettingsModal.tsx`, `src/components/Navbar.tsx`)**:
+    - Resa visibile la barra di stato della sincronizzazione cloud in `SettingsModal.tsx` anche quando `autoSyncDrive` è disattivato ma è presente un salvataggio precedente (`Boolean(syncState.lastSyncedAt)`).
+    - Applicato `formatSyncTimestamp` in `SettingsModal.tsx` e nel tooltip di `Navbar.tsx`.
+    - Adeguato il touch target di `#btn-sync-now` a `min-w-[44px] min-h-[44px]` per piena conformità mobile (`360x800`).
+  - **Suite di Test Unitari**:
+    - Aggiunti `DRV-11` e `DRV-12` in `src/services/googleDrive.test.ts`, 2 test in `src/services/syncEngine.test.ts` e 1 test in `src/components/SettingsModal.test.ts`.
+- **Scelte architetturali & Rationale**:
+  - *Persistenza Token con Margine di Sicurezza (60s)*: Mantenere il token OAuth2 solo in RAM costringeva l'utente a riautenticarsi a ogni apertura della PWA e faceva fallire i `pushNow(false)` schedulati da `schedulePush()`. La persistenza locale fino a 60s prima della scadenza naturale (1h) consente all'Auto-Sync in background e al pulsante manuale di operare senza interruzioni o popup superflui.
+- **Impatto sul Desiderata**:
+  - Allineamento completo dell'esperienza di sincronizzazione Google Drive con i criteri di ergonomia e zero attrito cognitivo di `DESIDERATA.md`.

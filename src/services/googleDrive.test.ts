@@ -1,15 +1,21 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { GoogleDriveService } from './googleDrive';
+import { GoogleDriveService, GOOGLE_TOKEN_STORAGE_KEY } from './googleDrive';
 
 describe('Suite 7: Google Drive Sync Service (src/services/googleDrive.ts)', () => {
   let service: GoogleDriveService;
 
   beforeEach(() => {
+    if (typeof globalThis.localStorage !== 'undefined') {
+      globalThis.localStorage.removeItem(GOOGLE_TOKEN_STORAGE_KEY);
+    }
     service = new GoogleDriveService();
     vi.restoreAllMocks();
   });
 
   afterEach(() => {
+    if (typeof globalThis.localStorage !== 'undefined') {
+      globalThis.localStorage.removeItem(GOOGLE_TOKEN_STORAGE_KEY);
+    }
     vi.restoreAllMocks();
   });
 
@@ -224,5 +230,69 @@ describe('Suite 7: Google Drive Sync Service (src/services/googleDrive.ts)', () 
     capturedCallback({ error: 'popup_blocked_by_browser' });
 
     await expect(tokenPromise).rejects.toThrow('popup_blocked_by_browser');
+  });
+
+  it('DRV-11: persists OAuth token across service reloads and reuses it without opening popup', async () => {
+    const store = new Map<string, string>();
+    (globalThis as any).localStorage = {
+      getItem: (k: string) => (store.has(k) ? store.get(k)! : null),
+      setItem: (k: string, v: string) => store.set(k, String(v)),
+      removeItem: (k: string) => store.delete(k)
+    };
+
+    let capturedCallback: any = null;
+    const mockRequestAccessToken = vi.fn();
+    (globalThis as any).window = {
+      google: {
+        accounts: {
+          oauth2: {
+            initTokenClient: vi.fn((config: any) => {
+              capturedCallback = config.callback;
+              return { requestAccessToken: mockRequestAccessToken };
+            })
+          }
+        }
+      }
+    };
+
+    service.initTokenClient('test_client_id');
+    const tokenPromise = service.getAccessToken(true);
+    expect(mockRequestAccessToken).toHaveBeenCalledWith({ prompt: '' });
+    capturedCallback({ access_token: 'persisted_token_xyz', expires_in: 3600 });
+
+    const firstToken = await tokenPromise;
+    expect(firstToken).toBe('persisted_token_xyz');
+    expect(store.has(GOOGLE_TOKEN_STORAGE_KEY)).toBe(true);
+
+    // Simulate page reload by instantiating a fresh GoogleDriveService
+    mockRequestAccessToken.mockClear();
+    const reloadedService = new GoogleDriveService();
+    expect(reloadedService.hasValidToken()).toBe(true);
+
+    // Both background (interactive=false) and manual (interactive=true) must reuse cached token without popup
+    await expect(reloadedService.getAccessToken(false)).resolves.toBe('persisted_token_xyz');
+    await expect(reloadedService.getAccessToken(true)).resolves.toBe('persisted_token_xyz');
+    expect(mockRequestAccessToken).not.toHaveBeenCalled();
+
+    // Clearing token removes it from storage
+    reloadedService.clearToken();
+    expect(reloadedService.hasValidToken()).toBe(false);
+    expect(store.has(GOOGLE_TOKEN_STORAGE_KEY)).toBe(false);
+  });
+
+  it('DRV-12: invalidates persisted token when API responds with HTTP 401', async () => {
+    (service as any).accessToken = 'expired_remote_token';
+    (service as any).tokenExpiry = Date.now() + 3600000;
+
+    globalThis.fetch = vi.fn().mockResolvedValueOnce({
+      ok: false,
+      status: 401,
+      json: async () => ({ error: { code: 401, message: 'Invalid Credentials' } })
+    });
+
+    const res = await service.uploadBackup('{"version":2}');
+    expect(res.success).toBe(false);
+    expect(res.message).toContain('401');
+    expect(service.hasValidToken()).toBe(false);
   });
 });
