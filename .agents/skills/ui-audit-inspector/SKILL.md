@@ -1,14 +1,8 @@
 ---
 name: ui-audit-inspector
-description: >
-  Audit automatizzato e interattivo di interfaccia grafica, viewport multi-dispositivo (mobile portrait 390x844,
-  tablet portrait 768x1024, tablet landscape 1024x768, desktop 1440x900), contrasto cromatico WCAG 2.1 AA,
-  anti-cluttering e microcopy essenziale (zero cosplay aeronautico, vocabolario univoco a 1 parola).
-  Genera report HTML completi e autosufficienti con timestamp (audit_report_YYYY-MM-DD_HH-mm-ss.html),
-  screenshot di evidenza integrati e ID univoci (es. [CONTRAST-01], [COPY-02]) per feedback e risoluzioni mirate.
-  Attiva questa skill quando: esegui audit UI, verifichi il contrasto chiaro/scuro, controlli layout e safe-area
-  su mobile/tablet/desktop, bonifichi il testo da gergo di vendita o cosplay, oppure quando l'utente dice
-  'audit ui', 'fai l'audit', 'verifica responsive', 'controlla contrasti' o 'genera report ui'.
+description: >-
+  Audit specifico del layout quiz VDS-VL (griglia 30 bolle, viste Tutor/Esame e lessico didattico AeCI) con report HTML.
+  Utilizza questa skill quando verifichi le viste specifiche di Quiz_VDS-VL oltre a laws-of-ux.
 version: 1.0.0
 language: it-IT
 ---

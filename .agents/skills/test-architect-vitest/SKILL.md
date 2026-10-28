@@ -1,12 +1,8 @@
 ---
 name: test-architect-vitest
-description: >
-  Architettura dei piani di test (Test Plan), progettazione di Unit & Integration Test con Vitest,
-  analisi dei casi limite (Boundary Values) e mocking specialistico per PWA (Dexie IndexedDB con fake-indexeddb,
-  timer esame con vi.useFakeTimers).
-  Attiva questa skill quando: progetti o scrivi test unitari, crei piani di test o test matrix, testi la logica
-  di calcolo (Fair Coverage Randomizer, calcolo esame AeCI, Quaderno Errori), configuri Vitest,
-  o quando l'utente dice 'piano di test', 'unit test', 'test vitest', 'testa la logica', 'coverage' o 'scrivi i test'.
+description: >-
+  Progettazione di unit e integration test con Vitest, fake-indexeddb (Dexie) e timer esame per la PWA VDS-VL.
+  Utilizza questa skill quando scrivi test Vitest sul motore d'esame AeCI o sullo store Dexie.
 version: 1.0.0
 language: it-IT
 ---

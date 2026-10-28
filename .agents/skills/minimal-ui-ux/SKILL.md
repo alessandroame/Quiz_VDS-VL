@@ -1,10 +1,8 @@
 ---
 name: minimal-ui-ux
-description: >
-  Design system minimale per lo studio, linee guida microcopy essenziale, ergonomia zero-distrazioni,
-  temi chiaro/scuro/auto ad alto contrasto e usabilità mobile/desktop per la PWA VDS-VL.
-  Attiva questa skill quando: crei o modifichi componenti UI, pulsanti, palette colori, layout responsive,
-  microcopy essenziale, o scorciatoie da tastiera (1, 2, 3, F, Spazio).
+description: >-
+  Design system specifico per lo studio VDS-VL AeCI, microcopy a 1 parola e scorciatoie tastiera (1, 2, 3, F, Spazio).
+  Utilizza questa skill quando modifichi viste studio/esame o etichette della PWA Quiz VDS-VL.
 version: 1.2.0
 language: it-IT
 ---

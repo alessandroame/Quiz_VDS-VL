@@ -1,11 +1,8 @@
 ---
 name: headless-pwa-tester
-description: >
-  Collaudo visuale e interattivo headless a zero dipendenze per la PWA Quiz VDS-VL tramite Chrome DevTools Protocol (CDP).
-  Genera screenshot pixel-perfect (mobile portrait 390x844, mobile landscape 844x390, desktop 1440x900) e asserisce
-  l'assenza assoluta di errori in console JavaScript.
-  Attiva questa skill quando: verifichi modifiche alla UI/UX, scatti screenshot di collaudo, testi la reattività dei layout,
-  oppure quando l'utente dice 'controlla nel browser', 'test visivo', 'headless', 'screenshot', 'collauda' o 'verifica UI'.
+description: >-
+  Collaudo CDP specifico per i flussi d'esame 30 quiz e barra risposte della PWA Quiz VDS-VL.
+  Utilizza questa skill quando esegui test headless dedicati ai flussi della PWA Quiz_VDS-VL.
 version: 1.0.0
 language: it-IT
 ---
