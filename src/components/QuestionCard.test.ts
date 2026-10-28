@@ -382,3 +382,67 @@ describe('QuestionCard Review / Debriefing Mode (isReviewMode)', () => {
   });
 });
 
+
+describe('QuestionCard Mobile Sticky Hover and Focus Prevention', () => {
+  let container: HTMLDivElement;
+  let root: ReturnType<typeof createRoot>;
+
+  beforeEach(() => {
+    vi.clearAllMocks();
+    container = document.createElement('div');
+    document.body.appendChild(container);
+    root = createRoot(container);
+  });
+
+  afterEach(() => {
+    act(() => {
+      root.unmount();
+    });
+    container.remove();
+  });
+
+  it('recreates option button DOM nodes on question change and blurs on click to prevent mobile sticky hover/focus', async () => {
+    const nextQuestion: Question = {
+      ...mockQuestion,
+      id: 5038,
+      question: 'Cosa indica una linea isobara?'
+    };
+
+    await act(async () => {
+      root.render(
+        React.createElement(QuestionCard, {
+          question: mockQuestion,
+          selectedAnswer: undefined,
+          showFeedback: false,
+          onSelectAnswer: vi.fn()
+        })
+      );
+    });
+
+    const prevOpt2Btn = container.querySelector('#btn-option-2') as HTMLButtonElement;
+    expect(prevOpt2Btn).not.toBeNull();
+    expect(prevOpt2Btn.className).toContain('focus:outline-none');
+
+    const blurSpy = vi.spyOn(prevOpt2Btn, 'blur');
+    await act(async () => {
+      prevOpt2Btn.click();
+    });
+    expect(blurSpy).toHaveBeenCalledTimes(1);
+
+    await act(async () => {
+      root.render(
+        React.createElement(QuestionCard, {
+          question: nextQuestion,
+          selectedAnswer: undefined,
+          showFeedback: false,
+          onSelectAnswer: vi.fn()
+        })
+      );
+    });
+
+    const nextOpt2Btn = container.querySelector('#btn-option-2') as HTMLButtonElement;
+    expect(nextOpt2Btn).not.toBeNull();
+    // DOM element must be a fresh instance so mobile WebKit/Chrome does not retain sticky :hover or :focus
+    expect(nextOpt2Btn).not.toBe(prevOpt2Btn);
+  });
+});

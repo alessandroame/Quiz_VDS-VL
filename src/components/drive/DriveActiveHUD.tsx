@@ -853,7 +853,7 @@ export const DriveActiveHUD: React.FC<DriveActiveHUDProps> = ({
 
             return (
               <button
-                key={optNum}
+                key={`${currentQ.id}-${optNum}`}
                 id={`btn-drive-opt-${optNum}`}
                 lang="it"
                 translate="no"
@@ -863,7 +863,7 @@ export const DriveActiveHUD: React.FC<DriveActiveHUDProps> = ({
                   onStopVoice();
                   onSelectAnswer(optNum);
                 }}
-                className={`overflow-hidden ${
+                className={`overflow-hidden focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-500/60 ${
                   isCurrentRevealed
                     ? 'w-full rounded-xl border p-2 sm:p-2.5 flex items-center gap-2.5 sm:gap-3 text-left transition-all duration-300'
                     : `${isAnyOptionExpanded ? (isExpanded ? 'flex-1' : 'flex-none') : 'flex-1'} w-full min-h-[74px] sm:min-h-[85px] rounded-2xl border-2 p-3 sm:p-4 flex items-center gap-3.5 sm:gap-5 text-left transition-all duration-300 shadow-md active:scale-[0.98]`

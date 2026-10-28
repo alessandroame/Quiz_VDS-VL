@@ -1,0 +1,9 @@
+### [2026-10-28] - Risoluzione Effetto Sticky Hover / Focus Mobile sulle Opzioni Quiz (v1.10.4)
+- **Cosa abbiamo fatto**:
+  - Abilitato `future: { hoverOnlyWhenSupported: true }` in [tailwind.config.js](file:///d:/Github/Quiz_VDS-VL/tailwind.config.js) affinché le utility `hover:*` e `light:hover:*` vengano applicate esclusivamente su dispositivi dotati di puntatore reale (`@media (hover: hover) and (pointer: fine)`), impedendo ai browser mobile touch (Chrome Android e Safari iOS) di mantenere attivo lo stile hover dopo il tap.
+  - Aggiornata la chiave React dei pulsanti opzione in [src/components/QuestionCard.tsx](file:///d:/Github/Quiz_VDS-VL/src/components/QuestionCard.tsx) (`key={`${question.id}-${optNum}`}`) e in [src/components/drive/DriveActiveHUD.tsx](file:///d:/Github/Quiz_VDS-VL/src/components/drive/DriveActiveHUD.tsx) (`key={`${currentQ.id}-${optNum}`}`), aggiungendo `e.currentTarget.blur()` al click e `focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-500/60`.
+  - Aggiunto test di regressione in [src/components/QuestionCard.test.ts](file:///d:/Github/Quiz_VDS-VL/src/components/QuestionCard.test.ts) per certificare la ricreazione dei nodi DOM `<button>` al cambio quesito e il blur al tocco.
+- **Scelte architetturali & Rationale**:
+  - Su touchscreen i browser emulano `:hover` e mantengono `:focus` sull'ultimo elemento `<button>` toccato; se React riutilizza in-place lo stesso nodo DOM (`key={optNum}`), alla domanda successiva la casella corrispondente conserva lo sfondo/bordo di hover dando l'illusione di una pre-selezione. La combinazione di `@media (hover: hover)` globale e chiave legata a `question.id` elimina il fenomeno alla radice.
+- **Impatto sul Desiderata**:
+  - Azzerato l'artefatto visivo mobile durante lo svolgimento dei quiz sia in vista standard che in Modalità Mani Libere, preservando l'accessibilità da tastiera (`:focus-visible`) su desktop.

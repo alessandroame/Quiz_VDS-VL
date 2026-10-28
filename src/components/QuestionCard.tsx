@@ -494,15 +494,18 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({
 
           return (
             <button
-              key={optNum}
+              key={`${question.id}-${optNum}`}
               id={`btn-option-${optNum}`}
               data-testid={`option-${optNum}`}
               data-answer-option={optNum}
               lang="it"
               translate="no"
-              onClick={() => handleSelect(optNum)}
+              onClick={(e) => {
+                e.currentTarget.blur();
+                handleSelect(optNum);
+              }}
               disabled={isReviewMode || (showFeedback && selectedAnswer !== undefined)}
-              className={`w-full text-left p-2.5 sm:p-3 min-h-[44px] sm:min-h-[48px] rounded-xl border transition-all flex items-start gap-2.5 sm:gap-3 text-xs sm:text-sm leading-snug ${btnStyle}`}
+              className={`w-full text-left p-2.5 sm:p-3 min-h-[44px] sm:min-h-[48px] rounded-xl border transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-500/60 flex items-start gap-2.5 sm:gap-3 text-xs sm:text-sm leading-snug ${btnStyle}`}
             >
               <span
                 className={`w-5 h-5 sm:w-6 sm:h-6 rounded-full flex-shrink-0 flex items-center justify-center font-bold text-[11px] sm:text-xs mt-0.5 ${

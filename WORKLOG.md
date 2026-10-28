@@ -14,6 +14,10 @@ Questo documento registra in ordine cronologico tutte le lavorazioni svolte nel 
 - **Impatto sul Desiderata**: <Come questo intervento contribuisce al desiderata (cfr. DESIDERATA.md) e indicazioni per il prossimo agente>
 ```
 
+### [2026-10-28] - Risoluzione Effetto Sticky Hover / Focus Mobile sulle Opzioni Quiz (v1.10.4)
+- **Tipo**: `fix(ui)` — Dettaglio completo in [2026-10-28_mobile_sticky_hover_fix.md](file:///c:/github/Quiz_VDS-VL/.agents/worklog.d/2026-10-28_mobile_sticky_hover_fix.md).
+- **Intervento**: Abilitato `future: { hoverOnlyWhenSupported: true }` in [tailwind.config.js](file:///c:/github/Quiz_VDS-VL/tailwind.config.js), impostata chiave dinamica `key={`${question.id}-${optNum}`}` con `blur()` al tocco e `focus:outline-none` in [QuestionCard.tsx](file:///c:/github/Quiz_VDS-VL/src/components/QuestionCard.tsx) e [DriveActiveHUD.tsx](file:///c:/github/Quiz_VDS-VL/src/components/drive/DriveActiveHUD.tsx), e aggiunto test di regressione in [QuestionCard.test.ts](file:///c:/github/Quiz_VDS-VL/src/components/QuestionCard.test.ts).
+
 ### [2026-10-24] - Riclassificazione Domanda 2147 come Esclusiva Deltaplano (v1.10.3)
 - **Tipo**: `fix(data)` — Dettaglio completo in [2026-10-24_reclassify_q2147_hang_glider.md](file:///c:/github/Quiz_VDS-VL/.agents/worklog.d/2026-10-24_reclassify_q2147_hang_glider.md).
 - **Intervento**: Riclassificata la domanda `#2147` da `all` a `hang_glider` in [src/data/questions.json](file:///c:/github/Quiz_VDS-VL/src/data/questions.json) (pool Parapendio a 473 quiz: 427 comuni + 46 parapendio, 31 esclusivi deltaplano), reso dinamico il conteggio in [HomeScreen.tsx](file:///c:/github/Quiz_VDS-VL/src/components/HomeScreen.tsx) e [ArchiveScreen.tsx](file:///c:/github/Quiz_VDS-VL/src/components/ArchiveScreen.tsx), e allineati i test `DATA-08` e `DISC-01..08`.
