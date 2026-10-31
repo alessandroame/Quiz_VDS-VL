@@ -69,6 +69,9 @@ export interface DriveActiveHUDProps {
   onPlayOption?: (option: 1 | 2 | 3) => void;
   waitingCountdown: number | null;
   assimilationCountdown: number | null;
+  isVoiceRefining?: boolean;
+  voiceCommittedTranscript?: string;
+  voicePendingCommandLabel?: string | null;
   voiceInterimTranscript: string;
   voiceLastTranscript: string;
   lastRecognizedLabel: string | null;
@@ -129,6 +132,9 @@ export const DriveActiveHUD: React.FC<DriveActiveHUDProps> = ({
   onPlayOption = () => {},
   waitingCountdown,
   assimilationCountdown,
+  isVoiceRefining = false,
+  voiceCommittedTranscript = '',
+  voicePendingCommandLabel = null,
   voiceInterimTranscript,
   voiceLastTranscript,
   lastRecognizedLabel,
@@ -159,6 +165,12 @@ export const DriveActiveHUD: React.FC<DriveActiveHUDProps> = ({
     isTutorEnabled ||
     (sessionContext?.isTutor ?? !isExamSession) ||
     Boolean(sessionContext?.title?.includes('Tutor'));
+
+  const isActivelyStreamingSpeech =
+    isVoiceRefining || Boolean(voiceCommittedTranscript || voiceInterimTranscript);
+  const isVoicePulseActive =
+    isActivelyStreamingSpeech ||
+    (isVoiceReceiving && !lastRecognizedLabel && !unrecognizedSpeech);
 
   // Synchronize modal dismiss on Escape or Enter confirm
   React.useEffect(() => {
@@ -479,7 +491,7 @@ export const DriveActiveHUD: React.FC<DriveActiveHUDProps> = ({
                   <div className="relative flex items-center justify-center">
                     <Mic
                       className={`w-3.5 h-3.5 transition-transform ${
-                        isVoiceReceiving
+                        isVoicePulseActive
                           ? 'animate-pulse text-emerald-200 scale-125'
                           : isVoiceSuspended
                           ? 'text-amber-300 opacity-80'
@@ -488,7 +500,7 @@ export const DriveActiveHUD: React.FC<DriveActiveHUDProps> = ({
                           : 'text-emerald-400/70'
                       }`}
                     />
-                    {isVoiceReceiving && (
+                    {isVoicePulseActive && (
                       <span className="absolute -inset-1 rounded-full bg-emerald-400 opacity-75 animate-ping pointer-events-none" />
                     )}
                   </div>
@@ -694,7 +706,7 @@ export const DriveActiveHUD: React.FC<DriveActiveHUDProps> = ({
       {waitingCountdown !== null && (
         <div
           className={`flex items-center justify-between px-3 py-1.5 border rounded-xl text-xs font-bold transition-all ${
-            isVoiceReceiving
+            isVoicePulseActive
               ? 'bg-emerald-950/80 border-emerald-400 text-emerald-200 shadow-[0_0_12px_rgba(52,211,153,0.3)] light:bg-emerald-100 light:border-emerald-500 light:text-emerald-900'
               : 'bg-amber-500/20 border-amber-500/40 text-amber-300 light:bg-amber-50 light:border-amber-300 light:text-amber-900'
           }`}
@@ -703,10 +715,10 @@ export const DriveActiveHUD: React.FC<DriveActiveHUDProps> = ({
             <div className="relative flex items-center justify-center flex-shrink-0">
               <Mic
                 className={`w-4 h-4 transition-transform ${
-                  isVoiceReceiving ? 'text-emerald-300 animate-pulse scale-125' : 'text-amber-400'
+                  isVoicePulseActive ? 'text-emerald-300 animate-pulse scale-125' : 'text-amber-400'
                 }`}
               />
-              {isVoiceReceiving && (
+              {isVoicePulseActive && (
                 <span className="absolute -inset-1 rounded-full bg-emerald-400 opacity-75 animate-ping pointer-events-none" />
               )}
             </div>
@@ -733,7 +745,7 @@ export const DriveActiveHUD: React.FC<DriveActiveHUDProps> = ({
           type="button"
           onClick={onOpenVoiceGuide}
           className={`w-full flex items-center justify-between px-3 py-1.5 rounded-xl border text-xs text-left transition-all ${
-            isVoiceReceiving
+            isVoicePulseActive
               ? 'bg-emerald-950/90 border-emerald-400 text-emerald-100 shadow-[0_0_16px_rgba(52,211,153,0.4)] ring-1 ring-emerald-400/50 light:bg-emerald-50 light:border-emerald-400 light:text-emerald-950'
               : lastRecognizedLabel
               ? 'bg-emerald-950/50 border-emerald-600/60 text-emerald-200 light:bg-emerald-50 light:border-emerald-300 light:text-emerald-900'
@@ -747,7 +759,7 @@ export const DriveActiveHUD: React.FC<DriveActiveHUDProps> = ({
             <div className="relative flex items-center justify-center flex-shrink-0">
               <Mic
                 className={`w-3.5 h-3.5 ${
-                  isVoiceReceiving
+                  isVoicePulseActive
                     ? 'text-emerald-300 animate-pulse scale-125'
                     : lastRecognizedLabel
                     ? 'text-emerald-400'
@@ -758,20 +770,47 @@ export const DriveActiveHUD: React.FC<DriveActiveHUDProps> = ({
                     : 'text-zinc-500'
                 }`}
               />
-              {isVoiceReceiving && (
+              {isVoicePulseActive && (
                 <span className="absolute -inset-1 rounded-full bg-emerald-400 opacity-75 animate-ping pointer-events-none" />
               )}
             </div>
 
             {voiceError ? (
               <span className="text-rose-400 font-bold truncate">Mic: {voiceError}</span>
-            ) : isVoiceReceiving ? (
+            ) : isActivelyStreamingSpeech ? (
               <div className="flex items-center gap-1.5 truncate">
                 <span className="font-black text-emerald-300 flex-shrink-0 animate-pulse">
                   In ricezione:
                 </span>
                 <span className="text-white light:text-slate-900 font-bold truncate">
-                  "{voiceInterimTranscript || voiceLastTranscript || 'Rilevamento voce...'}"
+                  {voiceCommittedTranscript || voiceInterimTranscript ? (
+                    <span className="inline-flex items-center gap-1 truncate" data-testid="voice-live-refinement">
+                      <span>&ldquo;</span>
+                      {voiceCommittedTranscript && (
+                        <span className="text-white light:text-slate-900 font-bold">
+                          {voiceCommittedTranscript}
+                        </span>
+                      )}
+                      {voiceInterimTranscript && (
+                        <span className="italic text-emerald-200 light:text-emerald-800 underline decoration-dotted underline-offset-2">
+                          {voiceInterimTranscript}&hellip;
+                        </span>
+                      )}
+                      <span>&rdquo;</span>
+                    </span>
+                  ) : (
+                    `"${voiceLastTranscript || 'Rilevamento voce...'}"`
+                  )}
+                </span>
+                {voicePendingCommandLabel && (
+                  <span
+                    data-testid="voice-pending-intent"
+                    className="ml-1 px-1.5 py-0.5 rounded bg-emerald-500/20 border border-emerald-400/50 text-[10px] font-black text-emerald-200 light:bg-emerald-200/70 light:border-emerald-500 light:text-emerald-950 flex-shrink-0"
+                  >
+                    &rarr; {voicePendingCommandLabel}
+                  </span>
+                )}
+                <span className="sr-only">
                 </span>
               </div>
             ) : lastRecognizedLabel ? (
@@ -785,6 +824,15 @@ export const DriveActiveHUD: React.FC<DriveActiveHUDProps> = ({
                 <AlertTriangle className="w-3.5 h-3.5 text-amber-400 flex-shrink-0" />
                 <span className="font-bold text-amber-400 flex-shrink-0">Sentito:</span>
                 <span className="text-zinc-200 light:text-slate-700 truncate">"{unrecognizedSpeech}" (non riconosciuto)</span>
+              </div>
+            ) : isVoiceReceiving ? (
+              <div className="flex items-center gap-1.5 truncate">
+                <span className="font-black text-emerald-300 flex-shrink-0 animate-pulse">
+                  In ricezione:
+                </span>
+                <span className="text-white light:text-slate-900 font-bold truncate">
+                  {`"${voiceLastTranscript || 'Rilevamento voce...'}"`}
+                </span>
               </div>
             ) : isVoiceSuspended ? (
               <div className="flex items-center gap-1.5 truncate">

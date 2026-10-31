@@ -256,4 +256,195 @@ describe('useDriveVoiceCommands Hook', () => {
 
     unmount();
   });
+
+  it('should reset lastHandledIndex across recognizer restarts after speaker suspension so subsequent commands at index 0 fire reliably', () => {
+    const instances: MockSpeechRecognition[] = [];
+    class SpyingRecognition extends MockSpeechRecognition {
+      constructor() {
+        super();
+        instances.push(this);
+      }
+    }
+    (window as any).SpeechRecognition = SpyingRecognition;
+
+    const onCommand = vi.fn();
+    const { rerender, unmount } = renderHook(
+      (props) => useDriveVoiceCommands(props!),
+      { enabled: true, onCommand, isSuspended: false, settleMs: 340 }
+    );
+
+    act(() => {
+      vi.advanceTimersByTime(260);
+    });
+    expect(instances).toHaveLength(1);
+
+    // Question 1: user speaks "uno" at index 0
+    act(() => {
+      instances[0].onresult?.({
+        results: [Object.assign([{ transcript: 'uno', confidence: 0.95 }], { isFinal: true })]
+      });
+    });
+    expect(onCommand).toHaveBeenCalledTimes(1);
+    expect(onCommand).toHaveBeenLastCalledWith('opt1');
+
+    // Question 2 starts speaking -> mic suspends, then resumes
+    rerender({ enabled: true, onCommand, isSuspended: true, settleMs: 340 });
+    rerender({ enabled: true, onCommand, isSuspended: false, settleMs: 340 });
+    act(() => {
+      vi.advanceTimersByTime(260);
+    });
+    expect(instances).toHaveLength(2);
+
+    // Question 2: new recognizer emits at index 0 again -> must NOT be dropped
+    act(() => {
+      instances[1].onresult?.({
+        results: [Object.assign([{ transcript: 'tre', confidence: 0.94 }], { isFinal: true })]
+      });
+    });
+    expect(onCommand).toHaveBeenCalledTimes(2);
+    expect(onCommand).toHaveBeenLastCalledWith('opt3');
+
+    unmount();
+  });
+
+  it('should progressively refine interim "ripeti..." into "ripeti la due" without premature firing when settleMs is active', () => {
+    let instance: MockSpeechRecognition | null = null;
+    class SpyingRecognition extends MockSpeechRecognition {
+      constructor() {
+        super();
+        instance = this;
+      }
+    }
+    (window as any).SpeechRecognition = SpyingRecognition;
+
+    const onCommand = vi.fn();
+    const { result, unmount } = renderHook(() =>
+      useDriveVoiceCommands({ enabled: true, onCommand, settleMs: 340 })
+    );
+
+    act(() => {
+      vi.advanceTimersByTime(260);
+    });
+
+    // Frame 1 (interim): "ripeti"
+    act(() => {
+      instance?.onresult?.({
+        results: [Object.assign([{ transcript: 'ripeti' }], { isFinal: false })]
+      });
+    });
+    expect(onCommand).not.toHaveBeenCalled();
+    expect(result.current.isRefining).toBe(true);
+    expect(result.current.pendingCommand).toBe('repeat');
+
+    // 180ms later (before 340ms settle expires), Frame 2 refines to "ripeti la due"
+    act(() => {
+      vi.advanceTimersByTime(180);
+      instance?.onresult?.({
+        results: [Object.assign([{ transcript: 'ripeti la due' }], { isFinal: false })]
+      });
+    });
+    expect(onCommand).not.toHaveBeenCalled();
+    expect(result.current.pendingCommand).toBe('repeat_opt2');
+
+    // Speech settles after 340ms of stability -> fires only 'repeat_opt2'
+    act(() => {
+      vi.advanceTimersByTime(350);
+    });
+    expect(onCommand).toHaveBeenCalledTimes(1);
+    expect(onCommand).toHaveBeenCalledWith('repeat_opt2');
+    expect(result.current.isRefining).toBe(false);
+
+    unmount();
+  });
+
+  it('should allow mid-utterance self-correction ("uno... anzi due") before settle window expires', () => {
+    let instance: MockSpeechRecognition | null = null;
+    class SpyingRecognition extends MockSpeechRecognition {
+      constructor() {
+        super();
+        instance = this;
+      }
+    }
+    (window as any).SpeechRecognition = SpyingRecognition;
+
+    const onCommand = vi.fn();
+    const { result, unmount } = renderHook(() =>
+      useDriveVoiceCommands({ enabled: true, onCommand, settleMs: 340 })
+    );
+
+    act(() => {
+      vi.advanceTimersByTime(260);
+    });
+
+    act(() => {
+      instance?.onresult?.({
+        results: [Object.assign([{ transcript: 'uno' }], { isFinal: false })]
+      });
+    });
+    expect(onCommand).not.toHaveBeenCalled();
+    expect(result.current.pendingCommand).toBe('opt1');
+
+    act(() => {
+      vi.advanceTimersByTime(150);
+      instance?.onresult?.({
+        results: [Object.assign([{ transcript: 'uno anzi due' }], { isFinal: true })]
+      });
+    });
+
+    expect(onCommand).toHaveBeenCalledTimes(1);
+    expect(onCommand).toHaveBeenCalledWith('opt2');
+
+    unmount();
+  });
+
+  it('should fast-path emergency stop/pause commands immediately even when settleMs is active, and flush unsettled interim on natural onend', () => {
+    let instance: MockSpeechRecognition | null = null;
+    class SpyingRecognition extends MockSpeechRecognition {
+      constructor() {
+        super();
+        instance = this;
+      }
+    }
+    (window as any).SpeechRecognition = SpyingRecognition;
+
+    const onCommand = vi.fn();
+    const { result, unmount } = renderHook(() =>
+      useDriveVoiceCommands({ enabled: true, onCommand, settleMs: 340 })
+    );
+
+    act(() => {
+      vi.advanceTimersByTime(260);
+    });
+
+    // Interim "stop" fires with 0ms delay
+    act(() => {
+      instance?.onresult?.({
+        results: [Object.assign([{ transcript: 'stop' }], { isFinal: false })]
+      });
+    });
+    expect(onCommand).toHaveBeenCalledTimes(1);
+    expect(onCommand).toHaveBeenLastCalledWith('stop');
+
+    // Next utterance at index 1 emits interim "seconda" and mobile WebView ends recognition before isFinal
+    act(() => {
+      instance?.onresult?.({
+        results: [
+          Object.assign([{ transcript: 'stop' }], { isFinal: true }),
+          Object.assign([{ transcript: 'seconda' }], { isFinal: false })
+        ]
+      });
+      instance?.onend?.();
+    });
+    expect(onCommand).toHaveBeenCalledTimes(2);
+    expect(onCommand).toHaveBeenLastCalledWith('opt2');
+
+    act(() => {
+      vi.advanceTimersByTime(160);
+    });
+
+
+    expect(result.current.isListening).toBe(true);
+
+    unmount();
+  });
 });

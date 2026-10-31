@@ -42,6 +42,13 @@ export type ThemeMode = 'dark' | 'light' | 'system';
 
 export type FontSizePreference = 'compact' | 'normal' | 'large';
 
+export interface AdaptiveVoiceAliasEntry {
+  phrase: string;
+  command: string;
+  occurrences: number;
+  updatedAt: number;
+}
+
 export interface AppSettings {
   theme: ThemeMode;
   fontSizePreference?: FontSizePreference;
@@ -63,6 +70,7 @@ export interface AppSettings {
   driveModeAutoAdvanceSeconds?: number;
   driveModeVoiceCommands: boolean;
   driveModeAudioOutput?: 'speaker' | 'headphones';
+  voiceAdaptiveAliases?: Record<string, AdaptiveVoiceAliasEntry>;
   driveModeIntroPlayed?: boolean;
   audioOfflinePromptDismissed?: boolean;
   driveModeTutor?: boolean;

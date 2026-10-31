@@ -732,6 +732,66 @@ describe('DriveActiveHUD - Karaoke Accordion & Long Text Expansion', () => {
     expect(htmlSaved).toContain('fill-amber-400');
     expect(htmlSaved).toContain('Salvato');
   });
+
+  it('HUD-VOICE-REFINE-01: renders live progressive transcript refinement and pending command preview badge without layout bloat', () => {
+    const html = renderToString(
+      React.createElement(DriveActiveHUD, {
+        currentQ: sampleLongQuestion,
+        currentIndex: 0,
+        totalCount: 30,
+        isExamSession: false,
+        secondsRemaining: 0,
+        isIntroActive: false,
+        onDismissIntro: () => {},
+        onReplayIntro: () => {},
+        onOpenVoiceGuide: () => {},
+        setIsVoiceMenuOpen: () => {},
+        onClose: () => {},
+        onExecuteClose: () => {},
+        isAutopilotEnabled: true,
+        onToggleAutopilot: () => {},
+        isTutorEnabled: true,
+        isVoiceSupported: true,
+        isVoiceCommandsEnabled: true,
+        voiceError: null,
+        isVoiceReceiving: true,
+        isVoiceRefining: true,
+        isVoiceListening: true,
+        onToggleVoiceCommands: () => {},
+        isPlaying: false,
+        isPaused: false,
+        isPartPlaying: () => false,
+        isExplanationPlaying: false,
+        onTogglePlayPause: () => {},
+        onRestartCurrentOrSequence: () => {},
+        onStopVoice: () => {},
+        onPlayExplanation: () => {},
+        waitingCountdown: null,
+        assimilationCountdown: null,
+        voiceCommittedTranscript: 'ripeti',
+        voiceInterimTranscript: 'la due',
+        voicePendingCommandLabel: 'Ripeti Due',
+        voiceLastTranscript: '',
+        lastRecognizedLabel: null,
+        unrecognizedSpeech: null,
+        voiceHint: '',
+        answers: {},
+        flags: {},
+        revealedQuestionId: null,
+        onSelectAnswer: () => {},
+        onPrevQuestion: () => {},
+        onNextQuestion: () => {},
+        onToggleFlag: () => {},
+        onSubmitExam: () => {}
+      })
+    );
+
+    expect(html).toContain('data-testid="voice-live-refinement"');
+    expect(html).toContain('ripeti');
+    expect(html).toContain('la due');
+    expect(html).toContain('data-testid="voice-pending-intent"');
+    expect(html).toContain('Ripeti Due');
+  });
 });
 
 

@@ -1,0 +1,23 @@
+### [2026-10-31] - Riconoscimento Vocale a Raffinamento Progressivo, Matching Opzioni e Lessico Adattivo Locale in Modalità Mani Libere (v1.11.0)
+
+- **Cosa abbiamo fatto**:
+  - **Fix P0 Reset Cursore `SpeechRecognition` (`src/hooks/useDriveVoiceCommands.ts`)**:
+    - Introdotto `recSessionIdRef` incrementale e reset sistematico di `lastHandledIndexRef.current = -1` su ogni ciclo `start`/`stop`/`onstart`/`onend`, eliminando lo scarto silenzioso dei comandi vocali a `resultIndex = 0` dopo il riavvio del riconoscitore tra domande successive o dopo sospensione anti-eco.
+  - **Streaming Progressivo Bicolore & Finestra di Stabilizzazione (`useDriveVoiceCommands.ts`, `DriveActiveHUD.tsx`, `DriveModeScreen.tsx`)**:
+    - Abilitato `rec.maxAlternatives = 5` e ricostruzione multi-chunk `committedTranscript` + `interimTranscript` lungo i segmenti non ancora consumati della frase.
+    - Introdotta la finestra di stabilizzazione `settleMs: 340` in `DriveModeScreen` (mantenendo `settleMs = 0` come default retrocompatibile dell'hook) e finestra di merge da `240ms` sui prefissi ambigui finalizzati (*"ripeti"* -> *"ripeti la due"*), con fast-path istantaneo (`0ms`) per i comandi d'emergenza `stop` e `pause` e flush automatico su `rec.onend` per i browser mobile WebView che chiudono lo stream prima di `isFinal: true`.
+    - Aggiornato il banner vocale a riga singola in `DriveActiveHUD.tsx` (zero incremento verticale, layout `100dvh` invariato) con testo confermato solido, coda in raffinamento in corsivo sottolineato (`data-testid="voice-live-refinement"`), badge di anteprima comando (`→ Ripeti Due`, `data-testid="voice-pending-intent"`) e priorità corretta sugli stati post-riconoscimento (`lastRecognizedLabel` e `unrecognizedSpeech` non più mascherati per 1.8s da `isVoiceReceiving`).
+  - **Autocorrezione in Frase, N-Best Phonetic Scoring, Keyword Opzioni & Lessico Adattivo Dexie (`src/utils/voiceCommandParser.ts`, `src/types/database.ts`)**:
+    - Implementato `resolveVoiceCommand` con rilevamento di autocorrezioni nella stessa emissione vocale (*"uno anzi due"*, *"la prima no scusa la terza"*, *"non la uno ma la due"*) e guardia contro negazioni a voce alta (*"non la uno"*).
+    - Aggiunto lo scoring sulle top-5 ipotesi fonetiche `SpeechRecognition` (`confidence >= 0.35` sulle alternative secondarie) e il matching lessicale distintivo sulle 3 opzioni della domanda attiva (`optionTexts`) con margine minimo obbligatorio di `>= 2` punti per impedire tirate a indovinare su termini condivisi.
+    - Aggiunto il dizionario adattivo personale `voiceAdaptiveAliases` in `AppSettings` (Dexie IndexedDB, 100% locale, cap LRU a 40 voci) alimentato passivamente da `recordAdaptiveVoiceCorrection` quando a una frase non riconosciuta segue entro `4.5s` un comando touch/tastiera manuale, con attivazione vincolata a `>= 2` occorrenze coerenti ed esclusione automatica dei termini specifici della domanda corrente.
+  - **Test Suite & Documentazione**:
+    - Estesi `voiceCommandParser.test.ts` (`VC-12..15`), `useDriveVoiceCommands.test.ts` (+4 test su reset cursore, raffinamento progressivo, autocorrezione e fast-path/onend flush), `DriveActiveHUD.test.ts` (`HUD-VOICE-REFINE-01`) e creata la suite d'integrazione end-to-end `DriveVoiceRefinement.test.ts` (`DRIVE-REFINE-E2E-01..02`). Totale suite: **58 file, 468 test passanti al 100%**.
+    - Consolidata `[NOTE-001]` in `NOTES.md` e aggiornati `VoiceCommandsModal.tsx`, `DESIDERATA.md`, `MEMORY.md` e `README.md`.
+
+- **Scelte architetturali & Rationale**:
+  - **100% Client-Side & Zero-Backend**: per rispettare il vincolo non negoziabile *Offline-First Assoluto & Zero Costi Server* di `DESIDERATA.md`, l'effetto di raffinamento progressivo stile PVA Antigravity è ottenuto interamente nel browser combinando `interimResults` + `maxAlternatives = 5` della Web Speech API nativa, stabilizzazione temporale adattiva (`340ms`), contesto semantico delle 3 opzioni del quiz attivo e apprendimento fonetico personale su IndexedDB.
+  - **Soglia di Coerenza `>= 2` e Filtro Lessico Domanda sugli Alias Adattivi**: richiedere almeno due associazioni identiche frase-comando e ignorare parole presenti nel testo della domanda/opzioni previene falsi positivi da rumori ambientali occasionali o risposte legate a un singolo quesito.
+
+- **Impatto sul Desiderata**:
+  - Chiude `[NOTE-001]` potenziando l'affidabilità e la naturalezza dei comandi vocali in Modalità Mani Libere (`DESIDERATA.md` §2.B.7) per l'uso reale con auricolari, vento o rumore stradale. Proposta B (dettatura vocale delle note di studio personali in `QuestionCard`/`ArchiveScreen`) resta disponibile come eventuale evoluzione futura indipendente.

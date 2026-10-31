@@ -9,7 +9,37 @@ import { triggerHapticFeedback } from '../utils/haptics';
 import { useAviationVoice } from '../hooks/useAviationVoice';
 import { useWakeLock } from '../hooks/useWakeLock';
 import { useDriveVoiceCommands } from '../hooks/useDriveVoiceCommands';
-import { parseVoiceCommand, type VoiceCommand } from '../utils/voiceCommandParser';
+import {
+  parseVoiceCommand,
+  recordAdaptiveVoiceCorrection,
+  type VoiceCommand
+} from '../utils/voiceCommandParser';
+
+const VOICE_PENDING_SHORT_LABELS: Record<VoiceCommand, string> = {
+  opt1: 'Opzione 1',
+  opt2: 'Opzione 2',
+  opt3: 'Opzione 3',
+  repeat_question: 'Ripeti Domanda',
+  repeat_opt1: 'Ripeti Uno',
+  repeat_opt2: 'Ripeti Due',
+  repeat_opt3: 'Ripeti Tre',
+  next: 'Avanti',
+  prev: 'Indietro',
+  repeat: 'Ripeti',
+  flag: 'Bandierina',
+  bookmark: 'Preferiti',
+  pause: 'Pausa',
+  stop: 'Stop',
+  resume: 'Riprendi',
+  explain: 'Spiega',
+  tutor_on: 'Tutor ON',
+  tutor_off: 'Tutor OFF',
+  toggle_tutor: 'Tutor',
+  help: 'Guida',
+  submit: 'Concludi',
+  confirm: 'Conferma',
+  cancel: 'Annulla'
+};
 import { VoiceCommandsModal } from './VoiceCommandsModal';
 import { AudioOfflinePromptModal } from './AudioOfflinePromptModal';
 import { audioDownloadManager } from '../services/audioDownloadManager';
@@ -293,6 +323,52 @@ export const DriveModeScreen: React.FC<DriveModeScreenProps> = ({
   const currentQ = internalQuestions[currentIndex];
   const totalCount = internalQuestions.length;
 
+  const currentQRef = useRef<Question | undefined>(currentQ);
+  currentQRef.current = currentQ;
+
+  const adaptiveAliasesRef = useRef(settings.voiceAdaptiveAliases);
+  adaptiveAliasesRef.current = settings.voiceAdaptiveAliases;
+
+  const isExecutingVoiceCommandRef = useRef<boolean>(false);
+  const lastUnrecognizedAttemptRef = useRef<{
+    raw: string;
+    at: number;
+    optionTexts: string[];
+  } | null>(null);
+
+  // Reset pending unrecognized voice buffer when switching questions
+  useEffect(() => {
+    lastUnrecognizedAttemptRef.current = null;
+    setUnrecognizedSpeech(null);
+  }, [currentQ?.id]);
+
+  const tryLearnFromManualAction = useCallback(
+    (manualCmd: VoiceCommand) => {
+      if (isExecutingVoiceCommandRef.current) return;
+      const attempt = lastUnrecognizedAttemptRef.current;
+      if (!attempt) return;
+      lastUnrecognizedAttemptRef.current = null;
+      if (!isVoiceCommandsEnabled || Date.now() - attempt.at > 4500) return;
+
+      const outcome = recordAdaptiveVoiceCorrection(
+        adaptiveAliasesRef.current,
+        attempt.raw,
+        manualCmd,
+        attempt.optionTexts
+      );
+      if (outcome) {
+        updateSetting('voiceAdaptiveAliases', outcome.nextMap);
+        if (outcome.learnedCommand) {
+          setVoiceToast(
+            `Pronuncia appresa: "${outcome.normalizedPhrase}" → ${VOICE_PENDING_SHORT_LABELS[outcome.learnedCommand]}`
+          );
+          setTimeout(() => setVoiceToast(null), 2600);
+        }
+      }
+    },
+    [isVoiceCommandsEnabled, updateSetting]
+  );
+
   // Grace period anti-misclick (250ms) al cambio domanda per prevenire risposte accidentali alla cieca
   useEffect(() => {
     if (!isOpen || internalMode !== 'running' || !currentQ?.id) return;
@@ -443,8 +519,9 @@ export const DriveModeScreen: React.FC<DriveModeScreenProps> = ({
     }
     setWaitingCountdown(null);
     triggerHapticFeedback('tap');
+    tryLearnFromManualAction('repeat_question');
     playQuestion();
-  }, [playQuestion]);
+  }, [playQuestion, tryLearnFromManualAction]);
 
   const handlePlayOption = useCallback((option: 1 | 2 | 3) => {
     if (countdownTimerRef.current) {
@@ -453,8 +530,11 @@ export const DriveModeScreen: React.FC<DriveModeScreenProps> = ({
     }
     setWaitingCountdown(null);
     triggerHapticFeedback('tap');
+    tryLearnFromManualAction(
+      option === 1 ? 'repeat_opt1' : option === 2 ? 'repeat_opt2' : 'repeat_opt3'
+    );
     playOption(option);
-  }, [playOption]);
+  }, [playOption, tryLearnFromManualAction]);
 
   // Navigazione tra le domande
   const handleNextQuestion = useCallback(() => {
@@ -541,6 +621,8 @@ export const DriveModeScreen: React.FC<DriveModeScreenProps> = ({
     // Se la domanda ha già una risposta, non sovrascrivere
     if (answers[currentQ.id] !== undefined) return;
 
+    tryLearnFromManualAction(ans === 1 ? 'opt1' : ans === 2 ? 'opt2' : 'opt3');
+
     // FERMA IMMEDIATAMENTE LA VOCE E TUTTI I TIMER AUDIO!
     voiceService.stop();
     stopVoice();
@@ -600,6 +682,7 @@ export const DriveModeScreen: React.FC<DriveModeScreenProps> = ({
 
   const handleToggleFlag = () => {
     if (!currentQ) return;
+    tryLearnFromManualAction('flag');
     triggerHapticFeedback('warning');
     const nextVal = !flagsRef.current[currentQ.id];
     const updatedFlags = { ...flagsRef.current, [currentQ.id]: nextVal };
@@ -614,9 +697,10 @@ export const DriveModeScreen: React.FC<DriveModeScreenProps> = ({
     if (!currentQ) return;
     triggerHapticFeedback('tap');
     const nextVal = await toggleBookmark(currentQ.id);
+    tryLearnFromManualAction('bookmark');
     if (settings.soundEnabled) soundFX.playClick();
     showToast(nextVal ? '🔖 Salvata nei preferiti' : 'Segnalibro rimosso');
-  }, [currentQ, toggleBookmark, settings.soundEnabled]);
+  }, [currentQ, toggleBookmark, settings.soundEnabled, tryLearnFromManualAction]);
 
   const showToast = (msg: string) => {
     setVoiceToast(msg);
@@ -817,18 +901,43 @@ export const DriveModeScreen: React.FC<DriveModeScreenProps> = ({
     isReceiving: isVoiceReceiving,
     isSuspended: isVoiceSuspended,
     lastTranscript: voiceLastTranscript,
+    isRefining: isVoiceRefining = false,
+    committedTranscript: voiceCommittedTranscript = '',
+    pendingCommand: voicePendingCommand = null,
     interimTranscript: voiceInterimTranscript,
     error: voiceError
   } = useDriveVoiceCommands({
     enabled: isOpen && isVoiceCommandsEnabled && internalMode === 'running',
     isSuspended: shouldSuspendVoiceCommands,
-    onCommand: handleVoiceCommand
+    settleMs: 340,
+    optionTexts: currentQ?.options,
+    adaptiveAliases: settings.voiceAdaptiveAliases,
+    onCommand: (cmd) => {
+      isExecutingVoiceCommandRef.current = true;
+      lastUnrecognizedAttemptRef.current = null;
+      setUnrecognizedSpeech(null);
+      try {
+        handleVoiceCommand(cmd);
+      } finally {
+        isExecutingVoiceCommandRef.current = false;
+      }
+    }
   });
 
   // Track unrecognized speech to provide clear diagnostic feedback to the user
   useEffect(() => {
     if (!voiceLastTranscript) return;
-    if (!parseVoiceCommand(voiceLastTranscript)) {
+    const matched = parseVoiceCommand(voiceLastTranscript, {
+      optionTexts: currentQRef.current?.options,
+      adaptiveAliases: adaptiveAliasesRef.current,
+      allowOptionContext: true
+    });
+    if (!matched) {
+      lastUnrecognizedAttemptRef.current = {
+        raw: voiceLastTranscript,
+        at: Date.now(),
+        optionTexts: currentQRef.current ? [...currentQRef.current.options] : []
+      };
       if (unrecognizedTimerRef.current) clearTimeout(unrecognizedTimerRef.current);
       setUnrecognizedSpeech(voiceLastTranscript);
       unrecognizedTimerRef.current = setTimeout(() => {
@@ -1249,6 +1358,11 @@ export const DriveModeScreen: React.FC<DriveModeScreenProps> = ({
           onPlayOption={handlePlayOption}
           waitingCountdown={waitingCountdown}
           assimilationCountdown={assimilationCountdown}
+          isVoiceRefining={isVoiceRefining}
+          voiceCommittedTranscript={voiceCommittedTranscript}
+          voicePendingCommandLabel={
+            voicePendingCommand ? VOICE_PENDING_SHORT_LABELS[voicePendingCommand] : null
+          }
           voiceInterimTranscript={voiceInterimTranscript}
           voiceLastTranscript={voiceLastTranscript}
           lastRecognizedLabel={lastRecognizedLabel}

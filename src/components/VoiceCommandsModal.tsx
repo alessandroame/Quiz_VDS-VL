@@ -241,6 +241,9 @@ export const VoiceCommandsModal: React.FC<VoiceCommandsModalProps> = ({
               <li>
                 Con vibrazioni da manubrio o corsa, tocca direttamente le 3 macro-fasce a tutta larghezza.
               </li>
+              <li>
+                Puoi correggerti nella stessa frase (es. &laquo;uno... anzi due&raquo;) o pronunciare una parola distintiva della risposta.
+              </li>
             </ul>
           </div>
         </div>

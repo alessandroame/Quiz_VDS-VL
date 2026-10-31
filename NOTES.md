@@ -8,13 +8,7 @@ Buffer di cattura rapida a zero cambio di contesto (`/take-note`). Le osservazio
 
 ## 📥 Da Analizzare (Open)
 
-### [NOTE-001] Raffinamento progressivo riconoscimento vocale stile PVA Antigravity
-- **Stato**: `📥 Da Analizzare`
-- **Data Cattura**: 2026-10-31 18:50
-- **Lavorazione Attiva al Momento della Nota**: Nessun task attivo in lavorazione
-- **Ambito Presunto**: Riconoscimento vocale / Modalità Mani Libere
-- **Testo Originale**:
-  > La modalità vocale di Antigravity attraverso la PVA controllo remoto ha una modalità di riconoscimento del testo molto figa che si raffina nel tempo. Cercare di capire se riesco a implementare la stessa cosa nel riconoscimento vocale di questa applicazione.
+*(Nessuna nota aperta)*
 
 ---
 
@@ -22,3 +16,4 @@ Buffer di cattura rapida a zero cambio di contesto (`/take-note`). Le osservazio
 
 | ID | Titolo Sintetico | Data | Esito & Destinazione (<= 120 char) |
 | :--- | :--- | :---: | :--- |
+| NOTE-001 | Raffinamento progressivo riconoscimento vocale stile PVA Antigravity | 2026-10-31 | Implementata Proposta A in Modalità Mani Libere (v1.11.0, DESIDERATA §2.B.7) |
