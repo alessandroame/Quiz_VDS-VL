@@ -14,6 +14,10 @@ Questo documento registra in ordine cronologico tutte le lavorazioni svolte nel 
 - **Impatto sul Desiderata**: <Come questo intervento contribuisce al desiderata (cfr. DESIDERATA.md) e indicazioni per il prossimo agente>
 ```
 
+### [2026-10-31] - Pulizia Trascrizione Vocale Residua al Cambio Domanda e Apertura Microfono Silenziosa (v1.11.3)
+- **Tipo**: `fix(voice)` — Dettaglio completo in [2026-10-31_fix_stale_voice_transcript_on_next_question.md](file:///c:/github/Quiz_VDS-VL/.agents/worklog.d/2026-10-31_fix_stale_voice_transcript_on_next_question.md).
+- **Intervento**: Azzerato `lastTranscript` su `stop()`, `onstart()` e cambio domanda (`resetKey: currentQ?.id`) e disaccoppiato `isReceiving` da `onaudiostart`/`onsoundstart` in [useDriveVoiceCommands.ts](file:///c:/github/Quiz_VDS-VL/src/hooks/useDriveVoiceCommands.ts), pulito `lastRecognizedLabel` al cambio `currentQ.id` in [DriveModeScreen.tsx](file:///c:/github/Quiz_VDS-VL/src/components/DriveModeScreen.tsx) ed eliminato il fallback alla trascrizione passata nello stato `In ricezione:` di [DriveActiveHUD.tsx](file:///c:/github/Quiz_VDS-VL/src/components/drive/DriveActiveHUD.tsx).
+
 ### [2026-10-31] - Ricalibrazione Scala Velocità Voce Centrata su `1.25x` (`0.9x..1.6x`) (v1.11.2)
 - **Tipo**: `feat(voice)` — Dettaglio completo in [2026-10-31_tts_playback_rate_centered_125x.md](file:///c:/github/Quiz_VDS-VL/.agents/worklog.d/2026-10-31_tts_playback_rate_centered_125x.md).
 - **Intervento**: Centralizzate `TTS_PLAYBACK_RATES = [0.9, 1.1, 1.25, 1.4, 1.6]` e `DEFAULT_TTS_PLAYBACK_RATE = 1.25` in [audio.ts](file:///c:/github/Quiz_VDS-VL/src/types/audio.ts), aggiornando il default in [db/index.ts](file:///c:/github/Quiz_VDS-VL/src/db/index.ts), [voiceService.ts](file:///c:/github/Quiz_VDS-VL/src/services/voiceService.ts) e [QuizContext.tsx](file:///c:/github/Quiz_VDS-VL/src/context/QuizContext.tsx) e i selettori `grid-cols-5` con `whitespace-nowrap` in [SettingsModal.tsx](file:///c:/github/Quiz_VDS-VL/src/components/SettingsModal.tsx) e [VoiceQuickMenu.tsx](file:///c:/github/Quiz_VDS-VL/src/components/VoiceQuickMenu.tsx).

@@ -24,6 +24,8 @@ export interface UseDriveVoiceCommandsProps {
   optionTexts?: readonly string[];
   /** User-specific adaptive pronunciation aliases persisted in IndexedDB. */
   adaptiveAliases?: Record<string, AdaptiveVoiceAliasEntry>;
+  /** Question identifier used to wipe stale transcripts/banners immediately on question transition. */
+  resetKey?: string | number;
 }
 
 export interface UseDriveVoiceCommandsResult {
@@ -60,7 +62,8 @@ export function useDriveVoiceCommands({
   isSuspended = false,
   settleMs = 0,
   optionTexts,
-  adaptiveAliases
+  adaptiveAliases,
+  resetKey
 }: UseDriveVoiceCommandsProps): UseDriveVoiceCommandsResult {
   const [isListening, setIsListening] = useState(false);
   const [isReceiving, setIsReceiving] = useState(false);
@@ -201,6 +204,7 @@ export function useDriveVoiceCommands({
       setIsRefining(false);
       setCommittedTranscript('');
       setInterimTranscript('');
+      setLastTranscript('');
       setPendingCommand(null);
       setError(null);
     },
@@ -229,28 +233,20 @@ export function useDriveVoiceCommands({
       rec.onstart = () => {
         if (recSessionIdRef.current !== sessionId) return;
         resetUtteranceCursor();
+        setCommittedTranscript('');
+        setInterimTranscript('');
+        setLastTranscript('');
+        setPendingCommand(null);
         setIsListening(true);
         setError(null);
       };
 
-      // Sound and speech detection events for instant visual responsiveness
-      rec.onaudiostart = () => {
-        markReceiving(true);
-      };
-
-      rec.onsoundstart = () => {
-        markReceiving(true);
-      };
-
+      // Trigger visual receiving state strictly on actual speech onset (not silent hardware mic open)
       rec.onspeechstart = () => {
         markReceiving(true);
       };
 
       rec.onspeechend = () => {
-        markReceiving(false, 1500);
-      };
-
-      rec.onsoundend = () => {
         markReceiving(false, 1500);
       };
 
@@ -614,6 +610,23 @@ export function useDriveVoiceCommands({
       recognitionRef.current = null;
     }
   }, [isSupported, markReceiving, clearPendingSettle, resetUtteranceCursor, resolveCandidatesWithTailFallback]);
+
+  // Clear stale transcripts and receiving pulse immediately when transitioning to a new question
+  useEffect(() => {
+    if (resetKey === undefined) return;
+    clearPendingSettle();
+    lastValidInterimRef.current = null;
+    if (receivingTimeoutRef.current) {
+      clearTimeout(receivingTimeoutRef.current);
+      receivingTimeoutRef.current = null;
+    }
+    setIsReceiving(false);
+    setIsRefining(false);
+    setCommittedTranscript('');
+    setInterimTranscript('');
+    setLastTranscript('');
+    setPendingCommand(null);
+  }, [resetKey, clearPendingSettle]);
 
   useEffect(() => {
     if (acousticCooldownRef.current) {

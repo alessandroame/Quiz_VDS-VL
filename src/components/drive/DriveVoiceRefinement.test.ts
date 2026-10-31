@@ -360,7 +360,7 @@ describe('DriveModeScreen + useDriveVoiceCommands Progressive Refinement Integra
     expect(container.textContent).not.toContain('non riconosciuto');
     expect(container.textContent).not.toContain('Mic:');
 
-    // Navigate to Question 2 and speak "il due" in letters followed by empty finalization packet
+    // Navigate to Question 2: previous question transcript/label ("due") must NOT remain displayed when mic opens
     const nextBtn = container.querySelector('#btn-drive-next') as HTMLButtonElement;
     await act(async () => {
       nextBtn.click();
@@ -370,6 +370,16 @@ describe('DriveModeScreen + useDriveVoiceCommands Progressive Refinement Integra
     });
 
     const activeRec = MockSpeechRecognition.latestInstance;
+    await act(async () => {
+      activeRec?.onaudiostart?.();
+      activeRec?.onsoundstart?.();
+    });
+
+    expect(container.textContent).not.toContain('Opzione 2 ("Due")');
+    expect(container.textContent).not.toContain('In ricezione:');
+    expect(container.textContent).not.toContain('"due"');
+
+    // Now speak "il due" in letters on Question 2 followed by empty finalization packet
     await act(async () => {
       activeRec?.onresult?.({
         results: [

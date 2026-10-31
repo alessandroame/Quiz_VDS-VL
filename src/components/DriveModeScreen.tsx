@@ -335,9 +335,18 @@ export const DriveModeScreen: React.FC<DriveModeScreenProps> = ({
     optionTexts: string[];
   } | null>(null);
 
-  // Reset pending unrecognized voice buffer when switching questions
+  // Reset voice feedback banners and unrecognized speech buffer immediately when switching questions
   useEffect(() => {
     lastUnrecognizedAttemptRef.current = null;
+    if (recognizedLabelTimerRef.current) {
+      clearTimeout(recognizedLabelTimerRef.current);
+      recognizedLabelTimerRef.current = null;
+    }
+    if (unrecognizedTimerRef.current) {
+      clearTimeout(unrecognizedTimerRef.current);
+      unrecognizedTimerRef.current = null;
+    }
+    setLastRecognizedLabel(null);
     setUnrecognizedSpeech(null);
   }, [currentQ?.id]);
 
@@ -911,6 +920,7 @@ export const DriveModeScreen: React.FC<DriveModeScreenProps> = ({
     settleMs: 340,
     optionTexts: currentQ?.options,
     adaptiveAliases: settings.voiceAdaptiveAliases,
+    resetKey: currentQ?.id,
     onCommand: (cmd) => {
       isExecutingVoiceCommandRef.current = true;
       lastUnrecognizedAttemptRef.current = null;

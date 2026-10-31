@@ -136,7 +136,6 @@ export const DriveActiveHUD: React.FC<DriveActiveHUDProps> = ({
   voiceCommittedTranscript = '',
   voicePendingCommandLabel = null,
   voiceInterimTranscript,
-  voiceLastTranscript,
   lastRecognizedLabel,
   unrecognizedSpeech,
   voiceHint,
@@ -799,7 +798,7 @@ export const DriveActiveHUD: React.FC<DriveActiveHUDProps> = ({
                       <span>&rdquo;</span>
                     </span>
                   ) : (
-                    `"${voiceLastTranscript || 'Rilevamento voce...'}"`
+                    '"Rilevamento voce..."'
                   )}
                 </span>
                 {voicePendingCommandLabel && (
@@ -831,7 +830,7 @@ export const DriveActiveHUD: React.FC<DriveActiveHUDProps> = ({
                   In ricezione:
                 </span>
                 <span className="text-white light:text-slate-900 font-bold truncate">
-                  {`"${voiceLastTranscript || 'Rilevamento voce...'}"`}
+                  &ldquo;Rilevamento voce...&rdquo;
                 </span>
               </div>
             ) : isVoiceSuspended ? (
