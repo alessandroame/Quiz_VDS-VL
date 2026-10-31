@@ -13,6 +13,10 @@ export interface VoicePlaybackState {
 
 export type VoiceName = 'giuseppe' | 'elsa';
 
+/** Symmetric voice speed presets centered on 1.25x (median, midrange, and arithmetic mean = 1.25). */
+export const TTS_PLAYBACK_RATES = [0.9, 1.1, 1.25, 1.4, 1.6] as const;
+export const DEFAULT_TTS_PLAYBACK_RATE = 1.25;
+
 export interface VoiceManifestData {
   version: string;
   fileCount: number;

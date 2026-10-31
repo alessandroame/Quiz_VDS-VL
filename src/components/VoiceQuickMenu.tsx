@@ -7,6 +7,7 @@ import {
   Mic
 } from 'lucide-react';
 import { useQuiz } from '../context/QuizContext';
+import { DEFAULT_TTS_PLAYBACK_RATE, TTS_PLAYBACK_RATES } from '../types/audio';
 import { voiceService } from '../services/voiceService';
 import { VoiceCommandsModal } from './VoiceCommandsModal';
 
@@ -135,7 +136,7 @@ export const VoiceQuickMenu: React.FC<VoiceQuickMenuProps> = ({
   };
 
   const currentVoice = settings.ttsVoice || 'giuseppe';
-  const currentRate = settings.ttsPlaybackRate || 1.0;
+  const currentRate = settings.ttsPlaybackRate || DEFAULT_TTS_PLAYBACK_RATE;
   const isEnabled = settings.ttsEnabled;
 
   const idPrefix = id !== 'btn-voice-quick-menu' ? `${id}-` : '';
@@ -309,15 +310,15 @@ export const VoiceQuickMenu: React.FC<VoiceQuickMenuProps> = ({
                 forceDark ? 'text-amber-400' : 'text-amber-400 light:text-amber-600'
               }`}>{currentRate}x</span>
             </div>
-            <div className="grid grid-cols-4 gap-1.5">
-              {[0.9, 1.0, 1.15, 1.25].map(rate => (
+            <div className="grid grid-cols-5 gap-1.5">
+              {TTS_PLAYBACK_RATES.map(rate => (
                 <button
                   key={rate}
                   type="button"
                   id={`${idPrefix}quick-speed-${rate}`}
                   data-testid={`quick-speed-${rate}`}
                   onClick={() => handleSelectSpeed(rate)}
-                  className={`py-1 rounded-lg text-xs font-semibold transition-all ${
+                  className={`min-h-[40px] py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap transition-all ${
                     currentRate === rate
                       ? 'bg-amber-600 text-white shadow-sm'
                       : forceDark

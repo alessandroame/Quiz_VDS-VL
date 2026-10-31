@@ -37,6 +37,7 @@ import { useTheme } from '../context/ThemeContext';
 import { useQuiz } from '../context/QuizContext';
 import { googleDrive } from '../services/googleDrive';
 import { syncEngine, formatSyncTimestamp } from '../services/syncEngine';
+import { DEFAULT_TTS_PLAYBACK_RATE, TTS_PLAYBACK_RATES } from '../types/audio';
 import { voiceService } from '../services/voiceService';
 import { telemetry } from '../services/telemetry';
 import { exportDatabaseBackup, importDatabaseBackup, db } from '../db';
@@ -459,7 +460,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
   }`;
 
   const voiceSummary = `${settings.ttsVoice === 'elsa' ? 'Elsa' : 'Giuseppe'} • ${
-    settings.ttsPlaybackRate || 1.0
+    settings.ttsPlaybackRate || DEFAULT_TTS_PLAYBACK_RATE
   }x • ${audioStatuses.giuseppe.isComplete || audioStatuses.elsa.isComplete ? 'Offline OK' : 'TTS Web'}`;
 
   const driveSummary = `${
@@ -804,17 +805,17 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                         Velocità di Lettura
                       </span>
                       <span className="font-mono font-bold text-amber-400">
-                        {settings.ttsPlaybackRate || 1.0}x
+                        {settings.ttsPlaybackRate || DEFAULT_TTS_PLAYBACK_RATE}x
                       </span>
                     </div>
-                    <div className="grid grid-cols-4 gap-1.5 pt-1">
-                      {[0.9, 1.0, 1.15, 1.25].map(rate => (
+                    <div className="grid grid-cols-5 gap-1.5 pt-1">
+                      {TTS_PLAYBACK_RATES.map(rate => (
                         <button
                           key={rate}
                           type="button"
                           onClick={() => updateSetting('ttsPlaybackRate', rate)}
-                          className={`py-2 rounded-lg text-xs font-semibold transition-all cursor-pointer active:scale-95 touch-manipulation ${
-                            (settings.ttsPlaybackRate || 1.0) === rate
+                          className={`min-h-[44px] py-2 rounded-lg text-xs font-semibold whitespace-nowrap transition-all cursor-pointer active:scale-95 touch-manipulation ${
+                            (settings.ttsPlaybackRate || DEFAULT_TTS_PLAYBACK_RATE) === rate
                               ? 'bg-amber-600 text-white shadow-sm'
                               : 'bg-zinc-800 hover:bg-zinc-700 text-zinc-300 light:bg-slate-200 light:text-slate-700'
                           }`}

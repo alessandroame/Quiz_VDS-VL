@@ -155,4 +155,46 @@ describe('VoiceQuickMenu Component (Neutral Disambiguation & Controls)', () => {
     });
     container.remove();
   });
+
+  it('centers playback speed presets on 1.25x (0.9x, 1.1x, 1.25x, 1.4x, 1.6x) and updates rate on selection', () => {
+    mockUseQuiz.mockReturnValue({
+      settings: { ...mockSettings, ttsPlaybackRate: undefined },
+      updateSetting: mockUpdateSetting
+    });
+
+    const container = document.createElement('div');
+    document.body.appendChild(container);
+    const root = createRoot(container);
+
+    act(() => {
+      root.render(React.createElement(VoiceQuickMenu, { id: 'btn-voice-quick-menu' }));
+    });
+
+    const triggerBtn = container.querySelector('#btn-voice-quick-menu') as HTMLButtonElement;
+    expect(triggerBtn.textContent).toContain('1.25x');
+
+    act(() => {
+      triggerBtn.click();
+    });
+
+    const expectedRates = [0.9, 1.1, 1.25, 1.4, 1.6];
+    const mean = expectedRates.reduce((acc, r) => acc + r, 0) / expectedRates.length;
+    expect(mean).toBeCloseTo(1.25, 5);
+    expect(expectedRates[Math.floor(expectedRates.length / 2)]).toBe(1.25);
+
+    for (const rate of expectedRates) {
+      expect(container.querySelector(`[data-testid="quick-speed-${rate}"]`)).not.toBeNull();
+    }
+
+    const fastBtn = container.querySelector('[data-testid="quick-speed-1.6"]') as HTMLButtonElement;
+    act(() => {
+      fastBtn.click();
+    });
+    expect(mockUpdateSetting).toHaveBeenCalledWith('ttsPlaybackRate', 1.6);
+
+    act(() => {
+      root.unmount();
+    });
+    container.remove();
+  });
 });

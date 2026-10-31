@@ -1,7 +1,7 @@
 // Singleton neural voice service for Quiz VDS-VL
 // Manages atomic playback of audio snippets, full question-option sequences, play/pause and restarts
 
-import type { AudioPart, VoicePlaybackState } from '../types/audio';
+import { DEFAULT_TTS_PLAYBACK_RATE, type AudioPart, type VoicePlaybackState } from '../types/audio';
 import { audioDownloadManager } from './audioDownloadManager';
 import { APP_NAME } from '../utils/buildInfo';
 
@@ -17,7 +17,7 @@ export class VoiceService {
   private pendingSequencePart: AudioPart | null = null;
   private listeners: Set<StateListener> = new Set();
   private fallbackListeners: Set<VoiceFallbackListener> = new Set();
-  private playbackRate: number = 1.0;
+  private playbackRate: number = DEFAULT_TTS_PLAYBACK_RATE;
   private voiceName: 'giuseppe' | 'elsa' = 'giuseppe';
   private effectiveVoice: 'giuseppe' | 'elsa' | null = null;
   private isDriveIntroPlaying: boolean = false;

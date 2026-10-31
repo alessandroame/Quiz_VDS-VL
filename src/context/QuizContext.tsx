@@ -3,6 +3,7 @@ import { useLiveQuery } from 'dexie-react-hooks';
 import questionsData from '../data/questions.json';
 import type { Question, Discipline } from '../types/quiz';
 import type { QuestionStat, ExamSession, AppSettings, InProgressSession } from '../types/database';
+import { DEFAULT_TTS_PLAYBACK_RATE } from '../types/audio';
 import { voiceService } from '../services/voiceService';
 import { syncEngine, type SyncEngineState } from '../services/syncEngine';
 import {
@@ -139,7 +140,7 @@ export const QuizProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, [settingsList]);
 
   useEffect(() => {
-    voiceService.setPlaybackRate(settings.ttsPlaybackRate || 1.0);
+    voiceService.setPlaybackRate(settings.ttsPlaybackRate || DEFAULT_TTS_PLAYBACK_RATE);
     voiceService.setVoice(settings.ttsVoice || 'giuseppe');
   }, [settings.ttsPlaybackRate, settings.ttsVoice]);
 

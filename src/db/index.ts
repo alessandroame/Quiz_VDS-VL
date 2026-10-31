@@ -6,6 +6,7 @@ import type {
   InProgressSession,
   BackupDataPayload
 } from '../types/database';
+import { DEFAULT_TTS_PLAYBACK_RATE } from '../types/audio';
 import { smartMergeBackups, type SmartMergeResult } from '../services/smartMerge';
 import { hasSessionAnswers } from '../services/examEvaluator';
 
@@ -23,7 +24,7 @@ export const DEFAULT_SETTINGS: AppSettings = {
   ttsVoice: 'giuseppe',
   ttsAutoExplainOnMistake: true,
   ttsAutoPlayQuestion: false,
-  ttsPlaybackRate: 1.0,
+  ttsPlaybackRate: DEFAULT_TTS_PLAYBACK_RATE,
   driveModeAutopilot: true,
   driveModeVoiceCommands: false,
   driveModeAudioOutput: 'speaker',
