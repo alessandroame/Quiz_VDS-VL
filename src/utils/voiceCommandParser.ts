@@ -155,8 +155,8 @@ export function normalizeVoiceText(raw: string): string {
   return raw
     .toLowerCase()
     .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, '')
-    .replace(/[.,/#!$%^&*;:{}=\-_`~()?"'’]/g, ' ')
+    .replace(/[\u0300-\u036f\u200b-\u200d\ufeff]/g, '')
+    .replace(/[^\p{L}\p{N}\s]/gu, ' ')
     .replace(/\s+/g, ' ')
     .trim();
 }
@@ -198,7 +198,7 @@ function extractSelfCorrectionTail(clean: string): string | null {
   }
 
   const negatedContrastMatch = clean.match(
-    /^non\s+(?:l[ao]\s+|il\s+|opzione\s+|risposta\s+|numero\s+)?(?:1|uno|prima|primo|2|due|seconda|secondo|3|tre|terza|terzo)\s+(?:ma\s+)?(.+)$/i
+    /^non\s+(?:e\s+|sia\s+|era\s+)?(?:l[ao]\s+|il\s+|l\s+|opzione\s+|risposta\s+|numero\s+)?(?:1|uno|prima|primo|2|due|seconda|secondo|3|tre|terza|terzo)\s+(?:ma\s+)?(.+)$/i
   );
   if (negatedContrastMatch?.[1]) {
     return negatedContrastMatch[1].trim();
@@ -230,48 +230,61 @@ function matchCoreVoiceGrammar(clean: string): VoiceCommand | null {
   }
 
   if (
-    /\b(ripeti|rileggi|riascolta|ascolta|ancora|solo)\s+(l[ao]\s+|il\s+)?(1|uno|prima|primo|opzione\s*(1|uno)|risposta\s*(1|uno))\b/i.test(clean)
+    /\b(ripeti|rileggi|riascolta|ascolta|ancora|solo)\s+(l[ao]\s+|il\s+|l\s+)?(1|uno|prima|primo|opzione\s*(1|uno)|risposta\s*(1|uno))\b/i.test(clean)
   ) {
     return 'repeat_opt1';
   }
 
   if (
-    /\b(ripeti|rileggi|riascolta|ascolta|ancora|solo)\s+(l[ao]\s+|il\s+)?(2|due|seconda|secondo|opzione\s*(2|due)|risposta\s*(2|due))\b/i.test(clean)
+    /\b(ripeti|rileggi|riascolta|ascolta|ancora|solo)\s+(l[ao]\s+|il\s+|l\s+)?(2|due|seconda|secondo|opzione\s*(2|due)|risposta\s*(2|due))\b/i.test(clean)
   ) {
     return 'repeat_opt2';
   }
 
   if (
-    /\b(ripeti|rileggi|riascolta|ascolta|ancora|solo)\s+(l[ao]\s+|il\s+)?(3|tre|terza|terzo|opzione\s*(3|tre)|risposta\s*(3|tre))\b/i.test(clean)
+    /\b(ripeti|rileggi|riascolta|ascolta|ancora|solo)\s+(l[ao]\s+|il\s+|l\s+)?(3|tre|terza|terzo|opzione\s*(3|tre)|risposta\s*(3|tre))\b/i.test(clean)
   ) {
     return 'repeat_opt3';
   }
 
-  // Guard against thinking-aloud negations such as "non la uno" or "non seconda"
+  // Guard against thinking-aloud negations such as "non la uno", "non è due", or "non seconda"
   const hasNegatedOption =
-    /\bnon\s+(l[ao]\s+|il\s+|opzione\s+|risposta\s+|numero\s+)?(1|uno|prima|primo|2|due|seconda|secondo|3|tre|terza|terzo)\b/i.test(
+    /\bnon\s+(?:e\s+|sia\s+|era\s+)?(?:l[ao]\s+|il\s+|l\s+|opzione\s+|risposta\s+|numero\s+)?(1|uno|prima|primo|2|due|seconda|secondo|3|tre|terza|terzo)\b/i.test(
       clean
     );
 
-  // 2. Answer Options (Direct Selection)
+  // 2. Answer Options (Direct Selection — supports digits, Italian words, masculine/elided articles, and short spoken fillers)
   if (!hasNegatedOption) {
     if (
-      /^(1|uno|prima|primo)\b/i.test(clean) ||
-      /\b(opzione 1|opzione uno|risposta 1|risposta uno|scelgo 1|scelgo la 1|scelgo uno|scelgo la uno|scelgo la prima|scelgo il primo|numero 1|numero uno|la 1|la uno|la prima|il primo)\b/i.test(clean)
+      /^(?:(?:eh|ehm|ah|oh|uhm|mmh|ok|okay|allora|dunque|beh|be|ma|e|dico|direi|scelgo|rispondo|metto|segno|vado\s+con|punto|lettera|opzione|risposta|numero)\s+)*(?:l[ao]\s+|il\s+|l\s+)?(1|uno|prima|primo)(?:\s+(?:grazie|per\s+favore|ok|okay))?$/i.test(
+        clean
+      ) ||
+      /\b(?:opzione|risposta|numero|punto|lettera|scelgo(?:\s+l[ao]|\s+il|\s+l)?|dico(?:\s+l[ao]|\s+il|\s+l)?|direi(?:\s+l[ao]|\s+il|\s+l)?|rispondo(?:\s+l[ao]|\s+il|\s+l)?|metto(?:\s+l[ao]|\s+il|\s+l)?|vado\s+con(?:\s+l[ao]|\s+il|\s+l)?|l[ao]|il)\s+(1|uno|prima|primo)\b/i.test(
+        clean
+      ) ||
+      /\bl\s+(1|uno)\b/i.test(clean)
     ) {
       return 'opt1';
     }
 
     if (
-      /^(2|due|seconda|secondo)\b/i.test(clean) ||
-      /\b(opzione 2|opzione due|risposta 2|risposta due|scelgo 2|scelgo la 2|scelgo due|scelgo la due|scelgo la seconda|scelgo il secondo|numero 2|numero due|la 2|la due|la seconda|il secondo)\b/i.test(clean)
+      /^(?:(?:eh|ehm|ah|oh|uhm|mmh|ok|okay|allora|dunque|beh|be|ma|e|dico|direi|scelgo|rispondo|metto|segno|vado\s+con|punto|lettera|opzione|risposta|numero)\s+)*(?:l[ao]\s+|il\s+|l\s+)?(2|due|seconda|secondo)(?:\s+(?:grazie|per\s+favore|ok|okay))?$/i.test(
+        clean
+      ) ||
+      /\b(?:opzione|risposta|numero|punto|lettera|scelgo(?:\s+l[ao]|\s+il|\s+l)?|dico(?:\s+l[ao]|\s+il|\s+l)?|direi(?:\s+l[ao]|\s+il|\s+l)?|rispondo(?:\s+l[ao]|\s+il|\s+l)?|metto(?:\s+l[ao]|\s+il|\s+l)?|vado\s+con(?:\s+l[ao]|\s+il|\s+l)?|l[ao]|il)\s+(2|due|seconda|secondo)\b/i.test(
+        clean
+      )
     ) {
       return 'opt2';
     }
 
     if (
-      /^(3|tre|terza|terzo)\b/i.test(clean) ||
-      /\b(opzione 3|opzione tre|risposta 3|risposta tre|scelgo 3|scelgo la 3|scelgo tre|scelgo la tre|scelgo la terza|scelgo il terzo|numero 3|numero tre|la 3|la tre|la terza|il terzo)\b/i.test(clean)
+      /^(?:(?:eh|ehm|ah|oh|uhm|mmh|ok|okay|allora|dunque|beh|be|ma|e|dico|direi|scelgo|rispondo|metto|segno|vado\s+con|punto|lettera|opzione|risposta|numero)\s+)*(?:l[ao]\s+|il\s+|l\s+)?(3|tre|terza|terzo)(?:\s+(?:grazie|per\s+favore|ok|okay))?$/i.test(
+        clean
+      ) ||
+      /\b(?:opzione|risposta|numero|punto|lettera|scelgo(?:\s+l[ao]|\s+il|\s+l)?|dico(?:\s+l[ao]|\s+il|\s+l)?|direi(?:\s+l[ao]|\s+il|\s+l)?|rispondo(?:\s+l[ao]|\s+il|\s+l)?|metto(?:\s+l[ao]|\s+il|\s+l)?|vado\s+con(?:\s+l[ao]|\s+il|\s+l)?|l[ao]|il)\s+(3|tre|terza|terzo)\b/i.test(
+        clean
+      )
     ) {
       return 'opt3';
     }

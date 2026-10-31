@@ -447,4 +447,120 @@ describe('useDriveVoiceCommands Hook', () => {
 
     unmount();
   });
+
+  it('should dispatch interim "due" in letters when mobile recognizer follows up with an empty final packet or transient no-match error', () => {
+    let instance: MockSpeechRecognition | null = null;
+    class SpyingRecognition extends MockSpeechRecognition {
+      constructor() {
+        super();
+        instance = this;
+      }
+    }
+    (window as any).SpeechRecognition = SpyingRecognition;
+
+    const onCommand = vi.fn();
+    const onUnrecognized = vi.fn();
+    const { result, unmount } = renderHook(() =>
+      useDriveVoiceCommands({ enabled: true, onCommand, onUnrecognized, settleMs: 340 })
+    );
+
+    act(() => {
+      vi.advanceTimersByTime(260);
+    });
+
+    // Scenario A: interim "due" in letters -> empty final packet 140ms later
+    act(() => {
+      instance?.onresult?.({
+        results: [Object.assign([{ transcript: 'due' }], { isFinal: false })]
+      });
+    });
+    expect(result.current.interimTranscript).toBe('due');
+    expect(result.current.pendingCommand).toBe('opt2');
+
+    act(() => {
+      vi.advanceTimersByTime(140);
+      instance?.onresult?.({
+        results: [Object.assign([{ transcript: '' }], { isFinal: true })]
+      });
+    });
+    expect(onCommand).toHaveBeenCalledTimes(1);
+    expect(onCommand).toHaveBeenLastCalledWith('opt2');
+    expect(onUnrecognized).not.toHaveBeenCalled();
+    expect(result.current.error).toBeNull();
+
+    // Scenario B: next utterance at index 1 streams interim "due" -> mobile fires onerror('no-match')
+    act(() => {
+      instance?.onresult?.({
+        results: [
+          Object.assign([{ transcript: '' }], { isFinal: true }),
+          Object.assign([{ transcript: 'due' }], { isFinal: false })
+        ]
+      });
+      vi.advanceTimersByTime(120);
+      instance?.onerror?.({ error: 'no-match' });
+    });
+
+    expect(onCommand).toHaveBeenCalledTimes(2);
+    expect(onCommand).toHaveBeenLastCalledWith('opt2');
+    expect(onUnrecognized).not.toHaveBeenCalled();
+    expect(result.current.error).toBeNull();
+
+    unmount();
+  });
+
+  it('should isolate subsequent "due" from prior unsettled unrecognized noise and handle mobile in-place slot-0 reuse', () => {
+    let instance: MockSpeechRecognition | null = null;
+    class SpyingRecognition extends MockSpeechRecognition {
+      constructor() {
+        super();
+        instance = this;
+      }
+    }
+    (window as any).SpeechRecognition = SpyingRecognition;
+
+    const onCommand = vi.fn();
+    const onUnrecognized = vi.fn();
+    const { unmount } = renderHook(() =>
+      useDriveVoiceCommands({ enabled: true, onCommand, onUnrecognized, settleMs: 340 })
+    );
+
+    act(() => {
+      vi.advanceTimersByTime(260);
+    });
+
+    // Unrecognized interim noise at index 0 settles after 340ms
+    act(() => {
+      instance?.onresult?.({
+        results: [Object.assign([{ transcript: 'rumorefondo' }], { isFinal: false })]
+      });
+      vi.advanceTimersByTime(360);
+    });
+    expect(onCommand).not.toHaveBeenCalled();
+    expect(onUnrecognized).toHaveBeenCalledWith('rumorefondo');
+
+    // User speaks "due" at index 1 -> must NOT be poisoned by index 0 noise
+    act(() => {
+      instance?.onresult?.({
+        results: [
+          Object.assign([{ transcript: 'rumorefondo' }], { isFinal: false }),
+          Object.assign([{ transcript: 'due' }], { isFinal: false })
+        ]
+      });
+      vi.advanceTimersByTime(360);
+    });
+    expect(onCommand).toHaveBeenCalledTimes(1);
+    expect(onCommand).toHaveBeenLastCalledWith('opt2');
+
+    // Mobile WebView resets results array in-place back to index 0 without firing onend/onstart
+    act(() => {
+      instance?.onresult?.({
+        results: [Object.assign([{ transcript: 'due' }], { isFinal: false })]
+      });
+      vi.advanceTimersByTime(360);
+    });
+    expect(onCommand).toHaveBeenCalledTimes(2);
+    expect(onCommand).toHaveBeenLastCalledWith('opt2');
+
+    unmount();
+  });
 });

@@ -12,6 +12,8 @@ import {
 export interface UseDriveVoiceCommandsProps {
   enabled: boolean;
   onCommand: (command: VoiceCommand) => void;
+  /** Invoked strictly when a settled/finalized non-empty utterance matches no command. */
+  onUnrecognized?: (transcript: string) => void;
   isSuspended?: boolean;
   /**
    * Stabilization window (ms) to let live transcripts refine before dispatching commands.
@@ -39,14 +41,22 @@ export interface UseDriveVoiceCommandsResult {
   stop: () => void;
 }
 
+interface CachedInterimSnapshot {
+  lastIdx: number;
+  alternatives: VoiceSpeechAlternative[];
+  tailAlternatives: VoiceSpeechAlternative[];
+  fullPrimaryText: string;
+}
+
 /**
  * Hook for continuous Italian speech recognition and progressive transcript refinement in Drive Mode.
  * Supports multi-alternative N-best scoring, interim stabilization windows, prefix disambiguation,
- * contextual quiz option matching, and clean state resets across recognizer restarts.
+ * contextual quiz option matching, mobile empty-final / no-match recovery, and clean cursor resets.
  */
 export function useDriveVoiceCommands({
   enabled,
   onCommand,
+  onUnrecognized,
   isSuspended = false,
   settleMs = 0,
   optionTexts,
@@ -78,6 +88,7 @@ export function useDriveVoiceCommands({
   const recSessionIdRef = useRef<number>(0);
   const shouldBeListeningRef = useRef(enabled && !isSuspendedEffective);
   const onCommandRef = useRef(onCommand);
+  const onUnrecognizedRef = useRef(onUnrecognized);
   const fatalErrorRef = useRef(false);
   const restartTimeoutRef = useRef<any>(null);
   const receivingTimeoutRef = useRef<any>(null);
@@ -85,14 +96,28 @@ export function useDriveVoiceCommands({
   const settleTimeoutRef = useRef<any>(null);
   const pendingFlushRef = useRef<(() => void) | null>(null);
   const ignoreResultsBeforeRef = useRef<number>(0);
+
   const lastHandledIndexRef = useRef<number>(-1);
+  const lastHandledWasFinalRef = useRef<boolean>(false);
+  const lastCommitResolvedRef = useRef<boolean>(false);
+  const lastCommitAtRef = useRef<number>(0);
+  const lastValidInterimRef = useRef<CachedInterimSnapshot | null>(null);
 
   onCommandRef.current = onCommand;
+  onUnrecognizedRef.current = onUnrecognized;
   shouldBeListeningRef.current = enabled && !isSuspendedEffective;
 
   const isSupported =
     typeof window !== 'undefined' &&
     Boolean((window as any).SpeechRecognition || (window as any).webkitSpeechRecognition);
+
+  const resetUtteranceCursor = useCallback(() => {
+    lastHandledIndexRef.current = -1;
+    lastHandledWasFinalRef.current = false;
+    lastCommitResolvedRef.current = false;
+    lastCommitAtRef.current = 0;
+    lastValidInterimRef.current = null;
+  }, []);
 
   const clearPendingSettle = useCallback(() => {
     if (settleTimeoutRef.current) {
@@ -116,12 +141,34 @@ export function useDriveVoiceCommands({
     }
   }, []);
 
+  const resolveCandidatesWithTailFallback = useCallback(
+    (
+      combinedAlts: readonly VoiceSpeechAlternative[],
+      tailAlts: readonly VoiceSpeechAlternative[],
+      allowOptionContext: boolean
+    ): VoiceResolutionResult | null => {
+      const ctx = {
+        optionTexts: optionTextsRef.current,
+        adaptiveAliases: adaptiveAliasesRef.current,
+        allowOptionContext
+      };
+      const primaryMatch = resolveVoiceCommand(combinedAlts, ctx);
+      if (primaryMatch) return primaryMatch;
+      if (tailAlts.length > 0) {
+        return resolveVoiceCommand(tailAlts, ctx);
+      }
+      return null;
+    },
+    []
+  );
+
   const stop = useCallback(
     (useAbort: boolean = false) => {
       shouldBeListeningRef.current = false;
       fatalErrorRef.current = false;
 
       clearPendingSettle();
+      resetUtteranceCursor();
 
       if (restartTimeoutRef.current) {
         clearTimeout(restartTimeoutRef.current);
@@ -149,15 +196,15 @@ export function useDriveVoiceCommands({
         recognitionRef.current = null;
       }
 
-      lastHandledIndexRef.current = -1;
       setIsListening(false);
       setIsReceiving(false);
       setIsRefining(false);
       setCommittedTranscript('');
       setInterimTranscript('');
       setPendingCommand(null);
+      setError(null);
     },
-    [clearPendingSettle]
+    [clearPendingSettle, resetUtteranceCursor]
   );
 
   const start = useCallback(() => {
@@ -166,7 +213,7 @@ export function useDriveVoiceCommands({
     fatalErrorRef.current = false;
     setError(null);
     clearPendingSettle();
-    lastHandledIndexRef.current = -1;
+    resetUtteranceCursor();
 
     try {
       const SpeechRecognitionClass =
@@ -181,7 +228,7 @@ export function useDriveVoiceCommands({
 
       rec.onstart = () => {
         if (recSessionIdRef.current !== sessionId) return;
-        lastHandledIndexRef.current = -1;
+        resetUtteranceCursor();
         setIsListening(true);
         setError(null);
       };
@@ -223,11 +270,33 @@ export function useDriveVoiceCommands({
         if (!results || results.length === 0) return;
 
         const lastIdx = results.length - 1;
+        const tailResult = results[lastIdx];
+        if (!tailResult) return;
+
+        // Recover when mobile WebView shrinks event.results or reuses slot 0 in-place
+        if (lastIdx < lastHandledIndexRef.current) {
+          resetUtteranceCursor();
+        } else if (lastIdx === lastHandledIndexRef.current) {
+          if (tailResult.isFinal) {
+            if (lastCommitResolvedRef.current) {
+              lastHandledWasFinalRef.current = true;
+              return;
+            }
+            lastHandledIndexRef.current = lastIdx - 1;
+          } else if (
+            lastHandledWasFinalRef.current ||
+            !lastCommitResolvedRef.current ||
+            Date.now() - lastCommitAtRef.current > 700
+          ) {
+            lastHandledIndexRef.current = lastIdx - 1;
+            lastHandledWasFinalRef.current = false;
+          } else {
+            return;
+          }
+        }
+
         const startIdx = Math.max(0, lastHandledIndexRef.current + 1);
         if (startIdx > lastIdx) return;
-
-        const tailResult = results[lastIdx];
-        if (!tailResult || !tailResult[0]) return;
 
         markReceiving(true);
         clearPendingSettle();
@@ -255,20 +324,30 @@ export function useDriveVoiceCommands({
         const committedText = committedParts.join(' ').trim();
         const interimText = interimParts.join(' ').trim();
         const prefixText = prefixParts.join(' ').trim();
-        const fullPrimaryText = [committedText, interimText].filter(Boolean).join(' ').trim();
+        let fullPrimaryText = [committedText, interimText].filter(Boolean).join(' ').trim();
         const allFinal = Boolean(tailResult.isFinal) && interimParts.length === 0;
 
         // Build N-best alternatives combining any uncommitted prefix with top-K tail hypotheses
-        const altCount = typeof tailResult.length === 'number' && tailResult.length > 0 ? tailResult.length : 1;
-        const alternatives: VoiceSpeechAlternative[] = [];
+        const altCount = typeof tailResult.length === 'number' ? tailResult.length : 0;
+        let alternatives: VoiceSpeechAlternative[] = [];
+        let tailAlternatives: VoiceSpeechAlternative[] = [];
+
         for (let k = 0; k < altCount; k++) {
           const item = tailResult[k];
           if (!item || typeof item.transcript !== 'string') continue;
-          const combined = [prefixText, item.transcript.trim()].filter(Boolean).join(' ').trim();
+          const rawTail = item.transcript.trim();
+          const conf = typeof item.confidence === 'number' ? item.confidence : undefined;
+          const combined = [prefixText, rawTail].filter(Boolean).join(' ').trim();
           if (combined) {
             alternatives.push({
               transcript: combined,
-              confidence: typeof item.confidence === 'number' ? item.confidence : undefined
+              confidence: conf
+            });
+          }
+          if (prefixText && rawTail) {
+            tailAlternatives.push({
+              transcript: rawTail,
+              confidence: conf
             });
           }
         }
@@ -277,54 +356,84 @@ export function useDriveVoiceCommands({
           alternatives.push({ transcript: fullPrimaryText });
         }
 
+        // Mobile Chrome/WebView frequently emits an empty isFinal=true packet after streaming a
+        // valid short 1-word interim ("due"): recover the cached interim snapshot instead of dropping it
+        if (allFinal && alternatives.length === 0 && !fullPrimaryText && lastValidInterimRef.current) {
+          alternatives = lastValidInterimRef.current.alternatives;
+          tailAlternatives = lastValidInterimRef.current.tailAlternatives;
+          fullPrimaryText = lastValidInterimRef.current.fullPrimaryText;
+        }
+
         const effectiveSettleMs = settleMsRef.current;
 
-        const commitResolvedCommand = (resolved: VoiceResolutionResult | null, fallbackText: string) => {
+        const commitResolvedCommand = (
+          resolved: VoiceResolutionResult | null,
+          fallbackText: string,
+          wasFinalPacket: boolean
+        ) => {
           if (recSessionIdRef.current !== sessionId) return;
           if (isSuspendedRef.current) return;
 
+          lastValidInterimRef.current = null;
           setIsRefining(false);
           setPendingCommand(null);
           setCommittedTranscript('');
           setInterimTranscript('');
-          setLastTranscript(resolved ? resolved.matchedTranscript : fallbackText);
           markReceiving(false, 1800);
+
+          const trimmedFallback = fallbackText.trim();
+          if (resolved || trimmedFallback) {
+            setLastTranscript(resolved ? resolved.matchedTranscript : trimmedFallback);
+          }
 
           if (resolved && lastHandledIndexRef.current < lastIdx) {
             lastHandledIndexRef.current = lastIdx;
+            lastHandledWasFinalRef.current = wasFinalPacket;
+            lastCommitResolvedRef.current = true;
+            lastCommitAtRef.current = Date.now();
             onCommandRef.current(resolved.command);
-          } else if (!resolved && allFinal && lastHandledIndexRef.current < lastIdx) {
-            // Advance past finalized unrecognized noise so it does not pollute future commands
-            lastHandledIndexRef.current = lastIdx;
+          } else if (!resolved) {
+            // Always advance cursor past unrecognized noise (final or settled interim) so it cannot poison next utterance
+            if (lastHandledIndexRef.current < lastIdx) {
+              lastHandledIndexRef.current = lastIdx;
+            }
+            lastHandledWasFinalRef.current = wasFinalPacket;
+            lastCommitResolvedRef.current = false;
+            lastCommitAtRef.current = Date.now();
+            if (trimmedFallback) {
+              onUnrecognizedRef.current?.(trimmedFallback);
+            }
           }
         };
 
         if (!allFinal) {
+          if (alternatives.length > 0 && fullPrimaryText) {
+            lastValidInterimRef.current = {
+              lastIdx,
+              alternatives,
+              tailAlternatives,
+              fullPrimaryText
+            };
+          }
+
           setCommittedTranscript(committedText);
           setInterimTranscript(interimText || fullPrimaryText);
 
           // Legacy zero-settle mode: immediate interim command execution
           if (effectiveSettleMs <= 0) {
-            const immediate = resolveVoiceCommand(alternatives, {
-              adaptiveAliases: adaptiveAliasesRef.current,
-              allowOptionContext: false
-            });
+            const immediate = resolveCandidatesWithTailFallback(alternatives, tailAlternatives, false);
             if (immediate && lastHandledIndexRef.current < lastIdx) {
-              commitResolvedCommand(immediate, fullPrimaryText);
+              commitResolvedCommand(immediate, fullPrimaryText, false);
             }
             return;
           }
 
           // Progressive refinement mode: preview live intent and wait for speech to settle
-          const preview = resolveVoiceCommand(alternatives, {
-            optionTexts: optionTextsRef.current,
-            adaptiveAliases: adaptiveAliasesRef.current,
-            allowOptionContext: true
-          });
+          const preview = resolveCandidatesWithTailFallback(alternatives, tailAlternatives, true);
 
           // Fast-path emergency audio halt ("stop" / "pausa") with zero stabilization delay
           if (preview && isImmediateVoiceCommand(preview.command) && lastHandledIndexRef.current < lastIdx) {
-            commitResolvedCommand(preview, fullPrimaryText);
+            commitResolvedCommand(preview, fullPrimaryText, false);
             return;
           }
 
@@ -333,23 +442,27 @@ export function useDriveVoiceCommands({
 
           const flushSettledInterim = () => {
             clearPendingSettle();
-            const settled = resolveVoiceCommand(alternatives, {
-              optionTexts: optionTextsRef.current,
-              adaptiveAliases: adaptiveAliasesRef.current,
-              allowOptionContext: true
-            });
-            commitResolvedCommand(settled, fullPrimaryText);
+            const settled = resolveCandidatesWithTailFallback(alternatives, tailAlternatives, true);
+            commitResolvedCommand(settled, fullPrimaryText, false);
           };
 
           pendingFlushRef.current = flushSettledInterim;
           settleTimeoutRef.current = setTimeout(flushSettledInterim, effectiveSettleMs);
         } else {
+          // Pure empty finalization packet with no prior interim: reset refining state silently
+          if (alternatives.length === 0 && !fullPrimaryText) {
+            lastHandledIndexRef.current = lastIdx;
+            lastHandledWasFinalRef.current = true;
+            setIsRefining(false);
+            setPendingCommand(null);
+            setCommittedTranscript('');
+            setInterimTranscript('');
+            return;
+          }
+
           // Finalized utterance from SpeechRecognition
-          const resolved = resolveVoiceCommand(alternatives, {
-            optionTexts: optionTextsRef.current,
-            adaptiveAliases: adaptiveAliasesRef.current,
-            allowOptionContext: effectiveSettleMs > 0 || Boolean(optionTextsRef.current?.length)
-          });
+          const allowOptCtx = effectiveSettleMs > 0 || Boolean(optionTextsRef.current?.length);
+          const resolved = resolveCandidatesWithTailFallback(alternatives, tailAlternatives, allowOptCtx);
 
           // If a prefix-extendable word ("ripeti") finalized mid-breath in continuous mode,
           // hold briefly so a trailing chunk ("la due" / "domanda") can merge into it
@@ -366,7 +479,7 @@ export function useDriveVoiceCommands({
             const prefixGraceMs = Math.min(240, effectiveSettleMs);
             const flushPrefixCommand = () => {
               clearPendingSettle();
-              commitResolvedCommand(resolved, fullPrimaryText);
+              commitResolvedCommand(resolved, fullPrimaryText, true);
             };
 
             pendingFlushRef.current = flushPrefixCommand;
@@ -374,22 +487,49 @@ export function useDriveVoiceCommands({
             return;
           }
 
-          commitResolvedCommand(resolved, fullPrimaryText);
+          commitResolvedCommand(resolved, fullPrimaryText, true);
         }
       };
 
       rec.onerror = (e: any) => {
         if (recSessionIdRef.current !== sessionId) return;
 
-        // 'no-speech' is normal during silence periods; not a fatal error
-        if (e.error === 'no-speech') {
+        const errCode = e?.error || '';
+
+        // Mobile recognizers frequently emit 'no-match', 'no-speech', 'aborted', or 'speech-timeout'
+        // right after streaming a valid short interim word ("due" in letters). Flush any pending
+        // interim command immediately and never surface these transient statuses as hardware mic errors.
+        if (
+          errCode === 'no-speech' ||
+          errCode === 'no-match' ||
+          errCode === 'aborted' ||
+          errCode === 'speech-timeout'
+        ) {
+          if (
+            pendingFlushRef.current &&
+            shouldBeListeningRef.current &&
+            !isSuspendedRef.current &&
+            !fatalErrorRef.current
+          ) {
+            const flush = pendingFlushRef.current;
+            clearPendingSettle();
+            flush();
+          } else {
+            clearPendingSettle();
+            lastValidInterimRef.current = null;
+            setIsRefining(false);
+            setPendingCommand(null);
+            setCommittedTranscript('');
+            setInterimTranscript('');
+          }
           return;
         }
 
-        if (e.error === 'not-allowed' || e.error === 'service-not-allowed') {
+        if (errCode === 'not-allowed' || errCode === 'service-not-allowed') {
           fatalErrorRef.current = true;
           shouldBeListeningRef.current = false;
           clearPendingSettle();
+          resetUtteranceCursor();
           setError('not-allowed');
           setIsListening(false);
           setIsReceiving(false);
@@ -398,10 +538,11 @@ export function useDriveVoiceCommands({
           return;
         }
 
-        if (e.error === 'audio-capture') {
+        if (errCode === 'audio-capture') {
           fatalErrorRef.current = true;
           shouldBeListeningRef.current = false;
           clearPendingSettle();
+          resetUtteranceCursor();
           setError('audio-capture');
           setIsListening(false);
           setIsReceiving(false);
@@ -410,12 +551,22 @@ export function useDriveVoiceCommands({
           return;
         }
 
-        if (e.error === 'network') {
+        if (errCode === 'network') {
+          if (
+            pendingFlushRef.current &&
+            shouldBeListeningRef.current &&
+            !isSuspendedRef.current &&
+            !fatalErrorRef.current
+          ) {
+            const flush = pendingFlushRef.current;
+            clearPendingSettle();
+            flush();
+          }
           setError('network');
           return;
         }
 
-        setError(e.error || 'Errore microfono');
+        setError(errCode || 'Errore microfono');
       };
 
       rec.onend = () => {
@@ -439,7 +590,7 @@ export function useDriveVoiceCommands({
         setIsRefining(false);
         setPendingCommand(null);
         recognitionRef.current = null;
-        lastHandledIndexRef.current = -1;
+        resetUtteranceCursor();
 
         // Restart cleanly after silence if still enabled and no fatal error occurred
         if (shouldBeListeningRef.current && !fatalErrorRef.current) {
@@ -462,7 +613,7 @@ export function useDriveVoiceCommands({
       setPendingCommand(null);
       recognitionRef.current = null;
     }
-  }, [isSupported, markReceiving, clearPendingSettle]);
+  }, [isSupported, markReceiving, clearPendingSettle, resetUtteranceCursor, resolveCandidatesWithTailFallback]);
 
   useEffect(() => {
     if (acousticCooldownRef.current) {

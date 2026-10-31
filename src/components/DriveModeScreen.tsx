@@ -10,7 +10,6 @@ import { useAviationVoice } from '../hooks/useAviationVoice';
 import { useWakeLock } from '../hooks/useWakeLock';
 import { useDriveVoiceCommands } from '../hooks/useDriveVoiceCommands';
 import {
-  parseVoiceCommand,
   recordAdaptiveVoiceCorrection,
   type VoiceCommand
 } from '../utils/voiceCommandParser';
@@ -921,30 +920,20 @@ export const DriveModeScreen: React.FC<DriveModeScreenProps> = ({
       } finally {
         isExecutingVoiceCommandRef.current = false;
       }
-    }
-  });
-
-  // Track unrecognized speech to provide clear diagnostic feedback to the user
-  useEffect(() => {
-    if (!voiceLastTranscript) return;
-    const matched = parseVoiceCommand(voiceLastTranscript, {
-      optionTexts: currentQRef.current?.options,
-      adaptiveAliases: adaptiveAliasesRef.current,
-      allowOptionContext: true
-    });
-    if (!matched) {
+    },
+    onUnrecognized: (rawTranscript) => {
       lastUnrecognizedAttemptRef.current = {
-        raw: voiceLastTranscript,
+        raw: rawTranscript,
         at: Date.now(),
         optionTexts: currentQRef.current ? [...currentQRef.current.options] : []
       };
       if (unrecognizedTimerRef.current) clearTimeout(unrecognizedTimerRef.current);
-      setUnrecognizedSpeech(voiceLastTranscript);
+      setUnrecognizedSpeech(rawTranscript);
       unrecognizedTimerRef.current = setTimeout(() => {
         setUnrecognizedSpeech(null);
       }, 2500);
     }
-  }, [voiceLastTranscript]);
+  });
 
   // Clean up feedback timers on unmount
   useEffect(() => {

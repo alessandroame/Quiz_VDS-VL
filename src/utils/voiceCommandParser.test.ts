@@ -305,4 +305,58 @@ describe('Suite: voiceCommandParser (Parser comandi vocali Modalità Guida)', ()
     const poisoned = recordAdaptiveVoiceCorrection(undefined, 'eliambulanza', 'opt2', sampleOpts, 4000);
     expect(poisoned).toBeNull();
   });
+
+  it('VC-16: handles all spoken Italian number forms ("due", "il due", "è due", "eh due", "l\'uno", Unicode quotes) without hijacking multi-word option content', () => {
+    for (const phrase of [
+      'due',
+      'Due',
+      '“due”',
+      '«due»',
+      'il due',
+      'il 2',
+      'è due',
+      'è la due',
+      'eh due',
+      'uhm due',
+      'ok due',
+      'allora due',
+      'dico due',
+      'rispondo due',
+      'metto la due',
+      'scelgo il due',
+      'vado con la due',
+      'punto due'
+    ]) {
+      expect(parseVoiceCommand(phrase)).toBe('opt2');
+    }
+
+    expect(parseVoiceCommand("l'uno")).toBe('opt1');
+    expect(parseVoiceCommand('il 1')).toBe('opt1');
+    expect(parseVoiceCommand('eh uno')).toBe('opt1');
+    expect(parseVoiceCommand('il tre')).toBe('opt3');
+    expect(parseVoiceCommand('il 3')).toBe('opt3');
+    expect(parseVoiceCommand('è la tre')).toBe('opt3');
+    expect(parseVoiceCommand('ripeti il due')).toBe('repeat_opt2');
+    expect(parseVoiceCommand("ripeti l'uno")).toBe('repeat_opt1');
+
+    // Negations must remain blocked
+    expect(parseVoiceCommand('non due')).toBeNull();
+    expect(parseVoiceCommand('non il due')).toBeNull();
+    expect(parseVoiceCommand('non è due')).toBeNull();
+    expect(parseVoiceCommand('non è la due')).toBeNull();
+    expect(parseVoiceCommand("non l'uno")).toBeNull();
+
+    // Multi-word option text starting with "uno" must route to option keyword matching rather than hijacking opt1
+    const airspaceOptions = [
+      'Una zona vietata al volo VDS.',
+      'Un corridoio di avvicinamento militare.',
+      'Uno spazio aereo controllato attorno ad un aeroporto.'
+    ];
+    expect(
+      parseVoiceCommand('uno spazio aereo controllato', {
+        optionTexts: airspaceOptions,
+        allowOptionContext: true
+      })
+    ).toBe('opt3');
+  });
 });

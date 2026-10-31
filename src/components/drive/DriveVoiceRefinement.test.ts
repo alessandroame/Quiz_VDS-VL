@@ -310,4 +310,84 @@ describe('DriveModeScreen + useDriveVoiceCommands Progressive Refinement Integra
 
     expect(handleAnswer).toHaveBeenCalledWith(7007, 3);
   });
+
+  it('DRIVE-REFINE-E2E-03: reliably selects Option 2 without recognition errors when mobile STT writes "due" in letters followed by no-match or empty final', async () => {
+    const handleAnswer = vi.fn();
+    const secondQuestion: Question = {
+      ...sampleQuestion,
+      id: 7007
+    };
+
+    await act(async () => {
+      root.render(
+        React.createElement(DriveModeScreen, {
+          isOpen: true,
+          onClose: vi.fn(),
+          sessionContext: {
+            questions: [sampleQuestion, secondQuestion],
+            currentIndex: 0,
+            answers: {},
+            flags: {},
+            onAnswer: handleAnswer,
+            onToggleFlag: vi.fn(),
+            onNavigateIndex: vi.fn(),
+            isTutor: true
+          }
+        })
+      );
+    });
+    await act(async () => {
+      vi.advanceTimersByTime(300);
+    });
+
+    const rec = MockSpeechRecognition.latestInstance;
+    expect(rec).not.toBeNull();
+
+    // Question 1: mobile STT writes "due" in letters (interim) and then emits transient 'no-match'
+    await act(async () => {
+      rec?.onresult?.({
+        results: [Object.assign([{ transcript: 'due' }], { isFinal: false })]
+      });
+    });
+    expect(container.querySelector('[data-testid="voice-live-refinement"]')?.textContent).toContain('due');
+
+    await act(async () => {
+      vi.advanceTimersByTime(140);
+      rec?.onerror?.({ error: 'no-match' });
+    });
+
+    expect(handleAnswer).toHaveBeenCalledWith(7006, 2);
+    expect(container.textContent).not.toContain('non riconosciuto');
+    expect(container.textContent).not.toContain('Mic:');
+
+    // Navigate to Question 2 and speak "il due" in letters followed by empty finalization packet
+    const nextBtn = container.querySelector('#btn-drive-next') as HTMLButtonElement;
+    await act(async () => {
+      nextBtn.click();
+    });
+    await act(async () => {
+      vi.advanceTimersByTime(350);
+    });
+
+    const activeRec = MockSpeechRecognition.latestInstance;
+    await act(async () => {
+      activeRec?.onresult?.({
+        results: [
+          Object.assign([{ transcript: 'due' }], { isFinal: true }),
+          Object.assign([{ transcript: 'il due' }], { isFinal: false })
+        ]
+      });
+      vi.advanceTimersByTime(120);
+      activeRec?.onresult?.({
+        results: [
+          Object.assign([{ transcript: 'due' }], { isFinal: true }),
+          Object.assign([{ transcript: '' }], { isFinal: true })
+        ]
+      });
+    });
+
+    expect(handleAnswer).toHaveBeenCalledWith(7007, 2);
+    expect(container.textContent).not.toContain('non riconosciuto');
+    expect(container.textContent).not.toContain('Mic:');
+  });
 });
