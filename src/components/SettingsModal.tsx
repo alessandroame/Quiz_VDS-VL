@@ -31,7 +31,8 @@ import {
   BookOpen,
   ExternalLink,
   AlertTriangle,
-  Activity
+  Activity,
+  Timer
 } from 'lucide-react';
 import { useTheme } from '../context/ThemeContext';
 import { useQuiz } from '../context/QuizContext';
@@ -43,6 +44,10 @@ import { telemetry } from '../services/telemetry';
 import { exportDatabaseBackup, importDatabaseBackup, db } from '../db';
 import type { ThemeMode } from '../types/database';
 import { FONT_SIZE_OPTIONS, getFontSizeLabel } from '../utils/fontSize';
+import {
+  OFFICIAL_WRITTEN_TIMER_MINUTES,
+  EXTENDED_EXAM_TIMER_MINUTES,
+} from '../utils/aeciRegulation';
 import { VoiceCommandsModal } from './VoiceCommandsModal';
 import { BuildInfoModal } from './BuildInfoModal';
 import { getBuildInfo, formatBuildDate, forceReloadPWA, APP_NAME } from '../utils/buildInfo';
@@ -686,6 +691,55 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                     className="w-4 h-4 accent-amber-500 rounded cursor-pointer"
                   />
                 </label>
+              </div>
+
+              {/* Written Exam Timer Duration Selector */}
+              <div className="space-y-2 pt-2 border-t border-zinc-700/80 light:border-slate-200">
+                <div className="flex items-center justify-between gap-2">
+                  <label className="text-xs font-bold text-zinc-400 light:text-slate-600 uppercase tracking-wider flex items-center gap-1.5">
+                    <Timer className="w-3.5 h-3.5 text-amber-400" />
+                    <span>Durata Timer Esame Scritto</span>
+                  </label>
+                  <span className="text-[11px] font-mono text-amber-400 light:text-amber-700 font-semibold whitespace-nowrap">
+                    {settings.examTimerMinutes || OFFICIAL_WRITTEN_TIMER_MINUTES} min
+                  </span>
+                </div>
+                <div className="grid grid-cols-2 gap-2">
+                  {[
+                    {
+                      minutes: OFFICIAL_WRITTEN_TIMER_MINUTES,
+                      label: '30 min',
+                      sublabel: 'Ufficiale AeCI',
+                    },
+                    {
+                      minutes: EXTENDED_EXAM_TIMER_MINUTES,
+                      label: '45 min',
+                      sublabel: 'Esteso',
+                    },
+                  ].map(opt => {
+                    const currentTimer = settings.examTimerMinutes || OFFICIAL_WRITTEN_TIMER_MINUTES;
+                    const isSelected = currentTimer === opt.minutes;
+                    return (
+                      <button
+                        key={opt.minutes}
+                        id={`exam-timer-btn-${opt.minutes}`}
+                        type="button"
+                        onClick={() => updateSetting('examTimerMinutes', opt.minutes)}
+                        className={`min-h-[48px] py-2 px-3 rounded-xl border text-left flex items-center justify-between gap-2 transition-all cursor-pointer active:scale-95 touch-manipulation ${
+                          isSelected
+                            ? 'border-amber-500 bg-amber-500/20 text-amber-300 light:border-amber-600 light:bg-amber-50 light:text-amber-800 shadow-sm'
+                            : 'border-zinc-700 bg-zinc-950/60 text-zinc-300 hover:text-white hover:bg-zinc-800/40 light:border-slate-300 light:bg-slate-50 light:text-slate-700'
+                        }`}
+                      >
+                        <span className="text-xs font-bold whitespace-nowrap">{opt.label}</span>
+                        <span className="text-[10px] font-mono opacity-80 whitespace-nowrap">{opt.sublabel}</span>
+                      </button>
+                    );
+                  })}
+                </div>
+                <p className="text-[11px] text-zinc-400 light:text-slate-600 leading-relaxed">
+                  In modalità Mani Libere il timer d'esame è sempre di almeno 45 minuti per compensare la lettura vocale dei quesiti.
+                </p>
               </div>
 
               {/* Opzione Schermo Intero Browser */}
@@ -1808,15 +1862,15 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                     </div>
                     <div className="p-2 rounded-lg bg-zinc-900/80 border border-zinc-700/80 light:bg-white light:border-slate-300">
                       <span className="text-[10px] text-zinc-400 light:text-slate-600 block">Regola Esame</span>
-                      <span className="font-semibold text-zinc-200 light:text-slate-800">30 Quiz · 45 Minuti</span>
+                      <span className="font-semibold text-zinc-200 light:text-slate-800 whitespace-nowrap">30 Quiz · 100 Pt · 30 Min</span>
                     </div>
                     <div className="p-2 rounded-lg bg-zinc-900/80 border border-zinc-700/80 light:bg-white light:border-slate-300">
                       <span className="text-[10px] text-zinc-400 light:text-slate-600 block">Soglia Idoneità</span>
-                      <span className="font-semibold text-emerald-400 light:text-emerald-700">Max 3 errori (≥27/30)</span>
+                      <span className="font-semibold text-emerald-400 light:text-emerald-700 whitespace-nowrap">≥86/100 (80–85 Orale)</span>
                     </div>
                   </div>
                   <div className="text-[10px] text-zinc-400 light:text-slate-600 pt-1 border-t border-zinc-700/60 light:border-slate-300">
-                    Quote canoniche per materia: Aerodinamica (9), Meteo (8), Tecnica (5), Normativa (2), Sicurezza (2), Primo Soccorso (1), Fisiopatologia (1), Strumenti (1), Materiali (1).
+                    Quote e pesi Volo Libero AeCI (100 pt): Aerodinamica 8×3 pt, Meteo 6×4 pt, Tecnica 5×4 pt, Normativa 4×3 pt, Sicurezza 3×4 pt, Primo Soccorso 1×2 pt, Fisiopatologia 1×2 pt, Strumenti 1×2 pt, Materiali 1×2 pt.
                   </div>
                 </div>
               </div>

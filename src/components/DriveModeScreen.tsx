@@ -4,6 +4,11 @@ import type { ExamSession } from '../types/database';
 import { useQuiz } from '../context/QuizContext';
 import { generateExamQuestions } from '../utils/fairRandomizer';
 import { evaluateExam } from '../services/examEvaluator';
+import {
+  HANDS_FREE_AUDIO_TIMER_MINUTES,
+  MARATHON_TIMER_MINUTES,
+  OFFICIAL_WRITTEN_TIMER_MINUTES,
+} from '../utils/aeciRegulation';
 import { soundFX, shouldSuspendVoiceMic } from '../utils/audio';
 import { triggerHapticFeedback } from '../utils/haptics';
 import { useAviationVoice } from '../hooks/useAviationVoice';
@@ -987,7 +992,7 @@ export const DriveModeScreen: React.FC<DriveModeScreenProps> = ({
 
     setInternalMode('debriefing');
 
-    const isEndlessTutor = internalQuestions.length > 30 || isTutorEnabled || !isExamSession;
+    const isEndlessTutor = !isMarathon && (!isExamSession || internalQuestions.length > 30);
 
     const session = evaluateExam({
       questions: internalQuestions,
@@ -995,8 +1000,8 @@ export const DriveModeScreen: React.FC<DriveModeScreenProps> = ({
       flags: effectiveFlags,
       durationSeconds,
       isMarathon,
-      examMode: isMarathon ? 'marathon' : (isExamSession ? 'official' : 'tutor'),
-      tutorFormat: isEndlessTutor ? 'endless' : undefined
+      examMode: isMarathon ? 'marathon' : (isExamSession && !isTutorEnabled ? 'official' : 'tutor'),
+      tutorFormat: isEndlessTutor ? 'endless' : (isTutorEnabled ? 'standard' : undefined)
     });
 
     for (const snap of session.snapshots) {
@@ -1181,7 +1186,11 @@ export const DriveModeScreen: React.FC<DriveModeScreenProps> = ({
     setCurrentIndex(0);
     setAnswers({});
     setFlags({});
-    setSecondsRemaining((marathon ? 60 : 45) * 60);
+    // Hands-Free audio exams grant at least 45 minutes (60 for Marathon) to cover spoken TTS playback
+    const audioExamMinutes = marathon
+      ? MARATHON_TIMER_MINUTES
+      : Math.max(HANDS_FREE_AUDIO_TIMER_MINUTES, settings.examTimerMinutes || OFFICIAL_WRITTEN_TIMER_MINUTES);
+    setSecondsRemaining(audioExamMinutes * 60);
     setStartTime(Date.now());
     setInternalMode('running');
   };

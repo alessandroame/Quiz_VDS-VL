@@ -22,6 +22,17 @@ export interface ExamQuestionSnapshot {
 
 export type ExamModeType = 'official' | 'tutor' | 'marathon';
 export type TutorFormat = 'flash' | 'standard' | 'endless';
+export type ExamOutcome = 'passed' | 'oral_check' | 'failed';
+
+export interface SubjectBreakdownEntry {
+  total: number;
+  correct: number;
+  wrong: number;
+  pointWeight?: number;
+  pointsEarned?: number;
+  maxPoints?: number;
+  pointsLost?: number;
+}
 
 export interface ExamSession {
   id?: number;
@@ -30,11 +41,16 @@ export interface ExamSession {
   totalQuestions: number;
   correctAnswers: number;
   wrongAnswers: number;
-  isPassed: boolean; // wrongAnswers <= 3 (or <= 6 for marathon 60)
+  isPassed: boolean; // Direct pass (>= 86/100 on weighted AeCI sheets, or legacy error threshold)
+  examOutcome?: ExamOutcome;
+  scorePoints?: number;
+  maxPoints?: number;
+  rawPoints?: number;
+  rawMaxPoints?: number;
   isMarathon: boolean;
   examMode?: ExamModeType;
   tutorFormat?: TutorFormat;
-  subjectBreakdown: Record<number, { total: number; correct: number; wrong: number }>;
+  subjectBreakdown: Record<number, SubjectBreakdownEntry>;
   snapshots: ExamQuestionSnapshot[];
 }
 
@@ -52,7 +68,7 @@ export interface AdaptiveVoiceAliasEntry {
 export interface AppSettings {
   theme: ThemeMode;
   fontSizePreference?: FontSizePreference;
-  examTimerMinutes: number; // 45 standard
+  examTimerMinutes: number; // 30 official written default (45 extended; Hands-Free audio uses 45)
   immediateFeedbackInTopics: boolean;
   autoAdvanceOnCorrect?: boolean;
   soundEnabled: boolean;

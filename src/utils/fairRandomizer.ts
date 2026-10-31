@@ -1,29 +1,13 @@
 import type { Question } from '../types/quiz';
 import type { QuestionStat } from '../types/database';
+import {
+  OFFICIAL_EXAM_QUOTAS,
+  MARATHON_EXAM_QUOTAS,
+  SUBJECT_POINT_WEIGHTS,
+  getSubjectPointWeight,
+} from './aeciRegulation';
 
-export const OFFICIAL_EXAM_QUOTAS: Record<number, number> = {
-  1: 2, // Normativa (40 quiz tot)
-  2: 9, // Aerodinamica (150 quiz tot)
-  3: 1, // Pronto Soccorso (20 quiz tot)
-  4: 1, // Fisiopatologia (10 quiz tot)
-  5: 8, // Meteorologia (120 quiz tot)
-  6: 1, // Strumenti (20 quiz tot)
-  7: 5, // Tecnica di Pilotaggio (79 quiz tot)
-  8: 1, // Materiali (20 quiz tot)
-  9: 2, // Sicurezza del Volo (45 quiz tot)
-};
-
-export const MARATHON_EXAM_QUOTAS: Record<number, number> = {
-  1: 4,
-  2: 18,
-  3: 2,
-  4: 2,
-  5: 16,
-  6: 2,
-  7: 10,
-  8: 2,
-  9: 4,
-};
+export { OFFICIAL_EXAM_QUOTAS, MARATHON_EXAM_QUOTAS, SUBJECT_POINT_WEIGHTS, getSubjectPointWeight };
 
 function shuffleArray<T>(array: T[]): T[] {
   const arr = [...array];
@@ -139,6 +123,7 @@ export function generateFlashTutorQuestions(
       priorityBucket,
       timesSeen,
       errorRate,
+      pointWeight: getSubjectPointWeight(q.subjectId),
       randomJitter: Math.random()
     };
   });
@@ -152,6 +137,10 @@ export function generateFlashTutorQuestions(
     }
     if (Math.abs(a.errorRate - b.errorRate) > 0.2) {
       return b.errorRate - a.errorRate;
+    }
+    // Secondary tie-breaker for active mistakes: prioritize higher exam point weight (4 > 3 > 2)
+    if (a.priorityBucket === 1 && a.pointWeight !== b.pointWeight) {
+      return b.pointWeight - a.pointWeight;
     }
     return a.randomJitter - b.randomJitter;
   });

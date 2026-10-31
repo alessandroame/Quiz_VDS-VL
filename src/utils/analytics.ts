@@ -1,6 +1,11 @@
 import type { Question } from '../types/quiz';
 import type { QuestionStat, ExamSession } from '../types/database';
-import { hasSessionAnswers } from '../services/examEvaluator';
+import { hasSessionAnswers, resolveSessionOutcome } from '../services/examEvaluator';
+import {
+  OFFICIAL_EXAM_QUOTAS,
+  getSubjectPointWeight,
+  getQuestionPointWeightById,
+} from './aeciRegulation';
 
 export interface SubjectAnalytics {
   id: number;
@@ -9,11 +14,13 @@ export interface SubjectAnalytics {
   seen: number;
   correct: number;
   accuracy: number;
+  pointWeight?: number;
+  examQuota?: number;
 }
 
 /**
- * Verifica se una domanda deve essere inclusa nel Quaderno Errori:
- * Ha almeno un errore registrato e non ha ancora conseguito 2 risposte corrette consecutive.
+ * Checks whether a question belongs to the Mistakes Notebook (Leitner recovery):
+ * at least one recorded error and fewer than 2 consecutive correct answers.
  */
 export function isMistakeQuestion(stat?: QuestionStat): boolean {
   if (!stat) return false;
@@ -21,14 +28,15 @@ export function isMistakeQuestion(stat?: QuestionStat): boolean {
 }
 
 /**
- * Calcola il numero di domande attualmente presenti nel Quaderno Errori.
+ * Counts how many questions currently reside in the Mistakes Notebook.
  */
 export function calculateMistakesCount(statsList: QuestionStat[]): number {
   return statsList.filter(isMistakeQuestion).length;
 }
 
 /**
- * Calcola le metriche aggregate di studio suddivise per singola materia.
+ * Computes aggregated study metrics per official subject, enriched with
+ * official AeCI exam point weight (2, 3, or 4 pt) and 30-quiz exam quota.
  */
 export function calculateSubjectAnalytics(
   questions: Question[],
@@ -60,16 +68,20 @@ export function calculateSubjectAnalytics(
       total: val.total,
       seen: val.seen,
       correct: val.correct,
-      accuracy
+      accuracy,
+      pointWeight: getSubjectPointWeight(id),
+      examQuota: OFFICIAL_EXAM_QUOTAS[id] ?? 1,
     };
   });
 }
 
 /**
- * Calcola l'indice di prontezza all'esame (0 - 100%):
- * - Componente 1: Copertura catalogo (peso 35%)
- * - Componente 2: Accuratezza generale sui visti (peso 35%)
- * - Componente 3: Tasso superamento ultime 3 simulazioni (peso 30%)
+ * Computes the Exam Readiness Index (0 - 100%):
+ * - Component 1 (35%): Unweighted catalog coverage (totalSeen / totalCatalogQuestions).
+ * - Component 2 (35%): Point-weighted accuracy on seen questions (4 / 3 / 2 pt by subject,
+ *   falling back to weight 1 for synthetic IDs < 1000).
+ * - Component 3 (30%): Average outcome over the last 3 valid simulations
+ *   ('passed' = 1.0, 'oral_check' = 0.5, 'failed' = 0.0).
  */
 export function calculateReadinessScore(
   totalCatalogQuestions: number,
@@ -79,20 +91,40 @@ export function calculateReadinessScore(
 ): number {
   if (totalCatalogQuestions === 0) return 0;
 
-  // Componente 1: Copertura catalogo (35%)
+  // Component 1: Catalog coverage (35%)
   const coverage = totalSeen / totalCatalogQuestions;
 
-  // Componente 2: Accuratezza generale sui visti (35%)
-  const correctCount = statsList.filter(s => s.lastResult === 'correct').length;
-  const accuracy = totalSeen > 0 ? correctCount / totalSeen : 0;
+  // Component 2: Weighted accuracy on seen questions (35%)
+  let weightedCorrect = 0;
+  let weightedSeen = 0;
+  for (const stat of statsList) {
+    if (stat.timesSeen > 0) {
+      const weight = getQuestionPointWeightById(stat.questionId);
+      weightedSeen += weight;
+      if (stat.lastResult === 'correct') {
+        weightedCorrect += weight;
+      }
+    }
+  }
+  const accuracy =
+    weightedSeen > 0
+      ? weightedCorrect / weightedSeen
+      : totalSeen > 0
+      ? statsList.filter(s => s.lastResult === 'correct').length / totalSeen
+      : 0;
 
-  // Componente 3: Media ultime 3 simulazioni valide con risposte (30%)
+  // Component 3: Average outcome of last 3 answered simulations (30%)
   let examScoreFactor = 0;
   const answeredSessions = sessions.filter(hasSessionAnswers);
   if (answeredSessions.length > 0) {
     const recent = answeredSessions.slice(0, 3);
-    const passedCount = recent.filter(s => s.isPassed).length;
-    examScoreFactor = passedCount / recent.length;
+    const weightedOutcomes = recent.reduce((acc, s) => {
+      const outcome = resolveSessionOutcome(s);
+      if (outcome === 'passed') return acc + 1;
+      if (outcome === 'oral_check') return acc + 0.5;
+      return acc;
+    }, 0);
+    examScoreFactor = weightedOutcomes / recent.length;
   }
 
   const calculated = Math.round((coverage * 0.35 + accuracy * 0.35 + examScoreFactor * 0.3) * 100);

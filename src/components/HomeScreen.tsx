@@ -25,6 +25,7 @@ interface HomeScreenProps {
 export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectTab }) => {
   const {
     readinessScore,
+    settings,
     mistakesCount,
     totalSeen,
     questions,
@@ -32,6 +33,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectTab }) => {
     dismissActiveSession
   } = useQuiz();
 
+  const examMinutes = settings?.examTimerMinutes ?? 45;
   const [showConfirmDiscard, setShowConfirmDiscard] = useState(false);
   const [conflictTargetTab, setConflictTargetTab] = useState<NavTab | null>(null);
 
@@ -311,7 +313,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectTab }) => {
               </div>
               <div className="flex items-center gap-1.5">
                 <span className="text-[10px] font-bold px-2 py-0.5 rounded-full border border-sky-500/40 bg-sky-500/20 text-sky-300 light:bg-sky-100 light:border-sky-300 light:text-sky-800 uppercase tracking-wider font-mono">
-                  45 Minuti
+                  {`${examMinutes} Minuti`}
                 </span>
                 <span className="text-[10px] font-mono px-1.5 py-0.5 rounded border border-zinc-700 light:border-slate-300 bg-zinc-800 text-zinc-300 light:bg-slate-100 light:text-slate-700 font-semibold hidden md:inline">
                   [3]
@@ -320,7 +322,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectTab }) => {
             </div>
 
             <p className="text-xs text-zinc-400 light:text-slate-600 truncate">
-              Simulazione AeCI: 30 quiz, 45 minuti, max 3 errori.
+              Simulazione AeCI: 30 quiz, 100 punti pesati (idoneo ≥ 86, orale 80–85).
             </p>
           </div>
         </button>
@@ -422,7 +424,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectTab }) => {
             </div>
 
             <p className="text-xs text-zinc-400 light:text-slate-600 truncate">
-              Radar di rendimento per materia e storico delle sessioni.
+              Rendimento per materia, pesi d'esame e storico delle sessioni.
             </p>
           </div>
         </button>

@@ -251,5 +251,65 @@ describe('Suite 2: Fair Coverage Randomizer (src/utils/fairRandomizer.ts)', () =
       expect(firstBatchIds.has(q.id)).toBe(false);
     }
   });
+
+  it('RAND-10: official 30-question quotas sum to exactly 100 weighted points and marathon 60-question quotas sum to 200 points', () => {
+    const statsMap = new Map<number, QuestionStat>();
+    const standardSheet = generateExamQuestions(allQuestions, statsMap, false);
+    const marathonSheet = generateExamQuestions(allQuestions, statsMap, true);
+
+    expect(OFFICIAL_EXAM_QUOTAS).toEqual({
+      1: 4,
+      2: 8,
+      3: 1,
+      4: 1,
+      5: 6,
+      6: 1,
+      7: 5,
+      8: 1,
+      9: 3,
+    });
+
+    const weights: Record<number, number> = { 1: 3, 2: 3, 3: 2, 4: 2, 5: 4, 6: 2, 7: 4, 8: 2, 9: 4 };
+    const standardTotalPoints = standardSheet.reduce((sum, q) => sum + weights[q.subjectId], 0);
+    const marathonTotalPoints = marathonSheet.reduce((sum, q) => sum + weights[q.subjectId], 0);
+
+    expect(standardTotalPoints).toBe(100);
+    expect(marathonTotalPoints).toBe(200);
+  });
+
+  it('RAND-11: generateFlashTutorQuestions breaks ties among active mistakes by prioritizing higher exam point weight (4 > 3 > 2)', () => {
+    const statsMap = new Map<number, QuestionStat>();
+    // Mark all 504 questions as seen and mastered
+    for (const q of allQuestions) {
+      statsMap.set(q.id, {
+        questionId: q.id,
+        timesSeen: 4,
+        timesCorrect: 4,
+        timesWrong: 0,
+        consecutiveCorrect: 4,
+        isBookmarked: false,
+      });
+    }
+
+    // Create 1 active mistake in Subject 5 (4 pt) and 1 active mistake in Subject 3 (2 pt) with identical frequency/errorRate
+    const sub5Question = allQuestions.find(q => q.subjectId === 5)!;
+    const sub3Question = allQuestions.find(q => q.subjectId === 3)!;
+
+    for (const q of [sub5Question, sub3Question]) {
+      statsMap.set(q.id, {
+        questionId: q.id,
+        timesSeen: 2,
+        timesCorrect: 0,
+        timesWrong: 2,
+        consecutiveCorrect: 0,
+        isBookmarked: false,
+      });
+    }
+
+    // Request count=1: the 4-pt active mistake must deterministically win the tie-breaker ahead of the 2-pt mistake
+    const chosen = generateFlashTutorQuestions(allQuestions, statsMap, 1);
+    expect(chosen).toHaveLength(1);
+    expect(chosen[0].id).toBe(sub5Question.id);
+  });
 });
 

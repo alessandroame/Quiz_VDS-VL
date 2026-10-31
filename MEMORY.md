@@ -9,17 +9,17 @@ Questo file costituisce la **memoria tecnica permanente** del progetto. Raccogli
 
 ## 1. Regolamento & Quiz VDS-VL (AeCI)
 - **Catalogo Completo**: 504 quiz totali (database ufficiale AeCI 2017).
-- **Esame Ufficiale**: 30 quesiti a scelta multipla, 45 minuti max, idoneità con max 3 errori (minimo 27/30). 4 o più errori = NON IDONEO.
-- **Ripartizione Materie (30 quiz)**:
-  - Normativa (2)
-  - Aerodinamica (9)
-  - Primo Soccorso (1)
-  - Fisiopatologia (1)
-  - Meteo (8)
-  - Strumenti (1)
-  - Tecnica Pilotaggio (5)
-  - Materiali (1)
-  - Sicurezza (2)
+- **Esame Ufficiale Volo Libero (`aeciRegulation.ts`)**: 30 quesiti a scelta multipla = **100 punti pesati** (`4 / 3 / 2` pt per materia). Esito a 3 fasce (`ExamOutcome`): **86–100 pt** = `IDONEO` (`'passed'`), **80–85 pt** = `IDONEO CON VERIFICA ORALE` (`'oral_check'`), **< 80 pt** = `NON IDONEO` (`'failed'`). Timer prova scritta: **30 min** ufficiale default (selettore `30 min / 45 min` in Impostazioni); in **Modalità Mani Libere** almeno **45 min** audio (`60 min` Maratona). Il punteggio `/100` vale solo sulle schede bilanciate a 9 materie (**Esame 30**, **Tutor Standard 30**, **Maratona 60** normalizzata da 200 a `/100`), mentre **Tutor Flash 10**, **Continuo**, **Materie** e **Quaderno Errori** restano a conteggio/accuratezza `%`; le sessioni storiche senza `scorePoints` mantengono l'esito legacy senza ricalcoli distruttivi.
+- **Ripartizione e Pesi Materie Volo Libero (30 quiz = 100 pt)**:
+  - 01 Normativa: 4 quiz × 3 pt = 12 pt
+  - 02 Aerodinamica: 8 quiz × 3 pt = 24 pt
+  - 03 Primo Soccorso: 1 quiz × 2 pt = 2 pt
+  - 04 Fisiopatologia: 1 quiz × 2 pt = 2 pt
+  - 05 Meteorologia: 6 quiz × 4 pt = 24 pt
+  - 06 Strumenti: 1 quiz × 2 pt = 2 pt
+  - 07 Tecnica Pilotaggio: 5 quiz × 4 pt = 20 pt
+  - 08 Materiali: 1 quiz × 2 pt = 2 pt
+  - 09 Sicurezza del Volo: 3 quiz × 4 pt = 12 pt
 - **Spiegazioni Didattiche**: Devono limitarsi a `Regola` (principio fisico o norma) e `Tranello` (motivo tipico di errore), senza menzionare fonti terze o manuali non ufficiali.
 
 ---
@@ -68,8 +68,8 @@ Questo file costituisce la **memoria tecnica permanente** del progetto. Raccogli
 ---
 
 ## 5. Testing & Architettura Suite (Vitest)
-- **Moduli Puri Estratti (SRP)**: La logica di valutazione esame risiede in `src/services/examEvaluator.ts`, il timer in `src/utils/timer.ts`, e le metriche in `src/utils/analytics.ts`.
-- **Zero Faux-Testing & BVA**: Soglie esame verificate su 2, 3 (Idoneo limite), 4 (Respinto), 6 (Idoneo maratona), 7 (Respinto maratona).
+- **Moduli Puri Estratti (SRP & Isolamento Mock)**: Costanti e pesi normativi risiedono nel modulo foglia `src/utils/aeciRegulation.ts` (evitando rotture nei test che mockano parzialmente `fairRandomizer`), la valutazione esame in `src/services/examEvaluator.ts`, il timer in `src/utils/timer.ts`, e le metriche in `src/utils/analytics.ts`.
+- **Zero Faux-Testing & BVA**: Soglie esame pesate verificate su `100`, `86` (Idoneo limite anche con 5 errori su materie da 2–3 pt), `85` e `80` (Idoneo con Verifica Orale), `79` (Non Idoneo), Maratona `200 -> 100` pt, Indice di Preparazione pesato (`0.5` su `oral_check`), e fallback legacy `resolveSessionOutcome`.
 - **Quaderno Errori**: Ingresso con 1 errore (`timesWrong > 0`), promozione e uscita solo con `consecutiveCorrect >= 2`.
 - **Isolamento In-Memory**: Test di persistenza Dexie eseguiti con `fake-indexeddb/auto` senza dipendere dal DOM o dal browser reale.
 - **Comandi**: `npm run test:unit` per la suite rapida, `npm run test:coverage` per il report di copertura v8.

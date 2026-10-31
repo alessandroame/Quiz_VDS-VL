@@ -9,7 +9,8 @@ import {
 } from 'lucide-react';
 import type { Question } from '../types/quiz';
 import { useQuiz } from '../context/QuizContext';
-import { hasSessionAnswers } from '../services/examEvaluator';
+import { hasSessionAnswers, resolveSessionOutcome } from '../services/examEvaluator';
+import { getSubjectPointWeight } from '../utils/aeciRegulation';
 import { SubjectDetailModal } from './SubjectDetailModal';
 import { QuestionDetailModal } from './QuestionDetailModal';
 
@@ -32,11 +33,19 @@ export const StatsScreen: React.FC<StatsScreenProps> = ({ onTrainSubject }) => {
   const [selectedQuestion, setSelectedQuestion] = useState<Question | null>(null);
 
   const answeredSessions = useMemo(() => sessions.filter(hasSessionAnswers), [sessions]);
+  const passedCount = useMemo(
+    () => answeredSessions.filter(s => resolveSessionOutcome(s) === 'passed').length,
+    [answeredSessions]
+  );
+  const oralCheckCount = useMemo(
+    () => answeredSessions.filter(s => resolveSessionOutcome(s) === 'oral_check').length,
+    [answeredSessions]
+  );
 
   const totalQuestionsCount = questions.length;
   const coveragePercent = Math.round((totalSeen / totalQuestionsCount) * 100);
 
-  // Top 10 domande più sbagliate
+  // Top 10 most frequently missed questions
   const topWrongQuestions = questions
     .map(q => {
       const s = statsMap.get(q.id);
@@ -53,244 +62,265 @@ export const StatsScreen: React.FC<StatsScreenProps> = ({ onTrainSubject }) => {
   return (
     <>
       <div className="max-w-2xl mx-auto px-4 py-6 space-y-6">
-      <div>
-        <h1 className="text-xl font-bold tracking-tight">I tuoi Progressi</h1>
-        <p className="text-xs text-zinc-400 light:text-slate-600">
-          Come sta procedendo la tua preparazione per l'esame VDS-VL
-        </p>
-      </div>
+        <div>
+          <h1 className="text-xl font-bold tracking-tight">I tuoi Progressi</h1>
+          <p className="text-xs text-zinc-400 light:text-slate-600">
+            Come sta procedendo la tua preparazione per l'esame VDS-VL
+          </p>
+        </div>
 
-      {/* Card Prontezza Esame Principale */}
-      <div className="p-6 rounded-2xl border border-zinc-700 bg-zinc-900 shadow-md light:bg-white light:border-slate-300 light:shadow-sm space-y-4">
-        <div className="flex items-center justify-between">
-          <div className="space-y-1">
-            <span className="text-xs font-bold text-zinc-400 light:text-slate-600 uppercase tracking-wider">
-              Preparazione Esame
+        {/* Main Exam Readiness Card */}
+        <div className="p-6 rounded-2xl border border-zinc-700 bg-zinc-900 shadow-md light:bg-white light:border-slate-300 light:shadow-sm space-y-4">
+          <div className="flex items-center justify-between">
+            <div className="space-y-1">
+              <span className="text-xs font-bold text-zinc-400 light:text-slate-600 uppercase tracking-wider">
+                Preparazione Esame
+              </span>
+              <div className="text-3xl sm:text-4xl font-black text-amber-400 light:text-amber-800">
+                {readinessScore}%
+              </div>
+            </div>
+
+            <div className="w-16 h-16 rounded-2xl bg-amber-500/10 flex items-center justify-center text-amber-400">
+              <Award className="w-9 h-9" />
+            </div>
+          </div>
+
+          {/* Readiness progress bar */}
+          <div className="w-full bg-zinc-950/80 border border-zinc-800 light:bg-slate-200 light:border-slate-300/60 rounded-full h-2.5 overflow-hidden">
+            <div
+              className={`h-full rounded-full transition-all duration-500 ${
+                readinessScore >= 90
+                  ? 'bg-emerald-500'
+                  : readinessScore >= 70
+                  ? 'bg-amber-500'
+                  : 'bg-amber-600'
+              }`}
+              style={{ width: `${readinessScore}%` }}
+            />
+          </div>
+
+          {/* 3 Summary Metric Boxes */}
+          <div className="grid grid-cols-3 gap-2 pt-2 text-center text-xs">
+            <div className="p-2.5 rounded-xl bg-zinc-950/60 light:bg-slate-50 border border-zinc-700/80 light:border-slate-300">
+              <div className="text-zinc-400 light:text-slate-600 text-[10px]">Quiz Visti</div>
+              <div className="font-bold text-zinc-200 light:text-slate-800 mt-0.5">
+                {totalSeen}/{totalQuestionsCount}
+              </div>
+              <div className="text-[10px] text-amber-400">{coveragePercent}%</div>
+            </div>
+
+            <div className="p-2.5 rounded-xl bg-zinc-950/60 light:bg-slate-50 border border-zinc-700/80 light:border-slate-300">
+              <div className="text-zinc-400 light:text-slate-600 text-[10px]">Errori</div>
+              <div className="font-bold text-rose-400 mt-0.5">
+                {mistakesCount}
+              </div>
+              <div className="text-[10px] text-zinc-400 light:text-slate-600">da rivedere</div>
+            </div>
+
+            <div className="p-2.5 rounded-xl bg-zinc-950/60 light:bg-slate-50 border border-zinc-700/80 light:border-slate-300">
+              <div className="text-zinc-400 light:text-slate-600 text-[10px]">Simulazioni</div>
+              <div className="font-bold text-zinc-200 light:text-slate-800 mt-0.5">
+                {answeredSessions.length}
+              </div>
+              <div className="text-[10px] text-emerald-400 whitespace-nowrap">
+                {passedCount} superate{oralCheckCount > 0 ? ` · ${oralCheckCount} orale` : ''}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Subject Accuracy Breakdown */}
+        <div className="p-5 rounded-2xl border border-zinc-700 bg-zinc-900 light:bg-white light:border-slate-300 light:shadow-sm space-y-3">
+          <div className="flex items-center justify-between">
+            <h3 className="text-xs font-bold text-zinc-400 light:text-slate-600 uppercase tracking-wider flex items-center gap-1.5">
+              <TrendingUp className="w-3.5 h-3.5 text-amber-400" />
+              <span>Risposte Esatte per Materia</span>
+            </h3>
+            <span className="text-[10px] text-zinc-500 italic hidden sm:inline">
+              Tocca una materia per ispezionarla
             </span>
-            <div className="text-3xl sm:text-4xl font-black text-amber-400 light:text-amber-800">
-              {readinessScore}%
-            </div>
           </div>
 
-          <div className="w-16 h-16 rounded-2xl bg-amber-500/10 flex items-center justify-center text-amber-400">
-            <Award className="w-9 h-9" />
-          </div>
-        </div>
+          <div className="space-y-1.5 pt-1">
+            {subjectsAnalytics.map(sub => {
+              const weight = sub.pointWeight ?? getSubjectPointWeight(sub.id);
+              return (
+                <button
+                  type="button"
+                  key={sub.id}
+                  id={`btn-stat-subject-${sub.id}`}
+                  onClick={() => setSelectedSubjectId(sub.id)}
+                  className="w-full text-left space-y-1 p-2 rounded-xl hover:bg-zinc-800/50 light:hover:bg-slate-100 transition-colors group cursor-pointer"
+                >
+                  <div className="flex items-center justify-between text-xs gap-2">
+                    <div className="flex items-center gap-1.5 min-w-0">
+                      <span className="text-zinc-300 light:text-slate-700 font-medium truncate max-w-[185px] sm:max-w-[260px] group-hover:text-amber-400 light:group-hover:text-amber-600 transition-colors">
+                        0{sub.id} {sub.name}
+                      </span>
+                      <span className="px-1.5 py-0.5 rounded bg-zinc-800/90 text-zinc-300 light:bg-slate-100 light:text-slate-700 border border-zinc-700/70 light:border-slate-300 text-[10px] font-mono whitespace-nowrap flex-shrink-0">
+                        {weight} pt
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-2 flex-shrink-0">
+                      <span className="text-zinc-400 light:text-slate-600 text-[11px] whitespace-nowrap">
+                        {sub.seen}/{sub.total}
+                      </span>
+                      <span
+                        className={`font-bold w-9 text-right whitespace-nowrap ${
+                          sub.accuracy >= 90
+                            ? 'text-emerald-400'
+                            : sub.accuracy >= 70
+                            ? 'text-amber-400'
+                            : 'text-zinc-400 light:text-slate-600'
+                        }`}
+                      >
+                        {sub.seen > 0 ? `${sub.accuracy}%` : '-'}
+                      </span>
+                      <ChevronRight className="w-3.5 h-3.5 text-zinc-400 light:text-slate-500 group-hover:text-zinc-200 light:group-hover:text-slate-800 transition-transform group-hover:translate-x-0.5" />
+                    </div>
+                  </div>
 
-        {/* Progress bar Prontezza */}
-        <div className="w-full bg-zinc-950/80 border border-zinc-800 light:bg-slate-200 light:border-slate-300/60 rounded-full h-2.5 overflow-hidden">
-          <div
-            className={`h-full rounded-full transition-all duration-500 ${
-              readinessScore >= 90
-                ? 'bg-emerald-500'
-                : readinessScore >= 70
-                ? 'bg-amber-500'
-                : 'bg-amber-600'
-            }`}
-            style={{ width: `${readinessScore}%` }}
-          />
-        </div>
-
-        {/* 3 Metric Box */}
-        <div className="grid grid-cols-3 gap-2 pt-2 text-center text-xs">
-          <div className="p-2.5 rounded-xl bg-zinc-950/60 light:bg-slate-50 border border-zinc-700/80 light:border-slate-300">
-            <div className="text-zinc-400 light:text-slate-600 text-[10px]">Quiz Visti</div>
-            <div className="font-bold text-zinc-200 light:text-slate-800 mt-0.5">
-              {totalSeen}/{totalQuestionsCount}
-            </div>
-            <div className="text-[10px] text-amber-400">{coveragePercent}%</div>
-          </div>
-
-          <div className="p-2.5 rounded-xl bg-zinc-950/60 light:bg-slate-50 border border-zinc-700/80 light:border-slate-300">
-            <div className="text-zinc-400 light:text-slate-600 text-[10px]">Errori</div>
-            <div className="font-bold text-rose-400 mt-0.5">
-              {mistakesCount}
-            </div>
-            <div className="text-[10px] text-zinc-400 light:text-slate-600">da rivedere</div>
-          </div>
-
-          <div className="p-2.5 rounded-xl bg-zinc-950/60 light:bg-slate-50 border border-zinc-700/80 light:border-slate-300">
-            <div className="text-zinc-400 light:text-slate-600 text-[10px]">Simulazioni</div>
-            <div className="font-bold text-zinc-200 light:text-slate-800 mt-0.5">
-              {answeredSessions.length}
-            </div>
-            <div className="text-[10px] text-emerald-400">
-              {answeredSessions.filter(s => s.isPassed).length} superate
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Radar / Prestazioni per Materia */}
-      <div className="p-5 rounded-2xl border border-zinc-700 bg-zinc-900 light:bg-white light:border-slate-300 light:shadow-sm space-y-3">
-        <div className="flex items-center justify-between">
-          <h3 className="text-xs font-bold text-zinc-400 light:text-slate-600 uppercase tracking-wider flex items-center gap-1.5">
-            <TrendingUp className="w-3.5 h-3.5 text-amber-400" />
-            <span>Risposte Esatte per Materia</span>
-          </h3>
-          <span className="text-[10px] text-zinc-500 italic hidden sm:inline">
-            Tocca una materia per ispezionarla
-          </span>
-        </div>
-
-        <div className="space-y-1.5 pt-1">
-          {subjectsAnalytics.map(sub => {
-            return (
-              <button
-                type="button"
-                key={sub.id}
-                id={`btn-stat-subject-${sub.id}`}
-                onClick={() => setSelectedSubjectId(sub.id)}
-                className="w-full text-left space-y-1 p-2 rounded-xl hover:bg-zinc-800/50 light:hover:bg-slate-100 transition-colors group cursor-pointer"
-              >
-                <div className="flex items-center justify-between text-xs">
-                  <span className="text-zinc-300 light:text-slate-700 font-medium truncate max-w-[220px] group-hover:text-amber-400 light:group-hover:text-amber-600 transition-colors">
-                    0{sub.id} {sub.name}
-                  </span>
-                  <div className="flex items-center gap-2">
-                    <span className="text-zinc-400 light:text-slate-600 text-[11px]">
-                      {sub.seen}/{sub.total}
-                    </span>
-                    <span
-                      className={`font-bold w-9 text-right ${
+                  <div className="w-full bg-zinc-950/80 border border-zinc-800 light:bg-slate-200 light:border-slate-300/60 rounded-full h-1.5 overflow-hidden">
+                    <div
+                      className={`h-full rounded-full transition-all duration-300 ${
                         sub.accuracy >= 90
-                          ? 'text-emerald-400'
+                          ? 'bg-emerald-500'
                           : sub.accuracy >= 70
-                          ? 'text-amber-400'
-                          : 'text-zinc-400 light:text-slate-600'
+                          ? 'bg-amber-500'
+                          : 'bg-rose-500'
                       }`}
-                    >
-                      {sub.seen > 0 ? `${sub.accuracy}%` : '-'}
+                      style={{ width: `${sub.accuracy}%` }}
+                    />
+                  </div>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Recent Exam Simulation History */}
+        <div className="p-5 rounded-2xl border border-zinc-700 bg-zinc-900 light:bg-white light:border-slate-300 light:shadow-sm space-y-3">
+          <h3 className="text-xs font-bold text-zinc-400 light:text-slate-600 uppercase tracking-wider flex items-center gap-1.5">
+            <Calendar className="w-3.5 h-3.5 text-amber-400" />
+            <span>Storico Simulazioni d'Esame</span>
+          </h3>
+
+          {answeredSessions.length === 0 ? (
+            <p className="text-xs text-zinc-400 light:text-slate-600 py-3 text-center">
+              Nessuna simulazione completata finora.
+            </p>
+          ) : (
+            <div className="space-y-2">
+              {answeredSessions.slice(0, 5).map((s, idx) => {
+                const dateStr = new Date(s.date).toLocaleDateString('it-IT', {
+                  day: '2-digit',
+                  month: 'short',
+                  hour: '2-digit',
+                  minute: '2-digit'
+                });
+                const mins = Math.floor(s.durationSeconds / 60);
+                const outcome = resolveSessionOutcome(s);
+                const hasWeightedScore = typeof s.scorePoints === 'number';
+
+                const badgeClass =
+                  outcome === 'passed'
+                    ? 'bg-emerald-500/20 text-emerald-400 light:bg-emerald-100 light:text-emerald-800'
+                    : outcome === 'oral_check'
+                    ? 'bg-amber-500/20 text-amber-400 light:bg-amber-100 light:text-amber-800'
+                    : 'bg-rose-500/20 text-rose-400 light:bg-rose-100 light:text-rose-800';
+
+                const badgeLabel =
+                  outcome === 'passed'
+                    ? 'IDONEO'
+                    : outcome === 'oral_check'
+                    ? 'VERIFICA ORALE'
+                    : 'NON IDONEO';
+
+                return (
+                  <div
+                    key={s.id || idx}
+                    className="p-3 rounded-xl border border-zinc-700 bg-zinc-950/60 light:bg-slate-50 light:border-slate-300 flex items-center justify-between text-xs"
+                  >
+                    <div className="space-y-0.5">
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <span className={`px-2 py-0.5 rounded font-bold text-[10px] whitespace-nowrap ${badgeClass}`}>
+                          {badgeLabel}
+                        </span>
+                        {hasWeightedScore && (
+                          <span className="font-mono font-black text-amber-300 light:text-amber-800 whitespace-nowrap">
+                            {s.scorePoints}/{s.maxPoints ?? 100} pt
+                          </span>
+                        )}
+                        <span className="font-mono font-bold text-zinc-200 light:text-slate-800 whitespace-nowrap">
+                          {s.correctAnswers}/{s.totalQuestions} ({s.wrongAnswers} err)
+                        </span>
+                      </div>
+                      <div className="text-[10px] text-zinc-400 light:text-slate-600 flex items-center gap-2">
+                        <span>{dateStr}</span>
+                        <span>•</span>
+                        <span className="flex items-center gap-0.5 whitespace-nowrap">
+                          <Clock className="w-3 h-3" /> {mins} min
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </div>
+
+        {/* Top 10 Most Frequently Missed Questions */}
+        {topWrongQuestions.length > 0 && (
+          <div className="p-5 rounded-2xl border border-zinc-700 bg-zinc-900 light:bg-white light:border-slate-300 light:shadow-sm space-y-3">
+            <div className="flex items-center justify-between">
+              <h3 className="text-xs font-bold text-rose-400 uppercase tracking-wider flex items-center gap-1.5">
+                <AlertTriangle className="w-3.5 h-3.5" />
+                <span>Top 10 Domande con Più Errori</span>
+              </h3>
+              <span className="text-[10px] text-zinc-400 light:text-slate-600 italic hidden sm:inline">
+                Tocca una domanda per la scheda completa
+              </span>
+            </div>
+
+            <div className="space-y-2">
+              {topWrongQuestions.map(item => (
+                <button
+                  type="button"
+                  key={item.question.id}
+                  id={`btn-stat-wrong-q-${item.question.id}`}
+                  onClick={() => setSelectedQuestion(item.question)}
+                  className="w-full text-left p-2.5 rounded-lg border border-zinc-700/80 bg-zinc-950/40 hover:bg-zinc-800/50 hover:border-zinc-600 light:bg-slate-50 light:border-slate-300 light:hover:bg-slate-100 text-xs flex items-center justify-between gap-3 transition-colors group cursor-pointer"
+                >
+                  <div className="space-y-0.5 truncate flex-1 min-w-0">
+                    <div className="flex items-center gap-2">
+                      <span className="font-mono font-bold text-amber-400">
+                        #{item.question.id}
+                      </span>
+                      <span className="text-[10px] text-zinc-400 light:text-slate-600">
+                        {item.question.subjectName}
+                      </span>
+                    </div>
+                    <p className="text-zinc-300 light:text-slate-700 truncate group-hover:text-zinc-100 light:group-hover:text-slate-900">
+                      {item.question.question}
+                    </p>
+                  </div>
+
+                  <div className="flex items-center gap-2 flex-shrink-0">
+                    <span className="px-2 py-0.5 rounded bg-rose-500/20 text-rose-400 light:bg-rose-100 light:text-rose-700 font-bold text-[10px] whitespace-nowrap">
+                      {item.timesWrong} {item.timesWrong === 1 ? 'errore' : 'errori'}
                     </span>
                     <ChevronRight className="w-3.5 h-3.5 text-zinc-400 light:text-slate-500 group-hover:text-zinc-200 light:group-hover:text-slate-800 transition-transform group-hover:translate-x-0.5" />
                   </div>
-                </div>
-
-                <div className="w-full bg-zinc-950/80 border border-zinc-800 light:bg-slate-200 light:border-slate-300/60 rounded-full h-1.5 overflow-hidden">
-                  <div
-                    className={`h-full rounded-full transition-all duration-300 ${
-                      sub.accuracy >= 90
-                        ? 'bg-emerald-500'
-                        : sub.accuracy >= 70
-                        ? 'bg-amber-500'
-                        : 'bg-rose-500'
-                    }`}
-                    style={{ width: `${sub.accuracy}%` }}
-                  />
-                </div>
-              </button>
-            );
-          })}
-        </div>
-      </div>
-
-      {/* Storico Ultime Simulazioni */}
-      <div className="p-5 rounded-2xl border border-zinc-700 bg-zinc-900 light:bg-white light:border-slate-300 light:shadow-sm space-y-3">
-        <h3 className="text-xs font-bold text-zinc-400 light:text-slate-600 uppercase tracking-wider flex items-center gap-1.5">
-          <Calendar className="w-3.5 h-3.5 text-amber-400" />
-          <span>Storico Simulazioni d'Esame</span>
-        </h3>
-
-        {answeredSessions.length === 0 ? (
-          <p className="text-xs text-zinc-400 light:text-slate-600 py-3 text-center">
-            Nessuna simulazione completata finora.
-          </p>
-        ) : (
-          <div className="space-y-2">
-            {answeredSessions.slice(0, 5).map((s, idx) => {
-              const dateStr = new Date(s.date).toLocaleDateString('it-IT', {
-                day: '2-digit',
-                month: 'short',
-                hour: '2-digit',
-                minute: '2-digit'
-              });
-              const mins = Math.floor(s.durationSeconds / 60);
-
-              return (
-                <div
-                  key={s.id || idx}
-                  className="p-3 rounded-xl border border-zinc-700 bg-zinc-950/60 light:bg-slate-50 light:border-slate-300 flex items-center justify-between text-xs"
-                >
-                  <div className="space-y-0.5">
-                    <div className="flex items-center gap-2">
-                      <span
-                        className={`px-2 py-0.5 rounded font-bold text-[10px] ${
-                          s.isPassed
-                            ? 'bg-emerald-500/20 text-emerald-400'
-                            : 'bg-rose-500/20 text-rose-400'
-                        }`}
-                      >
-                        {s.isPassed ? 'IDONEO' : 'NON IDONEO'}
-                      </span>
-                      <span className="font-mono font-bold text-zinc-200 light:text-slate-800">
-                        {s.correctAnswers}/{s.totalQuestions} ({s.wrongAnswers} err)
-                      </span>
-                    </div>
-                    <div className="text-[10px] text-zinc-400 light:text-slate-600 flex items-center gap-2">
-                      <span>{dateStr}</span>
-                      <span>•</span>
-                      <span className="flex items-center gap-0.5">
-                        <Clock className="w-3 h-3" /> {mins} min
-                      </span>
-                    </div>
-                  </div>
-                </div>
-              );
-            })}
+                </button>
+              ))}
+            </div>
           </div>
         )}
       </div>
 
-      {/* Top 10 Domande Più Sbagliate */}
-      {topWrongQuestions.length > 0 && (
-        <div className="p-5 rounded-2xl border border-zinc-700 bg-zinc-900 light:bg-white light:border-slate-300 light:shadow-sm space-y-3">
-          <div className="flex items-center justify-between">
-            <h3 className="text-xs font-bold text-rose-400 uppercase tracking-wider flex items-center gap-1.5">
-              <AlertTriangle className="w-3.5 h-3.5" />
-              <span>Top 10 Domande con Più Errori</span>
-            </h3>
-            <span className="text-[10px] text-zinc-400 light:text-slate-600 italic hidden sm:inline">
-              Tocca una domanda per la scheda completa
-            </span>
-          </div>
-
-          <div className="space-y-2">
-            {topWrongQuestions.map(item => (
-              <button
-                type="button"
-                key={item.question.id}
-                id={`btn-stat-wrong-q-${item.question.id}`}
-                onClick={() => setSelectedQuestion(item.question)}
-                className="w-full text-left p-2.5 rounded-lg border border-zinc-700/80 bg-zinc-950/40 hover:bg-zinc-800/50 hover:border-zinc-600 light:bg-slate-50 light:border-slate-300 light:hover:bg-slate-100 text-xs flex items-center justify-between gap-3 transition-colors group cursor-pointer"
-              >
-                <div className="space-y-0.5 truncate flex-1 min-w-0">
-                  <div className="flex items-center gap-2">
-                    <span className="font-mono font-bold text-amber-400">
-                      #{item.question.id}
-                    </span>
-                    <span className="text-[10px] text-zinc-400 light:text-slate-600">
-                      {item.question.subjectName}
-                    </span>
-                  </div>
-                  <p className="text-zinc-300 light:text-slate-700 truncate group-hover:text-zinc-100 light:group-hover:text-slate-900">
-                    {item.question.question}
-                  </p>
-                </div>
-
-                <div className="flex items-center gap-2 flex-shrink-0">
-                  <span className="px-2 py-0.5 rounded bg-rose-500/20 text-rose-400 light:bg-rose-100 light:text-rose-700 font-bold text-[10px]">
-                    {item.timesWrong} {item.timesWrong === 1 ? 'errore' : 'errori'}
-                  </span>
-                  <ChevronRight className="w-3.5 h-3.5 text-zinc-400 light:text-slate-500 group-hover:text-zinc-200 light:group-hover:text-slate-800 transition-transform group-hover:translate-x-0.5" />
-                </div>
-              </button>
-            ))}
-          </div>
-        </div>
-      )}
-      </div>
-
-      {/* Modale Dettaglio Materia */}
+      {/* Subject Detail Drilldown Modal */}
       <SubjectDetailModal
         subjectId={selectedSubjectId}
         isOpen={selectedSubjectId !== null}
@@ -299,7 +329,7 @@ export const StatsScreen: React.FC<StatsScreenProps> = ({ onTrainSubject }) => {
         onTrainSubject={onTrainSubject}
       />
 
-      {/* Modale Dettaglio Domanda */}
+      {/* Question Detail Modal */}
       <QuestionDetailModal
         question={selectedQuestion}
         isOpen={selectedQuestion !== null}

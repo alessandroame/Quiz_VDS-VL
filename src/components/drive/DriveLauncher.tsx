@@ -399,7 +399,7 @@ export const DriveLauncher: React.FC<DriveLauncherProps> = ({
             <Zap className="w-6 h-6 text-amber-200" />
             <div className="text-left">
               <div>Esame Ufficiale AeCI</div>
-              <div className="text-xs text-amber-200 font-medium">30 Quiz • 45 Minuti • Max 3 Errori (alla cieca)</div>
+              <div className="text-xs text-amber-200 font-medium">30 Quiz • 100 Punti Pesati • 45 Min Audio (idoneo ≥ 86, orale 80–85)</div>
             </div>
           </div>
           <ArrowRight className="w-5 h-5" />

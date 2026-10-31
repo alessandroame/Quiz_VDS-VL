@@ -401,6 +401,42 @@ describe('SettingsModal Component (Accordion & Mobile Ergonomics)', () => {
     container.remove();
   });
 
+  it('toggles examTimerMinutes between 30 min (official AeCI) and 45 min (extended) in Appearance section', () => {
+    const mockUpdateSetting = vi.fn();
+    mockUseQuiz.mockReturnValue({
+      settings: { ...defaultSettings, examTimerMinutes: 30 },
+      updateSetting: mockUpdateSetting,
+      updateSettings: vi.fn(),
+      syncState: { isSyncing: false, lastSyncedAt: null, error: null },
+      syncNow: vi.fn(),
+      resetAllStats: vi.fn(),
+      resetAllData: vi.fn()
+    });
+
+    const container = document.createElement('div');
+    document.body.appendChild(container);
+    const root = createRoot(container);
+
+    act(() => {
+      root.render(React.createElement(SettingsModal, { isOpen: true, onClose: () => {}, defaultTab: 'appearance' }));
+    });
+
+    const btn30 = container.querySelector('#exam-timer-btn-30') as HTMLButtonElement;
+    const btn45 = container.querySelector('#exam-timer-btn-45') as HTMLButtonElement;
+    expect(btn30).not.toBeNull();
+    expect(btn45).not.toBeNull();
+
+    act(() => {
+      btn45.click();
+    });
+    expect(mockUpdateSetting).toHaveBeenCalledWith('examTimerMinutes', 45);
+
+    act(() => {
+      root.unmount();
+    });
+    container.remove();
+  });
+
   it('displays formatted lastSyncedAt status bar even when autoSyncDrive is false', () => {
     const olderTs = new Date(2026, 9, 15, 14, 25, 0).getTime();
     mockUseQuiz.mockReturnValue({

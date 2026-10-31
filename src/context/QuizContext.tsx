@@ -23,7 +23,7 @@ import {
   calculateSubjectAnalytics,
   calculateReadinessScore
 } from '../utils/analytics';
-import { hasSessionAnswers } from '../services/examEvaluator';
+import { hasSessionAnswers, resolveSessionOutcome } from '../services/examEvaluator';
 import { telemetry } from '../services/telemetry';
 import type { StudyModeType } from '../types/telemetry';
 
@@ -204,7 +204,7 @@ export const QuizProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const accuracyPct = totalSeen > 0 ? Math.round((correctCount / totalSeen) * 100) : 0;
       const coveragePct = filteredQuestions.length > 0 ? Math.round((totalSeen / filteredQuestions.length) * 100) : 0;
       const recent = sessions.slice(0, 3);
-      const passRatePct = recent.length > 0 ? Math.round((recent.filter(s => s.isPassed).length / recent.length) * 100) : 0;
+      const passRatePct = recent.length > 0 ? Math.round((recent.reduce((acc, s) => acc + (resolveSessionOutcome(s) === 'passed' ? 1 : resolveSessionOutcome(s) === 'oral_check' ? 0.5 : 0), 0) / recent.length) * 100) : 0;
 
       telemetry.trackReadinessScoreUpdated({
         readiness_score: readinessScore,

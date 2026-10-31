@@ -20,7 +20,12 @@ import type { Question } from '../types/quiz';
 import type { ExamSession, ExamModeType, TutorFormat } from '../types/database';
 import { useQuiz } from '../context/QuizContext';
 import { generateExamQuestions, generateFlashTutorQuestions } from '../utils/fairRandomizer';
-import { evaluateExam } from '../services/examEvaluator';
+import { evaluateExam, resolveSessionOutcome } from '../services/examEvaluator';
+import {
+  OFFICIAL_WRITTEN_TIMER_MINUTES,
+  MARATHON_TIMER_MINUTES,
+  getSubjectPointWeight,
+} from '../utils/aeciRegulation';
 import { formatTime } from '../utils/timer';
 import { QuestionCard } from './QuestionCard';
 import { QuestionNavigator } from './QuestionNavigator';
@@ -74,7 +79,8 @@ export const ExamScreen: React.FC<ExamScreenProps> = ({
   useEffect(() => {
     flagsRef.current = flags;
   }, [flags]);
-  const [secondsRemaining, setSecondsRemaining] = useState(45 * 60);
+  const examTimerMinutes = settings?.examTimerMinutes || OFFICIAL_WRITTEN_TIMER_MINUTES;
+  const [secondsRemaining, setSecondsRemaining] = useState(examTimerMinutes * 60);
   const [elapsedSeconds, setElapsedSeconds] = useState(0);
   const [startTime, setStartTime] = useState(0);
   const [isMarathon, setIsMarathon] = useState(false);
@@ -181,7 +187,7 @@ export const ExamScreen: React.FC<ExamScreenProps> = ({
           }
           setElapsedSeconds(activeSession.elapsedSeconds || activeSession.secondsRemaining || 0);
         } else {
-          setSecondsRemaining(activeSession.secondsRemaining || 45 * 60);
+          setSecondsRemaining(activeSession.secondsRemaining || examTimerMinutes * 60);
         }
         setStartTime(activeSession.startTime || Date.now());
         setIsMarathon(mode === 'marathon');
@@ -226,7 +232,7 @@ export const ExamScreen: React.FC<ExamScreenProps> = ({
     setFlags({});
     flagsRef.current = {};
     recordedQuestionIds.current.clear();
-    const totalMinutes = marathon ? 60 : settings.examTimerMinutes || 45;
+    const totalMinutes = marathon ? MARATHON_TIMER_MINUTES : examTimerMinutes;
     const initialSeconds = totalMinutes * 60;
     setSecondsRemaining(initialSeconds);
     setElapsedSeconds(0);
@@ -760,7 +766,7 @@ export const ExamScreen: React.FC<ExamScreenProps> = ({
                   </span>
                 </div>
                 <p className="text-xs text-zinc-400 light:text-slate-600 leading-relaxed">
-                  30 quesiti distribuiti per materia secondo le quote ufficiali d'esame (9 aerodinamica, 8 meteo, ecc.).
+                  30 quesiti secondo le quote ufficiali AeCI Volo Libero (8 aerodinamica, 6 meteo, 5 pilotaggio, 4 normativa, 3 sicurezza...) valutati su 100 punti.
                 </p>
               </div>
             </div>
@@ -806,7 +812,7 @@ export const ExamScreen: React.FC<ExamScreenProps> = ({
               className="text-xs text-zinc-400 hover:text-sky-400 light:text-slate-500 light:hover:text-sky-600 transition-colors inline-flex items-center gap-1.5"
             >
               <Timer className="w-3.5 h-3.5 text-sky-400" />
-              <span>Vuoi metterti alla prova col timer? Passa a <strong>Esame Ufficiale (45 min)</strong></span>
+              <span>Vuoi metterti alla prova col timer? Passa a <strong>Esame Ufficiale ({examTimerMinutes} min)</strong></span>
             </button>
           </div>
         </div>
@@ -824,7 +830,7 @@ export const ExamScreen: React.FC<ExamScreenProps> = ({
                 Quota AeCI Certificata • D.P.R. 133/2010
               </span>
               <span className="text-[11px] font-mono text-zinc-400 light:text-slate-500">
-                30 Quiz • 45 Minuti
+                30 Quiz • 100 Punti • {examTimerMinutes} Min
               </span>
             </div>
             <h2 className="font-bold text-lg sm:text-xl text-zinc-100 light:text-slate-900 flex items-center gap-2.5">
@@ -832,7 +838,7 @@ export const ExamScreen: React.FC<ExamScreenProps> = ({
               <span>Esame Ufficiale AeCI</span>
             </h2>
             <p className="text-xs sm:text-sm text-zinc-400 light:text-slate-600 leading-relaxed">
-              Simulazione formale fedele alla prova d'esame per l'attestato VDS/VL. 30 quesiti a risposta multipla con countdown reale di 45 minuti e debriefing finale alla consegna.
+              Simulazione formale fedele alla prova scritta VDS/VL AeCI: 30 quesiti pesati (totale 100 punti), countdown di {examTimerMinutes} minuti e verifica finale a 3 fasce.
             </p>
           </div>
 
@@ -842,9 +848,9 @@ export const ExamScreen: React.FC<ExamScreenProps> = ({
               <span>Regolamento della sessione:</span>
             </div>
             <ul className="space-y-1.5 pl-6 list-disc text-zinc-400 light:text-slate-600">
-              <li><strong>30 quesiti ufficiali</strong> ripartiti esattamente secondo le 9 materie d'esame.</li>
-              <li><strong>Countdown di 45 minuti</strong> con avviso visivo negli ultimi minuti.</li>
-              <li><strong>Idoneità conseguita</strong> con un massimo di <strong>3 errori</strong> (minimo 27 risposte esatte).</li>
+              <li><strong>30 quesiti ufficiali (100 punti)</strong> ripartiti sulle 9 materie con pesi da 4, 3 e 2 punti.</li>
+              <li><strong>Countdown di {examTimerMinutes} minuti</strong> (45 minuti automatici in modalità Mani Libere).</li>
+              <li><strong>Esito ufficiale AeCI</strong>: <strong>Idoneo</strong> (86–100 pt), <strong>Idoneo con verifica orale</strong> (80–85 pt), <strong>Non idoneo</strong> (&lt; 80 pt).</li>
               <li><strong>Nessun feedback durante la prova</strong>: correzione e spiegazioni complete nel debriefing alla consegna.</li>
             </ul>
           </div>
@@ -855,7 +861,7 @@ export const ExamScreen: React.FC<ExamScreenProps> = ({
             className="w-full py-3.5 rounded-xl bg-sky-600 hover:bg-sky-500 text-white font-bold text-sm shadow-lg shadow-sky-950/40 flex items-center justify-center gap-2 transition-all active:scale-[0.99] light:bg-sky-600 light:hover:bg-sky-700"
           >
             <Timer className="w-4 h-4" />
-            <span>Inizia Esame Ufficiale (45 min)</span>
+            <span>Inizia Esame Ufficiale ({examTimerMinutes} min)</span>
           </button>
         </div>
 
@@ -867,7 +873,7 @@ export const ExamScreen: React.FC<ExamScreenProps> = ({
               <span>Maratona Intensiva (60 Quiz)</span>
             </div>
             <p className="text-[11px] text-zinc-400 light:text-slate-600">
-              Sessione estesa da 60 minuti con doppia quota quiz per testare resistenza e memoria.
+              Sessione estesa da 60 minuti con doppia quota quiz (60 quesiti normalizzati su 100 punti).
             </p>
           </div>
           <button
@@ -899,7 +905,19 @@ export const ExamScreen: React.FC<ExamScreenProps> = ({
 
   // --- Schermata REVIEW / DEBRIEFING ESITO ---
   if (examState === 'review' && completedSession) {
-    const isPassed = completedSession.isPassed;
+    const outcome = resolveSessionOutcome(completedSession);
+    const isPassed = outcome === 'passed';
+    const isOralCheck = outcome === 'oral_check';
+    const hasWeightedScore = typeof completedSession.scorePoints === 'number';
+    const weightedOutcomeNote = hasWeightedScore
+      ? isPassed
+        ? 'Idoneità diretta conseguita (fascia ufficiale 86–100 punti).'
+        : isOralCheck
+        ? 'Fascia 80–85 punti: ammesso con verifica orale integrativa sui quesiti errati.'
+        : 'Punteggio inferiore alla soglia minima di 80/100 punti. Rivedi subito gli errori qui sotto.'
+      : isPassed
+      ? 'Sessione completata sopra la soglia di idoneità.'
+      : 'Esercitazione completata. Rivedi subito gli errori qui sotto.';
     const errors = completedSession.wrongAnswers;
     const correct = completedSession.correctAnswers;
     const total = completedSession.totalQuestions;
@@ -912,6 +930,8 @@ export const ExamScreen: React.FC<ExamScreenProps> = ({
           className={`p-6 rounded-2xl border text-center space-y-2 ${
             isPassed
               ? 'bg-emerald-950/30 border-emerald-500/60 light:bg-emerald-50 light:border-emerald-300'
+              : isOralCheck
+              ? 'bg-amber-950/30 border-amber-500/60 light:bg-amber-50 light:border-amber-300'
               : 'bg-rose-950/30 border-rose-500/60 light:bg-rose-50 light:border-rose-300'
           }`}
         >
@@ -919,7 +939,11 @@ export const ExamScreen: React.FC<ExamScreenProps> = ({
             {isPassed ? (
               <CheckCircle2 className="w-14 h-14 text-emerald-400 light:text-emerald-600" />
             ) : (
-              <XCircle className="w-14 h-14 text-rose-400 light:text-rose-600" />
+              isOralCheck ? (
+                <AlertCircle className="w-14 h-14 text-amber-400 light:text-amber-600" />
+              ) : (
+                <XCircle className="w-14 h-14 text-rose-400 light:text-rose-600" />
+              )
             )}
           </div>
           <div className="text-[11px] font-bold uppercase tracking-wider text-zinc-400 light:text-slate-500">
@@ -935,24 +959,33 @@ export const ExamScreen: React.FC<ExamScreenProps> = ({
           </div>
           <h2
             className={`text-2xl font-black tracking-tight ${
-              isPassed ? 'text-emerald-300 light:text-emerald-800' : 'text-rose-300 light:text-rose-800'
+              isPassed
+                ? 'text-emerald-300 light:text-emerald-800'
+                : isOralCheck
+                ? 'text-amber-300 light:text-amber-800'
+                : 'text-rose-300 light:text-rose-800'
             }`}
           >
-            {isPassed ? 'IDONEO' : 'NON IDONEO'}
+            {isPassed ? 'IDONEO' : isOralCheck ? 'IDONEO CON VERIFICA ORALE' : 'NON IDONEO'}
           </h2>
           <div className="text-sm font-semibold text-zinc-300 light:text-slate-700">
+            {hasWeightedScore && (
+              <div className="text-xl sm:text-2xl font-mono font-black text-zinc-100 light:text-slate-900 whitespace-nowrap mb-1">
+                {completedSession.scorePoints} / {completedSession.maxPoints ?? 100} pt
+              </div>
+            )}
             {correct}/{total} esatte ({errors} {errors === 1 ? 'errore' : 'errori'}) • Tempo: {formatTime(completedSession.durationSeconds)}
           </div>
           <p className="text-xs text-zinc-400 light:text-slate-600">
             {isTutor
               ? (completedSession.tutorFormat === 'flash'
-                  ? (isPassed ? 'Complimenti! Hai superato la prova rapida da 10 quiz.' : 'Esercitazione completata. Rivedi subito gli errori qui sotto.')
+                  ? (isPassed ? 'Prova rapida da 10 quiz superata.' : 'Esercitazione da 10 quiz completata. Rivedi subito gli errori qui sotto.')
                   : completedSession.tutorFormat === 'endless'
                   ? 'Flusso continuo completato! Ottimo allenamento.'
-                  : (isPassed ? 'Complimenti! Hai superato la soglia ufficiale del 90% (max 3 errori).' : 'Soglia massima di 3 errori superata. Rivedi subito gli errori qui sotto.'))
+                  : weightedOutcomeNote)
               : (isPassed
-                  ? 'Complimenti! Hai superato la soglia ufficiale del 90% (max 3 errori).'
-                  : 'Soglia massima di 3 errori superata. Rivedi subito gli errori qui sotto.')}
+                  ? weightedOutcomeNote
+                  : weightedOutcomeNote)}
           </p>
         </div>
 
@@ -967,23 +1000,29 @@ export const ExamScreen: React.FC<ExamScreenProps> = ({
               const qSample = examQuestions.find(q => q.subjectId === subId);
               const subName = qSample?.subjectName || `Materia ${subId}`;
               const hasErrors = data.wrong > 0;
+              const weight = data.pointWeight ?? getSubjectPointWeight(subId);
+              const pointsLost = data.pointsLost ?? data.wrong * weight;
+              const pointsEarned = data.pointsEarned ?? data.correct * weight;
 
               return (
                 <div key={subId} className="flex items-center justify-between py-1 border-b border-zinc-700/60 light:border-slate-200 last:border-none">
                   <span className="text-zinc-200 light:text-slate-800 font-medium truncate max-w-[200px]">
-                    {subName}
+                    {subName}{' '}
+                    <span className="ml-1 text-[10px] font-mono text-zinc-400 light:text-slate-500 whitespace-nowrap">
+                      ({weight} pt)
+                    </span>
                   </span>
                   <div className="flex items-center gap-2">
                     <span className="text-zinc-400">
                       {data.correct}/{data.total}
                     </span>
                     {hasErrors ? (
-                      <span className="px-1.5 py-0.5 rounded bg-rose-500/20 text-rose-400 font-bold text-[10px]">
-                        -{data.wrong} err
+                      <span className="px-1.5 py-0.5 rounded bg-rose-500/20 text-rose-400 light:bg-rose-100 light:text-rose-700 font-bold text-[10px] whitespace-nowrap">
+                        {hasWeightedScore ? `-${pointsLost} pt (${data.wrong} err)` : `-${data.wrong} err`}
                       </span>
                     ) : (
-                      <span className="px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-400 font-bold text-[10px]">
-                        100%
+                      <span className="px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-400 light:bg-emerald-100 light:text-emerald-700 font-bold text-[10px] whitespace-nowrap">
+                        {hasWeightedScore ? `+${pointsEarned} pt` : '100%'}
                       </span>
                     )}
                   </div>
@@ -1020,7 +1059,7 @@ export const ExamScreen: React.FC<ExamScreenProps> = ({
             className="flex-1 py-3 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-zinc-200 light:bg-slate-200 light:text-slate-800 font-semibold text-xs sm:text-sm flex items-center justify-center gap-2 transition-colors"
           >
             <Timer className="w-4 h-4" />
-            <span>Esame Ufficiale (45 min)</span>
+            <span>Esame Ufficiale ({examTimerMinutes} min)</span>
           </button>
         </div>
 
@@ -1127,14 +1166,18 @@ export const ExamScreen: React.FC<ExamScreenProps> = ({
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-3.5 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-200 light:bg-amber-50 light:border-amber-200 light:text-amber-900">
                   <div className="flex items-center gap-2">
                     <RotateCcw className="w-4 h-4 text-amber-400 flex-shrink-0" />
-                    <span className="text-xs font-semibold">Vuoi riprovare subito i quesiti sbagliati con il feedback immediato?</span>
+                    <span className="text-xs font-semibold">
+                      {isOralCheck
+                        ? 'Verifica orale prevista sui quesiti errati: ripassali subito con Regola e Tranello.'
+                        : 'Vuoi riprovare subito i quesiti sbagliati con il feedback immediato?'}
+                    </span>
                   </div>
                   <button
                     id="btn-retry-mistakes-now"
                     onClick={handleReviewMistakesNow}
                     className="px-3.5 py-1.5 rounded-lg bg-amber-600 hover:bg-amber-500 text-white font-bold text-xs shadow-sm transition-colors flex items-center justify-center gap-1.5 whitespace-nowrap self-end sm:self-auto cursor-pointer"
                   >
-                    <span>Ripassa Ora in Tutor ({errors})</span>
+                    <span>{isOralCheck ? `Prepara Verifica Orale (${errors})` : `Ripassa Ora in Tutor (${errors})`}</span>
                     <ArrowRight className="w-3.5 h-3.5" />
                   </button>
                 </div>
@@ -1503,7 +1546,7 @@ export const ExamScreen: React.FC<ExamScreenProps> = ({
               if (resMode === 'tutor') {
                 setElapsedSeconds(activeSession.elapsedSeconds || activeSession.secondsRemaining || 0);
               } else {
-                setSecondsRemaining(activeSession.secondsRemaining || 45 * 60);
+                setSecondsRemaining(activeSession.secondsRemaining || examTimerMinutes * 60);
               }
               setStartTime(activeSession.startTime || Date.now());
               setIsMarathon(resMode === 'marathon');

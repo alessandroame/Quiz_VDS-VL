@@ -12,6 +12,7 @@ import { voiceService } from '../services/voiceService';
 import { SessionInterruptModal } from './SessionInterruptModal';
 import { SessionConflictModal } from './SessionConflictModal';
 import { getNextQuestionIndex } from '../utils/quizNavigation';
+import { getSubjectPointWeight } from '../utils/aeciRegulation';
 
 export interface TopicsScreenProps {
   initialSubjectId?: number | null;
@@ -389,7 +390,10 @@ export const TopicsScreen: React.FC<TopicsScreenProps> = ({
               <div className="flex items-start justify-between gap-2">
                 <div>
                   <div className="text-[11px] font-mono text-amber-400 light:text-amber-800 font-bold">
-                    0{sub.id}
+                    0{sub.id}{' '}
+                    <span className="ml-1 px-1.5 py-0.5 rounded bg-zinc-800 text-zinc-300 light:bg-slate-100 light:text-slate-700 border border-zinc-700/70 light:border-slate-300 text-[10px] font-mono whitespace-nowrap">
+                      {sub.pointWeight ?? getSubjectPointWeight(sub.id)} pt/quiz
+                    </span>
                   </div>
                   <h3 className="font-bold text-sm text-zinc-100 light:text-slate-900">
                     {sub.name}

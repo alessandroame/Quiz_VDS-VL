@@ -3,9 +3,11 @@ import {
   X,
   RotateCcw,
   CheckCircle2,
+  AlertCircle,
   XCircle
 } from 'lucide-react';
 import type { ExamSession } from '../../types/database';
+import { resolveSessionOutcome } from '../../services/examEvaluator';
 import { VoiceQuickMenu } from '../VoiceQuickMenu';
 
 export interface DriveDebriefingProps {
@@ -27,9 +29,36 @@ export const DriveDebriefing: React.FC<DriveDebriefingProps> = ({
   onReplayIntro,
   setIsVoiceMenuOpen
 }) => {
+  const outcome = resolveSessionOutcome(completedSession);
+  const hasWeightedScore = typeof completedSession.scorePoints === 'number';
+
+  const cardThemeClass =
+    outcome === 'passed'
+      ? 'bg-emerald-950/40 border-emerald-500 text-emerald-100 light:bg-emerald-50 light:border-emerald-500 light:text-emerald-950'
+      : outcome === 'oral_check'
+      ? 'bg-amber-950/40 border-amber-500 text-amber-100 light:bg-amber-50 light:border-amber-500 light:text-amber-950'
+      : 'bg-rose-950/40 border-rose-500 text-rose-100 light:bg-rose-50 light:border-rose-500 light:text-rose-950';
+
+  const outcomeTitle =
+    outcome === 'passed'
+      ? 'ESAME IDONEO'
+      : outcome === 'oral_check'
+      ? 'IDONEO CON VERIFICA ORALE'
+      : 'NON IDONEO';
+
+  const outcomeSubtitle = hasWeightedScore
+    ? outcome === 'passed'
+      ? 'Idoneità diretta conseguita (soglia ufficiale 86–100 pt)'
+      : outcome === 'oral_check'
+      ? 'Fascia 80–85 pt: ammesso con verifica orale sui quesiti errati'
+      : 'Punteggio inferiore alla soglia minima di 80/100 punti'
+    : outcome === 'passed'
+    ? `Sessione superata con ${completedSession.wrongAnswers} errori`
+    : `${completedSession.wrongAnswers} errori su ${completedSession.totalQuestions} quesiti`;
+
   return (
     <div className="flex-1 flex flex-col justify-between p-4 sm:p-6 max-w-lg mx-auto w-full">
-      {/* Header Debriefing */}
+      {/* Debriefing header */}
       <div className="flex items-center justify-between pb-3 border-b border-zinc-800 light:border-slate-200">
         <div className="flex items-center gap-2">
           <div className="w-8 h-8 rounded-lg bg-amber-500/20 text-amber-400 light:bg-amber-100 light:text-amber-700 flex items-center justify-center font-bold text-xs">
@@ -49,6 +78,7 @@ export const DriveDebriefing: React.FC<DriveDebriefingProps> = ({
             onClick={onClose}
             className="p-2 rounded-xl bg-zinc-900 border border-zinc-800 text-zinc-400 hover:text-white light:bg-white light:border-slate-200 light:text-slate-600 light:hover:text-slate-900 light:shadow-sm"
             title="Esci dalla Modalità Mani Libere"
+            aria-label="Esci dalla Modalità Mani Libere"
           >
             <X className="w-5 h-5" />
           </button>
@@ -56,27 +86,26 @@ export const DriveDebriefing: React.FC<DriveDebriefingProps> = ({
       </div>
 
       <div className="space-y-6 pt-4 text-center">
-        <div
-          className={`p-6 rounded-3xl border-2 space-y-3 ${
-            completedSession.isPassed
-              ? 'bg-emerald-950/40 border-emerald-500 text-emerald-100 light:bg-emerald-50 light:border-emerald-500 light:text-emerald-950'
-              : 'bg-rose-950/40 border-rose-500 text-rose-100 light:bg-rose-50 light:border-rose-500 light:text-rose-950'
-          }`}
-        >
+        <div className={`p-6 rounded-3xl border-2 space-y-3 ${cardThemeClass}`}>
           <div className="inline-flex items-center justify-center w-16 h-16 rounded-full mx-auto">
-            {completedSession.isPassed ? (
-              <CheckCircle2 className="w-16 h-16 text-emerald-400" />
+            {outcome === 'passed' ? (
+              <CheckCircle2 className="w-16 h-16 text-emerald-400 light:text-emerald-600" />
+            ) : outcome === 'oral_check' ? (
+              <AlertCircle className="w-16 h-16 text-amber-400 light:text-amber-600" />
             ) : (
-              <XCircle className="w-16 h-16 text-rose-400" />
+              <XCircle className="w-16 h-16 text-rose-400 light:text-rose-600" />
             )}
           </div>
-          <h2 className="text-3xl font-black tracking-tight">
-            {completedSession.isPassed ? 'ESAME IDONEO' : 'NON IDONEO'}
+          <h2 className="text-2xl sm:text-3xl font-black tracking-tight">
+            {outcomeTitle}
           </h2>
+          {hasWeightedScore && (
+            <div className="text-2xl font-mono font-black whitespace-nowrap">
+              {completedSession.scorePoints} / {completedSession.maxPoints ?? 100} pt
+            </div>
+          )}
           <p className="text-sm font-semibold opacity-90">
-            {completedSession.isPassed
-              ? `Complimenti! ${completedSession.wrongAnswers} errori (massimo 3 ammessi)`
-              : `${completedSession.wrongAnswers} errori su ${completedSession.totalQuestions} quesiti`}
+            {outcomeSubtitle}
           </p>
         </div>
 

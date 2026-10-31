@@ -183,6 +183,42 @@ describe('Suite 6: Calcolo Metriche & Quaderno Errori (src/utils/analytics.ts)',
       // Both should yield identical readiness score because the empty session is ignored
       expect(scoreWithEmpty).toBe(scoreWithoutEmpty);
     });
+
+    it('STAT-07: weights seen-question accuracy by official AeCI subject points (4 / 3 / 2 pt) on real catalog IDs', () => {
+      const statsHighCorrect: QuestionStat[] = [
+        { questionId: 5001, timesSeen: 1, timesCorrect: 1, timesWrong: 0, consecutiveCorrect: 1, lastResult: 'correct', isBookmarked: false },
+        { questionId: 3001, timesSeen: 1, timesCorrect: 0, timesWrong: 1, consecutiveCorrect: 0, lastResult: 'wrong', isBookmarked: false },
+      ];
+      const statsLowCorrect: QuestionStat[] = [
+        { questionId: 5001, timesSeen: 1, timesCorrect: 0, timesWrong: 1, consecutiveCorrect: 0, lastResult: 'wrong', isBookmarked: false },
+        { questionId: 3001, timesSeen: 1, timesCorrect: 1, timesWrong: 0, consecutiveCorrect: 1, lastResult: 'correct', isBookmarked: false },
+      ];
+
+      expect(calculateReadinessScore(100, 2, statsHighCorrect, [])).toBe(24);
+      expect(calculateReadinessScore(100, 2, statsLowCorrect, [])).toBe(12);
+    });
+
+    it('STAT-08: scores oral_check (80-85 pt) simulations at 0.5 weight in the 30% simulation component', () => {
+      const stats: QuestionStat[] = [
+        { questionId: 5001, timesSeen: 1, timesCorrect: 1, timesWrong: 0, consecutiveCorrect: 1, lastResult: 'correct', isBookmarked: false },
+      ];
+      const oralSession: ExamSession = {
+        date: 100,
+        durationSeconds: 1200,
+        totalQuestions: 30,
+        correctAnswers: 26,
+        wrongAnswers: 4,
+        isPassed: false,
+        examOutcome: 'oral_check',
+        scorePoints: 84,
+        maxPoints: 100,
+        isMarathon: false,
+        subjectBreakdown: {},
+        snapshots: [{ questionId: 5001, userAnswer: 1, correctAnswer: 1, isCorrect: true, wasFlagged: false }],
+      };
+
+      expect(calculateReadinessScore(1, 1, stats, [oralSession])).toBe(85);
+    });
   });
 
   describe('Statistiche per Materia (calculateSubjectAnalytics)', () => {

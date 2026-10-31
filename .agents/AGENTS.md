@@ -18,7 +18,7 @@ L'alberatura delle configurazioni dell'agente è standardizzata, modulare e ordi
 │   ├── headless-pwa-tester/    # Collaudo visivo CDP zero-dipendenze (mobile 390x844 e desktop)
 │   ├── minimal-ui-ux/          # Design system minimale per lo studio, microcopy essenziale ed ergonomia zero-distrazioni
 │   ├── pwa-quiz-engine/        # Fair Coverage Randomizer, persistenza Dexie e gestione offline
-│   ├── vds-exam-examiner/      # Regolamento esame ufficiale AeCI (30 quiz, 45 min, max 3 errori)
+│   ├── vds-exam-examiner/      # Regolamento esame ufficiale AeCI (30 quiz, 100 pt pesati, 30 min, idoneo >= 86, orale 80-85)
 │   ├── vds-quiz-extractor/     # Pipeline estrazione e normalizzazione dei 504 quiz dal PDF ufficiale
 │   └── ui-audit-inspector/     # Audit UI/UX, contrasti WCAG AA, anti-cluttering e report HTML con screenshot
 ├── worklog.d/                  # Frammenti di diario per sessioni parallele (anti-merge conflict)

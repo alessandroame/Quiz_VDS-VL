@@ -37,20 +37,20 @@ Questo documento rappresenta la **bussola strategica e funzionale** del progetto
      * **Avanzamento a 1 Tocco**: pulsante dedicato "Prossima Domanda" per una fluidità ottimale su smartphone.
      * **Registrazione Istantanea**: telemetria salvata subito in Dexie per alimentare in tempo reale il Quaderno Errori.
    - **Simulazione Esame Ufficiale (Conforme AeCI)**:
-     * 30 quesiti estratti rispettando fedelmente le quote per materia:
-       - *Aerodinamica*: 9 quiz
-       - *Meteorologia*: 8 quiz
-       - *Tecnica di Pilotaggio*: 5 quiz
-       - *Normativa e Legislazione*: 2 quiz
-       - *Sicurezza del Volo*: 2 quiz
-       - *Primo Soccorso*: 1 quiz
-       - *Fisiopatologia del Volo*: 1 quiz
-       - *Strumenti di Volo*: 1 quiz
-       - *Materiali e Manutenzione*: 1 quiz
-     * Timer countdown di 45 minuti con avvisi visivi.
-     * Idoneità: **Massimo 3 errori** ammessi (minimo 27/30). 4 o più errori = **NON IDONEO**.
+     * 30 quesiti estratti rispettando le quote e i pesi del Regolamento Tecnico-Operativo-Didattico Volo Libero AeCI (totale 100 punti):
+       - *Aerodinamica*: 8 quiz × 3 pt (24 pt)
+       - *Meteorologia*: 6 quiz × 4 pt (24 pt)
+       - *Tecnica di Pilotaggio*: 5 quiz × 4 pt (20 pt)
+       - *Normativa e Legislazione*: 4 quiz × 3 pt (12 pt)
+       - *Sicurezza del Volo*: 3 quiz × 4 pt (12 pt)
+       - *Primo Soccorso*: 1 quiz × 2 pt (2 pt)
+       - *Fisiopatologia del Volo*: 1 quiz × 2 pt (2 pt)
+       - *Strumenti di Volo*: 1 quiz × 2 pt (2 pt)
+       - *Materiali e Manutenzione*: 1 quiz × 2 pt (2 pt)
+     * Timer countdown di 30 minuti da regolamento scritto AeCI (selettore 30/45 min in Impostazioni; 45 min automatici in Modalità Mani Libere per lettura vocale).
+     * Valutazione in centesimi (`100 pt`): **86–100 pt = IDONEO**, **80–85 pt = IDONEO CON VERIFICA ORALE**, **< 80 pt = NON IDONEO** (applicata a Esame 30, Tutor Standard 30 e Maratona 60 normalizzata `/100`).
      * Griglia di navigazione interattiva a 30 slot per visualizzare quesiti risposti, da rispondere e contrassegnati con bandierina (`⚑ Rivedi`).
-     * Schermata finale di Debriefing con esito secco (`IDONEO` / `NON IDONEO`), tempo impiegato e analisi errori.
+     * Schermata finale di Debriefing a 3 fasce (`IDONEO` / `IDONEO CON VERIFICA ORALE` / `NON IDONEO`), punteggio `/100 pt`, punti persi per materia e preparazione orale.
 
 2. **Studio per Materie**:
    - Filtro immediato per ciascuna delle 9 materie.
@@ -129,13 +129,13 @@ Questo documento rappresenta la **bussola strategica e funzionale** del progetto
 | Dataset 504 Quiz AeCI | 🟢 Completato | Single Source of Truth (SSOT) in `src/data/questions.json` isolato nel chunk rollup `quiz-dataset.js`. Duplicato `public/data/questions.json` rimosso per ottimizzazione precache. |
 | Fair Coverage Randomizer | 🟢 Completato | Logica in `src/services/randomizer.ts` e `src/utils/fairRandomizer.ts`. |
 | Database Dexie (IndexedDB) | 🟢 Completato | Schema in `src/db/index.ts`, tipi in `src/types/database.ts`. |
-| Simulatore Esame Ufficiale & Didattico | 🟢 Completato | 30 quiz, modalità Tutor (senza tempo, feedback immediato Regola+Tranello) ed Esame Ufficiale (45 min), griglia 30 slot reattiva, evaluator in `src/services/examEvaluator.ts`. |
+| Simulatore Esame Ufficiale & Didattico | 🟢 Completato | 30 quiz = 100 pt pesati (`aeciRegulation.ts`), esito a 3 fasce (`>=86` Idoneo, `80-85` Verifica Orale, `<80` Non Idoneo), timer 30m scritto / 45m audio, `examEvaluator.ts`. |
 | Modalità Materie | 🟢 Completato | Filtro 9 materie con spiegazioni Regola + Tranello. |
 | Quaderno Errori Leitner | 🟢 Completato | Uscita vincolata a 2 risposte esatte consecutive. |
 | Archivio & Ricerca Full-Text | 🟢 Completato | Ricerca istantanea, preferiti e note personali salvate in Dexie. |
 | Dashboard Statistiche | 🟢 Completato | Radar materie, preparazione esame e storico sessioni. |
 | Temi Scuro & Chiaro, Icona Aero Shield | 🟢 Completato | Zero dominante blu (`zinc` + `amber`), bordi pannelli elevati ad alto contrasto (`zinc-700` dark, `slate-300` light) con conformità WCAG 2.1 AA/AAA su tutti i testi e card, icona Aero Shield vettoriale e PNG 192/512. |
-| Suite Vitest (Unit & BVA) | 🟢 Completato | 468 test attivi su 58 suite (100% passanti, 0 fallimenti), copertura linee estesa, test completi per custom hooks mobile (WakeLock, Voice, SpeechRecognition progressivo) e contratti ergonomici componenti. |
+| Suite Vitest (Unit & BVA) | 🟢 Completato | 482 test attivi su 58 suite (100% passanti, 0 fallimenti), BVA punteggi pesati AeCI (86/85/80/79), custom hooks mobile e contratti ergonomici componenti. |
 | UI Audit Inspector (WCAG AA & De-Clutter) | 🟢 Completato | Scansione automatizzata CDP su 10 schermate x 4 viewport x 2 temi: **0 difetti unici** (contrasti WCAG AA conformi, verbo canonico 'Inizia' su tutte le CTA, filtri Archivio a scheda singola e 6 card Home above-the-fold su mobile 390x844). |
 | Supporto Audio | 🟢 Completato | Sintesi vocale neurale con controlli Play/Pausa e Da Capo universali su domanda, singole opzioni e spiegazione; feedback Web Audio API e fonetica ICAO. |
 | Gestione Offline Audio & Fallback | 🟢 Completato | Download in background non bloccante via CacheStorage, prompt non invasivo al primo avvio Guida, gestione granulare Impostazioni, fallback automatico offline su voce scaricata e Range Requests Safari. |
@@ -176,6 +176,7 @@ Questo documento rappresenta la **bussola strategica e funzionale** del progetto
 | Modalità Tutor Flessibile (Flash 10, Standard 30, Continuo) | 🟢 Completato | 3 formati d'allenamento didattico a 1 tocco: Flash 10 (microlearning da 3-5 min per buchi di tempo con estensione immediata `[Continua (+10 Quiz)]`), Standard 30 (quote ufficiali AeCI per sessioni approfondite da 15-20 min) e Flusso Continuo (HUD avionico live, navigazione illimitata ad alta priorità su non viste ed errori, e uscita libera senza alcuna penalità sui quiz non visualizzati). |
 | Pagine Pubbliche OAuth (Home, Privacy Policy, Terms of Service) | 🟢 Completato | Pagine HTML statiche in `public/` (`about.html`, `privacy-policy.html`, `terms-of-service.html`) e doc Markdown in `docs/` conformi a Google OAuth Verification. |
 | Riconoscimento Vocale a Raffinamento Progressivo | 🟢 Completato | Streaming bicolore live + preview intento (settle 340ms), autocorrezione in frase, N-best=5, keyword opzioni e alias adattivi Dexie (>=2 match). |
+| Regolamento Ufficiale AeCI 100 Punti Pesati & Verifica Orale | 🟢 Completato | Quote Volo Libero `4-8-1-1-6-1-5-1-3` (`4/3/2` pt = 100 pt), fascia `80–85` Verifica Orale, Readiness pesato, timer 30m scritto / 45m audio e retrocompatibilità storico. |
 
 ---
 

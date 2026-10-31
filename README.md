@@ -67,7 +67,7 @@
   - 🎯 **Simulazione Didattica (Tutor - Consigliata per imparare)**:
     - **Tre Formati d'Allenamento Flessibili a 1 Tocco**:
       * ⚡ **Flash (10 Quiz)**: progettato per sfruttare i buchi di tempo quotidiani (3-5 minuti, pause caffè, trasporti) con selezione equilibrata ad alta priorità su quiz non ancora visti ed errori recenti. Include il checkpoint immediato `[Continua (+10 Quiz)]` nella modale di conclusione per prolungare la sessione al volo senza uscire. Criterio idoneità proporzionale al 90% (massimo 1 errore concesso).
-      * 🎯 **Standard (30 Quiz)**: allenamento canonico secondo le quote ufficiali d'esame AeCI (9 aerodinamica, 8 meteo, ecc.) per sessioni approfondite da 15-20 minuti.
+      * 🎯 **Standard (30 Quiz — 100 Punti AeCI)**: allenamento canonico secondo le quote e i pesi ufficiali del Volo Libero AeCI (`8` aerodinamica × `3 pt`, `6` meteo × `4 pt`, `5` tecnica × `4 pt`, `4` normativa × `3 pt`, `3` sicurezza × `4 pt`, `1×4` materie da `2 pt` = `100 punti`) per sessioni da 15-20 minuti.
       * ♾️ **Continuo (Endless Stream)**: flusso ininterrotto ad alta priorità senza limiti di domande, con HUD avionico compatto (`Quiz #X`, statistiche live `✓ / ✗` e percentuale di accuratezza) al posto della griglia a 30 slot. L'allievo può concludere in qualsiasi momento senza alcuna penalità o conteggio d'errore sui quiz non visualizzati.
     - **Nessun limite di tempo**: studio rilassato senza countdown, con cronometro discreto del tempo trascorso.
     - **Verifica e Feedback Immediato**: alla selezione di una risposta, l'opzione viene validata all'istante (verde/rosso), con visualizzazione esplicita della soluzione esatta e della spiegazione contestuale didattica (**Regola** e **Tranello**).
@@ -80,28 +80,29 @@
       * Pulsante dedicato *"Prossima Domanda"* sempre disponibile per avanzamento manuale.
     - **Registrazione Istantanea**: statistiche e telemetria salvate in tempo reale in IndexedDB, alimentando subito il Quaderno Errori senza attendere la fine della scheda.
   - ⏱️ **Simulazione Esame Ufficiale AeCI (Prova Formale)**:
-    - 30 quesiti AeCI, timer countdown di 45 minuti con indicatori di stato visivi e allarmi negli ultimi minuti.
+    - 30 quesiti AeCI per **100 punti complessivi**, timer countdown di **30 minuti** da regolamento scritto AeCI (commutabile a 45 min estesi in Impostazioni; 45 min automatici in Modalità Mani Libere per lettura vocale).
     - Esito, conteggio errori e debriefing completo svelati esclusivamente alla consegna finale.
-- **Ripartizione Ministeriale Esatta**: estrazione di 30 quesiti secondo le quote di legge:
-  - *Aerodinamica*: 9 quiz
-  - *Meteorologia*: 8 quiz
-  - *Tecnica di Pilotaggio*: 5 quiz
-  - *Normativa e Legislazione*: 2 quiz
-  - *Sicurezza del Volo*: 2 quiz
-  - *Primo Soccorso*: 1 quiz
-  - *Fisiopatologia del Volo*: 1 quiz
-  - *Strumenti di Volo*: 1 quiz
-  - *Materiali e Manutenzione*: 1 quiz
+- **Ripartizione e Pesi Ufficiali Volo Libero AeCI (30 quiz = 100 punti)**:
+  - *Aerodinamica*: 8 quiz × 3 pt = **24 pt**
+  - *Meteorologia e Aerologia*: 6 quiz × 4 pt = **24 pt**
+  - *Tecnica di Pilotaggio*: 5 quiz × 4 pt = **20 pt**
+  - *Normativa e Legislazione*: 4 quiz × 3 pt = **12 pt**
+  - *Sicurezza del Volo*: 3 quiz × 4 pt = **12 pt**
+  - *Primo Soccorso*: 1 quiz × 2 pt = **2 pt**
+  - *Fisiopatologia del Volo*: 1 quiz × 2 pt = **2 pt**
+  - *Strumenti di Volo*: 1 quiz × 2 pt = **2 pt**
+  - *Materiali e Manutenzione*: 1 quiz × 2 pt = **2 pt**
 - **Valutazione Ufficiale AeCI**:
-  - **IDONEO**: massimo **3 errori** ammessi (minimo 27/30).
-  - **NON IDONEO**: 4 o più errori.
+  - **IDONEO (`86 – 100` pt)**: esame superato direttamente.
+  - **IDONEO CON VERIFICA ORALE (`80 – 85` pt)**: ammissione con verifica orale delle domande sbagliate da parte dell'Esaminatore AeCI prima della prova pratica.
+  - **NON IDONEO (`< 80` pt)**: prova non superata. *(La Maratona a 60 quiz raddoppia le quote per 200 punti grezzi normalizzati in centesimi `/100`).*
 - **Navigatore Quesiti Comprimibile a Singola Riga**:
   - Modalità **Espansa**: griglia ergonomica a 3 righe da 10 bolle (28px) con feedback cromatico di stato e indicatore flag `⚑`.
   - Modalità **Compressa a Singola Riga**: tutti i 30 quiz sono disposti orizzontalmente su **una sola riga** senza bisogno di scroll (tacche avioniche colorate a tutta larghezza con indicatore domanda attiva su smartphone, e numeri visibili su desktop).
   - Recupera oltre 70px verticali per favorire il layout *Zero-Scroll* con visualizzazione contemporanea di domanda, opzioni e spiegazione Regola/Tranello su smartphone compatti (390x844).
   - Persistenza automatica della preferenza compresso/espanso dell'allievo in memoria locale (`localStorage`).
 - **Debriefing Finale con Filtri & Ripasso Immediato Errori**:
-  - Esito secco immediato (`IDONEO` / `NON IDONEO`), tempo impiegato, punteggio e ripartizione per materia con indicatore degli errori per argomento.
+  - Esito a 3 fasce (`IDONEO` / `IDONEO CON VERIFICA ORALE` / `NON IDONEO`), punteggio in centesimi (`/100 pt`), tempo impiegato, punti persi per materia (`-4 pt`, `-3 pt`, `-2 pt`) e azione immediata *"Prepara Verifica Orale"*.
   - **Filtri di Revisione a 1 Tocco**: navigazione istantanea sui quesiti della sessione con chip dedicati: `Solo Errori` (attivato automaticamente per azzerare lo scroll sui 30 quiz se presenti errori), `Tutti (30)`, `⚑ Rivedi` e `Corretti`.
   - **Ripasso Immediato in Tutor**: banner d'azione rapida *"Ripassa Ora in Tutor"* per riprovare subito i soli quesiti sbagliati con il feedback immediato Regola/Tranello prima che i dettagli svaniscano dalla memoria.
 - **Navigation Guard (Protezione Sessione)**: avviso di sicurezza e blocco in caso di tentata navigazione verso altre schede o ricaricamento pagina (`beforeunload`), evitando la perdita accidentale della simulazione in corso.
@@ -127,11 +128,11 @@
 - **Note Personali & Preferiti**: memorizzazione locale in Dexie IndexedDB con gestione note (aggiunta, modifica, eliminazione) e badge visivo.
 
 ### 7. Statistiche Avanzate & Ispezione Interattiva (Drilldown Liste)
-- **Indice di Preparazione Esame**: percentuale calcolata sull'accuratezza globale e sulla copertura delle materie.
+- **Indice di Preparazione Esame**: percentuale calcolata su copertura del catalogo (`35%`), accuratezza sui quiz visti ponderata per i punti ufficiali AeCI `4 / 3 / 2` pt (`35%`) ed esito delle ultime 3 simulazioni (`30%`, con peso `0.5` per la fascia *Verifica Orale*).
 - **Ispezione Interattiva Materie (`SubjectDetailModal`)**: toccando qualsiasi materia nell'elenco si apre un cruscotto dedicato con percentuale di accuratezza, barra di copertura, pulsante rapido *"Allenati su questa materia"* (con salto istantaneo allo Studio Materie), filtri a 1 tocco (*Tutte*, *Errori*, *Non viste*, *Corrette*) ed elenco scorrevole dei singoli quesiti.
 - **Scheda Integrale Quesito (`QuestionDetailModal`)**: toccando un quesito (dalla scheda materia o direttamente dalla Top 10 degli errori) si accede alla scheda completa ad alta leggibilità: testo integrale della domanda AeCI, 3 opzioni con risposta esatta evidenziata in verde smeraldo, spiegazione didattica (*Regola* e *Tranello*), riproduzione vocale neurale, note personali, preferiti e telemetria dettagliata (volte vista, errori, risposte corrette consecutive).
 - **Top 10 Domande Più Ostiche**: graduatoria interattiva dei quesiti che hanno registrato il maggior numero di risposte errate, con apertura a singolo tocco della scheda del quesito.
-- **Registro Storico Sessioni**: cronologia delle simulazioni svolte con esito (`IDONEO` / `NON IDONEO`), punteggio e tempo impiegato.
+- **Registro Storico Sessioni**: cronologia delle simulazioni svolte con esito a 3 fasce (`IDONEO` / `VERIFICA ORALE` / `NON IDONEO`), punteggio `/100 pt` (con retrocompatibilità integrale per le sessioni storiche) e tempo impiegato.
 
 ### 8. Modalità Mani Libere (Hands-Free Outdoor & Macro-Target Bici/Corsa)
 - Pensata per lo studio in movimento a mani libere (in auto, furgone navetta, sui rulli in bici o durante la corsa all'aperto) con smartphone a braccio o su manubrio.
@@ -209,7 +210,7 @@
     * **🚗 Mani Libere**: stato dell'avanzamento automatico continuo, countdown di risposta (3-8s) e riattivazione del briefing vocale iniziale.
     * **☁️ Backup**: stato della sincronizzazione Google Drive GIS (`Auto-Sync` / `Manuale`), ultimo backup e gestione token.
     * **⚙️ Dati**: catalogo 504 quiz Dexie IndexedDB (SSOT), ripristino/esportazione JSON locale e reset totale.
-    * **ℹ️ About**: versione attiva dell'applicazione (`v1.0.0 • AeCI`), riferimenti normativi ufficiali (D.P.R. 9 luglio 2010, n. 133 e regolamenti esame AeCI 30 quiz, 45 min, max 3 errori) e architettura di bordo.
+    * **ℹ️ About**: versione attiva dell'applicazione, riferimenti normativi ufficiali (D.P.R. 9 luglio 2010, n. 133 e Regolamento Volo Libero AeCI: 30 quiz, 100 punti pesati, 30 min scritto, idoneo ≥ 86, verifica orale 80–85) e architettura di bordo.
   - Toolbar rapida di controllo con contatore sezioni e pulsante contestuale per **comprimere tutto** a vista d'occhio o **espandere la prima sezione**.
   - Eliminazione totale dello scrolling della pagina sottostante (body scroll lock) per una navigazione pulita e focalizzata.
 - **Palette Cockpit Bimodale**:

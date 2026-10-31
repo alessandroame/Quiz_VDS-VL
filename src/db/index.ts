@@ -7,13 +7,14 @@ import type {
   BackupDataPayload
 } from '../types/database';
 import { DEFAULT_TTS_PLAYBACK_RATE } from '../types/audio';
+import { OFFICIAL_WRITTEN_TIMER_MINUTES } from '../utils/aeciRegulation';
 import { smartMergeBackups, type SmartMergeResult } from '../services/smartMerge';
 import { hasSessionAnswers } from '../services/examEvaluator';
 
 export const DEFAULT_SETTINGS: AppSettings = {
   theme: 'system',
   fontSizePreference: 'normal',
-  examTimerMinutes: 45,
+  examTimerMinutes: OFFICIAL_WRITTEN_TIMER_MINUTES,
   immediateFeedbackInTopics: true,
   autoAdvanceOnCorrect: true,
   soundEnabled: true,

@@ -1,8 +1,11 @@
 import { describe, it, expect } from 'vitest';
 import questionsData from '../data/questions.json';
+import { generateExamQuestions } from '../utils/fairRandomizer';
 import type { Question } from '../types/quiz';
 import {
   evaluateExam,
+  evaluateWeightedOutcome,
+  resolveSessionOutcome,
   isPassingScore,
   countSessionAnsweredQuestions,
   hasSessionAnswers,
@@ -414,5 +417,179 @@ describe('Suite 3: Motore di Valutazione Esame AeCI (src/services/examEvaluator.
     expect(emptyEndless.snapshots.length).toBe(0);
     expect(countSessionAnsweredQuestions(emptyEndless)).toBe(0);
     expect(hasSessionAnswers(emptyEndless)).toBe(false);
+  });
+
+  it('EVAL-17: weighted 100-point AeCI 30-question sheet awards 100/100 and passed outcome on perfect answers', () => {
+    const balanced30 = generateExamQuestions(allQuestions, new Map(), false);
+    const answers: Record<number, 1 | 2 | 3> = {};
+    for (const q of balanced30) {
+      answers[q.id] = q.correctAnswer;
+    }
+
+    const session = evaluateExam({
+      questions: balanced30,
+      answers,
+      durationSeconds: 1200,
+      examMode: 'official',
+    });
+
+    expect(session.scorePoints).toBe(100);
+    expect(session.maxPoints).toBe(100);
+    expect(session.examOutcome).toBe('passed');
+    expect(session.isPassed).toBe(true);
+  });
+
+  it('EVAL-18: BVA weighted thresholds - 86 pt is passed, 85 pt and 80 pt are oral_check, 79 pt is failed', () => {
+    expect(evaluateWeightedOutcome(100)).toBe('passed');
+    expect(evaluateWeightedOutcome(86)).toBe('passed');
+    expect(evaluateWeightedOutcome(85.5)).toBe('oral_check');
+    expect(evaluateWeightedOutcome(85)).toBe('oral_check');
+    expect(evaluateWeightedOutcome(80)).toBe('oral_check');
+    expect(evaluateWeightedOutcome(79.5)).toBe('failed');
+    expect(evaluateWeightedOutcome(79)).toBe('failed');
+
+    const balanced30 = generateExamQuestions(allQuestions, new Map(), false);
+    const wrongAnsFor = (q: Question): 1 | 2 | 3 => ((q.correctAnswer === 1 ? 2 : 1) as 1 | 2 | 3);
+
+    const bySubject = (sId: number) => balanced30.filter(q => q.subjectId === sId);
+    const fourPtQs = [...bySubject(5), ...bySubject(7), ...bySubject(9)];
+    const threePtQs = [...bySubject(1), ...bySubject(2)];
+    const twoPtQs = [...bySubject(3), ...bySubject(4), ...bySubject(6), ...bySubject(8)];
+
+    const buildAnswersWithErrors = (wrongIds: Set<number>) => {
+      const map: Record<number, 1 | 2 | 3> = {};
+      for (const q of balanced30) {
+        map[q.id] = wrongIds.has(q.id) ? wrongAnsFor(q) : q.correctAnswer;
+      }
+      return map;
+    };
+
+    // Case 86 pt (5 errors: two 4-pt [-8] + three 2-pt [-6] = -14 -> 86/100 -> passed)
+    const wrong86 = new Set([fourPtQs[0].id, fourPtQs[1].id, twoPtQs[0].id, twoPtQs[1].id, twoPtQs[2].id]);
+    const session86 = evaluateExam({
+      questions: balanced30,
+      answers: buildAnswersWithErrors(wrong86),
+      durationSeconds: 1100,
+      examMode: 'official',
+    });
+    expect(session86.wrongAnswers).toBe(5);
+    expect(session86.scorePoints).toBe(86);
+    expect(session86.examOutcome).toBe('passed');
+    expect(session86.isPassed).toBe(true);
+
+    // Case 85 pt (4 errors: three 4-pt [-12] + one 3-pt [-3] = -15 -> 85/100 -> oral_check)
+    const wrong85 = new Set([fourPtQs[0].id, fourPtQs[1].id, fourPtQs[2].id, threePtQs[0].id]);
+    const session85 = evaluateExam({
+      questions: balanced30,
+      answers: buildAnswersWithErrors(wrong85),
+      durationSeconds: 1100,
+      examMode: 'official',
+    });
+    expect(session85.wrongAnswers).toBe(4);
+    expect(session85.scorePoints).toBe(85);
+    expect(session85.examOutcome).toBe('oral_check');
+    expect(session85.isPassed).toBe(false);
+
+    // Case 80 pt (5 errors: five 4-pt [-20] -> 80/100 -> oral_check)
+    const wrong80 = new Set(fourPtQs.slice(0, 5).map(q => q.id));
+    const session80 = evaluateExam({
+      questions: balanced30,
+      answers: buildAnswersWithErrors(wrong80),
+      durationSeconds: 1100,
+      examMode: 'official',
+    });
+    expect(session80.scorePoints).toBe(80);
+    expect(session80.examOutcome).toBe('oral_check');
+    expect(session80.isPassed).toBe(false);
+
+    // Case 79 pt (6 errors: four 4-pt [-16] + one 3-pt [-3] + one 2-pt [-2] = -21 -> 79/100 -> failed)
+    const wrong79 = new Set([
+      fourPtQs[0].id,
+      fourPtQs[1].id,
+      fourPtQs[2].id,
+      fourPtQs[3].id,
+      threePtQs[0].id,
+      twoPtQs[0].id,
+    ]);
+    const session79 = evaluateExam({
+      questions: balanced30,
+      answers: buildAnswersWithErrors(wrong79),
+      durationSeconds: 1100,
+      examMode: 'official',
+    });
+    expect(session79.scorePoints).toBe(79);
+    expect(session79.examOutcome).toBe('failed');
+    expect(session79.isPassed).toBe(false);
+  });
+
+  it('EVAL-19: normalizes 60-question Marathon (200 raw points) onto the 100-point AeCI scale', () => {
+    const marathon60 = generateExamQuestions(allQuestions, new Map(), true);
+    const wrongAnsFor = (q: Question): 1 | 2 | 3 => ((q.correctAnswer === 1 ? 2 : 1) as 1 | 2 | 3);
+    const fourPtQs = marathon60.filter(q => q.subjectId === 5 || q.subjectId === 7 || q.subjectId === 9);
+    const threePtQs = marathon60.filter(q => q.subjectId === 1);
+
+    const wrong172 = new Set(fourPtQs.slice(0, 7).map(q => q.id));
+    const answers172: Record<number, 1 | 2 | 3> = {};
+    for (const q of marathon60) {
+      answers172[q.id] = wrong172.has(q.id) ? wrongAnsFor(q) : q.correctAnswer;
+    }
+    const passedMarathon = evaluateExam({
+      questions: marathon60,
+      answers: answers172,
+      durationSeconds: 2400,
+      isMarathon: true,
+      examMode: 'marathon',
+    });
+    expect(passedMarathon.rawPoints).toBe(172);
+    expect(passedMarathon.rawMaxPoints).toBe(200);
+    expect(passedMarathon.scorePoints).toBe(86);
+    expect(passedMarathon.examOutcome).toBe('passed');
+
+    const wrong170 = new Set([...fourPtQs.slice(0, 6).map(q => q.id), threePtQs[0].id, threePtQs[1].id]);
+    const answers170: Record<number, 1 | 2 | 3> = {};
+    for (const q of marathon60) {
+      answers170[q.id] = wrong170.has(q.id) ? wrongAnsFor(q) : q.correctAnswer;
+    }
+    const oralMarathon = evaluateExam({
+      questions: marathon60,
+      answers: answers170,
+      durationSeconds: 2400,
+      isMarathon: true,
+      examMode: 'marathon',
+    });
+    expect(oralMarathon.scorePoints).toBe(85);
+    expect(oralMarathon.examOutcome).toBe('oral_check');
+  });
+
+  it('EVAL-20: Tutor Standard (30 quiz) uses weighted /100 scoring while Flash (10) stays unweighted and resolveSessionOutcome handles legacy records', () => {
+    const balanced30 = generateExamQuestions(allQuestions, new Map(), false);
+    const answers30: Record<number, 1 | 2 | 3> = {};
+    for (const q of balanced30) answers30[q.id] = q.correctAnswer;
+
+    const tutorStandard = evaluateExam({
+      questions: balanced30,
+      answers: answers30,
+      durationSeconds: 600,
+      examMode: 'tutor',
+      tutorFormat: 'standard',
+    });
+    expect(tutorStandard.scorePoints).toBe(100);
+    expect(tutorStandard.examOutcome).toBe('passed');
+
+    const sample10 = balanced30.slice(0, 10);
+    const answers10: Record<number, 1 | 2 | 3> = {};
+    for (const q of sample10) answers10[q.id] = q.correctAnswer;
+    const tutorFlash = evaluateExam({
+      questions: sample10,
+      answers: answers10,
+      durationSeconds: 180,
+      examMode: 'tutor',
+      tutorFormat: 'flash',
+    });
+    expect(tutorFlash.scorePoints).toBeUndefined();
+
+    expect(resolveSessionOutcome({ isPassed: true })).toBe('passed');
+    expect(resolveSessionOutcome({ isPassed: false })).toBe('failed');
+    expect(resolveSessionOutcome({ isPassed: false, scorePoints: 83 })).toBe('oral_check');
   });
 });
