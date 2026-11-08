@@ -126,6 +126,7 @@ Questo documento rappresenta la **bussola strategica e funzionale** del progetto
 
 | Modulo / Requisito | Stato | Note per il Prossimo Agente |
 | :--- | :---: | :--- |
+| **TODO-12: Grafici Statistiche Prontezza (3 Pilastri), Trend `/100 pt` & Funnel Errori Leitner** | 🔴 **Prioritario (In Coda #1)** | Piano esecutivo pronto in [docs/PLAN_STATS_CHARTS.md](file:///c:/github/Quiz_VDS-VL/docs/PLAN_STATS_CHARTS.md). Estendere [analytics.ts](file:///c:/github/Quiz_VDS-VL/src/utils/analytics.ts), [StatsScreen.tsx](file:///c:/github/Quiz_VDS-VL/src/components/StatsScreen.tsx) e [SubjectDetailModal.tsx](file:///c:/github/Quiz_VDS-VL/src/components/SubjectDetailModal.tsx) con 3 grafici SVG/CSS zero-dipendenze: (1) Scomposizione Prontezza `35/35/30` + Leva prioritaria, (2) Sparkline `/100 pt` ultimi 10 esami con soglie AeCI `86/80 pt`, (3) Funnel Leitner `0/2 · 1/2 · 2/2` + Punti Esame a Rischio per materia con drill-down 1-touch. |
 | Dataset 504 Quiz AeCI | 🟢 Completato | Single Source of Truth (SSOT) in `src/data/questions.json` isolato nel chunk rollup `quiz-dataset.js`. Duplicato `public/data/questions.json` rimosso per ottimizzazione precache. |
 | Fair Coverage Randomizer | 🟢 Completato | Logica in `src/services/randomizer.ts` e `src/utils/fairRandomizer.ts`. |
 | Database Dexie (IndexedDB) | 🟢 Completato | Schema in `src/db/index.ts`, tipi in `src/types/database.ts`. |
@@ -237,6 +238,11 @@ Questa roadmap sintetizza il piano di riorganizzazione per massimizzare l'usabil
     - Finestra di dialogo unificata `SessionInterruptModal` che intercetta l'interruzione e offre scelta chiara: "Metti in Pausa" (salvataggio stato e freeze timer/countdown, ritorno a Home), "Termina ed Elimina" (`dismissActiveSession()` per ripartire puliti da zero) o "Rimani nel Quiz".
     - Banner Home arricchito con badge `In Pausa`, tasto `[Riprendi]` e icona cestino per eliminare la sessione in sospeso direttamente dalla Home previa conferma.
     - Dialog di risoluzione automatica conflitti `SessionConflictModal` per avvisi espliciti quando l'allievo tenta di avviare un nuovo scenario con una sessione incompiuta attiva.
+12. **TODO-12: Grafici Significativi Prontezza Esame (3 Pilastri), Trend `/100 pt` & Funnel Errori Leitner** `[🔴 PRIORITARIO — IN CODA #1]`:
+    - Piano architetturale e di verifica completo in [docs/PLAN_STATS_CHARTS.md](file:///c:/github/Quiz_VDS-VL/docs/PLAN_STATS_CHARTS.md).
+    - **Grafico 1 — Scomposizione Prontezza a 3 Pilastri (`35/35/30`) + Leva Prioritaria (`calculateReadinessBreakdown`)**: barra segmentata proporzionale dentro la card *Preparazione Esame* (`Copertura /35%`, `Precisione Pesata /35%`, `Ultime 3 Simulazioni /30%`) con indicazione deterministica della leva a maggior guadagno immediato.
+    - **Grafico 2 — Sparkline SVG Trend Punteggi (`/100 pt`) con Soglie AeCI (`calculateExamTrend`)**: grafico SVG nativo `340x130` sugli ultimi 10 esami validi con banda verde smeraldo `86..100 pt` (`IDONEO`), soglia tratteggiata ambra `80 pt` (`VERIFICA ORALE`) e normalizzazione automatica Maratona `/200 -> /100`.
+    - **Grafico 3 — Funnel Recupero Errori Leitner (`0/2 · 1/2 · 2/2`) & Punti Esame a Rischio per Materia (`calculateMistakeLeitnerBuckets`)**: barra tripartita dello stato di guarigione del Quaderno Errori (`Critici 0/2`, `In uscita 1/2`, `Recuperati 2/2`), badge `-X.X pt a rischio` su `100 pt` pesati (`4/3/2 pt`) per ciascuna delle 9 materie e apertura a 1 tocco di `SubjectDetailModal` con `initialFilterMode="wrong"`.
 
 
 ---
