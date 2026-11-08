@@ -75,9 +75,10 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab, openSet
       <>
         <header
           id="mini-header"
-          className="fixed top-0 left-0 right-0 z-40 w-full h-12 border-b backdrop-blur bg-zinc-950/95 border-zinc-700/80 dark:bg-zinc-950/95 dark:border-zinc-700/80 light:bg-white/95 light:border-slate-300 light:text-slate-900 transition-colors shadow-sm"
+          style={{ paddingTop: 'env(safe-area-inset-top, 0px)' }}
+          className="fixed top-0 left-0 right-0 z-40 w-full border-b backdrop-blur bg-zinc-950/95 border-zinc-700/80 dark:bg-zinc-950/95 dark:border-zinc-700/80 light:bg-white/95 light:border-slate-300 light:text-slate-900 transition-colors shadow-sm"
         >
-          <div className="max-w-4xl mx-auto px-2 sm:px-4 h-full flex items-center justify-between gap-2">
+          <div className="max-w-4xl mx-auto px-2 sm:px-4 h-12 flex items-center justify-between gap-2">
             {/* Tasto Ritorno a Home Hub */}
             <div className="flex items-center gap-2 min-w-0">
               <button
@@ -144,7 +145,7 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab, openSet
                 aria-label="Impostazioni"
                 onClick={() => openSettings()}
                 title="Impostazioni"
-                className="p-1.5 rounded-lg text-zinc-400 hover:text-zinc-200 light:text-slate-600 light:hover:text-slate-900 hover:bg-zinc-800/60 light:hover:bg-slate-100 transition-colors"
+                className="min-h-[38px] min-w-[38px] p-2 rounded-lg flex items-center justify-center text-zinc-400 hover:text-zinc-200 light:text-slate-600 light:hover:text-slate-900 hover:bg-zinc-800/60 light:hover:bg-slate-100 transition-colors"
               >
                 <SettingsIcon className="w-4 h-4" />
               </button>
@@ -161,8 +162,11 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab, openSet
   // HEADER COMPLETO PER HOME HUB (Singola barra da 56px, zero clutter)
   return (
     <>
-      <header className="fixed top-0 left-0 right-0 z-40 w-full h-14 border-b backdrop-blur bg-zinc-950/95 border-zinc-700/80 dark:bg-zinc-950/95 dark:border-zinc-700/80 light:bg-white/95 light:border-slate-300 light:text-slate-900 transition-colors shadow-sm">
-        <div className="max-w-4xl mx-auto px-3 sm:px-4 h-full flex items-center justify-between gap-1 sm:gap-2">
+      <header
+        style={{ paddingTop: 'env(safe-area-inset-top, 0px)' }}
+        className="fixed top-0 left-0 right-0 z-40 w-full border-b backdrop-blur bg-zinc-950/95 border-zinc-700/80 dark:bg-zinc-950/95 dark:border-zinc-700/80 light:bg-white/95 light:border-slate-300 light:text-slate-900 transition-colors shadow-sm"
+      >
+        <div className="max-w-4xl mx-auto px-3 sm:px-4 h-14 flex items-center justify-between gap-1 sm:gap-2">
           {/* Logo & Brand */}
           <div
             className="flex items-center gap-2 sm:gap-2.5 cursor-pointer min-w-0"
@@ -268,7 +272,7 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab, openSet
               id="btn-theme-toggle"
               onClick={cycleTheme}
               title={`Tema: ${theme}`}
-              className="p-1.5 sm:p-2 rounded-lg text-zinc-300 hover:text-white light:text-slate-700 light:hover:text-slate-900 border border-zinc-700 hover:border-zinc-600 light:border-slate-300 light:shadow-sm hover:bg-zinc-800/60 light:hover:bg-slate-100 transition-colors"
+              className="min-h-[38px] min-w-[38px] p-2 rounded-lg flex items-center justify-center text-zinc-300 hover:text-white light:text-slate-700 light:hover:text-slate-900 border border-zinc-700 hover:border-zinc-600 light:border-slate-300 light:shadow-sm hover:bg-zinc-800/60 light:hover:bg-slate-100 transition-colors"
             >
               {theme === 'dark' && <Moon className="w-4 h-4" />}
               {theme === 'light' && <Sun className="w-4 h-4 text-amber-500" />}
@@ -281,7 +285,7 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab, openSet
               aria-label="Impostazioni"
               onClick={() => openSettings()}
               title="Impostazioni"
-              className="p-1.5 sm:p-2 rounded-lg text-zinc-300 hover:text-white light:text-slate-700 light:hover:text-slate-900 border border-zinc-700 hover:border-zinc-600 light:border-slate-300 light:shadow-sm hover:bg-zinc-800/60 light:hover:bg-slate-100 transition-colors"
+              className="min-h-[38px] min-w-[38px] p-2 rounded-lg flex items-center justify-center text-zinc-300 hover:text-white light:text-slate-700 light:hover:text-slate-900 border border-zinc-700 hover:border-zinc-600 light:border-slate-300 light:shadow-sm hover:bg-zinc-800/60 light:hover:bg-slate-100 transition-colors"
             >
               <SettingsIcon className="w-4 h-4" />
             </button>

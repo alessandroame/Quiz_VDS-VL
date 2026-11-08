@@ -1289,6 +1289,10 @@ export const DriveModeScreen: React.FC<DriveModeScreenProps> = ({
     <div
       onTouchStart={handleTouchStart}
       onTouchEnd={handleTouchEnd}
+      style={{
+        paddingTop: 'env(safe-area-inset-top, 0px)',
+        paddingBottom: 'env(safe-area-inset-bottom, 0px)'
+      }}
       className="fixed inset-0 z-50 bg-black text-zinc-100 light:bg-slate-50 light:text-slate-900 flex flex-col h-[100dvh] w-full overflow-hidden select-none font-sans"
     >
       {/* Toast Notifiche Vocali */}

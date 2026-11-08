@@ -150,7 +150,7 @@ export const VoiceQuickMenu: React.FC<VoiceQuickMenuProps> = ({
         type="button"
         onClick={() => handleSetOpen(!isOpen)}
         title="Opzioni rapide parlato e voce"
-        className={`px-2 py-1.5 rounded-lg border flex items-center gap-1.5 text-xs font-semibold transition-all active:scale-95 ${
+        className={`min-h-[38px] min-w-[38px] px-2.5 py-1.5 rounded-lg border flex items-center justify-center gap-1.5 text-xs font-semibold transition-all active:scale-95 ${
           forceDark
             ? 'border-zinc-800 bg-zinc-900/60 hover:bg-zinc-800 hover:border-zinc-700 text-zinc-300 hover:text-white'
             : 'border-zinc-800 bg-zinc-900/60 hover:bg-zinc-800 hover:border-zinc-700 text-zinc-300 hover:text-white light:bg-slate-100 light:border-slate-200 light:text-slate-700 light:hover:text-slate-900'
@@ -217,11 +217,14 @@ export const VoiceQuickMenu: React.FC<VoiceQuickMenuProps> = ({
           </div>
 
           {/* Master Toggle */}
-          <div className={`flex items-center justify-between p-2 rounded-xl bg-zinc-950/60 border ${
-            forceDark
-              ? 'border-zinc-800/80'
-              : 'border-zinc-800/80 light:bg-slate-50 light:border-slate-200'
-          }`}>
+          <div
+            onClick={handleToggleTts}
+            className={`flex items-center justify-between p-2.5 rounded-xl bg-zinc-950/60 border cursor-pointer select-none ${
+              forceDark
+                ? 'border-zinc-800/80'
+                : 'border-zinc-800/80 light:bg-slate-50 light:border-slate-200'
+            }`}
+          >
             <div>
               <span className={`text-xs font-semibold block ${
                 forceDark ? 'text-zinc-200' : 'text-zinc-200 light:text-slate-800'
@@ -238,8 +241,11 @@ export const VoiceQuickMenu: React.FC<VoiceQuickMenuProps> = ({
               id={`${idPrefix}quick-toggle-tts`}
               data-testid="quick-toggle-tts"
               type="button"
-              onClick={handleToggleTts}
-              className={`px-3 py-1 rounded-lg text-xs font-bold transition-colors ${
+              onClick={(e) => {
+                e.stopPropagation();
+                handleToggleTts();
+              }}
+              className={`min-h-[36px] min-w-[52px] px-3.5 py-1.5 rounded-lg text-xs font-bold transition-colors ${
                 isEnabled
                   ? 'bg-amber-500 text-zinc-950 shadow-sm'
                   : forceDark

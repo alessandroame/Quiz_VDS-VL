@@ -380,6 +380,9 @@ function AppContent() {
         openSettings={handleOpenSettings}
       />
 
+      {/* iOS Safe-Area Top Spacer for Notch / Dynamic Island */}
+      <div style={{ height: 'env(safe-area-inset-top, 0px)' }} aria-hidden="true" />
+
       {/* Avviso Notifica Stato Offline */}
       <OfflineBanner />
 

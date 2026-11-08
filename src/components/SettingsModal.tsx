@@ -492,7 +492,10 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
       className="fixed inset-0 z-50 flex flex-col h-[100dvh] w-full bg-zinc-950 text-zinc-100 dark:bg-zinc-950 dark:text-zinc-100 light:bg-slate-50 light:text-slate-900 overflow-hidden font-sans animate-in fade-in duration-150"
     >
       {/* Top Header */}
-      <header className="sticky top-0 z-20 w-full border-b backdrop-blur bg-zinc-950/90 border-zinc-700 dark:bg-zinc-950/90 dark:border-zinc-700 light:bg-white/90 light:border-slate-300 light:shadow-sm transition-colors flex-shrink-0">
+      <header
+        style={{ paddingTop: 'env(safe-area-inset-top, 0px)' }}
+        className="sticky top-0 z-20 w-full border-b backdrop-blur bg-zinc-950/90 border-zinc-700 dark:bg-zinc-950/90 dark:border-zinc-700 light:bg-white/90 light:border-slate-300 light:shadow-sm transition-colors flex-shrink-0"
+      >
         <div className="max-w-2xl mx-auto px-4 h-14 flex items-center justify-between">
           <div className="flex items-center gap-2">
             <button
