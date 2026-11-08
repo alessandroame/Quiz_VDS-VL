@@ -1,0 +1,8 @@
+### [2026-11-08] - Integrazione Permanente Cloud Bootstrap per `antigravity-plugins` in `.agents/AGENTS.md`
+- **Cosa abbiamo fatto**:
+  - Aggiornato [.agents/AGENTS.md](file:///home/antigravity/alessandroame/Quiz_VDS-VL/.agents/AGENTS.md) chiudendo correttamente il blocco codice dell'alberatura `.agents/` ed esponendo la direttiva obbligatoria di **Cloud Bootstrap (`antigravity-plugins` Always-On dal Turno 1)** con puntamento diretto a `[~/.gemini/CLOUD_BOOTSTRAP.md](file:///home/antigravity/.gemini/CLOUD_BOOTSTRAP.md)`, esecuzione immediata di `triage.mjs` e `model-router.mjs`, risoluzione FUSE zero-timeout tramite `view_file` e divieto di riproporre la modifica nelle sessioni successive.
+  - Creati sul volume persistente condiviso `/shared/user/.gemini` (`~/.gemini`) i file speculari `~/.gemini/GEMINI.md` e `~/.gemini/AGENTS.md` allineati a `CLOUD_BOOTSTRAP.md`.
+- **Scelte architetturali & Rationale**:
+  - Ogni nuova sessione Cloud di Antigravity avvia una VM effimera clonando da zero il branch `origin/main` da GitHub, mentre solo `/shared/user/.gemini` (`~/.gemini`) persiste tra le conversazioni. Inoltre l'auto-discovery iniziale (`<user_rules>`) carica automaticamente `.agents/AGENTS.md` del repository attivo. Persistendo la direttiva in [.agents/AGENTS.md](file:///home/antigravity/alessandroame/Quiz_VDS-VL/.agents/AGENTS.md) su `origin/main` (su richiesta esplicita dell'utente) e affiancando `GEMINI.md`/`AGENTS.md` in `~/.gemini`, ogni futura sessione carica e applica i 15 plugin globali fin dal Turno 1 senza mai più riproporre la configurazione.
+- **Impatto sul Desiderata**:
+  - Allineamento permanente della governance dell'agente su `Quiz_VDS-VL` con il catalogo globale `antigravity-plugins` senza impatto sul runtime della PWA.

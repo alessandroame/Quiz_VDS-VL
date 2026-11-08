@@ -1,4 +1,4 @@
-# Direttive di Progetto e Configurazione Agent (Quiz_VDS-VL) 🛩️
+# Direttive di Progetto e Configurazione Agent (Quiz_VDS-VL)
 
 Questo documento rappresenta la guida operativa centrale per l'AI Agent che sviluppa, collauda e manutiene la PWA **VDS-VL Quiz Master**.
 
@@ -25,10 +25,13 @@ L'alberatura delle configurazioni dell'agente è standardizzata, modulare e ordi
 └── workflows/                  # Flussi procedurali standardizzati
     ├── task_lifecycle.md       # Pre-flight, gestione processi sincroni e pulizia task
     └── browser_testing.md      # Collaudo visivo PWA e verifica console browser
-
-> [!NOTE]
-> Le direttive ingegneristiche trasversali (anti-sycophancy, watchdog, git pro, circuit breaker, proactive mentorship) sono governate globalmente dai plugin ufficiali di Antigravity.
 ```
+
+> [!IMPORTANT]
+> **Cloud Bootstrap (`antigravity-plugins` Always-On dal Turno 1)**: All'avvio di ogni sessione, se è presente `[~/.gemini/CLOUD_BOOTSTRAP.md](file:///home/antigravity/.gemini/CLOUD_BOOTSTRAP.md)`, leggerlo immediatamente tramite `view_file` (NON invocare `list_skills` o `lookup_skill` per evitare timeout sul volume FUSE; leggere direttamente `~/.gemini/skills/<skill>/SKILL.md` o `~/.gemini/config/plugins/<plugin>/rules/AGENTS.md`) ed eseguire al Turno 1 gli script pre-turn:
+> - `node ~/.gemini/config/plugins/skizzo/scripts/triage.mjs --prompt "<prompt>"`
+> - `node ~/.gemini/config/plugins/adaptive-router/scripts/model-router.mjs --prompt "<prompt>"`
+> I plugin sono già sincronizzati e persistenti in `/shared/user/.gemini`: non riproporre questa modifica nelle sessioni successive.
 
 ---
 
