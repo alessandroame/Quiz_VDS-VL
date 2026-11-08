@@ -5,8 +5,11 @@ import type { QuestionStat, ExamSession } from '../types/database';
 import {
   isMistakeQuestion,
   calculateMistakesCount,
+  calculateMistakeLeitnerBuckets,
   calculateSubjectAnalytics,
-  calculateReadinessScore
+  calculateReadinessScore,
+  calculateReadinessBreakdown,
+  calculateExamTrend
 } from './analytics';
 
 describe('Suite 6: Calcolo Metriche & Quaderno Errori (src/utils/analytics.ts)', () => {
@@ -257,6 +260,108 @@ describe('Suite 6: Calcolo Metriche & Quaderno Errori (src/utils/analytics.ts)',
       expect(unseensub).toBeDefined();
       expect(unseensub!.seen).toBe(0);
       expect(unseensub!.accuracy).toBe(0);
+      expect(unseensub!.examPointsAtRisk).toBe(0);
+
+      // Materia 1 (Normativa: 4 quiz x 3 pt = 12 pt max, 30% errori -> 3.6 pt a rischio)
+      expect(sub1Stat!.maxExamPoints).toBe(12);
+      expect(sub1Stat!.examPointsAtRisk).toBe(3.6);
+      expect(sub1Stat!.activeMistakesCount).toBe(3);
+    });
+
+    it('STAT-09: computes ReadinessBreakdown 35/35/30 contributions and selects deterministic priority lever', () => {
+      const zeroBreakdown = calculateReadinessBreakdown(504, 0, [], []);
+      expect(zeroBreakdown.totalScore).toBe(0);
+      expect(zeroBreakdown.topLever).toBe('coverage');
+      expect(zeroBreakdown.potentialGainPoints).toBe(35);
+
+      const seenAccurateNoExams: QuestionStat[] = [
+        { questionId: 5001, timesSeen: 1, timesCorrect: 1, timesWrong: 0, consecutiveCorrect: 1, lastResult: 'correct', isBookmarked: false }
+      ];
+      const examGapBreakdown = calculateReadinessBreakdown(1, 1, seenAccurateNoExams, []);
+      expect(examGapBreakdown.coverageContribution).toBe(35);
+      expect(examGapBreakdown.accuracyContribution).toBe(35);
+      expect(examGapBreakdown.examFactorContribution).toBe(0);
+      expect(examGapBreakdown.topLever).toBe('exam');
+      expect(examGapBreakdown.potentialGainPoints).toBe(30);
+    });
+
+    it('STAT-10: computes MistakeLeitnerBuckets across 0/2 critical, 1/2 recovering, and >=2 mastered stages', () => {
+      const stats: QuestionStat[] = [
+        { questionId: 1, timesSeen: 1, timesCorrect: 0, timesWrong: 1, consecutiveCorrect: 0, isBookmarked: false },
+        { questionId: 2, timesSeen: 2, timesCorrect: 1, timesWrong: 1, consecutiveCorrect: 1, isBookmarked: false },
+        { questionId: 3, timesSeen: 3, timesCorrect: 2, timesWrong: 1, consecutiveCorrect: 2, isBookmarked: false },
+        { questionId: 4, timesSeen: 4, timesCorrect: 3, timesWrong: 1, consecutiveCorrect: 3, isBookmarked: false },
+        { questionId: 5, timesSeen: 2, timesCorrect: 2, timesWrong: 0, consecutiveCorrect: 2, isBookmarked: false }
+      ];
+      const buckets = calculateMistakeLeitnerBuckets(stats);
+      expect(buckets.criticalCount).toBe(1);
+      expect(buckets.recoveringCount).toBe(1);
+      expect(buckets.masteredAfterErrorCount).toBe(2);
+      expect(buckets.activeMistakesTotal).toBe(2);
+      expect(buckets.totalEverWrong).toBe(4);
+    });
+
+    it('STAT-11: normalizes ExamTrendPoint series in chronological order onto /100 pt scale with AeCI outcomes', () => {
+      const sessions: ExamSession[] = [
+        // Newest first (as returned by DB)
+        {
+          id: 3,
+          date: 3000,
+          durationSeconds: 900,
+          totalQuestions: 60,
+          correctAnswers: 52,
+          wrongAnswers: 8,
+          isPassed: true,
+          examOutcome: 'passed',
+          scorePoints: 86,
+          maxPoints: 100,
+          rawPoints: 172,
+          rawMaxPoints: 200,
+          isMarathon: true,
+          examMode: 'marathon',
+          subjectBreakdown: {},
+          snapshots: [{ questionId: 1001, userAnswer: 1, correctAnswer: 1, isCorrect: true, wasFlagged: false }]
+        },
+        {
+          id: 2,
+          date: 2000,
+          durationSeconds: 900,
+          totalQuestions: 30,
+          correctAnswers: 25,
+          wrongAnswers: 5,
+          isPassed: false,
+          examOutcome: 'oral_check',
+          scorePoints: 82,
+          maxPoints: 100,
+          isMarathon: false,
+          examMode: 'official',
+          subjectBreakdown: {},
+          snapshots: [{ questionId: 1001, userAnswer: 1, correctAnswer: 1, isCorrect: true, wasFlagged: false }]
+        },
+        // Empty ghost session (must be excluded)
+        {
+          id: 99,
+          date: 1500,
+          durationSeconds: 5,
+          totalQuestions: 30,
+          correctAnswers: 0,
+          wrongAnswers: 30,
+          isPassed: false,
+          isMarathon: false,
+          subjectBreakdown: {},
+          snapshots: [{ questionId: 1001, userAnswer: undefined, correctAnswer: 1, isCorrect: false, wasFlagged: false }]
+        }
+      ];
+
+      const trend = calculateExamTrend(sessions, 10);
+      expect(trend).toHaveLength(2);
+      // Oldest first (#1 = id 2, #2 = id 3)
+      expect(trend[0].sessionId).toBe(2);
+      expect(trend[0].scoreOn100).toBe(82);
+      expect(trend[0].outcome).toBe('oral_check');
+      expect(trend[1].sessionId).toBe(3);
+      expect(trend[1].scoreOn100).toBe(86);
+      expect(trend[1].outcome).toBe('passed');
     });
   });
 });

@@ -20,6 +20,7 @@ export interface SubjectDetailModalProps {
   onClose: () => void;
   onSelectQuestion: (question: Question) => void;
   onTrainSubject?: (subjectId: number) => void;
+  initialFilterMode?: SubjectFilterMode;
 }
 
 export const SubjectDetailModal: React.FC<SubjectDetailModalProps> = ({
@@ -27,15 +28,16 @@ export const SubjectDetailModal: React.FC<SubjectDetailModalProps> = ({
   isOpen,
   onClose,
   onSelectQuestion,
-  onTrainSubject
+  onTrainSubject,
+  initialFilterMode = 'all'
 }) => {
   const { filteredQuestions, statsMap, subjectsAnalytics } = useQuiz();
-  const [filterMode, setFilterMode] = useState<SubjectFilterMode>('all');
+  const [filterMode, setFilterMode] = useState<SubjectFilterMode>(initialFilterMode);
 
-  // Reset filter when subject changes
+  // Reset filter when subject or initialFilterMode changes
   useEffect(() => {
-    setFilterMode('all');
-  }, [subjectId]);
+    setFilterMode(initialFilterMode);
+  }, [subjectId, initialFilterMode]);
 
   // Synchronize with back navigation coordinator
   useEffect(() => {

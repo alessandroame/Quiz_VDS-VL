@@ -285,4 +285,43 @@ describe('StatsScreen Component Interactive Drilldown', () => {
 
     expect(container.textContent).toContain('Nessuna simulazione completata finora.');
   });
+
+  it('STS-07: renders the 3 diagnostic charts (Readiness Pillars, SVG /100 Trend, Leitner Funnel) and opens SubjectDetailModal pre-filtered on mistakes when clicking risk badge', () => {
+    act(() => {
+      root.render(React.createElement(StatsScreen));
+    });
+
+    // Chart 1: 3-Pillar Readiness Breakdown & Priority Lever
+    const readinessPillars = container.querySelector('#readiness-pillars-breakdown');
+    const priorityLever = container.querySelector('#readiness-priority-lever');
+    expect(readinessPillars).toBeTruthy();
+    expect(readinessPillars?.getAttribute('role')).toBe('img');
+    expect(priorityLever).toBeTruthy();
+    expect(container.textContent).toContain('Leva Prioritaria');
+
+    // Chart 2: Native SVG /100 pt Score Trend
+    const trendChart = container.querySelector('#exam-trend-chart');
+    expect(trendChart).toBeTruthy();
+    expect(trendChart?.getAttribute('role')).toBe('img');
+    expect(container.textContent).toContain('>=86 Idoneo');
+    expect(container.textContent).toContain('80-85 Orale');
+
+    // Chart 3: Leitner Error Recovery Funnel & Subject Risk Points badge
+    const leitnerCard = container.querySelector('#leitner-recovery-card');
+    expect(leitnerCard).toBeTruthy();
+    expect(container.textContent).toContain('Stato Recupero Errori (Regola 2x)');
+    expect(container.textContent).toContain('Critici (0/2)');
+
+    const riskBadge1 = container.querySelector('#badge-stat-risk-1') as HTMLElement;
+    expect(riskBadge1).toBeTruthy();
+    expect(riskBadge1.textContent).toContain('-12.0 pt');
+
+    // Clicking the risk badge opens SubjectDetailModal directly with 'wrong' filter
+    act(() => {
+      riskBadge1.click();
+    });
+
+    expect(container.querySelector('#btn-close-subject-detail')).toBeTruthy();
+    expect(container.textContent).toContain('Qual è il limite di quota VDS?');
+  });
 });
