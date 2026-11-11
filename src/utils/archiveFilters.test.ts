@@ -231,6 +231,31 @@ describe('Archive Filters Utility', () => {
       });
       expect(results.map(q => q.id)).toEqual([1002]);
     });
+
+    it('matches Unicode subscripts, superscripts, and Greek letters with plain ASCII smartphone queries', () => {
+      const formulaQuestions: Question[] = [
+        {
+          id: 2047,
+          subjectId: 2,
+          subjectName: 'Aerodinamica',
+          question: 'Qual è la formula della resistenza?',
+          options: ['R = 1/2 ρ S Cᵣ V²', 'R = 1/2 ρ S² Cᵣ V', 'R = 1/2 ρ S Cᵣ V'],
+          correctAnswer: 1,
+          discipline: 'all',
+          explanation: {
+            rule: 'Formula con Cᵣ, superficie in m² e coefficiente Cₚ.',
+            trap: 'Attenzione a O₂ in quota.'
+          }
+        }
+      ];
+
+      expect(filterArchiveQuestions(formulaQuestions, new Map(), { searchQuery: 'Cr' }).map(q => q.id)).toEqual([2047]);
+      expect(filterArchiveQuestions(formulaQuestions, new Map(), { searchQuery: 'Cp' }).map(q => q.id)).toEqual([2047]);
+      expect(filterArchiveQuestions(formulaQuestions, new Map(), { searchQuery: 'V2' }).map(q => q.id)).toEqual([2047]);
+      expect(filterArchiveQuestions(formulaQuestions, new Map(), { searchQuery: 'm2' }).map(q => q.id)).toEqual([2047]);
+      expect(filterArchiveQuestions(formulaQuestions, new Map(), { searchQuery: 'O2' }).map(q => q.id)).toEqual([2047]);
+      expect(filterArchiveQuestions(formulaQuestions, new Map(), { searchQuery: 'ro' }).map(q => q.id)).toEqual([2047]);
+    });
   });
 
   it('exposes the standard 7 thematic concept chips defined in specifications', () => {

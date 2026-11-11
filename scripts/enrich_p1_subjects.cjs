@@ -21,11 +21,11 @@ const P1_EXPLANATIONS = {
     trap: "Confondere ipossia (carenza di ossigeno) con ipotermia (abbassamento della temperatura corporea) o ipotensione (calo della pressione sanguigna)."
   },
   4003: {
-    rule: "L'ipossia da quota (altitudinale o ipobarica) dipende direttamente dal deficit di pressione alveolare dell'O2, che riduce la saturazione dell'emoglobina arteriosa.",
+    rule: "L'ipossia da quota (altitudinale o ipobarica) dipende direttamente dal deficit di pressione alveolare dell'O₂, che riduce la saturazione dell'emoglobina arteriosa.",
     trap: "Attribuire l'ipossia a cali della pressione arteriosa o a sbalzi termici, ignorando che la causa primaria è la ridotta tensione dell'ossigeno nell'aria inspirata."
   },
   4004: {
-    rule: "Il cervello soffre per primo il deficit di O2: compaiono euforia ingiustificata, perdita di senso critico, rallentamento dei riflessi e iperventilazione compensatoria.",
+    rule: "Il cervello soffre per primo il deficit di O₂: compaiono euforia ingiustificata, perdita di senso critico, rallentamento dei riflessi e iperventilazione compensatoria.",
     trap: "La sensazione ingannevole di euforia o benessere fa sottovalutare il pericolo, impedendo al pilota di riconoscere l'imminente perdita di coscienza."
   },
   4005: {
@@ -94,7 +94,7 @@ const P1_EXPLANATIONS = {
     trap: "Confondere la velocità all'aria (IAS) con la velocità al suolo (GS), che risente della componente favorevole o contraria del vento."
   },
   6010: {
-    rule: "Nei tubi di Pitot misura la differenza tra pressione totale e pressione statica (pressione dinamica q = 1/2*rho*v^2), oppure sfrutta la rotazione di micro-giranti calibrate.",
+    rule: "Nei tubi di Pitot misura la differenza tra pressione totale e pressione statica (pressione dinamica q = 1/2 ρ V²), oppure sfrutta la rotazione di micro-giranti calibrate.",
     trap: "Credere che l'anemometro misuri la pressione statica o l'energia termica, anziché l'energia cinetica della pressione d'impatto del vento relativo."
   },
   6011: {

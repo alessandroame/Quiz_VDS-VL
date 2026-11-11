@@ -84,11 +84,11 @@ const explanations = {
   },
   7020: {
     regola: "Le colonne termiche hanno ampiezza orizzontale limitata; spiralare a 360° consente al pilota di rimanere centrato nel nocciolo ascendente sfruttando la spinta verticale.",
-    tranello: "Le termiche non salgono necessariamente a spirale e la virata continua aumenta la caduta propria, ma è l'unico modo per non uscire dalla zona di risalita."
+    tranello: "Le termiche non salgono necessariamente a spirale e la virata continua aumenta il proprio tasso di caduta, ma è l'unico modo per non uscire dalla zona di risalita."
   },
   7021: {
     regola: "All'interno della colonna ascensionale si interviene sui comandi per ridurre la velocità al regime di minimo tasso di caduta, massimizzando il guadagno di quota al secondo.",
-    tranello: "Accelerare in termica riduce il tempo di permanenza nell'ascendenza e aumenta il tasso di caduta propria, riducendo l'efficacia del galleggiamento."
+    tranello: "Accelerare in termica riduce il tempo di permanenza nell'ascendenza e aumenta il proprio tasso di caduta, riducendo l'efficacia del galleggiamento."
   },
   7022: {
     regola: "È lo stallo dinamico: richiamando bruscamente la barra o i freni ad alta velocità l'angolo di incidenza supera il valore critico prima che l'ala possa cambiare traiettoria.",
@@ -159,7 +159,7 @@ const explanations = {
     tranello: "Dimenticare i cosciali dell'imbrago o il casco allacciato è una delle cause primarie di incidenti mortali al momento dello stacco dal decollo."
   },
   7039: {
-    regola: "La larghezza della ventrale tra i maillons e l'altezza di sospensione devono rispettare scrupolosamente i valori riportati sulla targhetta di omologazione dell'ala.",
+    regola: "La larghezza della ventrale tra i maillons e l'altezza di sospensione devono rispettare scrupolosamente i valori riportati sulla targhetta di omologazione della selletta.",
     tranello: "Una ventrale regolata a caso altera drasticamente il comportamento omologato: troppo larga rende l'ala instabile, troppo stretta ostacola il pilotaggio col peso."
   },
   7040: {
@@ -207,7 +207,7 @@ const explanations = {
     tranello: "Tirare il freno interno a fondo tenendo frenato anche l'esterno strozza il profilo, aumenta drasticamente la caduta ed espone allo stallo d'ala."
   },
   7051: {
-    regola: "In termica si sceglie il miglior compromesso tra inclinazione e raggio di virata per non fuoriuscire dal nucleo ascensionale, minimizzando la caduta propria compatibilmente col raggio.",
+    regola: "In termica si sceglie il miglior compromesso tra inclinazione e raggio di virata per non fuoriuscire dal nucleo ascensionale, minimizzando il proprio tasso di caduta compatibilmente col raggio.",
     tranello: "Volare troppo piatti allarga il raggio facendo scivolare l'ala fuori dall'ascendenza; fare 'otto' spezza il ritmo e fa perdere il centro della termica."
   },
   7052: {

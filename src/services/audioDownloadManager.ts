@@ -626,7 +626,7 @@ export class AudioDownloadManager {
 
       for (const voice of ['giuseppe', 'elsa'] as VoiceName[]) {
         const detail = check.voiceUpdates[voice];
-        if (detail.hasUpdates && detail.staleFiles.length > 0 && detail.staleFiles.length <= 25) {
+        if (detail.hasUpdates && detail.staleFiles.length > 0 && detail.staleFiles.length <= 350) {
           await this.applyAudioUpdates(voice);
         }
       }

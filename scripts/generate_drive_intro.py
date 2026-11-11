@@ -10,10 +10,14 @@ import os
 import sys
 import asyncio
 import subprocess
-import imageio_ffmpeg
+import shutil
 import edge_tts
 
-FFMPEG_EXE = imageio_ffmpeg.get_ffmpeg_exe()
+try:
+    import imageio_ffmpeg
+    FFMPEG_EXE = imageio_ffmpeg.get_ffmpeg_exe()
+except ImportError:
+    FFMPEG_EXE = shutil.which("ffmpeg") or "ffmpeg"
 
 INTRO_TEXT = (
     "Benvenuto nella modalità a mani libere. "

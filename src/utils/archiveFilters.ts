@@ -96,6 +96,24 @@ export function getArchiveStatusCounts(
 }
 
 /**
+ * Normalizes mathematical subscripts, superscripts, Greek symbols, and underscores
+ * so plain keyboard searches (e.g. "Cr", "Cp", "V2", "m2", "O2", "ro") match Unicode formulas.
+ */
+export function normalizeSearchText(text: string): string {
+  if (!text) return '';
+  return text
+    .toLowerCase()
+    .replace(/ᵣ/g, 'r')
+    .replace(/ₚ/g, 'p')
+    .replace(/[²₂]/g, '2')
+    .replace(/[³₃]/g, '3')
+    .replace(/[ρϱ]/g, 'ro')
+    .replace(/_/g, '')
+    .normalize('NFKD')
+    .replace(/[\u0300-\u036f]/g, '');
+}
+
+/**
  * Filters the list of archive questions based on subject, status, concept chips, and text search.
  */
 export function filterArchiveQuestions(
@@ -111,6 +129,7 @@ export function filterArchiveQuestions(
   } = options;
 
   const trimmedQuery = searchQuery.trim().toLowerCase();
+  const normalizedQuery = normalizeSearchText(trimmedQuery);
   const isIdSearch = /^#?\d+$/.test(trimmedQuery);
   const cleanIdQuery = isIdSearch ? trimmedQuery.replace(/^#/, '') : '';
 
@@ -162,7 +181,7 @@ export function filterArchiveQuestions(
           return false;
         }
       } else {
-        const fullText = (
+        const rawFullText = (
           q.question +
           ' ' +
           q.options.join(' ') +
@@ -173,7 +192,10 @@ export function filterArchiveQuestions(
           (stat?.userNote ? ' ' + stat.userNote : '')
         ).toLowerCase();
 
-        if (!fullText.includes(trimmedQuery)) {
+        if (
+          !rawFullText.includes(trimmedQuery) &&
+          !(normalizedQuery && normalizeSearchText(rawFullText).includes(normalizedQuery))
+        ) {
           return false;
         }
       }

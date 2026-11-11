@@ -14,7 +14,7 @@ from datetime import datetime, timezone
 def generate_manifest(out_path="public/audio/manifest.json"):
     manifest = {
         "schemaVersion": 1,
-        "bundleVersion": "1.0.0",
+        "bundleVersion": "1.1.0",
         "generatedAt": datetime.now(timezone.utc).isoformat(),
         "voices": {}
     }
@@ -43,7 +43,7 @@ def generate_manifest(out_path="public/audio/manifest.json"):
             file_map[fname] = digest
 
         manifest["voices"][voice] = {
-            "version": "1.0.0",
+            "version": "1.1.0",
             "fileCount": len(files),
             "totalBytes": total_bytes,
             "files": file_map

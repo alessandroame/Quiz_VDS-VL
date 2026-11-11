@@ -154,7 +154,12 @@ export function normalizeVoiceText(raw: string): string {
   if (!raw || typeof raw !== 'string') return '';
   return raw
     .toLowerCase()
-    .normalize('NFD')
+    .replace(/ᵣ/g, 'r')
+    .replace(/ₚ/g, 'p')
+    .replace(/[²₂]/g, '2')
+    .replace(/[³₃]/g, '3')
+    .replace(/[ρϱ]/g, 'ro')
+    .normalize('NFKD')
     .replace(/[\u0300-\u036f\u200b-\u200d\ufeff]/g, '')
     .replace(/[^\p{L}\p{N}\s]/gu, ' ')
     .replace(/\s+/g, ' ')

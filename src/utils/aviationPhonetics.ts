@@ -1,58 +1,105 @@
-// Normalizzatore Fonetico per Terminologia Aeronautica e Acronimi VDS-VL
-// Ottimizzato per sintetizzatori neurali italiani (garantisce dizione 100% corretta)
+// Phonetic normalizer for VDS-VL aeronautical terminology, acronyms, and formulas.
+// Uses lowercase Italian letter names without artificial grave accents so both
+// Edge-TTS neural voices (Diego/Elsa) and Web Speech API fallback never misread
+// uppercase V/I as Roman numerals ("quinto", "primo").
 
 export function normalizeAviationPhonetics(text: string): string {
   if (!text) return '';
 
   let cleaned = text;
 
-  // 1. Pulizia apici e virgolette
+  // 1. Normalize typographic quotes and apostrophes
   cleaned = cleaned.replace(/[’‘]/g, "'").replace(/[“”]/g, '"');
 
-  // 2. Normalizzazione Normativa e Decreti
+  // 2. Regulations and institutions (before single-letter/acronym rules)
   cleaned = cleaned.replace(/D\.P\.R\.\s*(\d+)\/(\d+)/gi, 'Decreto del Presidente della Repubblica $1 del $2');
   cleaned = cleaned.replace(/D\.P\.R\./gi, 'Decreto del Presidente della Repubblica');
-
-  // 3. Istituzioni e Assicurazioni
   cleaned = cleaned.replace(/Ae\.C\.I\./gi, "Aero Club d'Italia");
   cleaned = cleaned.replace(/\bAeCI\b/g, "Aero Club d'Italia");
-  cleaned = cleaned.replace(/\bRCT\b/g, 'R C T');
   cleaned = cleaned.replace(/\bENAC\b/g, 'Enac');
   cleaned = cleaned.replace(/\bENAV\b/g, 'Enav');
+  cleaned = cleaned.replace(/\bICAO\b/g, 'Icao');
 
-  // 4. Sigle di Volo e Licenze
-  cleaned = cleaned.replace(/\bVDS\/VL\b/gi, 'V D S Volo Libero');
-  cleaned = cleaned.replace(/\bVDS\b/g, 'V D S');
-  cleaned = cleaned.replace(/\bVL\b/g, 'Volo Libero');
-  cleaned = cleaned.replace(/\bVFR\b/g, 'V F R');
-  cleaned = cleaned.replace(/\bIFR\b/g, 'I F R');
+  // 3. Physics formulas, subscripts, superscripts, and composite units
+  // Must run BEFORE acronym rules because superscripts like ² create a \b boundary after V/S/m.
+  cleaned = cleaned.replace(/\bkg\/m²(?![a-zA-Z0-9])/gi, 'chilogrammi per metro quadrato');
+  cleaned = cleaned.replace(/\bm\/s²(?![a-zA-Z0-9])/gi, 'metri al secondo quadrato');
+  cleaned = cleaned.replace(/\bm²(?![a-zA-Z0-9])/gi, 'metri quadrati');
+  cleaned = cleaned.replace(/\b1\/2\b/g, 'un mezzo');
+  cleaned = cleaned.replace(/\bCₚ(?![a-zA-Z0-9])/g, 'ci con pi');
+  cleaned = cleaned.replace(/\bCᵣ(?![a-zA-Z0-9])/g, 'ci con erre');
+  cleaned = cleaned.replace(/\bEₚ(?![a-zA-Z0-9])/g, 'e con pi');
+  cleaned = cleaned.replace(/\bO₂(?![a-zA-Z0-9])/g, 'ossigeno');
+  cleaned = cleaned.replace(/(?<![a-zA-ZÀ-ÿ])[ρϱ](?![a-zA-ZÀ-ÿ])/g, 'ro');
+  cleaned = cleaned.replace(/√n\b/g, 'radice di enne');
+  cleaned = cleaned.replace(/∝/g, 'è proporzionale a');
+  cleaned = cleaned.replace(/\bVx\b/g, 'vu con ics');
+  cleaned = cleaned.replace(/\bVy\b/g, 'vu con ipsilon');
+  cleaned = cleaned.replace(/\bVz\b/g, 'vu con zeta');
+  cleaned = cleaned.replace(/\bVs\b/g, 'vu con esse');
+  cleaned = cleaned.replace(/\b3V\b/g, 'tre vu');
+  cleaned = cleaned.replace(/\b[vV]²(?![a-zA-Z0-9])/g, 'vu al quadrato');
+  cleaned = cleaned.replace(/\bS²(?![a-zA-Z0-9])/g, 'esse al quadrato');
+  cleaned = cleaned.replace(/\bb²(?![a-zA-Z0-9])/g, 'bi al quadrato');
+  cleaned = cleaned.replace(/(\d+)²(?![a-zA-Z0-9])/g, '$1 al quadrato');
 
-  // 5. Spazi Aerei e Telecomunicazioni
-  cleaned = cleaned.replace(/\bCTR\b/g, 'C T R');
-  cleaned = cleaned.replace(/\bTMA\b/g, 'T M A');
-  cleaned = cleaned.replace(/\bATZ\b/g, 'A T Z');
+  // 4. Compound and single aeronautical acronyms (syllabic Italian letter names)
+  cleaned = cleaned.replace(/\bVDS\s*[/-]\s*VL\b/gi, 'vu di esse, vu elle');
+  cleaned = cleaned.replace(/\bTAS\/IAS\b/g, 'ti a esse su i a esse');
+  cleaned = cleaned.replace(/\bEN\/LTF\b/g, 'e enne, elle ti effe');
+  cleaned = cleaned.replace(/\bEN-A\b/g, 'e enne a');
+  cleaned = cleaned.replace(/\bEN-B\b/g, 'e enne bi');
+  cleaned = cleaned.replace(/\bEN-C\b/g, 'e enne ci');
+  cleaned = cleaned.replace(/\bEN-D\b/g, 'e enne di');
+  cleaned = cleaned.replace(/\bVDS\b/gi, 'vu di esse');
+  cleaned = cleaned.replace(/\bVL\b/gi, 'vu elle');
+  cleaned = cleaned.replace(/\bVFR\b/g, 'vu effe erre');
+  cleaned = cleaned.replace(/\bIFR\b/g, 'i effe erre');
+  cleaned = cleaned.replace(/\bRCT\b/g, 'erre ci ti');
+  cleaned = cleaned.replace(/\bCTR\b/g, 'ci ti erre');
+  cleaned = cleaned.replace(/\bTMA\b/g, 'ti emme a');
+  cleaned = cleaned.replace(/\bATZ\b/g, 'a ti zeta');
   cleaned = cleaned.replace(/\bNOTAM\b/gi, 'Notam');
   cleaned = cleaned.replace(/\bMETAR\b/gi, 'Metar');
   cleaned = cleaned.replace(/\bTAF\b/gi, 'Taf');
+  cleaned = cleaned.replace(/\bQNH\b/g, 'qu enne acca');
+  cleaned = cleaned.replace(/\bQFE\b/g, 'qu effe e');
+  cleaned = cleaned.replace(/\bVNE\b/g, 'vu enne e');
+  cleaned = cleaned.replace(/\bGPS\b/g, 'gi pi esse');
+  cleaned = cleaned.replace(/\bIAS\b/g, 'i a esse');
+  cleaned = cleaned.replace(/\bTAS\b/g, 'ti a esse');
+  cleaned = cleaned.replace(/\bGS\b/g, 'gi esse');
+  cleaned = cleaned.replace(/\bATC\b/g, 'a ti ci');
+  cleaned = cleaned.replace(/\bSIV\b/g, 'esse i vu');
+  cleaned = cleaned.replace(/\bPIO\b/g, 'pi i o');
+  cleaned = cleaned.replace(/\bMSL\b/g, 'emme esse elle');
+  cleaned = cleaned.replace(/\bAIP\b/g, 'a i pi');
+  cleaned = cleaned.replace(/\bISA\b/g, 'i esse a');
+  cleaned = cleaned.replace(/\bVMC\b/g, 'vu emme ci');
+  cleaned = cleaned.replace(/\bIMC\b/g, 'i emme ci');
+  cleaned = cleaned.replace(/\bUV\b/g, 'u vu');
+  cleaned = cleaned.replace(/\bUR\b/g, 'u erre');
+  cleaned = cleaned.replace(/\bAWY\b/g, 'a doppia vu ipsilon');
+  cleaned = cleaned.replace(/\bPLS\b/g, 'pi elle esse');
+  cleaned = cleaned.replace(/\bWMO\b/g, 'doppia vu emme o');
+  cleaned = cleaned.replace(/(?<![a-zA-ZÀ-ÿ])AR(?![a-zA-ZÀ-ÿ])/g, 'a erre');
 
-  // 6. Altimetria e Pressione
-  cleaned = cleaned.replace(/\bQNH\b/g, 'Q N H');
-  cleaned = cleaned.replace(/\bQFE\b/g, 'Q F E');
+  // Standalone uppercase V (velocity symbol in formulas) -> "vu" so TTS never reads "quinto"
+  cleaned = cleaned.replace(/(?<![a-zA-ZÀ-ÿ])V(?![a-zA-ZÀ-ÿ])/g, 'vu');
+
+  // 5. Aeronautical units of measurement and flight levels
   cleaned = cleaned.replace(/\bhPa\b/g, 'ettopascal');
   cleaned = cleaned.replace(/\bFL\s*(\d+)/gi, 'Livello di volo $1');
-
-  // 7. Unità di Misura Aeronautiche
   cleaned = cleaned.replace(/\bkm\/h\b/gi, "chilometri all'ora");
   cleaned = cleaned.replace(/\bm\/s\b/gi, 'metri al secondo');
   cleaned = cleaned.replace(/\bkts?\b/gi, 'nodi');
-  cleaned = cleaned.replace(/\b(\d+)\s*°C\b/g, '$1 gradi centigradi');
-  cleaned = cleaned.replace(/\b(\d+)\s*°\b/g, '$1 gradi');
+  cleaned = cleaned.replace(/(\d+(?:[.,]\d+)?)\s*°C\b/g, '$1 gradi centigradi');
+  cleaned = cleaned.replace(/(\d+(?:[.,]\d+)?)\s*°(?![a-zA-Z])/g, '$1 gradi');
 
-  // 8. Punteggiatura morbida: sostituisce punti interrogativi enfatici
-  // con punti fermi per evitare intonazioni acute stridule
+  // 6. Soft punctuation: replace trailing question mark with period to avoid shrill pitch
   cleaned = cleaned.replace(/\?\s*$/g, '.');
 
-  // 9. Phonetic overrides to resolve homographs, enforce Italian tonic accents and spell out acronyms
+  // 7. Phonetic overrides to resolve homographs and enforce Italian tonic accents
   for (const [pattern, replacement] of PHONETIC_OVERRIDES) {
     cleaned = cleaned.replace(pattern, (match) => {
       if (match[0] === match[0].toUpperCase() && match[0] !== match[0].toLowerCase()) {
@@ -116,23 +163,7 @@ const PHONETIC_OVERRIDES: Array<[RegExp, string]> = [
   [/\baltostrato\b/gi, 'altostràto'],
   [/\bsottovento\b/gi, 'sottovènto'],
   [/\bsopravvento\b/gi, 'sopravvènto'],
-  [/\bsopravento\b/gi, 'sopravvènto'],
-
-  // 5. Technical acronyms spelled out as distinct letters
-  [/\bVNE\b/g, 'V N E'],
-  [/\bGPS\b/g, 'G P S'],
-  [/\bIAS\b/g, 'I A S'],
-  [/\bTAS\b/g, 'T A S'],
-  [/\bGS\b/g, 'G S'],
-  [/\bATC\b/g, 'A T C'],
-  [/\bSIV\b/g, 'S I V'],
-  [/\bPIO\b/g, 'P I O'],
-  [/\bMSL\b/g, 'M S L'],
-  [/\bAIP\b/g, 'A I P'],
-  [/\bISA\b/g, 'I S A'],
-  [/\bVMC\b/g, 'V M C'],
-  [/\bUV\b/g, 'U V'],
-  [/\bUR\b/g, 'U R']
+  [/\bsopravento\b/gi, 'sopravvènto']
 ];
 
 /**

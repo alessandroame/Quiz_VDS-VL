@@ -15,18 +15,21 @@ describe('aviationPhonetics', () => {
       expect(output).not.toContain('D.P.R.');
     });
 
-    it('espande acronimi aeronautici essenziali (VDS/VL, AeCI, RCT)', () => {
-      const input = 'Attestato VDS/VL con esame Ae.C.I. e copertura RCT.';
+    it('espande acronimi aeronautici essenziali con spelling sillabico italiano (VDS/VL, VDS-VL, AeCI, RCT)', () => {
+      const input = 'Attestato VDS/VL e manuale VDS-VL con esame Ae.C.I., abilitazione VL e copertura RCT.';
       const output = normalizeAviationPhonetics(input);
-      expect(output).toContain('V D S Volo Libero');
+      expect(output).toContain('vu di esse, vu elle');
       expect(output).toContain("Aero Club d'Italia");
-      expect(output).toContain('R C T');
+      expect(output).toContain('vu elle');
+      expect(output).toContain('erre ci ti');
+      // Never leave isolated uppercase V that neural TTS misreads as "quinto"
+      expect(output).not.toMatch(/\bV\b/);
     });
 
     it('espande correttamente unità di misura (QNH, hPa, km/h, m/s, kt)', () => {
       const input = 'Regolare il QNH a 1013 hPa con vento di 25 km/h e salita a 2 m/s.';
       const output = normalizeAviationPhonetics(input);
-      expect(output).toContain('Q N H');
+      expect(output).toContain('qu enne acca');
       expect(output).toContain('ettopascal');
       expect(output).toContain("chilometri all'ora");
       expect(output).toContain('metri al secondo');
@@ -71,13 +74,28 @@ describe('aviationPhonetics', () => {
       expect(output).toContain('Sùbito');
     });
 
-    it('spells out technical aviation acronyms as spaced individual letters', () => {
+    it('spells out technical aviation acronyms with Italian phonetic letter names', () => {
       const input = 'Danni da raggi UV prima della VNE controllati via GPS e circuito SIV.';
       const output = normalizeAviationPhonetics(input);
-      expect(output).toContain('U V');
-      expect(output).toContain('V N E');
-      expect(output).toContain('G P S');
-      expect(output).toContain('S I V');
+      expect(output).toContain('u vu');
+      expect(output).toContain('vu enne e');
+      expect(output).toContain('gi pi esse');
+      expect(output).toContain('esse i vu');
+    });
+
+    it('reads aerodynamic formulas, subscripts, superscripts, and standalone V cleanly in Italian', () => {
+      const input = 'R = 1/2 ρ S Cᵣ V² con carico in kg/m², superficie 25 m², rapporto Cₚ / Cᵣ, gas O₂ e velocità V.';
+      const output = normalizeAviationPhonetics(input);
+      expect(output).toContain('un mezzo');
+      expect(output).toContain('ro');
+      expect(output).toContain('ci con erre');
+      expect(output).toContain('vu al quadrato');
+      expect(output).toContain('chilogrammi per metro quadrato');
+      expect(output).toContain('25 metri quadrati');
+      expect(output).toContain('ci con pi');
+      expect(output).toContain('ossigeno');
+      expect(output).toContain('velocità vu.');
+      expect(output).not.toMatch(/\bV\b/);
     });
   });
 
@@ -97,7 +115,7 @@ describe('aviationPhonetics', () => {
         'D.P.R. 133/2010 regola di precedenza.',
         'Non confondere con il volo commerciale.'
       );
-      expect(text).toContain('La risposta esatta è la due: Attestato V D S valido..');
+      expect(text).toContain('La risposta esatta è la due: Attestato vu di esse valido..');
       expect(text).not.toContain('Risposta errata');
       expect(text).toContain('Regola: Decreto del Presidente della Repubblica 133 del 2010');
       expect(text).toContain('Tranello: Non confondere con il volo commerciale.');
@@ -118,7 +136,7 @@ describe('aviationPhonetics', () => {
       const questionText = 'A quale quota QNH corrisponde il livello FL 195?';
       const output = formatQuestionForSpeech(questionText);
 
-      expect(output).toBe('A quale quota Q N H corrisponde il livello Livello di volo 195.');
+      expect(output).toBe('A quale quota qu enne acca corrisponde il livello Livello di volo 195.');
     });
   });
 });

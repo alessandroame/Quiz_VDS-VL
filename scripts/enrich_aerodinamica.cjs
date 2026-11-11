@@ -135,7 +135,7 @@ const explanations = {
     tranello: "È proprio questa depressione statica sull'estradosso che 'risucchia' l'ala verso l'alto generando oltre i due terzi della portanza totale."
   },
   2033: {
-    regola: "Il principio di Bernoulli afferma che lungo una linea di flusso a densità costante la somma di pressione statica e pressione dinamica si mantiene costante (P_tot = cost).",
+    regola: "Il principio di Bernoulli afferma che lungo una linea di flusso a densità costante la somma di pressione statica e pressione dinamica si mantiene costante (P tot = cost).",
     tranello: "La pressione totale non varia spontaneamente: se la dinamica sale la statica scende per conservare l'energia totale."
   },
   2034: {
@@ -191,7 +191,7 @@ const explanations = {
     tranello: "Non è perpendicolare alla traiettoria né parallela alla corda geometrica: agisce lungo la linea di scorrimento del vento relativo."
   },
   2047: {
-    regola: "La formula della resistenza aerodinamica è: R = 1/2 ρ S C_r V², dove ρ è la densità, S la superficie alare, C_r il coefficiente di resistenza e V la velocità.",
+    regola: "La formula della resistenza aerodinamica è: R = 1/2 ρ S Cᵣ V², dove ρ è la densità, S la superficie alare, Cᵣ il coefficiente di resistenza e V la velocità.",
     tranello: "La velocità è sempre al quadrato (V²); la superficie e il coefficiente non sono elevati al quadrato."
   },
   2048: {
@@ -203,7 +203,7 @@ const explanations = {
     tranello: "Non triplica: l'effetto quadratico (3² = 9) moltiplica per nove la forza resistente dell'aria."
   },
   2050: {
-    regola: "Il coefficiente di resistenza C_r è un numero puro adimensionale determinato dalla forma del profilo alare e dall'angolo di incidenza.",
+    regola: "Il coefficiente di resistenza Cᵣ è un numero puro adimensionale determinato dalla forma del profilo alare e dall'angolo di incidenza.",
     tranello: "Non è una forza in Newton o kg né dipende dal carico alare; è un coefficiente geometrico-fluidodinamico puro."
   },
   2051: {
@@ -244,14 +244,14 @@ const explanations = {
   },
   2060: {
     regola: "La resistenza indotta nasce dalla differenza di pressione tra intradosso (alta pressione) ed estradosso (depressione), che fa travasare l'aria alle estremità alari.",
-    tranello: "Il travaso spontaneo dell'aria dai bordi marginali da sotto a sopra crea due potenti rotoli d'aria vorticosi alle estremità."
+    tranello: "Il travaso spontaneo dell'aria dai bordi marginali da sotto a sopra crea due potenti rotori (vortici d'estremità) ai bordi marginali."
   },
   2061: {
     regola: "La resistenza indotta è inversamente proporzionale all'allungamento alare: ali a grande allungamento riducono la proporzione dei vortici marginali.",
     tranello: "Non dipende solo dall'allungamento (dipende anche dal coefficiente di portanza), ma un allungamento maggiore abbatte nettamente la resistenza indotta."
   },
   2062: {
-    regola: "A velocità elevate l'ala vola a incidenza minore e coefficiente di portanza C_p basso, riducendo l'intensità dei vortici e facendo diminuire la resistenza indotta.",
+    regola: "A velocità elevate l'ala vola a incidenza minore e coefficiente di portanza Cₚ basso, riducendo l'intensità dei vortici e facendo diminuire la resistenza indotta.",
     tranello: "A differenza delle resistenze parassite che aumentano con la velocità, la resistenza indotta diminuisce all'aumentare della velocità."
   },
   2063: {
@@ -276,7 +276,7 @@ const explanations = {
   },
   2068: {
     regola: "Variando l'angolo d'incidenza varia l'esposizione del profilo al flusso e la portanza, modificando sia la resistenza di forma che quella indotta.",
-    tranello: "La resistenza non è costante: cabrare o picchiare sposta l'angolo d'attacco variando istantaneamente il coefficiente di resistenza C_r."
+    tranello: "La resistenza non è costante: cabrare o picchiare sposta l'angolo d'attacco variando istantaneamente il coefficiente di resistenza Cᵣ."
   },
   2069: {
     regola: "In atmosfera reale è fisicamente impossibile annullare la resistenza aerodinamica di un'ala in volo, poiché esisterà sempre attrito viscoso e spessore solido.",
@@ -296,14 +296,14 @@ const explanations = {
   },
   2073: {
     regola: "La portanza dipende dalla forma e disegno del profilo, dalla densità dell'aria, dalla superficie alare, dal quadrato della velocità e dall'angolo d'incidenza.",
-    tranello: "Non dipende solo dall'incidenza o solo dalla velocità: la formula P = 1/2 ρ S C_p V² racchiude tutti questi cinque parametri."
+    tranello: "Non dipende solo dall'incidenza o solo dalla velocità: la formula P = 1/2 ρ S Cₚ V² racchiude tutti questi cinque parametri."
   },
   2074: {
-    regola: "La formula corretta della portanza è: P = 1/2 ρ S C_p V², con la velocità al quadrato (V²) e gli altri fattori lineari.",
-    tranello: "Non confondere gli esponenti: la superficie S e il coefficiente C_p non sono elevati al quadrato; solo la velocità è V²."
+    regola: "La formula corretta della portanza è: P = 1/2 ρ S Cₚ V², con la velocità al quadrato (V²) e gli altri fattori lineari.",
+    tranello: "Non confondere gli esponenti: la superficie S e il coefficiente Cₚ non sono elevati al quadrato; solo la velocità è V²."
   },
   2075: {
-    regola: "Il coefficiente di portanza C_p è un fattore numerico adimensionale che dipende dalla geometria del profilo e dall'angolo di incidenza con cui vola.",
+    regola: "Il coefficiente di portanza Cₚ è un fattore numerico adimensionale che dipende dalla geometria del profilo e dall'angolo di incidenza con cui vola.",
     tranello: "Non è una forza in kg o Newton né una velocità; è un coefficiente puro di efficacia di sostentamento."
   },
   2076: {
@@ -331,8 +331,8 @@ const explanations = {
     tranello: "In discesa o salita l'angolo della traiettoria separa i due valori; solo quando la traiettoria giace sul piano orizzontale i due angoli sono identici."
   },
   2082: {
-    regola: "L'angolo d'incidenza non compare esplicitamente nella formula della resistenza perché la sua influenza è già interamente incorporata nel coefficiente C_r.",
-    tranello: "Non è omesso per errore: il valore numerico del coefficiente C_r varia in funzione dell'angolo d'incidenza tramite la polare del profilo."
+    regola: "L'angolo d'incidenza non compare esplicitamente nella formula della resistenza perché la sua influenza è già interamente incorporata nel coefficiente Cᵣ.",
+    tranello: "Non è omesso per errore: il valore numerico del coefficiente Cᵣ varia in funzione dell'angolo d'incidenza tramite la polare del profilo."
   },
   2083: {
     regola: "Aumentando l'incidenza la portanza aumenta linearmente, ma solo entro ben precisi limiti fino a raggiungere l'angolo critico di stallo.",
@@ -343,8 +343,8 @@ const explanations = {
     tranello: "Variando l'incidenza cambiano contemporaneamente sia la portanza che la resistenza; non è possibile variare l'una lasciando invariata l'altra."
   },
   2085: {
-    regola: "L'angolo d'incidenza non compare esplicitamente nella formula P = 1/2 ρ S C_p V² perché la sua variazione è compresa all'interno del coefficiente C_p.",
-    tranello: "Il coefficiente C_p è una funzione diretta dell'angolo d'incidenza tracciata sperimentalmente sulla curva del profilo."
+    regola: "L'angolo d'incidenza non compare esplicitamente nella formula P = 1/2 ρ S Cₚ V² perché la sua variazione è compresa all'interno del coefficiente Cₚ.",
+    tranello: "Il coefficiente Cₚ è una funzione diretta dell'angolo d'incidenza tracciata sperimentalmente sulla curva del profilo."
   },
   2086: {
     regola: "In volo il pilota può variare la portanza modificando l'angolo d'incidenza entro i limiti consentiti agendo sui comandi o sulla barra di controllo.",
@@ -359,7 +359,7 @@ const explanations = {
     tranello: "Non vi è propulsione meccanica o aerodinamica: è la gravità che agisce da propulsore facendo scivolare l'apparecchio verso il basso."
   },
   2089: {
-    regola: "L'energia sfruttata dal deltaplano e parapendio per mantenersi in volo è l'energia potenziale gravitazionale dovuta alla quota del decollo (E_p = m g h).",
+    regola: "L'energia sfruttata dal deltaplano e parapendio per mantenersi in volo è l'energia potenziale gravitazionale dovuta alla quota del decollo (Eₚ = m g h).",
     tranello: "Non è energia termica o cinetica iniziale: la quota iniziale rappresenta un serbatoio di energia potenziale che viene convertito in moto."
   },
   2090: {
@@ -435,24 +435,24 @@ const explanations = {
     tranello: "Non è il rapporto con il carico alare o con la velocità; è il rapporto adimensionale puro tra forza portante e forza resistente."
   },
   2108: {
-    regola: "Poiché densità, superficie e velocità si semplificano, l'efficienza aerodinamica coincide con il rapporto tra i coefficienti C_p e C_r (E = C_p / C_r).",
+    regola: "Poiché densità, superficie e velocità si semplificano, l'efficienza aerodinamica coincide con il rapporto tra i coefficienti Cₚ e Cᵣ (E = Cₚ / Cᵣ).",
     tranello: "Non è legata al peso massimo o alla superficie lorda, ma al quoziente puro tra coefficiente di portanza e coefficiente di resistenza."
   },
   2109: {
-    regola: "Geometricamente e cinematicamente in aria calma l'efficienza equivale al rapporto tra la velocità orizzontale e la velocità verticale di discesa (E = V_x / V_z).",
+    regola: "Geometricamente e cinematicamente in aria calma l'efficienza equivale al rapporto tra la velocità orizzontale e la velocità verticale di discesa (E = Vx / Vz).",
     tranello: "Non è verticale diviso orizzontale (quello sarebbe il gradiente di discesa reciproco); è la distanza orizzontale percorsa per unità di quota persa."
   },
   2110: {
     regola: "L'efficienza aerodinamica varia continuamente al variare dell'angolo d'incidenza, raggiungendo il suo valore massimo a una specifica incidenza ottimale.",
-    tranello: "Non dipende dalla sola superficie alare o dal peso: a ogni angolo d'incidenza corrisponde un diverso rapporto C_p/C_r sulla polare."
+    tranello: "Non dipende dalla sola superficie alare o dal peso: a ogni angolo d'incidenza corrisponde un diverso rapporto Cₚ/Cᵣ sulla polare."
   },
   2111: {
     regola: "Un'efficienza massima pari a 8 significa che in aria calma l'ala può percorrere 8 chilometri orizzontali perdendo 1000 metri di quota (rapporto 8:1).",
     tranello: "Non significa fare 1 km perdendo 800 m (che darebbe un'efficienza pessima di 1.25); significa 8 km di distanza per 1 km di quota persa."
   },
   2112: {
-    regola: "Variando l'angolo d'incidenza cambiano contemporaneamente sia il coefficiente di portanza C_p che quello di resistenza C_r, determinando la variazione dell'efficienza.",
-    tranello: "Non varia solo uno dei due: ruotando il profilo rispetto al flusso si modificano simultaneamente sia C_p che C_r."
+    regola: "Variando l'angolo d'incidenza cambiano contemporaneamente sia il coefficiente di portanza Cₚ che quello di resistenza Cᵣ, determinando la variazione dell'efficienza.",
+    tranello: "Non varia solo uno dei due: ruotando il profilo rispetto al flusso si modificano simultaneamente sia Cₚ che Cᵣ."
   },
   2113: {
     regola: "In aria calma l'efficienza massima non varia al variare del peso del pilota, a condizione categorica che l'ala non subisca deformazioni strutturali sotto carico.",
@@ -475,7 +475,7 @@ const explanations = {
     tranello: "Non diminuisce il tasso di caduta: per sostenere più peso serve più velocità di scorrimento, accelerando sia l'avanzamento che la discesa."
   },
   2118: {
-    regola: "In aria calma un volo orizzontale stabile e prolungato è impossibile per deltaplano e parapendio perché la resistenza aerodinamica dissipa continuamente energia di quota.",
+    regola: "In aria calma un volo orizzontale stabile e prolungato è impossibile per deltaplano e parapendio perché la resistenza aerodinamica dissipa continuamente energia potenziale gravitazionale (consumando quota).",
     tranello: "Senza un motore propulsivo o una corrente ascensionale esterna la resistenza impone una traiettoria costantemente discendente verso il suolo."
   },
   2119: {
@@ -483,7 +483,7 @@ const explanations = {
     tranello: "Il vento in coda aumenta l'avanzamento ma non impedisce all'ala di scendere; solo una corrente ascensionale permette il volo orizzontale al suolo."
   },
   2120: {
-    regola: "La polare aerodinamica (polare di Lilienthal) è la curva cartesiana che riporta i valori del coefficiente di portanza C_p e resistenza C_r al variare dell'incidenza.",
+    regola: "La polare aerodinamica (polare di Lilienthal) è la curva cartesiana che riporta i valori del coefficiente di portanza Cₚ e resistenza Cᵣ al variare dell'incidenza.",
     tranello: "Non è basata sull'assetto visivo né sulla velocità al suolo: mette in relazione i coefficienti aerodinamici puri con l'angolo d'attacco."
   },
   2121: {
@@ -552,7 +552,7 @@ const explanations = {
   },
   2137: {
     regola: "In virata il fattore di carico è superiore a 1G aumentando il carico alare; di conseguenza sia la velocità minima che la velocità di stallo sono maggiori che in volo dritto.",
-    tranello: "In virata la velocità di stallo non resta identica: cresce proporzionalmente alla radice quadrata del fattore di carico (Vs_virata = Vs * √n)."
+    tranello: "In virata la velocità di stallo non resta identica: cresce proporzionalmente alla radice quadrata del fattore di carico (Vs in virata = Vs · √n)."
   },
   2138: {
     regola: "La velocità di stallo cresce all'aumentare del carico alare, poiché per sostenere un peso maggiore serve più velocità di scorrimento prima di toccare l'incidenza limite.",

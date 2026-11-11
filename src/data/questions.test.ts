@@ -196,4 +196,46 @@ describe('Suite 1: Integrità Dataset 504 Quiz AeCI (questions.json)', () => {
       expect(speechText).toContain('Tranello:');
     }
   });
+
+  it('DATA-11: verifica assenza di pedici/apici corrotti e correttezza terminologica sui 7 casi segnalati e quesiti gemelli', () => {
+    for (const q of questions) {
+      const allTexts = [q.question, ...q.options, q.explanation.rule, q.explanation.trap];
+      for (const text of allTexts) {
+        expect(text).not.toMatch(/\bC_[pr]\b|\bE_p\b/);
+        expect(text).not.toMatch(/\bC[.?]?\s+[pr]\b/);
+        expect(text).not.toMatch(/C\s+V2\s+[pr]|S2\s+C\s+V\s+[pr]|C\s+V\s+[pr]\b/);
+        expect(text).not.toMatch(/\b(?:V2|S2|b2|m2|O2)\b/);
+        expect(text).not.toContain('rotoli');
+        expect(text).not.toContain('esattamente circa');
+        expect(text).not.toContain('energia di quota');
+      }
+    }
+
+    const q2047 = questions.find(q => q.id === 2047)!;
+    expect(q2047.options).toEqual([
+      'R = 1/2 ρ S Cᵣ V²',
+      'R = 1/2 ρ S² Cᵣ V',
+      'R = 1/2 ρ S Cᵣ V'
+    ]);
+
+    const q2060 = questions.find(q => q.id === 2060)!;
+    expect(q2060.explanation.trap).toContain("rotori (vortici d'estremità)");
+
+    const q2108 = questions.find(q => q.id === 2108)!;
+    expect(q2108.options[2]).toContain('Cₚ e Cᵣ');
+    expect(q2108.explanation.rule).toContain('Cₚ / Cᵣ');
+
+    const q7051 = questions.find(q => q.id === 7051)!;
+    expect(q7051.explanation.rule).toContain('il proprio tasso di caduta');
+
+    const q7039 = questions.find(q => q.id === 7039)!;
+    expect(q7039.explanation.rule).toContain('targhetta di omologazione della selletta');
+
+    const q5054 = questions.find(q => q.id === 5054)!;
+    expect(q5054.explanation.rule).toContain('perde circa 1°C');
+    expect(q5054.explanation.rule).toContain('0,98°C/100 m');
+
+    const q2118 = questions.find(q => q.id === 2118)!;
+    expect(q2118.explanation.rule).toContain('energia potenziale gravitazionale (consumando quota)');
+  });
 });

@@ -13,10 +13,14 @@ import asyncio
 import re
 import argparse
 import subprocess
-import imageio_ffmpeg
+import shutil
 import edge_tts
 
-FFMPEG_EXE = imageio_ffmpeg.get_ffmpeg_exe()
+try:
+    import imageio_ffmpeg
+    FFMPEG_EXE = imageio_ffmpeg.get_ffmpeg_exe()
+except ImportError:
+    FFMPEG_EXE = shutil.which("ffmpeg") or "ffmpeg"
 
 VOICE_CONFIGS = {
     "giuseppe": {
@@ -47,48 +51,96 @@ def normalize_phonetics(text: str) -> str:
         return ""
     cleaned = text
     cleaned = cleaned.replace("’", "'").replace("‘", "'").replace("“", '"').replace("”", '"')
-    
-    # Regulations and decrees
+
+    # 1. Regulations and institutions (before single-letter/acronym rules)
     cleaned = re.sub(r'D\.P\.R\.\s*(\d+)/(\d+)', r'Decreto del Presidente della Repubblica \1 del \2', cleaned, flags=re.IGNORECASE)
     cleaned = re.sub(r'D\.P\.R\.', 'Decreto del Presidente della Repubblica', cleaned, flags=re.IGNORECASE)
-    
-    # Institutions and insurance
     cleaned = re.sub(r'Ae\.C\.I\.', "Aero Club d'Italia", cleaned, flags=re.IGNORECASE)
     cleaned = re.sub(r'\bAeCI\b', "Aero Club d'Italia", cleaned)
-    cleaned = re.sub(r'\bRCT\b', 'R C T', cleaned)
     cleaned = re.sub(r'\bENAC\b', 'Enac', cleaned)
     cleaned = re.sub(r'\bENAV\b', 'Enav', cleaned)
-    
-    # Flight acronyms and ratings
-    cleaned = re.sub(r'\bVDS/VL\b', 'V D S Volo Libero', cleaned, flags=re.IGNORECASE)
-    cleaned = re.sub(r'\bVDS\b', 'V D S', cleaned)
-    cleaned = re.sub(r'\bVL\b', 'Volo Libero', cleaned)
-    cleaned = re.sub(r'\bVFR\b', 'V F R', cleaned)
-    cleaned = re.sub(r'\bIFR\b', 'I F R', cleaned)
-    
-    # Airspaces and weather reports
-    cleaned = re.sub(r'\bCTR\b', 'C T R', cleaned)
-    cleaned = re.sub(r'\bTMA\b', 'T M A', cleaned)
-    cleaned = re.sub(r'\bATZ\b', 'A T Z', cleaned)
+    cleaned = re.sub(r'\bICAO\b', 'Icao', cleaned)
+
+    # 2. Physics formulas, subscripts, superscripts, and composite units
+    # Must run BEFORE acronym rules because superscripts like ² create a boundary after V/S/m.
+    cleaned = re.sub(r'\bkg/m²(?![a-zA-Z0-9])', 'chilogrammi per metro quadrato', cleaned, flags=re.IGNORECASE)
+    cleaned = re.sub(r'\bm/s²(?![a-zA-Z0-9])', 'metri al secondo quadrato', cleaned, flags=re.IGNORECASE)
+    cleaned = re.sub(r'\bm²(?![a-zA-Z0-9])', 'metri quadrati', cleaned, flags=re.IGNORECASE)
+    cleaned = re.sub(r'\b1/2\b', 'un mezzo', cleaned)
+    cleaned = re.sub(r'\bCₚ(?![a-zA-Z0-9])', 'ci con pi', cleaned)
+    cleaned = re.sub(r'\bCᵣ(?![a-zA-Z0-9])', 'ci con erre', cleaned)
+    cleaned = re.sub(r'\bEₚ(?![a-zA-Z0-9])', 'e con pi', cleaned)
+    cleaned = re.sub(r'\bO₂(?![a-zA-Z0-9])', 'ossigeno', cleaned)
+    cleaned = re.sub(r'(?<![a-zA-ZÀ-ÿ])[ρϱ](?![a-zA-ZÀ-ÿ])', 'ro', cleaned)
+    cleaned = re.sub(r'√n\b', 'radice di enne', cleaned)
+    cleaned = re.sub(r'∝', 'è proporzionale a', cleaned)
+    cleaned = re.sub(r'\bVx\b', 'vu con ics', cleaned)
+    cleaned = re.sub(r'\bVy\b', 'vu con ipsilon', cleaned)
+    cleaned = re.sub(r'\bVz\b', 'vu con zeta', cleaned)
+    cleaned = re.sub(r'\bVs\b', 'vu con esse', cleaned)
+    cleaned = re.sub(r'\b3V\b', 'tre vu', cleaned)
+    cleaned = re.sub(r'\b[vV]²(?![a-zA-Z0-9])', 'vu al quadrato', cleaned)
+    cleaned = re.sub(r'\bS²(?![a-zA-Z0-9])', 'esse al quadrato', cleaned)
+    cleaned = re.sub(r'\bb²(?![a-zA-Z0-9])', 'bi al quadrato', cleaned)
+    cleaned = re.sub(r'(\d+)²(?![a-zA-Z0-9])', r'\1 al quadrato', cleaned)
+
+    # 3. Compound and single aeronautical acronyms (syllabic Italian letter names)
+    cleaned = re.sub(r'\bVDS\s*[/-]\s*VL\b', 'vu di esse, vu elle', cleaned, flags=re.IGNORECASE)
+    cleaned = re.sub(r'\bTAS/IAS\b', 'ti a esse su i a esse', cleaned)
+    cleaned = re.sub(r'\bEN/LTF\b', 'e enne, elle ti effe', cleaned)
+    cleaned = re.sub(r'\bEN-A\b', 'e enne a', cleaned)
+    cleaned = re.sub(r'\bEN-B\b', 'e enne bi', cleaned)
+    cleaned = re.sub(r'\bEN-C\b', 'e enne ci', cleaned)
+    cleaned = re.sub(r'\bEN-D\b', 'e enne di', cleaned)
+    cleaned = re.sub(r'\bVDS\b', 'vu di esse', cleaned, flags=re.IGNORECASE)
+    cleaned = re.sub(r'\bVL\b', 'vu elle', cleaned, flags=re.IGNORECASE)
+    cleaned = re.sub(r'\bVFR\b', 'vu effe erre', cleaned)
+    cleaned = re.sub(r'\bIFR\b', 'i effe erre', cleaned)
+    cleaned = re.sub(r'\bRCT\b', 'erre ci ti', cleaned)
+    cleaned = re.sub(r'\bCTR\b', 'ci ti erre', cleaned)
+    cleaned = re.sub(r'\bTMA\b', 'ti emme a', cleaned)
+    cleaned = re.sub(r'\bATZ\b', 'a ti zeta', cleaned)
     cleaned = re.sub(r'\bNOTAM\b', 'Notam', cleaned, flags=re.IGNORECASE)
     cleaned = re.sub(r'\bMETAR\b', 'Metar', cleaned, flags=re.IGNORECASE)
     cleaned = re.sub(r'\bTAF\b', 'Taf', cleaned, flags=re.IGNORECASE)
-    
-    # Altimetry and units of measurement
-    cleaned = re.sub(r'\bQNH\b', 'Q N H', cleaned)
-    cleaned = re.sub(r'\bQFE\b', 'Q F E', cleaned)
+    cleaned = re.sub(r'\bQNH\b', 'qu enne acca', cleaned)
+    cleaned = re.sub(r'\bQFE\b', 'qu effe e', cleaned)
+    cleaned = re.sub(r'\bVNE\b', 'vu enne e', cleaned)
+    cleaned = re.sub(r'\bGPS\b', 'gi pi esse', cleaned)
+    cleaned = re.sub(r'\bIAS\b', 'i a esse', cleaned)
+    cleaned = re.sub(r'\bTAS\b', 'ti a esse', cleaned)
+    cleaned = re.sub(r'\bGS\b', 'gi esse', cleaned)
+    cleaned = re.sub(r'\bATC\b', 'a ti ci', cleaned)
+    cleaned = re.sub(r'\bSIV\b', 'esse i vu', cleaned)
+    cleaned = re.sub(r'\bPIO\b', 'pi i o', cleaned)
+    cleaned = re.sub(r'\bMSL\b', 'emme esse elle', cleaned)
+    cleaned = re.sub(r'\bAIP\b', 'a i pi', cleaned)
+    cleaned = re.sub(r'\bISA\b', 'i esse a', cleaned)
+    cleaned = re.sub(r'\bVMC\b', 'vu emme ci', cleaned)
+    cleaned = re.sub(r'\bIMC\b', 'i emme ci', cleaned)
+    cleaned = re.sub(r'\bUV\b', 'u vu', cleaned)
+    cleaned = re.sub(r'\bUR\b', 'u erre', cleaned)
+    cleaned = re.sub(r'\bAWY\b', 'a doppia vu ipsilon', cleaned)
+    cleaned = re.sub(r'\bPLS\b', 'pi elle esse', cleaned)
+    cleaned = re.sub(r'\bWMO\b', 'doppia vu emme o', cleaned)
+    cleaned = re.sub(r'(?<![a-zA-ZÀ-ÿ])AR(?![a-zA-ZÀ-ÿ])', 'a erre', cleaned)
+
+    # Standalone uppercase V (velocity symbol in formulas) -> "vu" so TTS never reads "quinto"
+    cleaned = re.sub(r'(?<![a-zA-ZÀ-ÿ])V(?![a-zA-ZÀ-ÿ])', 'vu', cleaned)
+
+    # 4. Aeronautical units of measurement and flight levels
     cleaned = re.sub(r'\bhPa\b', 'ettopascal', cleaned)
     cleaned = re.sub(r'\bFL\s*(\d+)', r'Livello di volo \1', cleaned, flags=re.IGNORECASE)
     cleaned = re.sub(r'\bkm/h\b', "chilometri all'ora", cleaned, flags=re.IGNORECASE)
-    cleaned = re.sub(r'\bm/s\b', 'metri al secondo', cleaned)
+    cleaned = re.sub(r'\bm/s\b', 'metri al secondo', cleaned, flags=re.IGNORECASE)
     cleaned = re.sub(r'\bkts?\b', 'nodi', cleaned, flags=re.IGNORECASE)
-    cleaned = re.sub(r'\b(\d+)\s*°C\b', r'\1 gradi centigradi', cleaned)
-    cleaned = re.sub(r'\b(\d+)\s*°\b', r'\1 gradi', cleaned)
-    
-    # Soft punctuation: replace trailing question mark with period to avoid shrill pitch
+    cleaned = re.sub(r'(\d+(?:[.,]\d+)?)\s*°C\b', r'\1 gradi centigradi', cleaned)
+    cleaned = re.sub(r'(\d+(?:[.,]\d+)?)\s*°(?![a-zA-Z])', r'\1 gradi', cleaned)
+
+    # 5. Soft punctuation: replace trailing question mark with period to avoid shrill pitch
     cleaned = re.sub(r'\?\s*$', '.', cleaned)
 
-    # Phonetic overrides to resolve homographs and enforce correct Italian tonic accents
+    # 6. Phonetic overrides to resolve homographs and enforce correct Italian tonic accents
     for pattern, replacement in PHONETIC_OVERRIDES:
         def repl(match):
             val = match.group(0)
@@ -150,22 +202,6 @@ PHONETIC_OVERRIDES = [
     (r'\bsottovento\b', 'sottovènto'),
     (r'\bsopravvento\b', 'sopravvènto'),
     (r'\bsopravento\b', 'sopravvènto'),
-
-    # 5. Technical acronyms spelled out as distinct letters
-    (r'\bVNE\b', 'V N E'),
-    (r'\bGPS\b', 'G P S'),
-    (r'\bIAS\b', 'I A S'),
-    (r'\bTAS\b', 'T A S'),
-    (r'\bGS\b', 'G S'),
-    (r'\bATC\b', 'A T C'),
-    (r'\bSIV\b', 'S I V'),
-    (r'\bPIO\b', 'P I O'),
-    (r'\bMSL\b', 'M S L'),
-    (r'\bAIP\b', 'A I P'),
-    (r'\bISA\b', 'I S A'),
-    (r'\bVMC\b', 'V M C'),
-    (r'\bUV\b', 'U V'),
-    (r'\bUR\b', 'U R'),
 ]
 
 def is_question_affected_by_phonetics(q: dict) -> bool:
@@ -270,7 +306,7 @@ async def generate_single(out_dir: str, filename: str, text: str, voice_cfg: dic
                     return False
                 await asyncio.sleep(2.0 * (attempt + 1))
 
-async def process_voice(voice_key: str, questions: list, concurrency: int, part_filter: str = "all", force: bool = False):
+async def process_voice(voice_key: str, questions: list, concurrency: int, part_filter: str = "all", force: bool = False, allowed_segments: set | None = None):
     cfg = VOICE_CONFIGS[voice_key]
     out_dir = cfg["dir"]
     os.makedirs(out_dir, exist_ok=True)
@@ -282,12 +318,17 @@ async def process_voice(voice_key: str, questions: list, concurrency: int, part_
     total_segments = 0
     for q in questions:
         segments = build_segments(q, part_filter=part_filter)
-        total_segments += len(segments)
         for fn, txt in segments:
+            if allowed_segments is not None and fn not in allowed_segments:
+                continue
+            total_segments += 1
             tasks.append(generate_single(out_dir, fn, txt, cfg, semaphore, force=force))
 
     print(f"Total segments: {total_segments} (Concurrency: {concurrency})")
-    
+    if total_segments == 0:
+        print(f"No segments matched for {voice_key.upper()}.")
+        return
+
     completed = 0
     for fut in asyncio.as_completed(tasks):
         await fut
@@ -305,6 +346,8 @@ async def main():
     parser.add_argument("--force", action="store_true", help="Force overwrite existing audio files")
     parser.add_argument("--start", type=int, default=None, help="Start question ID (e.g. 1001)")
     parser.add_argument("--end", type=int, default=None, help="End question ID (e.g. 1040)")
+    parser.add_argument("--ids", type=str, default=None, help="Comma-separated list of question IDs to process")
+    parser.add_argument("--segments-file", type=str, default=None, help="JSON array file of exact segment filenames (e.g. 2047_e.mp3)")
     parser.add_argument("--phonetic-only", action="store_true", help="Only process questions affected by phonetic overrides")
     parser.add_argument("--limit", type=int, default=None, help="Max number of quiz items to process")
     parser.add_argument("--concurrency", type=int, default=10, help="Concurrent edge-tts calls")
@@ -313,7 +356,15 @@ async def main():
     with open("src/data/questions.json", "r", encoding="utf-8") as f:
         all_questions = json.load(f)
 
+    allowed_segments = None
+    if args.segments_file:
+        with open(args.segments_file, "r", encoding="utf-8") as sf:
+            allowed_segments = set(json.load(sf))
+
     target_questions = all_questions
+    if args.ids:
+        id_set = {int(x.strip()) for x in args.ids.split(",") if x.strip()}
+        target_questions = [q for q in target_questions if q["id"] in id_set]
     if args.phonetic_only:
         target_questions = [q for q in target_questions if is_question_affected_by_phonetics(q)]
     if args.start is not None:
@@ -327,7 +378,7 @@ async def main():
 
     voices_to_run = ["giuseppe", "elsa"] if args.voice == "all" else [args.voice]
     for v in voices_to_run:
-        await process_voice(v, target_questions, args.concurrency, part_filter=args.part, force=args.force)
+        await process_voice(v, target_questions, args.concurrency, part_filter=args.part, force=args.force, allowed_segments=allowed_segments)
 
     print("\nAll requested generations completed successfully!")
 

@@ -837,7 +837,7 @@
     "subjectId": 2,
     "subjectName": "Aerodinamica",
     "discipline": "all",
-    "question": "Quant'è l'allungamento di un'ala di 25 m2 di superficie dotata di un'apertura alare di 10 m?",
+    "question": "Quant'è l'allungamento di un'ala di 25 m² di superficie dotata di un'apertura alare di 10 m?",
     "options": [
       "4 (quattro).",
       "2.5 (due virgola cinque).",
@@ -1126,7 +1126,7 @@
     "subjectId": 2,
     "subjectName": "Aerodinamica",
     "discipline": "all",
-    "question": "Che cosa rappresenta l'espressione \"1/2 ρ V2\"?",
+    "question": "Che cosa rappresenta l'espressione \"1/2 ρ V²\"?",
     "options": [
       "La densità dell'aria ad una certa velocità.",
       "La pressione statica di un fluido la cui densità è pari a \"ρ\".",
@@ -1236,7 +1236,7 @@
     ],
     "correctAnswer": 2,
     "explanation": {
-      "rule": "Il principio di Bernoulli afferma che lungo una linea di flusso a densità costante la somma di pressione statica e pressione dinamica si mantiene costante (P_tot = cost).",
+      "rule": "Il principio di Bernoulli afferma che lungo una linea di flusso a densità costante la somma di pressione statica e pressione dinamica si mantiene costante (P tot = cost).",
       "trap": "La pressione totale non varia spontaneamente: se la dinamica sale la statica scende per conservare l'energia totale."
     }
   },
@@ -1468,13 +1468,13 @@
     "discipline": "all",
     "question": "Qual è la formula della resistenza?",
     "options": [
-      "R = 1/2 ρ S C V2 r",
-      "R = 1/2 ρ S2 C V r",
-      "R = 1/2 ρ S C V r"
+      "R = 1/2 ρ S Cᵣ V²",
+      "R = 1/2 ρ S² Cᵣ V",
+      "R = 1/2 ρ S Cᵣ V"
     ],
     "correctAnswer": 1,
     "explanation": {
-      "rule": "La formula della resistenza aerodinamica è: R = 1/2 ρ S C_r V², dove ρ è la densità, S la superficie alare, C_r il coefficiente di resistenza e V la velocità.",
+      "rule": "La formula della resistenza aerodinamica è: R = 1/2 ρ S Cᵣ V², dove ρ è la densità, S la superficie alare, Cᵣ il coefficiente di resistenza e V la velocità.",
       "trap": "La velocità è sempre al quadrato (V²); la superficie e il coefficiente non sono elevati al quadrato."
     }
   },
@@ -1517,7 +1517,7 @@
     "subjectId": 2,
     "subjectName": "Aerodinamica",
     "discipline": "all",
-    "question": "Che cosa è il C? r",
+    "question": "Che cosa è il Cᵣ?",
     "options": [
       "Un coefficiente numerico che dipende dal carico alare.",
       "Un coefficiente numerico che dipende dalla forma del profilo e dalla sua incidenza di volo.",
@@ -1525,7 +1525,7 @@
     ],
     "correctAnswer": 2,
     "explanation": {
-      "rule": "Il coefficiente di resistenza C_r è un numero puro adimensionale determinato dalla forma del profilo alare e dall'angolo di incidenza.",
+      "rule": "Il coefficiente di resistenza Cᵣ è un numero puro adimensionale determinato dalla forma del profilo alare e dall'angolo di incidenza.",
       "trap": "Non è una forza in Newton o kg né dipende dal carico alare; è un coefficiente geometrico-fluidodinamico puro."
     }
   },
@@ -1696,7 +1696,7 @@
     "correctAnswer": 3,
     "explanation": {
       "rule": "La resistenza indotta nasce dalla differenza di pressione tra intradosso (alta pressione) ed estradosso (depressione), che fa travasare l'aria alle estremità alari.",
-      "trap": "Il travaso spontaneo dell'aria dai bordi marginali da sotto a sopra crea due potenti rotoli d'aria vorticosi alle estremità."
+      "trap": "Il travaso spontaneo dell'aria dai bordi marginali da sotto a sopra crea due potenti rotori (vortici d'estremità) ai bordi marginali."
     }
   },
   {
@@ -1729,7 +1729,7 @@
     ],
     "correctAnswer": 3,
     "explanation": {
-      "rule": "A velocità elevate l'ala vola a incidenza minore e coefficiente di portanza C_p basso, riducendo l'intensità dei vortici e facendo diminuire la resistenza indotta.",
+      "rule": "A velocità elevate l'ala vola a incidenza minore e coefficiente di portanza Cₚ basso, riducendo l'intensità dei vortici e facendo diminuire la resistenza indotta.",
       "trap": "A differenza delle resistenze parassite che aumentano con la velocità, la resistenza indotta diminuisce all'aumentare della velocità."
     }
   },
@@ -1832,7 +1832,7 @@
     "correctAnswer": 3,
     "explanation": {
       "rule": "Variando l'angolo d'incidenza varia l'esposizione del profilo al flusso e la portanza, modificando sia la resistenza di forma che quella indotta.",
-      "trap": "La resistenza non è costante: cabrare o picchiare sposta l'angolo d'attacco variando istantaneamente il coefficiente di resistenza C_r."
+      "trap": "La resistenza non è costante: cabrare o picchiare sposta l'angolo d'attacco variando istantaneamente il coefficiente di resistenza Cᵣ."
     }
   },
   {
@@ -1917,7 +1917,7 @@
     "correctAnswer": 1,
     "explanation": {
       "rule": "La portanza dipende dalla forma e disegno del profilo, dalla densità dell'aria, dalla superficie alare, dal quadrato della velocità e dall'angolo d'incidenza.",
-      "trap": "Non dipende solo dall'incidenza o solo dalla velocità: la formula P = 1/2 ρ S C_p V² racchiude tutti questi cinque parametri."
+      "trap": "Non dipende solo dall'incidenza o solo dalla velocità: la formula P = 1/2 ρ S Cₚ V² racchiude tutti questi cinque parametri."
     }
   },
   {
@@ -1927,14 +1927,14 @@
     "discipline": "all",
     "question": "Qual è la formula della portanza?",
     "options": [
-      "P = 1/2 ρ S2 C V p",
-      "P = 1/2 ρ S C V2 p",
-      "P = 1/2 ρ S C V p"
+      "P = 1/2 ρ S² Cₚ V",
+      "P = 1/2 ρ S Cₚ V²",
+      "P = 1/2 ρ S Cₚ V"
     ],
     "correctAnswer": 2,
     "explanation": {
-      "rule": "La formula corretta della portanza è: P = 1/2 ρ S C_p V², con la velocità al quadrato (V²) e gli altri fattori lineari.",
-      "trap": "Non confondere gli esponenti: la superficie S e il coefficiente C_p non sono elevati al quadrato; solo la velocità è V²."
+      "rule": "La formula corretta della portanza è: P = 1/2 ρ S Cₚ V², con la velocità al quadrato (V²) e gli altri fattori lineari.",
+      "trap": "Non confondere gli esponenti: la superficie S e il coefficiente Cₚ non sono elevati al quadrato; solo la velocità è V²."
     }
   },
   {
@@ -1942,7 +1942,7 @@
     "subjectId": 2,
     "subjectName": "Aerodinamica",
     "discipline": "all",
-    "question": "Nella formula della portanza il fattore C p detto coefficiente di portanza è:",
+    "question": "Nella formula della portanza il fattore Cₚ detto coefficiente di portanza è:",
     "options": [
       "una forza perpendicolare alla traiettoria di volo o alla direzione del vento relativo.",
       "una velocità che dipende dall'incidenza del profilo.",
@@ -1950,7 +1950,7 @@
     ],
     "correctAnswer": 3,
     "explanation": {
-      "rule": "Il coefficiente di portanza C_p è un fattore numerico adimensionale che dipende dalla geometria del profilo e dall'angolo di incidenza con cui vola.",
+      "rule": "Il coefficiente di portanza Cₚ è un fattore numerico adimensionale che dipende dalla geometria del profilo e dall'angolo di incidenza con cui vola.",
       "trap": "Non è una forza in kg o Newton né una velocità; è un coefficiente puro di efficacia di sostentamento."
     }
   },
@@ -2061,16 +2061,16 @@
     "subjectId": 2,
     "subjectName": "Aerodinamica",
     "discipline": "all",
-    "question": "Perché nella formula della resistenza R = 1/2 ϱ C S V2 non compare l'angolo d'incidenza al r cui variare varia la resistenza stessa?",
+    "question": "Perché nella formula della resistenza R = 1/2 ρ Cᵣ S V² non compare l'angolo d'incidenza al cui variare varia la resistenza stessa?",
     "options": [
       "Perché al variare dell'incidenza varia la sola superficie proiettata.",
       "Perché un'altra formula lega incidenza e resistenza aerodinamica.",
-      "Perché al variare dell'incidenza varia il C. r"
+      "Perché al variare dell'incidenza varia il Cᵣ."
     ],
     "correctAnswer": 3,
     "explanation": {
-      "rule": "L'angolo d'incidenza non compare esplicitamente nella formula della resistenza perché la sua influenza è già interamente incorporata nel coefficiente C_r.",
-      "trap": "Non è omesso per errore: il valore numerico del coefficiente C_r varia in funzione dell'angolo d'incidenza tramite la polare del profilo."
+      "rule": "L'angolo d'incidenza non compare esplicitamente nella formula della resistenza perché la sua influenza è già interamente incorporata nel coefficiente Cᵣ.",
+      "trap": "Non è omesso per errore: il valore numerico del coefficiente Cᵣ varia in funzione dell'angolo d'incidenza tramite la polare del profilo."
     }
   },
   {
@@ -2112,16 +2112,16 @@
     "subjectId": 2,
     "subjectName": "Aerodinamica",
     "discipline": "all",
-    "question": "Perché nella formula della portanza P = 1/2 ϱ C S V2 non compare l'angolo d'incidenza al p cui variare varia la portanza stessa?",
+    "question": "Perché nella formula della portanza P = 1/2 ρ Cₚ S V² non compare l'angolo d'incidenza al cui variare varia la portanza stessa?",
     "options": [
       "Perché al variare dell'incidenza varia la sola superficie proiettata.",
       "Perché un'altra formula lega incidenza e portanza.",
-      "Perché al variare dell'incidenza varia il C . p"
+      "Perché al variare dell'incidenza varia il Cₚ."
     ],
     "correctAnswer": 3,
     "explanation": {
-      "rule": "L'angolo d'incidenza non compare esplicitamente nella formula P = 1/2 ρ S C_p V² perché la sua variazione è compresa all'interno del coefficiente C_p.",
-      "trap": "Il coefficiente C_p è una funzione diretta dell'angolo d'incidenza tracciata sperimentalmente sulla curva del profilo."
+      "rule": "L'angolo d'incidenza non compare esplicitamente nella formula P = 1/2 ρ S Cₚ V² perché la sua variazione è compresa all'interno del coefficiente Cₚ.",
+      "trap": "Il coefficiente Cₚ è una funzione diretta dell'angolo d'incidenza tracciata sperimentalmente sulla curva del profilo."
     }
   },
   {
@@ -2188,7 +2188,7 @@
     ],
     "correctAnswer": 3,
     "explanation": {
-      "rule": "L'energia sfruttata dal deltaplano e parapendio per mantenersi in volo è l'energia potenziale gravitazionale dovuta alla quota del decollo (E_p = m g h).",
+      "rule": "L'energia sfruttata dal deltaplano e parapendio per mantenersi in volo è l'energia potenziale gravitazionale dovuta alla quota del decollo (Eₚ = m g h).",
       "trap": "Non è energia termica o cinetica iniziale: la quota iniziale rappresenta un serbatoio di energia potenziale che viene convertito in moto."
     }
   },
@@ -2299,11 +2299,11 @@
     "subjectId": 2,
     "subjectName": "Aerodinamica",
     "discipline": "all",
-    "question": "Se il pilota pesa 78 kg, l'attrezzatura di volo, ala compresa, 22 kg e la superficie proiettata è 25 m2, quanto sarà il carico alare?",
+    "question": "Se il pilota pesa 78 kg, l'attrezzatura di volo, ala compresa, 22 kg e la superficie proiettata è 25 m², quanto sarà il carico alare?",
     "options": [
-      "6 kg/m2.",
-      "9 kg/m2.",
-      "4 kg/m2."
+      "6 kg/m².",
+      "9 kg/m².",
+      "4 kg/m²."
     ],
     "correctAnswer": 3,
     "explanation": {
@@ -2507,11 +2507,11 @@
     "options": [
       "il rapporto tra la sua superficie ed il peso trasportato.",
       "il rapporto tra il peso trasportato e la sua velocità massima.",
-      "il rapporto tra C e C. p r"
+      "il rapporto tra Cₚ e Cᵣ."
     ],
     "correctAnswer": 3,
     "explanation": {
-      "rule": "Poiché densità, superficie e velocità si semplificano, l'efficienza aerodinamica coincide con il rapporto tra i coefficienti C_p e C_r (E = C_p / C_r).",
+      "rule": "Poiché densità, superficie e velocità si semplificano, l'efficienza aerodinamica coincide con il rapporto tra i coefficienti Cₚ e Cᵣ (E = Cₚ / Cᵣ).",
       "trap": "Non è legata al peso massimo o alla superficie lorda, ma al quoziente puro tra coefficiente di portanza e coefficiente di resistenza."
     }
   },
@@ -2528,7 +2528,7 @@
     ],
     "correctAnswer": 1,
     "explanation": {
-      "rule": "Geometricamente e cinematicamente in aria calma l'efficienza equivale al rapporto tra la velocità orizzontale e la velocità verticale di discesa (E = V_x / V_z).",
+      "rule": "Geometricamente e cinematicamente in aria calma l'efficienza equivale al rapporto tra la velocità orizzontale e la velocità verticale di discesa (E = Vx / Vz).",
       "trap": "Non è verticale diviso orizzontale (quello sarebbe il gradiente di discesa reciproco); è la distanza orizzontale percorsa per unità di quota persa."
     }
   },
@@ -2546,7 +2546,7 @@
     "correctAnswer": 1,
     "explanation": {
       "rule": "L'efficienza aerodinamica varia continuamente al variare dell'angolo d'incidenza, raggiungendo il suo valore massimo a una specifica incidenza ottimale.",
-      "trap": "Non dipende dalla sola superficie alare o dal peso: a ogni angolo d'incidenza corrisponde un diverso rapporto C_p/C_r sulla polare."
+      "trap": "Non dipende dalla sola superficie alare o dal peso: a ogni angolo d'incidenza corrisponde un diverso rapporto Cₚ/Cᵣ sulla polare."
     }
   },
   {
@@ -2573,14 +2573,14 @@
     "discipline": "all",
     "question": "Al variare dell'incidenza varia l'efficienza di un'ala perché:",
     "options": [
-      "varia solo il coefficiente di portanza C dell'ala. p",
-      "varia solo il coefficiente di resistenza C dell'ala. r",
-      "variano i coefficienti di portanza e resistenza C p e C. r"
+      "varia solo il coefficiente di portanza Cₚ dell'ala.",
+      "varia solo il coefficiente di resistenza Cᵣ dell'ala.",
+      "variano i coefficienti di portanza e resistenza Cₚ e Cᵣ."
     ],
     "correctAnswer": 3,
     "explanation": {
-      "rule": "Variando l'angolo d'incidenza cambiano contemporaneamente sia il coefficiente di portanza C_p che quello di resistenza C_r, determinando la variazione dell'efficienza.",
-      "trap": "Non varia solo uno dei due: ruotando il profilo rispetto al flusso si modificano simultaneamente sia C_p che C_r."
+      "rule": "Variando l'angolo d'incidenza cambiano contemporaneamente sia il coefficiente di portanza Cₚ che quello di resistenza Cᵣ, determinando la variazione dell'efficienza.",
+      "trap": "Non varia solo uno dei due: ruotando il profilo rispetto al flusso si modificano simultaneamente sia Cₚ che Cᵣ."
     }
   },
   {
@@ -2681,7 +2681,7 @@
     ],
     "correctAnswer": 2,
     "explanation": {
-      "rule": "In aria calma un volo orizzontale stabile e prolungato è impossibile per deltaplano e parapendio perché la resistenza aerodinamica dissipa continuamente energia di quota.",
+      "rule": "In aria calma un volo orizzontale stabile e prolungato è impossibile per deltaplano e parapendio perché la resistenza aerodinamica dissipa continuamente energia potenziale gravitazionale (consumando quota).",
       "trap": "Senza un motore propulsivo o una corrente ascensionale esterna la resistenza impone una traiettoria costantemente discendente verso il suolo."
     }
   },
@@ -2715,7 +2715,7 @@
     ],
     "correctAnswer": 3,
     "explanation": {
-      "rule": "La polare aerodinamica (polare di Lilienthal) è la curva cartesiana che riporta i valori del coefficiente di portanza C_p e resistenza C_r al variare dell'incidenza.",
+      "rule": "La polare aerodinamica (polare di Lilienthal) è la curva cartesiana che riporta i valori del coefficiente di portanza Cₚ e resistenza Cᵣ al variare dell'incidenza.",
       "trap": "Non è basata sull'assetto visivo né sulla velocità al suolo: mette in relazione i coefficienti aerodinamici puri con l'angolo d'attacco."
     }
   },
@@ -3005,7 +3005,7 @@
     "correctAnswer": 1,
     "explanation": {
       "rule": "In virata il fattore di carico è superiore a 1G aumentando il carico alare; di conseguenza sia la velocità minima che la velocità di stallo sono maggiori che in volo dritto.",
-      "trap": "In virata la velocità di stallo non resta identica: cresce proporzionalmente alla radice quadrata del fattore di carico (Vs_virata = Vs * √n)."
+      "trap": "In virata la velocità di stallo non resta identica: cresce proporzionalmente alla radice quadrata del fattore di carico (Vs in virata = Vs · √n)."
     }
   },
   {
@@ -3616,7 +3616,7 @@
     ],
     "correctAnswer": 3,
     "explanation": {
-      "rule": "L'ipossia da quota (altitudinale o ipobarica) dipende direttamente dal deficit di pressione alveolare dell'O2, che riduce la saturazione dell'emoglobina arteriosa.",
+      "rule": "L'ipossia da quota (altitudinale o ipobarica) dipende direttamente dal deficit di pressione alveolare dell'O₂, che riduce la saturazione dell'emoglobina arteriosa.",
       "trap": "Attribuire l'ipossia a cali della pressione arteriosa o a sbalzi termici, ignorando che la causa primaria è la ridotta tensione dell'ossigeno nell'aria inspirata."
     }
   },
@@ -3633,7 +3633,7 @@
     ],
     "correctAnswer": 1,
     "explanation": {
-      "rule": "Il cervello soffre per primo il deficit di O2: compaiono euforia ingiustificata, perdita di senso critico, rallentamento dei riflessi e iperventilazione compensatoria.",
+      "rule": "Il cervello soffre per primo il deficit di O₂: compaiono euforia ingiustificata, perdita di senso critico, rallentamento dei riflessi e iperventilazione compensatoria.",
       "trap": "La sensazione ingannevole di euforia o benessere fa sottovalutare il pericolo, impedendo al pilota di riconoscere l'imminente perdita di coscienza."
     }
   },
@@ -4653,7 +4653,7 @@
     ],
     "correctAnswer": 2,
     "explanation": {
-      "rule": "L'aria non satura che si solleva adiabaticamente senza condensazione del vapore perde esattamente circa 1°C di temperatura ogni 100 m di dislivello.",
+      "rule": "L'aria non satura che si solleva adiabaticamente senza condensazione del vapore perde circa 1°C di temperatura ogni 100 m di dislivello (0,98°C/100 m).",
       "trap": "Non perde 0.65°C né valori variabili con la giornata: il gradiente adiabatico secco è una costante fisica fissa di 1°C/100m."
     }
   },
@@ -5945,7 +5945,7 @@
     ],
     "correctAnswer": 3,
     "explanation": {
-      "rule": "Nei tubi di Pitot misura la differenza tra pressione totale e pressione statica (pressione dinamica q = 1/2*rho*v^2), oppure sfrutta la rotazione di micro-giranti calibrate.",
+      "rule": "Nei tubi di Pitot misura la differenza tra pressione totale e pressione statica (pressione dinamica q = 1/2 ρ V²), oppure sfrutta la rotazione di micro-giranti calibrate.",
       "trap": "Credere che l'anemometro misuri la pressione statica o l'energia termica, anziché l'energia cinetica della pressione d'impatto del vento relativo."
     }
   },
@@ -6456,7 +6456,7 @@
     "correctAnswer": 2,
     "explanation": {
       "rule": "Le colonne termiche hanno ampiezza orizzontale limitata; spiralare a 360° consente al pilota di rimanere centrato nel nocciolo ascendente sfruttando la spinta verticale.",
-      "trap": "Le termiche non salgono necessariamente a spirale e la virata continua aumenta la caduta propria, ma è l'unico modo per non uscire dalla zona di risalita."
+      "trap": "Le termiche non salgono necessariamente a spirale e la virata continua aumenta il proprio tasso di caduta, ma è l'unico modo per non uscire dalla zona di risalita."
     }
   },
   {
@@ -6473,7 +6473,7 @@
     "correctAnswer": 1,
     "explanation": {
       "rule": "All'interno della colonna ascensionale si interviene sui comandi per ridurre la velocità al regime di minimo tasso di caduta, massimizzando il guadagno di quota al secondo.",
-      "trap": "Accelerare in termica riduce il tempo di permanenza nell'ascendenza e aumenta il tasso di caduta propria, riducendo l'efficacia del galleggiamento."
+      "trap": "Accelerare in termica riduce il tempo di permanenza nell'ascendenza e aumenta il proprio tasso di caduta, riducendo l'efficacia del galleggiamento."
     }
   },
   {
@@ -6778,7 +6778,7 @@
     ],
     "correctAnswer": 3,
     "explanation": {
-      "rule": "La larghezza della ventrale tra i maillons e l'altezza di sospensione devono rispettare scrupolosamente i valori riportati sulla targhetta di omologazione dell'ala.",
+      "rule": "La larghezza della ventrale tra i maillons e l'altezza di sospensione devono rispettare scrupolosamente i valori riportati sulla targhetta di omologazione della selletta.",
       "trap": "Una ventrale regolata a caso altera drasticamente il comportamento omologato: troppo larga rende l'ala instabile, troppo stretta ostacola il pilotaggio col peso."
     }
   },
@@ -6982,7 +6982,7 @@
     ],
     "correctAnswer": 1,
     "explanation": {
-      "rule": "In termica si sceglie il miglior compromesso tra inclinazione e raggio di virata per non fuoriuscire dal nucleo ascensionale, minimizzando la caduta propria compatibilmente col raggio.",
+      "rule": "In termica si sceglie il miglior compromesso tra inclinazione e raggio di virata per non fuoriuscire dal nucleo ascensionale, minimizzando il proprio tasso di caduta compatibilmente col raggio.",
       "trap": "Volare troppo piatti allarga il raggio facendo scivolare l'ala fuori dall'ascendenza; fare 'otto' spezza il ritmo e fa perdere il centro della termica."
     }
   },

@@ -219,7 +219,7 @@ const explanations = {
     tranello: "Non è un processo che scambia calore con l'aria circostante (che lo renderebbe diabatico); è per definizione adiabatico."
   },
   5054: {
-    regola: "L'aria non satura che si solleva adiabaticamente senza condensazione del vapore perde esattamente circa 1°C di temperatura ogni 100 m di dislivello.",
+    regola: "L'aria non satura che si solleva adiabaticamente senza condensazione del vapore perde circa 1°C di temperatura ogni 100 m di dislivello (0,98°C/100 m).",
     tranello: "Non perde 0.65°C né valori variabili con la giornata: il gradiente adiabatico secco è una costante fisica fissa di 1°C/100m."
   },
   5055: {
