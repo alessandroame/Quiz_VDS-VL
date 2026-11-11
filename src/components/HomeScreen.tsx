@@ -56,6 +56,8 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectTab }) => {
       onSelectTab('topics');
     } else if (activeSession.type === 'mistakes') {
       onSelectTab('mistakes');
+    } else if (activeSession.type === 'archive') {
+      onSelectTab('archive');
     }
   };
 
@@ -73,7 +75,8 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectTab }) => {
       (tab === 'tutor' && activeSession.type === 'exam' && activeSession.examMode === 'tutor') ||
       (tab === 'exam' && activeSession.type === 'exam' && activeSession.examMode !== 'tutor') ||
       (tab === 'topics' && activeSession.type === 'topic') ||
-      (tab === 'mistakes' && activeSession.type === 'mistakes');
+      (tab === 'mistakes' && activeSession.type === 'mistakes') ||
+      (tab === 'archive' && activeSession.type === 'archive');
 
     if (isMatchingSession) {
       handleResumeSession();
@@ -196,6 +199,8 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectTab }) => {
                           ? 'Tutor Continuo'
                           : 'Tutor Standard (30 Quiz)')
                       : 'Simulazione Esame')
+                  : activeSession.type === 'archive'
+                  ? 'Quiz Archivio'
                   : 'Quaderno Errori')}
               </div>
               <div className="text-[11px] text-zinc-400 light:text-slate-600 truncate">
@@ -494,6 +499,8 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onSelectTab }) => {
             activeSession.subjectName ||
             (activeSession.type === 'exam'
               ? (activeSession.examMode === 'tutor' ? 'Tutor' : 'Simulazione Esame')
+              : activeSession.type === 'archive'
+              ? 'Quiz Archivio'
               : 'Quaderno Errori')
           }
           existingProgress={`Domanda ${(activeSession.currentIndex || 0) + 1} di ${

@@ -156,14 +156,17 @@ export const DriveActiveHUD: React.FC<DriveActiveHUDProps> = ({
   isQuestionSwitching = false,
   isCooldownActive = false
 }) => {
-  const isCurrentRevealed =
-    revealedQuestionId === currentQ.id || answers[currentQ.id] !== undefined;
-  const isLocked = isCurrentRevealed || isCooldownActive || isQuestionSwitching;
-
   const isTutorSession =
-    isTutorEnabled ||
-    (sessionContext?.isTutor ?? !isExamSession) ||
-    Boolean(sessionContext?.title?.includes('Tutor'));
+    sessionContext?.isTutor !== undefined
+      ? sessionContext.isTutor
+      : (isExamSession ? isTutorEnabled : true);
+  const isBlindExamSession = isExamSession && !isTutorSession;
+
+  const isCurrentRevealed =
+    !isBlindExamSession &&
+    (revealedQuestionId === currentQ.id || answers[currentQ.id] !== undefined);
+  const isLocked =
+    (!isBlindExamSession && isCurrentRevealed) || isCooldownActive || isQuestionSwitching;
 
   const isActivelyStreamingSpeech =
     isVoiceRefining || Boolean(voiceCommittedTranscript || voiceInterimTranscript);

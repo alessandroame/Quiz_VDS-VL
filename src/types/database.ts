@@ -98,7 +98,7 @@ export interface AppSettings {
 }
 
 export interface InProgressSession {
-  type: 'exam' | 'topic' | 'mistakes';
+  type: 'exam' | 'topic' | 'mistakes' | 'archive';
   subjectId?: number;
   subjectName?: string;
   mode?: 'all' | 'unseen' | 'wrong';

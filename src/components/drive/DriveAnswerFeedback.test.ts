@@ -191,7 +191,7 @@ describe('DriveAnswerFeedback - Audio & Tutor Answer Feedback Verification', () 
     expect(urlElsa).toContain('/audio/elsa/1001_e.mp3');
   });
 
-  it('AUDIO-FEEDBACK-05: in modalità esame senza tutor, le risposte date vengono rivelate immediatamente con feedback verde/rosso e didattica', () => {
+  it('AUDIO-FEEDBACK-05: in modalità esame ufficiale senza tutor (simulazione cieca), NON rivela esito verde/rosso né scheda didattica prima della consegna', () => {
     const html = renderToString(
       React.createElement(DriveActiveHUD, {
         currentQ: sampleQuestion,
@@ -208,7 +208,7 @@ describe('DriveAnswerFeedback - Audio & Tutor Answer Feedback Verification', () 
         onExecuteClose: () => {},
         isAutopilotEnabled: true,
         onToggleAutopilot: () => {},
-        isTutorEnabled: false, // Esame ufficiale non-tutor
+        isTutorEnabled: false, // Simulazione esame ufficiale cieca
         onToggleTutor: () => {},
         isVoiceSupported: true,
         isVoiceCommandsEnabled: false,
@@ -231,7 +231,7 @@ describe('DriveAnswerFeedback - Audio & Tutor Answer Feedback Verification', () 
         lastRecognizedLabel: null,
         unrecognizedSpeech: null,
         voiceHint: '',
-        answers: { 1001: 1 }, // Risposta errata
+        answers: { 1001: 1 }, // Risposta errata selezionata
         flags: {},
         revealedQuestionId: null,
         onSelectAnswer: () => {},
@@ -242,13 +242,68 @@ describe('DriveAnswerFeedback - Audio & Tutor Answer Feedback Verification', () 
       })
     );
 
-    // Anche senza tutor esplicito, la risposta errata mostra stile rosso e quella esatta verde
+    // Mostra solo selezione ambra neutra, senza verde/rosso né scheda didattica
+    expect(html).toContain('bg-amber-950');
+    expect(html).toContain('border-amber-500');
+    expect(html).not.toContain('bg-rose-950/80');
+    expect(html).not.toContain('bg-emerald-950/80');
+    expect(html).not.toContain('id="drive-didactic-card"');
+    expect(html).not.toContain('pointer-events-none');
+  });
+
+  it('AUDIO-FEEDBACK-05b: in sessione studio/radio non-esame, continua a rivelare immediatamente esito verde/rosso e scheda didattica', () => {
+    const html = renderToString(
+      React.createElement(DriveActiveHUD, {
+        currentQ: sampleQuestion,
+        currentIndex: 0,
+        totalCount: 30,
+        isExamSession: false,
+        secondsRemaining: 0,
+        isIntroActive: false,
+        onDismissIntro: () => {},
+        onReplayIntro: () => {},
+        onOpenVoiceGuide: () => {},
+        setIsVoiceMenuOpen: () => {},
+        onClose: () => {},
+        onExecuteClose: () => {},
+        isAutopilotEnabled: true,
+        onToggleAutopilot: () => {},
+        isTutorEnabled: false,
+        onToggleTutor: () => {},
+        isVoiceSupported: true,
+        isVoiceCommandsEnabled: false,
+        voiceError: null,
+        isVoiceReceiving: false,
+        isVoiceListening: false,
+        onToggleVoiceCommands: () => {},
+        isPlaying: false,
+        isPaused: false,
+        isPartPlaying: () => false,
+        isExplanationPlaying: false,
+        onTogglePlayPause: () => {},
+        onRestartCurrentOrSequence: () => {},
+        onStopVoice: () => {},
+        onPlayExplanation: () => {},
+        waitingCountdown: null,
+        assimilationCountdown: null,
+        voiceInterimTranscript: '',
+        voiceLastTranscript: '',
+        lastRecognizedLabel: null,
+        unrecognizedSpeech: null,
+        voiceHint: '',
+        answers: { 1001: 1 },
+        flags: {},
+        revealedQuestionId: null,
+        onSelectAnswer: () => {},
+        onPrevQuestion: () => {},
+        onNextQuestion: () => {},
+        onToggleFlag: () => {},
+        onSubmitExam: () => {}
+      })
+    );
+
     expect(html).toContain('bg-rose-950/80');
-    expect(html).toContain('border-rose-500');
-    expect(html).toContain('bg-rose-500 text-white');
     expect(html).toContain('bg-emerald-950/80');
-    expect(html).toContain('border-emerald-500');
-    expect(html).toContain('bg-emerald-500 text-white');
     expect(html).toContain('id="drive-didactic-card"');
   });
 

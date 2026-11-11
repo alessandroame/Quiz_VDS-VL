@@ -363,6 +363,8 @@ function AppContent() {
       handleSelectTab('topics');
     } else if (activeSession.type === 'mistakes') {
       handleSelectTab('mistakes');
+    } else if (activeSession.type === 'archive') {
+      handleSelectTab('archive');
     }
   };
 
@@ -404,6 +406,8 @@ function AppContent() {
                             ? 'Tutor Continuo'
                             : 'Tutor Standard (30 Quiz)')
                         : 'Simulazione Esame')
+                    : activeSession.type === 'archive'
+                    ? 'Quiz Archivio'
                     : 'Quaderno Errori')}
                 </div>
                 <div className="text-[11px] text-amber-300/80 light:text-amber-700 truncate">
@@ -481,7 +485,7 @@ function AppContent() {
           {activeTab === 'mistakes' && (
             <MistakesScreen onNavigateHome={handleDirectNavigateHome} />
           )}
-          {activeTab === 'archive' && <ArchiveScreen />}
+          {activeTab === 'archive' && <ArchiveScreen onNavigateHome={handleDirectNavigateHome} />}
           {activeTab === 'stats' && (
             <StatsScreen
               onTrainSubject={(subjectId) => {
@@ -532,6 +536,8 @@ function AppContent() {
                       ? 'Tutor Continuo'
                       : 'Tutor Standard (30 Quiz)')
                   : 'Simulazione Esame')
+              : activeSession?.type === 'archive'
+              ? 'Quiz Archivio'
               : 'Quaderno Errori')
           }
           currentIndex={activeSession?.currentIndex || 0}

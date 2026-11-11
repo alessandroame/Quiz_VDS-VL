@@ -131,21 +131,26 @@ describe('QuestionNavigator Component', () => {
     expect(html).toContain('(1 ⚑)');
   });
 
-  it('displays correct/wrong indicator for answered questions in official exam mode', () => {
-    const html = renderToString(
-      React.createElement(QuestionNavigator, {
-        questions: mockQuestions,
-        currentIndex: 0,
-        answers: { 1: 2 },
-        flags: {},
-        examMode: 'official',
-        onSelectIndex: () => {},
-        defaultCompressed: false
-      })
-    );
+  it('displays neutral sky-blue answered indicator without leaking correctness in official and marathon exam modes', () => {
+    for (const mode of ['official', 'marathon'] as const) {
+      const html = renderToString(
+        React.createElement(QuestionNavigator, {
+          questions: mockQuestions,
+          currentIndex: 0,
+          answers: { 1: 1, 2: 2 }, // 1 correct, 2 wrong
+          flags: {},
+          examMode: mode,
+          onSelectIndex: () => {},
+          defaultCompressed: false
+        })
+      );
 
-    // In official mode, answers are now verified with feedback
-    expect(html).toContain('border-rose-500');
+      expect(html).toContain('border-sky-500/70');
+      expect(html).not.toContain('border-emerald-500');
+      expect(html).not.toContain('border-rose-500');
+      expect(html).not.toContain('(Esatta)');
+      expect(html).not.toContain('(Errata)');
+    }
   });
 
   it('renders active question dot and ring in compressed mode', () => {

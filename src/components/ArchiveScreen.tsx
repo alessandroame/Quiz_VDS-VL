@@ -1,19 +1,7 @@
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useState, useMemo, useEffect, useRef, useCallback } from 'react';
 import {
   Search,
-  Bookmark,
-  ChevronDown,
-  ChevronUp,
-  FileText,
-  CheckCircle2,
-  Volume2,
   Play,
-  Pause,
-  RotateCcw,
-  Square,
-  Edit3,
-  Trash2,
-  Plus,
   Hash,
   Delete,
   CornerDownLeft,
@@ -21,8 +9,11 @@ import {
   Sparkles
 } from 'lucide-react';
 import { useQuiz } from '../context/QuizContext';
-import { useAviationVoice } from '../hooks/useAviationVoice';
 import { voiceService } from '../services/voiceService';
+import { ArchiveItem } from './ArchiveItemCard';
+import { ArchiveQuizSessionView } from './ArchiveQuizSessionView';
+import { SessionConflictModal } from './SessionConflictModal';
+import { getNextQuestionIndex } from '../utils/quizNavigation';
 import {
   formatSubjectCode,
   findQuestionById,
@@ -35,438 +26,31 @@ import { triggerHapticFeedback } from '../utils/haptics';
 import { backNavigation } from '../utils/backNavigation';
 import type { Question } from '../types/quiz';
 
-interface ArchiveItemExpandedContentProps {
-  question: Question;
+export interface ArchiveScreenProps {
+  onNavigateHome?: () => void;
 }
 
-interface ArchiveItemProps {
-  question: Question;
-  isExpanded: boolean;
-  onToggle: () => void;
-}
+const STATUS_LABELS: Record<ArchiveStatusFilter, string> = {
+  all: 'Tutte',
+  unseen: 'Non viste',
+  incorrect: 'Errate',
+  correct: 'Esatte',
+  bookmarked: 'Preferiti',
+  with_notes: 'Note'
+};
 
-const ArchiveItemExpandedContent: React.FC<ArchiveItemExpandedContentProps> = ({ question: q }) => {
-  const { statsMap, settings, saveNote } = useQuiz();
-  const stat = statsMap.get(q.id);
-
-  const [isEditingNote, setIsEditingNote] = useState(false);
-  const [noteText, setNoteText] = useState(stat?.userNote || '');
-
-  useEffect(() => {
-    setIsEditingNote(false);
-    setNoteText(stat?.userNote || '');
-  }, [q.id, stat?.userNote]);
-
+export const ArchiveScreen: React.FC<ArchiveScreenProps> = ({ onNavigateHome }) => {
   const {
-    isPlaying,
-    isPaused,
-    isThisQuestionActive,
-    isPartPlaying,
-    isPartPaused,
-    isPartActive,
-    togglePlayPause,
-    restartFullSequence,
-    playQuestion,
-    restartQuestion,
-    playOption,
-    restartOption,
-    playExplanation,
-    restartExplanation,
-    stop
-  } = useAviationVoice(q.id);
-
-  return (
-    <div className="p-3.5 border-t border-zinc-700/80 light:border-slate-200 bg-zinc-950/60 light:bg-slate-50 space-y-3">
-      {/* Barra comandi vocali rapidi */}
-          {settings.ttsEnabled && (
-            <div className="flex items-center justify-between pb-2 border-b border-zinc-700/60 light:border-slate-200 text-xs">
-              <span className="text-[11px] text-zinc-400 light:text-slate-600 font-medium">
-                Ascolto Vocale
-              </span>
-              <div className="flex items-center gap-1.5">
-                {isPartActive('question') ? (
-                  <div className="inline-flex items-center bg-zinc-800/80 light:bg-slate-100 border border-zinc-700/80 light:border-slate-300 rounded p-0.5 gap-0.5 text-[11px] animate-in fade-in duration-150">
-                    <button
-                      onClick={() => playQuestion()}
-                      className={`px-1.5 py-0.5 rounded flex items-center gap-1 font-semibold transition-colors ${
-                        isPartPlaying('question')
-                          ? 'bg-amber-500/20 text-amber-400 ring-1 ring-amber-500/50 light:bg-amber-100 light:text-amber-800 light:ring-amber-400'
-                          : 'bg-zinc-700/50 text-zinc-300 ring-1 ring-zinc-600 light:bg-slate-200 light:text-slate-700'
-                      }`}
-                      title={isPartPlaying('question') ? 'Metti in pausa la lettura della domanda' : 'Riprendi lettura della domanda'}
-                    >
-                      {isPartPlaying('question') ? (
-                        <Pause className="w-2.5 h-2.5 animate-pulse text-amber-400 light:text-amber-700" />
-                      ) : (
-                        <Play className="w-2.5 h-2.5 text-amber-400 light:text-amber-700" />
-                      )}
-                      <span>Domanda</span>
-                    </button>
-                    <button
-                      onClick={() => restartQuestion()}
-                      className="p-1 rounded text-zinc-300 light:text-slate-700 hover:text-white light:hover:text-black hover:bg-zinc-700/60 light:hover:bg-slate-200 transition-colors"
-                      title="Ricomincia lettura domanda dall'inizio"
-                    >
-                      <RotateCcw className="w-2.5 h-2.5" />
-                    </button>
-                  </div>
-                ) : (
-                  <button
-                    onClick={() => playQuestion()}
-                    className="px-2 py-0.5 rounded text-[11px] font-medium flex items-center gap-1 transition-colors text-zinc-300 hover:text-white bg-zinc-800/80 hover:bg-zinc-700 border border-zinc-700/60 light:bg-slate-100 light:hover:bg-slate-200 light:text-slate-700 light:hover:text-slate-900 light:border-slate-300 shadow-sm"
-                    title="Ascolta solo la domanda"
-                  >
-                    <Volume2 className="w-3 h-3 text-zinc-400 light:text-slate-500" />
-                    <span>Domanda</span>
-                  </button>
-                )}
-
-                {isThisQuestionActive && (isPlaying || isPaused) ? (
-                  <div className="inline-flex items-center bg-zinc-800/80 light:bg-slate-100 border border-zinc-700/80 light:border-slate-300 rounded p-0.5 gap-0.5 text-[11px] animate-in fade-in duration-150">
-                    <button
-                      onClick={togglePlayPause}
-                      className={`px-1.5 py-0.5 rounded flex items-center gap-1 font-semibold transition-colors ${
-                        isPlaying
-                          ? 'bg-amber-500/20 text-amber-400 ring-1 ring-amber-500/50 light:bg-amber-100 light:text-amber-800 light:ring-amber-400'
-                          : 'bg-zinc-700/50 text-zinc-300 ring-1 ring-zinc-600 light:bg-slate-200 light:text-slate-700'
-                      }`}
-                      title={isPlaying ? 'Metti in pausa (Tasto V)' : 'Riprendi ascolto (Tasto V)'}
-                    >
-                      {isPlaying ? <Pause className="w-2.5 h-2.5 animate-pulse text-amber-400 light:text-amber-700" /> : <Play className="w-2.5 h-2.5 text-amber-400 light:text-amber-700" />}
-                      <span>{isPlaying ? 'Pausa' : 'Riprendi'}</span>
-                    </button>
-                    <button
-                      onClick={restartFullSequence}
-                      className="px-1.5 py-0.5 rounded text-zinc-300 light:text-slate-700 hover:text-white light:hover:text-black flex items-center gap-1 transition-colors"
-                      title="Ricomincia dall'inizio"
-                    >
-                      <RotateCcw className="w-2.5 h-2.5" />
-                      <span>Da capo</span>
-                    </button>
-                    <button
-                      onClick={stop}
-                      className="p-1 rounded text-zinc-500 hover:text-rose-400 light:text-slate-400 light:hover:text-rose-600 hover:bg-zinc-700/40 light:hover:bg-slate-200 transition-colors"
-                      title="Interrompi ascolto (Esc)"
-                    >
-                      <Square className="w-2 h-2 fill-current" />
-                    </button>
-                  </div>
-                ) : (
-                  <button
-                    onClick={togglePlayPause}
-                    className="px-2 py-0.5 rounded text-[11px] font-medium flex items-center gap-1 transition-colors text-zinc-300 hover:text-white bg-zinc-800/80 hover:bg-zinc-700 border border-zinc-700/60 light:bg-slate-100 light:hover:bg-slate-200 light:text-slate-700 light:hover:text-slate-900 light:border-slate-300 shadow-sm"
-                    title="Ascolta sequenza completa"
-                  >
-                    <Volume2 className="w-3 h-3 text-zinc-400 light:text-slate-500" />
-                    <span>Tutto</span>
-                  </button>
-                )}
-              </div>
-            </div>
-          )}
-
-          {/* 3 Opzioni con audio discreto */}
-          <div className="space-y-1.5">
-            {q.options.map((opt, idx) => {
-              const optNum = (idx + 1) as 1 | 2 | 3;
-              const isCorrect = q.correctAnswer === optNum;
-              const isOptPlaying = isPartPlaying(`opt${optNum}` as any);
-              const isOptPaused = isPartPaused(`opt${optNum}` as any);
-              const isOptActive = isPartActive(`opt${optNum}` as any);
-
-              return (
-                <div
-                  key={idx}
-                  className={`p-2.5 rounded-lg text-xs flex items-start gap-2 border transition-all ${
-                    isCorrect
-                      ? 'bg-emerald-950/30 border-emerald-500/50 text-emerald-300 light:bg-emerald-50 light:border-emerald-300 light:text-emerald-900 font-medium'
-                      : 'bg-zinc-900/60 border-zinc-700/80 text-zinc-300 light:bg-white light:border-slate-300 light:text-slate-700'
-                  } ${isOptPlaying ? 'ring-1 ring-amber-400' : isOptPaused ? 'ring-1 ring-amber-400/50' : ''}`}
-                >
-                  <span className="font-bold">{optNum}.</span>
-                  <span className="flex-1">{opt}</span>
-
-                  {settings.ttsEnabled && (
-                    isOptActive ? (
-                      <span className="inline-flex items-center bg-zinc-800/90 light:bg-slate-200 border border-zinc-700/90 light:border-slate-300 rounded p-0.5 gap-0.5 flex-shrink-0">
-                        <button
-                          onClick={() => playOption(optNum)}
-                          className={`p-0.5 rounded transition-colors ${
-                            isOptPlaying
-                              ? 'bg-amber-500/20 text-amber-400 ring-1 ring-amber-500/50 light:bg-amber-100 light:text-amber-800 light:ring-amber-400'
-                              : 'bg-zinc-700/50 text-zinc-300 ring-1 ring-zinc-600 light:bg-slate-100 light:text-slate-700'
-                          }`}
-                          title={isOptPlaying ? `Metti in pausa opzione ${optNum}` : `Riprendi ascolto opzione ${optNum}`}
-                        >
-                          {isOptPlaying ? (
-                            <Pause className="w-3 h-3 text-amber-400 light:text-amber-700 animate-pulse" />
-                          ) : (
-                            <Play className="w-3 h-3 text-amber-400 light:text-amber-700" />
-                          )}
-                        </button>
-                        <button
-                          onClick={() => restartOption(optNum)}
-                          className="p-0.5 rounded text-zinc-300 light:text-slate-700 hover:text-white light:hover:text-black hover:bg-zinc-700/60 light:hover:bg-slate-300 transition-colors"
-                          title={`Ricomincia opzione ${optNum} da capo`}
-                        >
-                          <RotateCcw className="w-2.5 h-2.5" />
-                        </button>
-                      </span>
-                    ) : (
-                      <button
-                        onClick={() => playOption(optNum)}
-                        className="p-0.5 rounded transition-colors text-zinc-500 hover:text-zinc-300 light:text-slate-500 light:hover:text-slate-700"
-                        title={`Ascolta opzione ${optNum}`}
-                      >
-                        <Volume2 className="w-3.5 h-3.5" />
-                      </button>
-                    )
-                  )}
-
-                  {isCorrect && (
-                    <CheckCircle2 className="w-4 h-4 text-emerald-400 flex-shrink-0" />
-                  )}
-                </div>
-              );
-            })}
-          </div>
-
-          {/* Spiegazione Sintetica con tasto ascolto */}
-          <div className="p-2.5 rounded-lg bg-zinc-900 border border-zinc-700 light:bg-white light:border-slate-300 text-xs space-y-1 text-zinc-300 light:text-slate-700">
-            <div className="flex items-center justify-between pb-1 border-b border-zinc-700/60 light:border-slate-200">
-              <span className="font-bold text-[11px] text-zinc-400 light:text-slate-600">Spiegazione Didattica</span>
-              {settings.ttsEnabled && (
-                isPartActive('explanation') ? (
-                  <div className="inline-flex items-center bg-zinc-800/80 light:bg-slate-100 border border-zinc-700/80 light:border-slate-300 rounded p-0.5 gap-0.5 text-[10px] animate-in fade-in duration-150">
-                    <button
-                      onClick={() => playExplanation()}
-                      className={`px-1.5 py-0.5 rounded flex items-center gap-1 font-semibold transition-colors ${
-                        isPartPlaying('explanation')
-                          ? 'bg-amber-500/20 text-amber-400 ring-1 ring-amber-500/50 light:bg-amber-100 light:text-amber-800 light:ring-amber-400'
-                          : 'bg-zinc-700/50 text-zinc-300 ring-1 ring-zinc-600 light:bg-slate-200 light:text-slate-700'
-                      }`}
-                      title={isPartPlaying('explanation') ? 'Metti in pausa la spiegazione' : 'Riprendi spiegazione'}
-                    >
-                      {isPartPlaying('explanation') ? (
-                        <>
-                          <Pause className="w-2.5 h-2.5 animate-pulse text-amber-400 light:text-amber-700" />
-                          <span>Pausa</span>
-                        </>
-                      ) : (
-                        <>
-                          <Play className="w-2.5 h-2.5 text-amber-400 light:text-amber-700" />
-                          <span>Riprendi</span>
-                        </>
-                      )}
-                    </button>
-                    <button
-                      onClick={() => restartExplanation()}
-                      className="px-1 py-0.5 rounded text-zinc-300 light:text-slate-700 hover:text-white light:hover:text-black hover:bg-zinc-700/60 light:hover:bg-slate-200 flex items-center gap-0.5 transition-colors"
-                      title="Ricomincia spiegazione da capo"
-                    >
-                      <RotateCcw className="w-2.5 h-2.5" />
-                      <span>Da capo</span>
-                    </button>
-                    <button
-                      onClick={stop}
-                      className="p-0.5 rounded text-zinc-500 hover:text-rose-400 light:text-slate-400 light:hover:text-rose-600 hover:bg-zinc-700/40 light:hover:bg-slate-200 transition-colors"
-                      title="Interrompi spiegazione (Esc)"
-                    >
-                      <Square className="w-2 h-2 fill-current" />
-                    </button>
-                  </div>
-                ) : (
-                  <button
-                    onClick={() => playExplanation()}
-                    className="text-[11px] font-medium px-2 py-0.5 rounded-lg flex items-center gap-1.5 text-zinc-300 hover:text-white bg-zinc-800/80 hover:bg-zinc-700 border border-zinc-700/60 light:bg-slate-100 light:hover:bg-slate-200 light:text-slate-700 light:hover:text-slate-900 light:border-slate-300 transition-colors shadow-sm"
-                    title="Ascolta spiegazione didattica"
-                  >
-                    <Volume2 className="w-3.5 h-3.5 text-zinc-400 light:text-slate-500" />
-                    <span>Ascolta Spiegazione</span>
-                  </button>
-                )
-              )}
-            </div>
-            <div>
-              <strong className="text-emerald-400 light:text-emerald-700">Regola: </strong>
-              <span>{q.explanation.rule}</span>
-            </div>
-            <div>
-              <strong className="text-amber-400 light:text-amber-800">Tranello: </strong>
-              <span>{q.explanation.trap}</span>
-            </div>
-          </div>
-
-          {/* Sezione Nota Personale */}
-          {stat?.userNote && !isEditingNote && (
-            <div className="p-3 rounded-xl border bg-amber-950/40 border-amber-700/60 dark:bg-amber-950/40 dark:border-amber-700/60 dark:text-zinc-100 light:bg-amber-50 light:border-amber-300 light:text-amber-950 text-xs space-y-1.5 shadow-sm">
-              <div className="flex items-center justify-between border-b border-amber-700/60 light:border-amber-300/80 pb-1.5">
-                <span className="font-bold flex items-center gap-1.5 text-amber-400 light:text-amber-700 text-[11px] uppercase tracking-wider">
-                  <FileText className="w-3.5 h-3.5" />
-                  Nota Personale
-                </span>
-                <div className="flex items-center gap-2">
-                  <button
-                    onClick={() => {
-                      setNoteText(stat.userNote || '');
-                      setIsEditingNote(true);
-                    }}
-                    className="text-[11px] text-amber-400 hover:text-amber-200 light:text-amber-700 light:hover:text-amber-950 flex items-center gap-1 font-medium"
-                    title="Modifica nota"
-                  >
-                    <Edit3 className="w-3 h-3" />
-                    <span>Modifica</span>
-                  </button>
-                  <button
-                    onClick={async () => {
-                      await saveNote(q.id, '');
-                      setNoteText('');
-                    }}
-                    className="text-[11px] text-rose-400 hover:text-rose-200 light:text-rose-600 light:hover:text-rose-900 flex items-center gap-1 font-medium"
-                    title="Elimina nota"
-                  >
-                    <Trash2 className="w-3 h-3" />
-                    <span>Elimina</span>
-                  </button>
-                </div>
-              </div>
-              <p className="whitespace-pre-wrap leading-relaxed text-zinc-200 dark:text-zinc-200 light:text-slate-800 text-xs font-normal">
-                {stat.userNote}
-              </p>
-            </div>
-          )}
-
-          {isEditingNote && (
-            <div className="p-3 rounded-xl border bg-zinc-950/90 border-zinc-700 dark:bg-zinc-950/90 dark:border-zinc-700 light:bg-slate-50 light:border-slate-300 space-y-2.5">
-              <div className="flex items-center justify-between text-xs">
-                <span className="font-bold text-amber-400 light:text-amber-700 text-[11px] uppercase tracking-wider flex items-center gap-1">
-                  <Edit3 className="w-3.5 h-3.5" />
-                  {stat?.userNote ? 'Modifica Nota Personale' : 'Aggiungi Nota Personale'}
-                </span>
-                {stat?.userNote && (
-                  <button
-                    onClick={async () => {
-                      await saveNote(q.id, '');
-                      setNoteText('');
-                      setIsEditingNote(false);
-                    }}
-                    className="text-[11px] text-rose-400 hover:text-rose-200 light:text-rose-600 flex items-center gap-1"
-                    title="Elimina nota esistente"
-                  >
-                    <Trash2 className="w-3 h-3" />
-                    <span>Elimina</span>
-                  </button>
-                )}
-              </div>
-              <textarea
-                id={`textarea-note-${q.id}`}
-                value={noteText}
-                onChange={e => setNoteText(e.target.value)}
-                placeholder="Scrivi qui la tua nota personale per questo quesito..."
-                className="w-full bg-zinc-900 dark:bg-zinc-900 border border-zinc-700 dark:border-zinc-700 rounded-lg p-2.5 text-xs text-zinc-100 dark:text-zinc-100 light:bg-white light:border-slate-300 light:text-slate-900 resize-none outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500"
-                rows={3}
-              />
-              <div className="flex justify-end gap-2">
-                <button
-                  onClick={() => setIsEditingNote(false)}
-                  className="text-xs px-3 py-1.5 rounded-lg border border-zinc-700 dark:border-zinc-700 text-zinc-300 hover:text-white light:border-slate-300 light:text-slate-700 hover:bg-zinc-800/40 light:hover:bg-slate-100 transition-colors"
-                >
-                  Annulla
-                </button>
-                <button
-                  id={`btn-save-note-${q.id}`}
-                  onClick={async () => {
-                    await saveNote(q.id, noteText);
-                    setIsEditingNote(false);
-                  }}
-                  className="text-xs px-3.5 py-1.5 rounded-lg bg-amber-600 hover:bg-amber-500 text-white font-bold shadow-sm transition-all"
-                >
-                  Salva Nota
-                </button>
-              </div>
-            </div>
-          )}
-
-          {!stat?.userNote && !isEditingNote && (
-            <button
-              id={`btn-add-note-${q.id}`}
-              onClick={() => {
-                setNoteText('');
-                setIsEditingNote(true);
-              }}
-              className="w-full py-2 px-3 rounded-lg border border-dashed border-zinc-700 dark:border-zinc-700 hover:border-amber-500/60 light:border-slate-300 light:hover:border-amber-600 text-zinc-300 hover:text-amber-400 light:text-slate-600 light:hover:text-amber-700 text-xs font-medium flex items-center justify-center gap-1.5 transition-colors"
-            >
-              <Plus className="w-3.5 h-3.5" />
-              <span>Aggiungi una nota personale sulla domanda #{q.id}</span>
-            </button>
-          )}
-    </div>
-  );
-};
-
-const ArchiveItem: React.FC<ArchiveItemProps> = ({ question: q, isExpanded, onToggle }) => {
-  const { statsMap } = useQuiz();
-  const stat = statsMap.get(q.id);
-
-  return (
-    <div className="border border-zinc-700 rounded-xl overflow-hidden bg-zinc-900/50 light:bg-white light:border-slate-300 light:shadow-sm">
-      <div
-        id={`archive-item-${q.id}`}
-        onClick={onToggle}
-        className="p-3.5 flex items-start justify-between gap-3 cursor-pointer hover:bg-zinc-800/40 light:hover:bg-slate-50 transition-colors"
-      >
-        <div className="space-y-1 flex-1">
-          <div className="flex items-center gap-2">
-            <span className="font-mono font-bold text-amber-400 light:text-amber-800 text-xs">
-              #{q.id}
-            </span>
-            <span className="text-[11px] text-zinc-400 light:text-slate-600 font-medium">
-              {q.subjectName}
-            </span>
-            {stat?.isBookmarked && (
-              <Bookmark className="w-3 h-3 text-amber-400 fill-amber-400" />
-            )}
-            {stat?.userNote && (
-              <span className="inline-flex items-center gap-1 text-[10px] px-1.5 py-0.2 rounded bg-amber-500/20 text-amber-400 light:bg-amber-100 light:text-amber-800 font-medium">
-                <FileText className="w-3 h-3" />
-                <span>Nota</span>
-              </span>
-            )}
-          </div>
-          <p className="text-xs text-zinc-200 light:text-slate-800 font-medium line-clamp-2">
-            {q.question}
-          </p>
-          {stat?.userNote && (
-            <div className="flex items-center gap-1.5 mt-1 text-[11px] text-amber-400 light:text-amber-800 bg-amber-950/50 light:bg-amber-50 px-2 py-0.5 rounded border border-amber-700/50 light:border-amber-300 w-fit max-w-full">
-              <FileText className="w-3 h-3 flex-shrink-0 text-amber-400 light:text-amber-600" />
-              <span className="truncate italic font-normal">"{stat.userNote}"</span>
-            </div>
-          )}
-        </div>
-
-        <div className="flex items-center gap-2 text-zinc-400 flex-shrink-0 mt-1">
-          {stat?.lastResult && (
-            <span
-              className={`text-[10px] px-1.5 py-0.5 rounded font-bold ${
-                stat.lastResult === 'correct'
-                  ? 'bg-emerald-500/20 text-emerald-400'
-                  : 'bg-rose-500/20 text-rose-400'
-              }`}
-            >
-              {stat.lastResult === 'correct' ? 'OK' : 'ERR'}
-            </span>
-          )}
-          {isExpanded ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
-        </div>
-      </div>
-
-      {isExpanded && <ArchiveItemExpandedContent question={q} />}
-    </div>
-  );
-};
-
-export const ArchiveScreen: React.FC = () => {
-  const { questions, statsMap, subjectsAnalytics } = useQuiz();
+    questions,
+    statsMap,
+    subjectsAnalytics,
+    settings,
+    recordAnswer,
+    activeSession,
+    persistActiveSession,
+    dismissActiveSession,
+    setIsExamRunning
+  } = useQuiz();
 
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedSubject, setSelectedSubject] = useState<number | 'all'>('all');
@@ -477,15 +61,70 @@ export const ArchiveScreen: React.FC = () => {
   const [numericBuffer, setNumericBuffer] = useState('');
   const [expandedId, setExpandedId] = useState<number | null>(null);
 
+  // Interactive quiz session state over currently filtered questions
+  const [isQuizRunning, setIsQuizRunning] = useState(false);
+  const [sessionQuestions, setSessionQuestions] = useState<Question[]>([]);
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [sessionAnswers, setSessionAnswers] = useState<Record<number, 1 | 2 | 3>>({});
+  const [sessionFlags, setSessionFlags] = useState<Record<number, boolean>>({});
+  const [sessionTitle, setSessionTitle] = useState<string>('Quiz Archivio');
+  const [conflictPendingPool, setConflictPendingPool] = useState<{ questions: Question[]; title: string } | null>(null);
+
+  const sessionAnswersRef = useRef<Record<number, 1 | 2 | 3>>(sessionAnswers);
+  const sessionFlagsRef = useRef<Record<number, boolean>>(sessionFlags);
+  const isDismissedRef = useRef(false);
+  const autoAdvanceTimerRef = useRef<any>(null);
+
+  useEffect(() => {
+    sessionAnswersRef.current = sessionAnswers;
+  }, [sessionAnswers]);
+
+  useEffect(() => {
+    sessionFlagsRef.current = sessionFlags;
+  }, [sessionFlags]);
+
+  useEffect(() => {
+    setIsExamRunning(isQuizRunning);
+    return () => {
+      setIsExamRunning(false);
+    };
+  }, [isQuizRunning, setIsExamRunning]);
+
   const INITIAL_PAGE_SIZE = 50;
   const [visibleCount, setVisibleCount] = useState<number>(INITIAL_PAGE_SIZE);
 
-  // Stop any ongoing voice playback on unmount
+  // Stop any ongoing voice playback and pending auto-advance timers on unmount
   useEffect(() => {
     return () => {
       voiceService.stop();
+      if (autoAdvanceTimerRef.current) {
+        clearTimeout(autoAdvanceTimerRef.current);
+        autoAdvanceTimerRef.current = null;
+      }
     };
   }, []);
+
+  // Auto-resume an existing Archive quiz session when entering ArchiveScreen
+  useEffect(() => {
+    if (!isQuizRunning && !isDismissedRef.current && activeSession?.type === 'archive' && activeSession.questionIds?.length > 0) {
+      const ordered = activeSession.questionIds
+        .map(id => questions.find(q => q.id === id))
+        .filter((q): q is Question => Boolean(q));
+
+      if (ordered.length > 0) {
+        const resumedAnswers = activeSession.answers || {};
+        const resumedFlags = activeSession.flags || {};
+        setSessionQuestions(ordered);
+        setSessionTitle(activeSession.subjectName || 'Quiz Archivio');
+        setCurrentIndex(Math.min(activeSession.currentIndex || 0, ordered.length - 1));
+        setSessionAnswers(resumedAnswers);
+        sessionAnswersRef.current = resumedAnswers;
+        setSessionFlags(resumedFlags);
+        sessionFlagsRef.current = resumedFlags;
+        setIsQuizRunning(true);
+      }
+    }
+  }, [activeSession, isQuizRunning, questions]);
 
   // Reset visibleCount when filters change
   useEffect(() => {
@@ -533,6 +172,189 @@ export const ArchiveScreen: React.FC = () => {
     activeConceptChipId ||
     numericBuffer
   );
+
+  const buildArchiveSessionTitle = useCallback(() => {
+    const parts: string[] = [];
+    if (selectedSubject !== 'all') {
+      parts.push(`Materia ${formatSubjectCode(selectedSubject)}`);
+    }
+    if (statusFilter !== 'all') {
+      parts.push(STATUS_LABELS[statusFilter]);
+    }
+    if (activeConceptChipId) {
+      const chip = ARCHIVE_CONCEPT_CHIPS.find(c => c.id === activeConceptChipId);
+      if (chip) parts.push(chip.label);
+    }
+    if (searchQuery.trim()) {
+      parts.push(`"${searchQuery.trim().slice(0, 18)}"`);
+    }
+    return parts.length > 0 ? `Archivio: ${parts.join(' · ')}` : 'Quiz Archivio Completo';
+  }, [selectedSubject, statusFilter, activeConceptChipId, searchQuery]);
+
+  const startArchiveQuiz = useCallback((pool: Question[], title: string) => {
+    if (pool.length === 0) return;
+    voiceService.stop();
+    isDismissedRef.current = false;
+    setIsKeypadOpen(false);
+    setSessionQuestions(pool);
+    setSessionTitle(title);
+    setCurrentIndex(0);
+    setSessionAnswers({});
+    sessionAnswersRef.current = {};
+    setSessionFlags({});
+    sessionFlagsRef.current = {};
+    setIsQuizRunning(true);
+
+    persistActiveSession({
+      type: 'archive',
+      subjectName: title,
+      questionIds: pool.map(q => q.id),
+      currentIndex: 0,
+      answers: {},
+      flags: {},
+      isPaused: false,
+      updatedAt: Date.now()
+    }).catch(console.error);
+  }, [persistActiveSession]);
+
+  const handleRequestStartArchiveQuiz = () => {
+    if (filteredQuestions.length === 0) return;
+    triggerHapticFeedback('tap');
+    const title = buildArchiveSessionTitle();
+    if (activeSession && activeSession.questionIds?.length > 0) {
+      setConflictPendingPool({ questions: [...filteredQuestions], title });
+    } else {
+      startArchiveQuiz([...filteredQuestions], title);
+    }
+  };
+
+  const changeIndex = useCallback((nextIndex: number) => {
+    voiceService.stop();
+    if (autoAdvanceTimerRef.current) {
+      clearTimeout(autoAdvanceTimerRef.current);
+      autoAdvanceTimerRef.current = null;
+    }
+    setCurrentIndex(nextIndex);
+    if (sessionQuestions.length > 0) {
+      persistActiveSession({
+        type: 'archive',
+        subjectName: sessionTitle,
+        questionIds: sessionQuestions.map(q => q.id),
+        currentIndex: nextIndex,
+        answers: sessionAnswersRef.current,
+        flags: sessionFlagsRef.current,
+        updatedAt: Date.now()
+      }).catch(console.error);
+    }
+  }, [persistActiveSession, sessionQuestions, sessionTitle]);
+
+  const handleSelectQuizAnswer = useCallback(async (ans: 1 | 2 | 3, qid?: number) => {
+    voiceService.stop();
+    const currentQ = sessionQuestions[currentIndex];
+    const targetQid = qid ?? currentQ?.id;
+    if (!targetQid) return;
+    if (settings.immediateFeedbackInTopics && sessionAnswersRef.current[targetQid] !== undefined) {
+      return;
+    }
+
+    const targetQ = sessionQuestions.find(q => q.id === targetQid) || currentQ;
+    if (!targetQ) return;
+
+    const updatedAnswers = { ...sessionAnswersRef.current, [targetQid]: ans };
+    sessionAnswersRef.current = updatedAnswers;
+    setSessionAnswers(updatedAnswers);
+
+    const isCorrect = ans === targetQ.correctAnswer;
+    try {
+      await recordAnswer(targetQid, isCorrect, ans, 'archive');
+    } catch (err) {
+      console.error(err);
+    }
+
+    persistActiveSession({
+      type: 'archive',
+      subjectName: sessionTitle,
+      questionIds: sessionQuestions.map(q => q.id),
+      currentIndex,
+      answers: updatedAnswers,
+      flags: sessionFlagsRef.current,
+      updatedAt: Date.now()
+    }).catch(console.error);
+
+    if (
+      isCorrect &&
+      settings.autoAdvanceOnCorrect !== false &&
+      targetQid === currentQ?.id
+    ) {
+      const nextIdx = getNextQuestionIndex(currentIndex, sessionQuestions, updatedAnswers, { fallbackToEndIfComplete: true });
+      if (nextIdx !== currentIndex) {
+        if (autoAdvanceTimerRef.current) clearTimeout(autoAdvanceTimerRef.current);
+        autoAdvanceTimerRef.current = setTimeout(() => {
+          changeIndex(nextIdx);
+        }, 900);
+      }
+    }
+  }, [sessionQuestions, currentIndex, settings.immediateFeedbackInTopics, settings.autoAdvanceOnCorrect, recordAnswer, persistActiveSession, sessionTitle, changeIndex]);
+
+  const handleToggleQuizFlag = useCallback((qid?: number) => {
+    const currentQ = sessionQuestions[currentIndex];
+    const targetQid = qid ?? currentQ?.id;
+    if (!targetQid) return;
+    const updatedFlags = {
+      ...sessionFlagsRef.current,
+      [targetQid]: !sessionFlagsRef.current[targetQid]
+    };
+    sessionFlagsRef.current = updatedFlags;
+    setSessionFlags(updatedFlags);
+
+    persistActiveSession({
+      type: 'archive',
+      subjectName: sessionTitle,
+      questionIds: sessionQuestions.map(q => q.id),
+      currentIndex,
+      answers: sessionAnswersRef.current,
+      flags: updatedFlags,
+      updatedAt: Date.now()
+    }).catch(console.error);
+  }, [sessionQuestions, currentIndex, persistActiveSession, sessionTitle]);
+
+  const handlePauseArchiveQuiz = useCallback(() => {
+    voiceService.stop();
+    if (autoAdvanceTimerRef.current) {
+      clearTimeout(autoAdvanceTimerRef.current);
+      autoAdvanceTimerRef.current = null;
+    }
+    isDismissedRef.current = true;
+    persistActiveSession({
+      type: 'archive',
+      subjectName: sessionTitle,
+      questionIds: sessionQuestions.map(q => q.id),
+      currentIndex,
+      answers: sessionAnswersRef.current,
+      flags: sessionFlagsRef.current,
+      isPaused: true,
+      pausedAt: Date.now(),
+      updatedAt: Date.now()
+    }).catch(console.error);
+    setIsQuizRunning(false);
+    if (onNavigateHome) {
+      onNavigateHome();
+    }
+  }, [persistActiveSession, sessionTitle, sessionQuestions, currentIndex, onNavigateHome]);
+
+  const handleCompleteOrTerminateArchiveQuiz = useCallback(async (navigateHome = false) => {
+    voiceService.stop();
+    if (autoAdvanceTimerRef.current) {
+      clearTimeout(autoAdvanceTimerRef.current);
+      autoAdvanceTimerRef.current = null;
+    }
+    isDismissedRef.current = true;
+    setIsQuizRunning(false);
+    await dismissActiveSession();
+    if (navigateHome && onNavigateHome) {
+      onNavigateHome();
+    }
+  }, [dismissActiveSession, onNavigateHome]);
 
   const handleResetAllFilters = () => {
     setSearchQuery('');
@@ -590,9 +412,26 @@ export const ArchiveScreen: React.FC = () => {
     }
   };
 
+  if (isQuizRunning && sessionQuestions.length > 0) {
+    return (
+      <ArchiveQuizSessionView
+        sessionQuestions={sessionQuestions}
+        sessionTitle={sessionTitle}
+        currentIndex={currentIndex}
+        sessionAnswers={sessionAnswers}
+        sessionFlags={sessionFlags}
+        onChangeIndex={changeIndex}
+        onSelectAnswer={handleSelectQuizAnswer}
+        onToggleFlag={handleToggleQuizFlag}
+        onPauseSession={handlePauseArchiveQuiz}
+        onCompleteOrTerminateSession={handleCompleteOrTerminateArchiveQuiz}
+      />
+    );
+  }
+
   return (
     <div className="max-w-2xl mx-auto px-2.5 sm:px-4 py-3 sm:py-5 space-y-3 sm:space-y-4 pb-20 sm:pb-24">
-      {/* Header Catalogo */}
+      {/* Catalog Header */}
       <div className="flex items-center justify-between gap-3">
         <div>
           <h1 className="text-xl font-bold tracking-tight">Archivio Completo</h1>
@@ -600,12 +439,12 @@ export const ArchiveScreen: React.FC = () => {
             {`Catalogo ${questions.length} quiz: Parapendio e teoria comune AeCI`}
           </p>
         </div>
-        <div className="text-xs font-mono font-bold px-2.5 py-1 rounded-lg bg-zinc-900 border border-zinc-700 text-amber-400 light:bg-white light:border-slate-300 light:text-amber-700 shrink-0">
+        <div className="text-xs font-mono font-bold px-2.5 py-1 rounded-lg bg-zinc-900 border border-zinc-700 text-amber-400 light:bg-white light:border-slate-300 light:text-amber-700 shrink-0 whitespace-nowrap">
           {filteredQuestions.length} / {questions.length}
         </div>
       </div>
 
-      {/* Barra di Ricerca & Tasto Pad Numerico */}
+      {/* Search Bar & #ID Keypad Button */}
       <div className="flex items-center gap-2">
         <div className="relative flex-1">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400" />
@@ -635,7 +474,6 @@ export const ArchiveScreen: React.FC = () => {
           )}
         </div>
 
-        {/* Pulsante Tastierino #ID No-Keyboard */}
         <button
           id="btn-toggle-keypad"
           onClick={() => {
@@ -654,7 +492,7 @@ export const ArchiveScreen: React.FC = () => {
         </button>
       </div>
 
-      {/* Tastierino Numerico Rapido (#ID Jump) */}
+      {/* #ID Quick Numeric Keypad */}
       {isKeypadOpen && (
         <div className="p-3 bg-zinc-900/95 backdrop-blur-md border border-zinc-700 rounded-2xl space-y-2.5 light:bg-white light:border-slate-300 shadow-xl animate-in fade-in duration-150">
           <div className="flex items-center justify-between px-1">
@@ -681,7 +519,6 @@ export const ArchiveScreen: React.FC = () => {
             </div>
           </div>
 
-          {/* Griglia Pad 4x3 */}
           <div className="grid grid-cols-3 gap-1.5">
             {[1, 2, 3, 4, 5, 6, 7, 8, 9].map(num => (
               <button
@@ -717,7 +554,7 @@ export const ArchiveScreen: React.FC = () => {
         </div>
       )}
 
-      {/* Barra Compatta Categorie Filtro (Materie | Stato | Temi) */}
+      {/* Filter Category Selector (Materie | Stato | Temi) */}
       <div className="space-y-1.5 pt-1 border-t border-zinc-800/80 light:border-slate-200">
         <div className="flex items-center justify-between gap-2">
           <div className="inline-flex p-0.5 rounded-lg bg-zinc-900 border border-zinc-700/80 light:bg-slate-100 light:border-slate-200 text-xs">
@@ -769,14 +606,14 @@ export const ArchiveScreen: React.FC = () => {
             <button
               id="btn-archive-reset-filters"
               onClick={handleResetAllFilters}
-              className="text-[11px] text-amber-400 hover:text-amber-300 light:text-amber-700 light:hover:text-amber-900 font-medium"
+              className="text-[11px] text-amber-400 hover:text-amber-300 light:text-amber-700 light:hover:text-amber-900 font-medium whitespace-nowrap"
             >
               Azzera filtri
             </button>
           )}
         </div>
 
-        {/* Riga Singola Filtro Attivo */}
+        {/* Single Horizontal Scrollable Chip Row */}
         {activeFilterCategory === 'subject' && (
           <div id="archive-filter-row-subject" className="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-0.5">
             <button
@@ -888,22 +725,46 @@ export const ArchiveScreen: React.FC = () => {
         )}
       </div>
 
-      {/* Reset filtri attivi */}
-      {hasActiveFilters && (
-        <div className="flex items-center justify-between text-xs pt-1 px-0.5">
-          <span className="text-zinc-400 light:text-slate-600 text-[11px]">
-            Filtri applicati ({filteredQuestions.length} risultati)
+      {/* Action Bar: Launch Interactive Quiz on Filtered Pool */}
+      <div className="flex items-center justify-between gap-2.5 p-2.5 rounded-xl bg-zinc-900/80 border border-zinc-700/80 light:bg-white light:border-slate-300 light:shadow-sm">
+        <div className="min-w-0 flex flex-col">
+          <span className="text-xs font-semibold text-zinc-200 light:text-slate-800 truncate">
+            {hasActiveFilters
+              ? `Filtri applicati (${filteredQuestions.length} risultati)`
+              : `Tutti i quesiti (${filteredQuestions.length})`}
           </span>
-          <button
-            onClick={handleResetAllFilters}
-            className="text-xs text-amber-400 hover:text-amber-300 font-medium"
-          >
-            Azzera tutti i filtri
-          </button>
+          {hasActiveFilters ? (
+            <button
+              onClick={handleResetAllFilters}
+              className="text-[11px] text-amber-400 hover:text-amber-300 light:text-amber-700 light:hover:text-amber-900 font-medium text-left w-fit"
+            >
+              Azzera tutti i filtri
+            </button>
+          ) : (
+            <span className="text-[11px] text-zinc-400 light:text-slate-600 truncate">
+              Esercitati sulle domande elencate
+            </span>
+          )}
         </div>
-      )}
 
-      {/* Lista Domande */}
+        <button
+          type="button"
+          id="btn-archive-start-quiz"
+          disabled={filteredQuestions.length === 0}
+          onClick={handleRequestStartArchiveQuiz}
+          className="min-h-[44px] px-3.5 py-2 rounded-xl bg-amber-700 hover:bg-amber-600 disabled:opacity-40 disabled:cursor-not-allowed text-white font-bold text-xs flex items-center justify-center gap-1.5 shrink-0 whitespace-nowrap shadow-sm active:scale-[0.98] transition-all"
+          title={
+            filteredQuestions.length > 0
+              ? `Inizia un quiz sulle ${filteredQuestions.length} domande visualizzate`
+              : 'Nessuna domanda disponibile con i filtri attuali'
+          }
+        >
+          <Play className="w-3.5 h-3.5 fill-current shrink-0" />
+          <span>{`Inizia Quiz (${filteredQuestions.length})`}</span>
+        </button>
+      </div>
+
+      {/* Filtered Questions List */}
       <div className="space-y-2 pt-1">
         {filteredQuestions.length === 0 ? (
           <div className="text-center py-12 text-zinc-400 light:text-slate-600 text-xs border border-dashed border-zinc-700 light:border-slate-300 rounded-xl">
@@ -936,6 +797,53 @@ export const ArchiveScreen: React.FC = () => {
           </>
         )}
       </div>
+
+      {/* Session Conflict Guard Modal */}
+      {conflictPendingPool && activeSession && (
+        <SessionConflictModal
+          isOpen={Boolean(conflictPendingPool)}
+          onClose={() => setConflictPendingPool(null)}
+          onResumeExisting={() => {
+            setConflictPendingPool(null);
+            if (activeSession.type === 'archive') {
+              isDismissedRef.current = false;
+              const ordered = activeSession.questionIds
+                .map(id => questions.find(q => q.id === id))
+                .filter((q): q is Question => Boolean(q));
+              if (ordered.length > 0) {
+                setSessionQuestions(ordered);
+                setSessionTitle(activeSession.subjectName || 'Quiz Archivio');
+                setCurrentIndex(Math.min(activeSession.currentIndex || 0, ordered.length - 1));
+                setSessionAnswers(activeSession.answers || {});
+                setSessionFlags(activeSession.flags || {});
+                setIsQuizRunning(true);
+              }
+            } else if (onNavigateHome) {
+              onNavigateHome();
+            }
+          }}
+          onDiscardAndStartNew={async () => {
+            const pending = conflictPendingPool;
+            setConflictPendingPool(null);
+            await dismissActiveSession();
+            if (pending) {
+              startArchiveQuiz(pending.questions, pending.title);
+            }
+          }}
+          existingTitle={
+            activeSession.subjectName ||
+            (activeSession.type === 'exam'
+              ? (activeSession.examMode === 'tutor' ? 'Tutor' : 'Simulazione Esame')
+              : activeSession.type === 'archive'
+              ? 'Quiz Archivio'
+              : 'Quaderno Errori')
+          }
+          existingProgress={`Domanda ${(activeSession.currentIndex || 0) + 1} di ${
+            activeSession.questionIds?.length || 0
+          } • ${Object.keys(activeSession.answers || {}).length} risposte date`}
+          newSessionTitle={conflictPendingPool.title}
+        />
+      )}
     </div>
   );
 };

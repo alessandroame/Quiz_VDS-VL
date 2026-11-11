@@ -192,7 +192,9 @@ export const ExamScreen: React.FC<ExamScreenProps> = ({
         setStartTime(activeSession.startTime || Date.now());
         setIsMarathon(mode === 'marathon');
         setIsPaused(false);
-        recordedQuestionIds.current = new Set(Object.keys(resumedAnswers).map(Number));
+        recordedQuestionIds.current = mode === 'tutor'
+          ? new Set(Object.keys(resumedAnswers).map(Number))
+          : new Set();
         setExamState('running');
       }
     }
@@ -408,8 +410,14 @@ export const ExamScreen: React.FC<ExamScreenProps> = ({
     const targetId = qid ?? currentQuestion?.id;
     if (!targetId) return;
 
-    // Avoid changing an answer that has already been verified
-    if (answersRef.current[targetId] !== undefined) {
+    const wasAlreadyAnswered = answersRef.current[targetId] !== undefined;
+
+    // In Tutor mode an answer is verified immediately and locked; in Official/Marathon exam
+    // simulations the candidate can revise their choice until final submission.
+    if (examMode === 'tutor' && wasAlreadyAnswered) {
+      return;
+    }
+    if (examMode !== 'tutor' && answersRef.current[targetId] === ans) {
       return;
     }
 
@@ -417,36 +425,47 @@ export const ExamScreen: React.FC<ExamScreenProps> = ({
     answersRef.current = updatedAnswers;
     setAnswers(updatedAnswers);
 
-    // Record answer statistics immediately into Dexie
     const targetQ = examQuestions.find(q => q.id === targetId) || currentQuestion;
     if (targetQ) {
       const isCorrect = ans === targetQ.correctAnswer;
-      try {
-        await recordAnswer(targetId, isCorrect);
-      } catch (err) {
-        console.error(err);
-      }
-      recordedQuestionIds.current.add(targetId);
 
-      // Play audio feedback for keyboard answering
+      // Record answer statistics immediately only in Tutor mode; in blind exam simulations,
+      // telemetry is deferred to handleSubmitExam so mistakes/stats do not leak mid-exam.
+      if (examMode === 'tutor') {
+        try {
+          await recordAnswer(targetId, isCorrect);
+        } catch (err) {
+          console.error(err);
+        }
+        recordedQuestionIds.current.add(targetId);
+      }
+
+      // Play audio feedback for keyboard answering (neutral click in blind exam mode)
       if (fromKeyboard && settings.soundEnabled) {
-        if (isCorrect) soundFX.playCorrect();
-        else if (examMode === 'tutor') soundFX.playWrong();
-        else soundFX.playClick();
+        if (examMode === 'tutor') {
+          if (isCorrect) soundFX.playCorrect();
+          else soundFX.playWrong();
+        } else {
+          soundFX.playClick();
+        }
       }
 
-      // Auto-advance on correct answer if enabled in settings
-      if (
-        isCorrect &&
+      // Auto-advance: in Tutor mode only on first correct answer (900ms); in Official/Marathon
+      // blind simulation, advance symmetrically on first answer regardless of correctness (500ms).
+      const shouldAutoAdvance =
+        !wasAlreadyAnswered &&
         settings.autoAdvanceOnCorrect !== false &&
-        targetId === currentQuestion?.id
-      ) {
+        targetId === currentQuestion?.id &&
+        (examMode !== 'tutor' || isCorrect);
+
+      if (shouldAutoAdvance) {
         const nextIdx = getNextQuestionIndex(currentIndex, examQuestions, updatedAnswers, { fallbackToEndIfComplete: true });
         if (nextIdx !== currentIndex) {
           if (autoAdvanceTimerRef.current) clearTimeout(autoAdvanceTimerRef.current);
+          const advanceDelayMs = examMode === 'tutor' ? 900 : 500;
           autoAdvanceTimerRef.current = setTimeout(() => {
             changeIndex(nextIdx);
-          }, 900);
+          }, advanceDelayMs);
         }
       }
     }
@@ -643,6 +662,8 @@ export const ExamScreen: React.FC<ExamScreenProps> = ({
       onNavigateIndex: (idx) => setCurrentIndex(idx),
       isExam: true,
       isTutor: examMode === 'tutor',
+      isMarathon,
+      examMode,
       secondsRemaining: examMode === 'tutor' ? elapsedSeconds : secondsRemaining,
       onSubmitExam: (overrideAnswers, overrideDuration) => handleSubmitExam(overrideAnswers, overrideDuration),
       onAbandonSession: () => {
@@ -1313,7 +1334,8 @@ export const ExamScreen: React.FC<ExamScreenProps> = ({
           question={currentQuestion}
           selectedAnswer={answers[currentQuestion.id]}
           onSelectAnswer={handleSelectAnswer}
-          showFeedback={true}
+          showFeedback={examMode === 'tutor'}
+          disableAutoPlay={examMode !== 'tutor'}
           isFlagged={flags[currentQuestion.id]}
           onToggleFlag={handleToggleFlag}
           indexNumber={currentIndex + 1}

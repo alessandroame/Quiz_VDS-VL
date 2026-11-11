@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import type { Question } from '../types/quiz';
-import type { ExamSession } from '../types/database';
+import type { ExamModeType, ExamSession } from '../types/database';
 import { useQuiz } from '../context/QuizContext';
 import { generateExamQuestions } from '../utils/fairRandomizer';
 import { evaluateExam } from '../services/examEvaluator';
@@ -65,6 +65,8 @@ export interface DriveModeSessionContext {
   onNavigateIndex: (index: number) => void;
   isExam?: boolean;
   isTutor?: boolean;
+  isMarathon?: boolean;
+  examMode?: ExamModeType;
   secondsRemaining?: number;
   onSubmitExam?: (answers?: Record<number, 1 | 2 | 3>, durationSeconds?: number) => void;
   onAbandonSession?: () => void;
@@ -134,8 +136,12 @@ export const DriveModeScreen: React.FC<DriveModeScreenProps> = ({
   const [isExamSession, setIsExamSession] = useState<boolean>(
     sessionContext?.isExam ?? false
   );
-  const [isMarathon, setIsMarathon] = useState<boolean>(false);
-  const [secondsRemaining, setSecondsRemaining] = useState<number>(45 * 60);
+  const [isMarathon, setIsMarathon] = useState<boolean>(
+    sessionContext?.isMarathon ?? false
+  );
+  const [secondsRemaining, setSecondsRemaining] = useState<number>(
+    sessionContext?.secondsRemaining ?? (45 * 60)
+  );
   const [startTime, setStartTime] = useState<number>(Date.now());
   const [completedSession, setCompletedSession] = useState<ExamSession | null>(null);
 
@@ -156,14 +162,20 @@ export const DriveModeScreen: React.FC<DriveModeScreenProps> = ({
   const [assimilationCountdown, setAssimilationCountdown] = useState<number | null>(null);
   const assimilationTimeoutRef = useRef<any>(null);
 
-  // Sincronizza stato Tutor se aggiornato dall'esterno (es. Settings o VoiceQuickMenu)
+  const isTutorSession =
+    sessionContext?.isTutor !== undefined
+      ? sessionContext.isTutor
+      : (isExamSession ? isTutorEnabled : true);
+  const isBlindExamSession = isExamSession && !isTutorSession;
+
+  // Sync Tutor state from Settings only when NOT running a locked exam simulation
   useEffect(() => {
     if (sessionContext?.isTutor !== undefined) {
       setIsTutorEnabled(sessionContext.isTutor);
-    } else if (settings.driveModeTutor !== undefined) {
+    } else if (!isExamSession && settings.driveModeTutor !== undefined) {
       setIsTutorEnabled(settings.driveModeTutor);
     }
-  }, [settings.driveModeTutor, sessionContext?.isTutor]);
+  }, [settings.driveModeTutor, sessionContext?.isTutor, isExamSession]);
 
   const [voiceToast, setVoiceToast] = useState<string | null>(null);
   const [waitingCountdown, setWaitingCountdown] = useState<number | null>(null);
@@ -309,12 +321,14 @@ export const DriveModeScreen: React.FC<DriveModeScreenProps> = ({
         setAnswers(sessionContext.answers || {});
         setFlags(sessionContext.flags || {});
         setIsExamSession(sessionContext.isExam ?? false);
+        setIsMarathon(Boolean(sessionContext.isMarathon));
         if (sessionContext.isTutor !== undefined) {
           setIsTutorEnabled(sessionContext.isTutor);
         }
         if (sessionContext.secondsRemaining !== undefined) {
           setSecondsRemaining(sessionContext.secondsRemaining);
         }
+        setRevealedQuestionId(null);
         setInternalMode('running');
       } else if (sessionContext.currentIndex !== undefined && sessionContext.currentIndex !== prevContextRef.current?.currentIndex) {
         setCurrentIndex(sessionContext.currentIndex);
@@ -631,8 +645,12 @@ export const DriveModeScreen: React.FC<DriveModeScreenProps> = ({
     // Ignore clicks during safety question switch micro-cooldown (250ms)
     if (isQuestionSwitching) return;
 
-    // Se la domanda ha già una risposta, non sovrascrivere
-    if (answers[currentQ.id] !== undefined) return;
+    const wasAlreadyAnswered = answersRef.current[currentQ.id] !== undefined;
+
+    // In Tutor / Study mode answers are locked once revealed; in blind Official/Marathon exams
+    // the candidate can revise their choice until final submission.
+    if (!isBlindExamSession && wasAlreadyAnswered) return;
+    if (isBlindExamSession && answersRef.current[currentQ.id] === ans) return;
 
     tryLearnFromManualAction(ans === 1 ? 'opt1' : ans === 2 ? 'opt2' : 'opt3');
 
@@ -644,7 +662,6 @@ export const DriveModeScreen: React.FC<DriveModeScreenProps> = ({
     triggerHapticFeedback('tap');
 
     const isCorrect = ans === currentQ.correctAnswer;
-    triggerHapticFeedback(isCorrect ? 'success' : 'error');
 
     // Aggiorna stato locale e notifica context padre se esistente
     const updatedAnswers = { ...answersRef.current, [currentQ.id]: ans };
@@ -653,6 +670,25 @@ export const DriveModeScreen: React.FC<DriveModeScreenProps> = ({
     if (sessionContext) {
       sessionContext.onAnswer(currentQ.id, ans);
     }
+
+    // Blind exam simulation: zero correctness feedback (visual, acoustic, haptic, or spoken)
+    if (isBlindExamSession) {
+      if (settings.soundEnabled) {
+        soundFX.playClick();
+      }
+      if (isAutopilotEnabled && !wasAlreadyAnswered && internalMode === 'running') {
+        if (autopilotAdvanceTimerRef.current) clearTimeout(autopilotAdvanceTimerRef.current);
+        autopilotAdvanceTimerRef.current = setTimeout(() => {
+          autopilotAdvanceTimerRef.current = null;
+          if (internalMode === 'running') {
+            handleNextQuestionRef.current();
+          }
+        }, 1200);
+      }
+      return;
+    }
+
+    triggerHapticFeedback(isCorrect ? 'success' : 'error');
 
     if (settings.soundEnabled) {
       if (isCorrect) soundFX.playCorrect();
@@ -837,6 +873,10 @@ export const DriveModeScreen: React.FC<DriveModeScreenProps> = ({
         playFullSequence();
       }
     } else if (cmd === 'explain') {
+      if (isBlindExamSession) {
+        showToast("Non disponibile durante la prova d'esame");
+        return;
+      }
       showToast('🗣️ "Spiega" - Regola & Tranello');
       if (currentQ) {
         setRevealedQuestionId(currentQ.id);
@@ -852,14 +892,26 @@ export const DriveModeScreen: React.FC<DriveModeScreenProps> = ({
       }
       playExplanation();
     } else if (cmd === 'tutor_on') {
+      if (isExamSession) {
+        showToast("Non disponibile durante la prova d'esame");
+        return;
+      }
       showToast('🗣️ "Tutor Attivo"');
       setIsTutorEnabled(true);
       updateSetting('driveModeTutor', true);
     } else if (cmd === 'tutor_off') {
+      if (isExamSession) {
+        showToast("Non disponibile durante la prova d'esame");
+        return;
+      }
       showToast('🗣️ "Tutor Disattivato"');
       setIsTutorEnabled(false);
       updateSetting('driveModeTutor', false);
     } else if (cmd === 'toggle_tutor') {
+      if (isExamSession) {
+        showToast("Non disponibile durante la prova d'esame");
+        return;
+      }
       setIsTutorEnabled(prev => {
         const next = !prev;
         updateSetting('driveModeTutor', next);
@@ -872,7 +924,7 @@ export const DriveModeScreen: React.FC<DriveModeScreenProps> = ({
       setIsAutopilotEnabled(false);
       pauseVoice();
     }
-  }, [currentQ, handleSelectAnswer, handleNextQuestion, handlePrevQuestion, handlePlayQuestion, handlePlayOption, playFullSequence, restartCurrentOrSequence, handleToggleFlag, handleToggleBookmark, pauseVoice, stopVoice, resumeVoice, isPaused, playExplanation, updateSetting]);
+  }, [currentQ, isBlindExamSession, isExamSession, isAutopilotEnabled, handleSelectAnswer, handleNextQuestion, handlePrevQuestion, handlePlayQuestion, handlePlayOption, playFullSequence, restartCurrentOrSequence, handleToggleFlag, handleToggleBookmark, pauseVoice, stopVoice, resumeVoice, isPaused, playExplanation, updateSetting]);
 
   // Audio output preference: 'speaker' (mic only after speech/paused) or 'headphones' (continuous listening)
   const audioOutputMode = settings.driveModeAudioOutput || 'speaker';
@@ -1185,7 +1237,10 @@ export const DriveModeScreen: React.FC<DriveModeScreenProps> = ({
     setInternalQuestions(qs);
     setCurrentIndex(0);
     setAnswers({});
+    answersRef.current = {};
     setFlags({});
+    flagsRef.current = {};
+    setRevealedQuestionId(null);
     // Hands-Free audio exams grant at least 45 minutes (60 for Marathon) to cover spoken TTS playback
     const audioExamMinutes = marathon
       ? MARATHON_TIMER_MINUTES
@@ -1204,13 +1259,20 @@ export const DriveModeScreen: React.FC<DriveModeScreenProps> = ({
     setInternalQuestions(qs);
     setCurrentIndex(0);
     setAnswers({});
+    answersRef.current = {};
     setFlags({});
+    flagsRef.current = {};
+    setRevealedQuestionId(null);
     setSecondsRemaining(0);
     setStartTime(Date.now());
     setInternalMode('running');
   };
 
   const handleReplayExplanation = useCallback(() => {
+    if (isBlindExamSession) {
+      showToast("Non disponibile durante la prova d'esame");
+      return;
+    }
     if (isAutopilotEnabled) {
       if (assimilationTimeoutRef.current) {
         clearTimeout(assimilationTimeoutRef.current);
@@ -1221,7 +1283,7 @@ export const DriveModeScreen: React.FC<DriveModeScreenProps> = ({
       setIsWaitingForExplanationEnd(true);
     }
     playExplanation();
-  }, [isAutopilotEnabled, playExplanation]);
+  }, [isBlindExamSession, isAutopilotEnabled, playExplanation]);
 
   const startDriveMistakes = () => {
     const wrongQs = questions.filter(q => {
@@ -1278,6 +1340,10 @@ export const DriveModeScreen: React.FC<DriveModeScreenProps> = ({
   };
 
   const handleToggleTutor = () => {
+    if (isExamSession) {
+      showToast("Non disponibile durante la prova d'esame");
+      return;
+    }
     const nextVal = !isTutorEnabled;
     setIsTutorEnabled(nextVal);
     updateSetting('driveModeTutor', nextVal);
