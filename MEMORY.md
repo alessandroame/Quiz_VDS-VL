@@ -20,7 +20,10 @@ Questo file costituisce la **memoria tecnica permanente** del progetto. Raccogli
   - 07 Tecnica Pilotaggio: 5 quiz × 4 pt = 20 pt
   - 08 Materiali: 1 quiz × 2 pt = 2 pt
   - 09 Sicurezza del Volo: 3 quiz × 4 pt = 12 pt
-- **Spiegazioni Didattiche**: Devono limitarsi a `Regola` (principio fisico o norma) e `Tranello` (motivo tipico di errore), senza menzionare fonti terze o manuali non ufficiali.
+- **Spiegazioni Didattiche**: Devono limitarsi a `Regola` (principio fisico o norma) e `Tranello` (motivo tipico di errore), senza menzionare fonti terze o manuali non ufficiali. Formule fisiche e chimiche devono usare pedici/apici Unicode canonici (`Cₚ`, `Cᵣ`, `Eₚ`, `V²`, `S²`, `b²`, `m²`, `O₂`, `ρ` — guard `DATA-11` in `questions.test.ts`), normalizzati lato ricerca (`normalizeSearchText`) e comandi vocali (`normalizeVoiceText`).
+- **Simulazione Esame Cieca vs Modalità Studio (`ExamScreen.tsx`, `DriveModeScreen.tsx`, `QuestionNavigator.tsx`)**:
+  * *Insidia*: Mostrare colori verde/rosso, suoni esatto/errato, card `Regola/Tranello` o salvare subito `recordAnswer` durante **Esame Ufficiale (30 quiz)** o **Maratona (60 quiz)** rivela l'esito prima della consegna, altera il Quaderno Errori a metà prova e in caso di pausa/ripresa salta la registrazione delle risposte pre-pausa se `recordedQuestionIds` viene pre-popolato.
+  * *Regola*: In `official` e `marathon` (sia UI classica sia Mani Libere) mantenere feedback neutro (`showFeedback={examMode === 'tutor'}`, bolle `border-sky-500/70`, click neutro, zero spiegazioni vocali/testuali), consentire la revisione della risposta prima di `Consegna` (auto-advance solo su `!wasAlreadyAnswered`) e differire `recordAnswer` interamente a `handleSubmitExam`.
 
 ---
 
@@ -90,7 +93,7 @@ Questo file costituisce la **memoria tecnica permanente** del progetto. Raccogli
     * Dinamica del Volo: *verticale/i* $\rightarrow$ *verticàle/i*, *orizzontale/i* $\rightarrow$ *orizzontàle/i*, *rollio* $\rightarrow$ *rollìo*, *velivolo/i* $\rightarrow$ *velìvolo/i*, *aerodina/e* $\rightarrow$ *aerodìna/e*.
     * Strumentazione: *variometro* $\rightarrow$ *variòmetro*, *anemometro* $\rightarrow$ *anemòmetro*, *altimetro* $\rightarrow$ *altìmetro*, *barometro* $\rightarrow$ *baròmetro*, *igrometro* $\rightarrow$ *igròmetro*.
     * Meteorologia: *isobare/a* $\rightarrow$ *isòbare/a*, *cumulo/i* $\rightarrow$ *cùmulo/i*, *cumulonembo/i* $\rightarrow$ *cumulonèmbo/i*, *stratocumulo/altocumulo* $\rightarrow$ *stratocùmulo/altocùmulo*, *cirrostrato/altostrato* $\rightarrow$ *cirrostràto/altostràto*, *sottovento* $\rightarrow$ *sottovènto*, *sopravvento* $\rightarrow$ *sopravvènto*.
-    * Acronimi scanditi a lettere: *UV*, *VNE*, *GPS*, *IAS*, *TAS*, *GS*, *ATC*, *SIV*, *PIO*, *MSL*, *AIP*, *ISA*, *VMC*, *UR*.
+    * Acronimi scanditi a lettere (nomi italiani minuscoli senza accenti gravi artificiali): *VDS/VL* e *VDS-VL* -> *"vu di esse, vu elle"*, *VDS* -> *"vu di esse"*, *VL* -> *"vu elle"*, oltre a *VFR*, *IFR*, *VNE*, *VMC*, *IMC*, *SIV*, *UV*, *UR*, *RCT*, *CTR*, *TMA*, *ATZ*, *QNH*, *QFE*, *GPS*, *IAS*, *TAS*, *GS*, *ATC*, *PIO*, *MSL*, *AIP*, *ISA*, *AWY*, *PLS*, *WMO*, *AR*, *EN-A..D*; formule *Cₚ*, *Cᵣ*, *Eₚ*, *V²*, *S²*, *b²*, *m²*, *O₂*, *ρ*, *1/2* e *V* isolata -> *"vu"*.
   - Pronuncia domanda concisa (Zero Preamboli): le tracce audio delle domande (`_q.mp3`) contengono esclusivamente il testo della domanda normalizzato, omettendo tassativamente prefissi verbali come il numero (*"Domanda X"*) o il nome della materia/categoria per azzerare la latenza d'ascolto.
   - Pronuncia opzioni essenziale: *"Uno. [testo]"*, *"Due. [testo]"*, *"Tre. [testo]"*.
 - **Persistenza & Switch**: Selezione della voce salvata in Dexie (`settings.ttsVoice: 'giuseppe' | 'elsa'`) e commutabile istantaneamente dalle impostazioni.

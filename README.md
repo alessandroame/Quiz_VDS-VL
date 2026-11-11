@@ -81,7 +81,7 @@
     - **Registrazione Istantanea**: statistiche e telemetria salvate in tempo reale in IndexedDB, alimentando subito il Quaderno Errori senza attendere la fine della scheda.
   - ⏱️ **Simulazione Esame Ufficiale AeCI (Prova Formale)**:
     - 30 quesiti AeCI per **100 punti complessivi**, timer countdown di **30 minuti** da regolamento scritto AeCI (commutabile a 45 min estesi in Impostazioni; 45 min automatici in Modalità Mani Libere per lettura vocale).
-    - Esito, conteggio errori e debriefing completo svelati esclusivamente alla consegna finale.
+    - **Modalità Esame Cieca (Zero Correzione Immediata)**: nessuna indicazione verde/rossa, nessun suono di risposta esatta/errata e nessuna spiegazione didattica durante lo svolgimento (sia in vista classica sia in Modalità Mani Libere), con possibilità di modificare liberamente le risposte prima della consegna finale; esito, punteggio, registrazione errori e debriefing completo vengono svelati esclusivamente alla pressione di **Consegna**.
 - **Ripartizione e Pesi Ufficiali Volo Libero AeCI (30 quiz = 100 punti)**:
   - *Aerodinamica*: 8 quiz × 3 pt = **24 pt**
   - *Meteorologia e Aerologia*: 6 quiz × 4 pt = **24 pt**
@@ -126,6 +126,7 @@
 - **7 Thematic Quick Chips**: filtri a tocco immediato per concetti frequenti del volo libero (*Vento*, *Stallo*, *Efficienza*, *Precedenze*, *Spazio Aereo*, *Termica*, *Nubi*) con abbinamento semantico automatico sulle radici delle parole.
 - **Pad Numerico Rapido #ID**: tastierino 4x3 a scomparsa (tasti 0-9, Backspace `⌫`, `VAI ⏎`) con feedback aptico per digitare direttamente l'identificativo ministeriale (#1001-#9045) e saltare al quiz desiderato con auto-espansione e smooth scroll, senza mai attivare la tastiera virtuale dello smartphone.
 - **Note Personali & Preferiti**: memorizzazione locale in Dexie IndexedDB con gestione note (aggiunta, modifica, eliminazione) e badge visivo.
+- **Esecuzione Quiz sul Filtro Corrente (`Inizia Quiz (N)`)**: pulsante dedicato sotto la barra filtri dell'Archivio per avviare subito una sessione interattiva esattamente sulle domande selezionate dal filtro corrente (Materia, Stato come *Note* / *Errate* / *Preferiti*, Tema o ricerca testuale/formule `Cr`, `Cp`, `V2`), completa di pausa/ripresa e passaggio istantaneo in Modalità Mani Libere.
 
 ### 7. Statistiche Avanzate, Grafici Diagnostici & Ispezione Interattiva (Drilldown Liste)
 - **Indice di Preparazione Esame & Barra Scomposizione a 3 Pilastri (`35/35/30`)**: percentuale calcolata e visualizzata con barra segmentata proporzionale su copertura del catalogo (`max 35%`), accuratezza sui quiz visti ponderata per i punti ufficiali AeCI `4 / 3 / 2` pt (`max 35%`) ed esito delle ultime 3 simulazioni (`max 30%`, con peso `0.5` per la fascia *Verifica Orale*), accompagnata dal badge **Leva Prioritaria** che indica l'azione a maggior guadagno immediato.
@@ -177,8 +178,8 @@
   - Risoluzione omografi e disambiguazione verbo/sostantivo (es. *decade* $\rightarrow$ *decàde*, *subito* $\rightarrow$ *sùbito*, *circuito* $\rightarrow$ *circùito*).
   - Fissaggio dell'accento tonico piano su assi e dinamica del volo (*verticale/i* $\rightarrow$ *verticàle/i*, *orizzontale/i* $\rightarrow$ *orizzontàle/i*, *rollio* $\rightarrow$ *rollìo*).
   - Accento tonico sdrucciolo su meteorologia e strumenti (*isobare* $\rightarrow$ *isòbare*, *variometro* $\rightarrow$ *variòmetro*, *anemometro* $\rightarrow$ *anemòmetro*, *altimetro* $\rightarrow$ *altìmetro*).
-  - Spaziatura fonetica lettera per lettera per acronimi tecnici (*UV*, *VNE*, *GPS*, *IAS*, *TAS*, *ATC*, *SIV*, *PIO*, *MSL*).
-  - Pronuncia fedele delle sigle istituzionali, normative e unità di misura (*D.P.R. 133/2010*, *AeCI*, *VDS/VL*, *hPa*, *km/h*, *m/s*, *kt*).
+  - Spaziatura fonetica sillabica in italiano per sigle e formule: *VDS-VL* / *VDS/VL* (*"vu di esse, vu elle"*), acronimi aeronautici (*VFR*, *IFR*, *VNE*, *VMC*, *IMC*, *UV*, *UR*, *RCT*, *CTR*, *TMA*, *ATZ*, *QNH*, *QFE*, *GPS*, *IAS*, *TAS*, *ATC*, *SIV*, *PIO*, *MSL*, *AIP*, *ISA*) e formule aerodinamiche (*Cₚ*, *Cᵣ*, *Eₚ*, *V²*, *S²*, *O₂*, *ρ*, *1/2*).
+  - Pronuncia fedele delle sigle istituzionali, normative e unità di misura (*D.P.R. 133/2010*, *AeCI*, *hPa*, *km/h*, *m/s*, *kt*).
 - **Controlli Parlato Interattivi Universali (Play, Pausa, Riprendi, Da Capo)**: controlli dedicati su ogni frammento (domanda, singole opzioni 1, 2, 3 e spiegazione didattica).
 - **Feedback Sonoro Avionico Web Audio API**: sintetizzatore audio a zero dipendenze esterne con **chime ascendente Sol5 (784 Hz) $\rightarrow$ Do6 (1046 Hz)** con inviluppo esponenziale a 220ms per la conferma immediata della risposta esatta, suono di errore per le risposte errate in modalità didattica/tutor, e sblocco automatico del contesto audio (`AudioContext`) alla prima interazione touch o da tastiera.
 

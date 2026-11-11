@@ -49,7 +49,7 @@ Questo documento rappresenta la **bussola strategica e funzionale** del progetto
        - *Materiali e Manutenzione*: 1 quiz × 2 pt (2 pt)
      * Timer countdown di 30 minuti da regolamento scritto AeCI (selettore 30/45 min in Impostazioni; 45 min automatici in Modalità Mani Libere per lettura vocale).
      * Valutazione in centesimi (`100 pt`): **86–100 pt = IDONEO**, **80–85 pt = IDONEO CON VERIFICA ORALE**, **< 80 pt = NON IDONEO** (applicata a Esame 30, Tutor Standard 30 e Maratona 60 normalizzata `/100`).
-     * Griglia di navigazione interattiva a 30 slot per visualizzare quesiti risposti, da rispondere e contrassegnati con bandierina (`⚑ Rivedi`).
+     * Griglia di navigazione interattiva a 30 slot con stato neutro azzurro sui quesiti compilati, possibilità di rivedere e cambiare risposta prima della consegna e **zero correzione immediata** fino al completamento (sia in vista classica sia in Modalità Mani Libere).
      * Schermata finale di Debriefing a 3 fasce (`IDONEO` / `IDONEO CON VERIFICA ORALE` / `NON IDONEO`), punteggio `/100 pt`, punti persi per materia e preparazione orale.
 
 2. **Studio per Materie**:
@@ -61,8 +61,8 @@ Questo documento rappresenta la **bussola strategica e funzionale** del progetto
    - Logica Leitner rigida: una domanda esce dal quaderno solo dopo **2 risposte corrette consecutive** (`consecutiveCorrect >= 2`).
 
 4. **Archivio & Ricerca**:
-   - Esplorazione dell'intero database con ricerca full-text istantanea.
-   - Possibilità di aggiungere domande ai **Preferiti** e inserire **Note personali** persistenti.
+   - Esplorazione dell'intero database con ricerca full-text istantanea (inclusa normalizzazione ASCII per formule `Cr`, `Cp`, `V2`, `O2`, `ro`).
+   - Possibilità di aggiungere domande ai **Preferiti**, inserire **Note personali** persistenti e avviare un quiz interattivo sulle domande visualizzate dal filtro attivo tramite **`Inizia Quiz (N)`**.
 
 5. **Statistiche & Analytics**:
    - Indice di preparazione complessivo per l'esame.
@@ -136,7 +136,7 @@ Questo documento rappresenta la **bussola strategica e funzionale** del progetto
 | Archivio & Ricerca Full-Text | 🟢 Completato | Ricerca istantanea, preferiti e note personali salvate in Dexie. |
 | Dashboard Statistiche | 🟢 Completato | Radar materie, preparazione esame e storico sessioni. |
 | Temi Scuro & Chiaro, Icona Aero Shield | 🟢 Completato | Zero dominante blu (`zinc` + `amber`), bordi pannelli elevati ad alto contrasto (`zinc-700` dark, `slate-300` light) con conformità WCAG 2.1 AA/AAA su tutti i testi e card, icona Aero Shield vettoriale e PNG 192/512. |
-| Suite Vitest (Unit & BVA) | 🟢 Completato | 486 test attivi su 58 suite (100% passanti, 0 fallimenti), BVA punteggi pesati AeCI (86/85/80/79), grafici diagnostici Statistiche, custom hooks mobile e contratti ergonomici componenti. |
+| Suite Vitest (Unit & BVA) | 🟢 Completato | 495 test attivi su 60 suite (100% passanti, 0 fallimenti), BVA punteggi pesati AeCI (86/85/80/79), grafici diagnostici Statistiche, esame cieco, quiz filtro archivio, guard formule Unicode (`DATA-11`) e fonetica sillabica. |
 | UI Audit Inspector (WCAG AA & De-Clutter) | 🟢 Completato | Scansione automatizzata CDP su 10 schermate x 4 viewport x 2 temi: **0 difetti unici** (contrasti WCAG AA conformi, verbo canonico 'Inizia' su tutte le CTA, filtri Archivio a scheda singola e 6 card Home above-the-fold su mobile 390x844). |
 | Supporto Audio | 🟢 Completato | Sintesi vocale neurale con controlli Play/Pausa e Da Capo universali su domanda, singole opzioni e spiegazione; feedback Web Audio API e fonetica ICAO. |
 | Gestione Offline Audio & Fallback | 🟢 Completato | Download in background non bloccante via CacheStorage, prompt non invasivo al primo avvio Guida, gestione granulare Impostazioni, fallback automatico offline su voce scaricata e Range Requests Safari. |
@@ -178,6 +178,7 @@ Questo documento rappresenta la **bussola strategica e funzionale** del progetto
 | Pagine Pubbliche OAuth (Home, Privacy Policy, Terms of Service) | 🟢 Completato | Pagine HTML statiche in `public/` (`about.html`, `privacy-policy.html`, `terms-of-service.html`) e doc Markdown in `docs/` conformi a Google OAuth Verification. |
 | Riconoscimento Vocale a Raffinamento Progressivo | 🟢 Completato | Streaming bicolore live + preview intento (settle 340ms), autocorrezione in frase, N-best=5, keyword opzioni e alias adattivi Dexie (>=2 match). |
 | Regolamento Ufficiale AeCI 100 Punti Pesati & Verifica Orale | 🟢 Completato | Quote Volo Libero `4-8-1-1-6-1-5-1-3` (`4/3/2` pt = 100 pt), fascia `80–85` Verifica Orale, Readiness pesato, timer 30m scritto / 45m audio e retrocompatibilità storico. |
+| Bonifica Formule 30 Quiz, TTS Sillabico VDS-VL, Esame Cieco & Quiz Archivio | 🟢 Completato | Pedici/apici Unicode su 30 quiz + ricerca ASCII, spelling `"vu di esse, vu elle"` + 356 MP3 rigenerati, simulazione esame cieca fino a Consegna e pulsante `Inizia Quiz (N)` in Archivio. |
 
 ---
 
